@@ -19,16 +19,18 @@ services:
       - ./app:/app
 
   mysql:
-    image: mariadb:latest
-    environment:
-      MYSQL_ROOT_PASSWORD: secret123
-      MYSQL_DATABASE: HaarlemFestivaldb
-      MYSQL_USER: developer
-      MYSQL_PASSWORD: secret123
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysqldata:/var/lib/mysql
+      image: mariadb:latest
+      environment:
+        MYSQL_ROOT_PASSWORD: secret123
+        MYSQL_DATABASE: HaarlemFestivaldb
+        MYSQL_USER: developer
+        MYSQL_PASSWORD: secret123
+      ports:
+        - "3307:3306"
+      volumes:
+        - mysqldata:/var/lib/mysql
+        - ./docker/mysql/init:/docker-entrypoint-initdb.d
+      
 
   phpmyadmin:
     image: phpmyadmin:latest
