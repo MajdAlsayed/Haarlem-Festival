@@ -16,7 +16,7 @@ composer.phar
 /app/vendor/
 /vendor-bin/**/vendor/
 
-# Environment files (keep example files tracked)
+# Environment files
 .env
 .env.*
 !.env.example
@@ -36,9 +36,11 @@ app/var/
 .phpunit.result.cache
 coverage/
 
-# Node (if present)
+# Node
 node_modules/
 
-# Docker overrides (optional local overrides)
+# Docker
 docker-compose.override.yml
-
+mysql-data/
+db-data/
+docker-data/

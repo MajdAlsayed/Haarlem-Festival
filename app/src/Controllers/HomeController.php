@@ -2,12 +2,27 @@
 
 namespace App\Controllers;
 
+use App\Repositories\PageRepository;
+
 class HomeController
 {
-    public function home($vars = [])
+    private PageRepository $pageRepository;
+
+    public function __construct()
     {
-        // normally we don't want to echo from a controller method directly
-        // but rather load a view template
-        echo "Welcome home!";
+        $this->pageRepository = new PageRepository();
+    }
+
+    public function index(): void
+    {
+        $page = $this->pageRepository->getBySlug('home');
+
+        if ($page === null) {
+            http_response_code(404);
+            echo 'Homepage not found';
+            return;
+        }
+
+        require __DIR__ . '/../Views/Home/Index.php';
     }
 }
