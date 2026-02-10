@@ -22,15 +22,14 @@ final class CreateRolesTable extends AbstractMigration
         $table = $this->table('roles', ['id' => false, 'primary_key' => 'role_id']);
 
         $table->addColumn('role_id', 'integer', ['identity' => true])
-            ->addColumn('role_name', 'string', ['limit' => 50])
-            ->addIndex(['role_name'], ['unique' => true])
+            ->addColumn('name', 'string', ['limit' => 50, 'null' => false])
+            ->addIndex(['name'], ['unique' => true])
             ->create();
 
-        // Insert default roles
         $this->table('roles')->insert([
-            ['role_name' => 'admin'],
-            ['role_name' => 'customer'],
-            ['role_name' => 'visitor']
+            ['name' => 'admin'],
+            ['name' => 'customer'],
+            ['name' => 'visitor']
         ])->saveData();
     }
 }

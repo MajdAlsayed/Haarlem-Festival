@@ -22,15 +22,15 @@ final class CreateUsersTable extends AbstractMigration
         $table = $this->table('users', ['id' => false, 'primary_key' => 'user_id']);
 
         $table->addColumn('user_id', 'integer', ['identity' => true])
-            ->addColumn('role_id', 'integer', ['null' => true])
-            ->addColumn('email', 'string', ['limit' => 255])
-            ->addColumn('password_hash', 'string', ['limit' => 255])
-            ->addColumn('first_name', 'string', ['limit' => 255])
-            ->addColumn('last_name', 'string', ['limit' => 255])
-            ->addColumn('created_at', 'datetime', ['default' => 'CURRENT_TIMESTAMP'])
+            ->addColumn('role_id', 'integer', ['null' => false])
+            ->addColumn('email', 'string', ['limit' => 255, 'null' => false])
+            ->addColumn('password_hash', 'string', ['limit' => 255, 'null' => false])
+            ->addColumn('first_name', 'string', ['limit' => 255, 'null' => false])
+            ->addColumn('last_name', 'string', ['limit' => 255, 'null' => false])
+            ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->addColumn('is_active', 'boolean', ['default' => true])
             ->addIndex(['email'], ['unique' => true])
-            ->addForeignKey('role_id', 'roles', 'role_id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('role_id', 'roles', 'role_id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])
             ->create();
     }
 }
