@@ -5,8 +5,13 @@ namespace App\Models;
 class Event
 {
     public int $id;
-    public string $category;
+
+    public int $eventTypeId;
+    public int $venueId;
+
     public string $title;
-    public string $description;
-    public ?string $location;
+    public ?string $description = null;
+
+    public string $eventTypeName;
+    public string $venueName;
 }

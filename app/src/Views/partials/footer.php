@@ -1,0 +1,3 @@
+<footer>
+    © Haarlem Festival
+</footer>

@@ -7,32 +7,43 @@ use App\Models\Event;
 
 class EventRepository
 {
-    public function getByCategory(string $category): array
+    public function getAll(): array
     {
         $db = Database::getConnection();
 
         $stmt = $db->prepare(
-            'SELECT id, category, title, description, location
-             FROM events
-             WHERE category = :category'
+            'SELECT e.event_id,
+                    e.event_type_id,
+                    e.venue_id,
+                    e.title,
+                    e.description,
+                    et.name AS event_type_name,
+                    v.name AS venue_name
+             FROM events e
+             JOIN event_types et ON e.event_type_id = et.event_type_id
+             JOIN venues v ON e.venue_id = v.venue_id'
         );
 
-        $stmt->execute(['category' => $category]);
+        $stmt->execute();
         $rows = $stmt->fetchAll();
 
         $events = [];
 
         foreach ($rows as $row) {
             $event = new Event();
-            $event->id = $row['id'];
-            $event->category = $row['category'];
+            $event->id = $row['event_id'];
+            $event->eventTypeId = $row['event_type_id'];
+            $event->venueId = $row['venue_id'];
             $event->title = $row['title'];
             $event->description = $row['description'];
-            $event->location = $row['location'];
+
+            $event->eventTypeName = $row['event_type_name'];
+            $event->venueName = $row['venue_name'];
 
             $events[] = $event;
         }
 
         return $events;
     }
+
 }

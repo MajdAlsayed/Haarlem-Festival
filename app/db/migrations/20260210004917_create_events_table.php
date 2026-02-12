@@ -25,7 +25,7 @@ final class CreateEventsTable extends AbstractMigration
             ->addColumn('event_type_id', 'integer', ['null' => false])
             ->addColumn('venue_id', 'integer', ['null' => false])
             ->addColumn('title', 'string', ['limit' => 255, 'null' => false])
-            ->addColumn('description', 'string', ['limit' => 255, 'null' => false])
+            ->addColumn('description', 'string', ['limit' => 255, 'null' => true])
             ->addForeignKey('event_type_id', 'event_types', 'event_type_id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])
             ->addForeignKey('venue_id', 'venues', 'venue_id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])
             ->create();
