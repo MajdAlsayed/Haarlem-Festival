@@ -12,7 +12,7 @@ class PageRepository
         $db = Database::getConnection();
 
         $stmt = $db->prepare(
-            'SELECT id, slug, title, content
+            'SELECT page_id, slug, title
              FROM pages
              WHERE slug = :slug AND is_published = 1'
         );
@@ -25,10 +25,10 @@ class PageRepository
         }
 
         $page = new Page();
-        $page->id = $row['id'];
+        $page->id = $row['page_id'];
         $page->slug = $row['slug'];
         $page->title = $row['title'];
-        $page->content = $row['content'];
+        $page->content = ''; 
 
         return $page;
     }
