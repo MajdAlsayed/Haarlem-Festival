@@ -37,11 +37,3 @@ docker compose run --rm php vendor/bin/phinx seed:run -s PageSeeder
 docker compose run --rm php vendor/bin/phinx seed:run -s EventSeeder
 ```
 
-### 5. Open the app
-
-- **Website:** http://localhost  
-- **phpMyAdmin:** http://localhost:8080 (user: `developer`, password: `secret123`)
-
----
-
-For creating and editing migrations, see [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md).
