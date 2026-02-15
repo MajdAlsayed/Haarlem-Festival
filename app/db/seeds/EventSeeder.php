@@ -37,7 +37,7 @@ class EventSeeder extends AbstractSeed
                 'description' => 'Kickoff festival with live dance performances.'
             ],
             [
-                'event_type_id' => 2
+                'event_type_id' => 2,
                 'venue_id' => 2,      
                 'title' => 'Jazz Evening',
                 'description' => 'Smooth jazz in the heart of Haarlem.'
