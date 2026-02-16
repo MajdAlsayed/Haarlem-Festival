@@ -6,7 +6,6 @@ class HistoryTour
 {
 public int $id;
 public int $sessionId;
-public string $languageId;
-
+public int $languageId;
 public int $ticketsAvailable;
 }

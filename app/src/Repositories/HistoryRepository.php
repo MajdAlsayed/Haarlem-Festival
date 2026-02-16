@@ -4,10 +4,13 @@ namespace App\Repositories;
 
 use App\Core\Database;
 use App\Models\HistoryTour;
-
+use App\Models\HistoryLocation;
+use App\Models\HistoryImage;
 
 class HistoryRepository implements IHistoryRepository
 {
+    // TOURS
+
     public function getAllTours(): array
     {
         $db = Database::getConnection();
@@ -87,5 +90,96 @@ class HistoryRepository implements IHistoryRepository
             $historyTours[] = $historyTour;
         }
         return $historyTours;
+    }
+
+    // LOCATIONS
+
+    public function getAllLocations(): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT history_location_id, name, slug, description, page_id, sort_order
+            FROM history_locations 
+            ORDER BY sort_order');
+
+        $stmt->execute();
+        $rows = $stmt->fetchall();
+
+        $historyLocations = [];
+
+        foreach ($rows as $row) {
+            $historyLocation = new HistoryLocation();
+            $historyLocation->id = $row['history_location_id'];
+            $historyLocation->name = $row['name'];
+            $historyLocation->description = $row['description'];
+            $historyLocation->sortOrder = $row['sort_order'];
+            $historyLocation->slug = $row['slug'];
+            $historyLocation->pageId = $row['page_id'];
+
+            $historyLocations[] = $historyLocation;
+        }
+        return $historyLocations;
+    }
+
+    // IMAGES
+
+    public function getPrimaryImage(int $locationId): ?HistoryImage
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT history_image_id, history_location_id, image_url, alt_text, is_primary, sort_order
+             FROM history_images
+             WHERE history_location_id = :location_id AND is_primary = 1
+             LIMIT 1'
+        );
+
+        $stmt->execute(['location_id' => $locationId]);
+        $row = $stmt->fetch();
+
+        if (!$row) {
+            return null;
+        }
+
+        $image = new HistoryImage();
+        $image->id = $row['history_image_id'];
+        $image->historyLocationId = $row['history_location_id'];
+        $image->imageUrl = $row['image_url'];
+        $image->altText = $row['alt_text'];
+        $image->isPrimary = (bool)$row['is_primary'];
+        $image->sortOrder = $row['sort_order'];
+
+        return $image;
+    }
+
+    public function getLocationImages(int $locationId): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT history_image_id, history_location_id, image_url, alt_text, is_primary, sort_order
+             FROM history_images
+             WHERE history_location_id = :location_id
+             ORDER BY sort_order'
+        );
+
+        $stmt->execute(['location_id' => $locationId]);
+        $rows = $stmt->fetchAll();
+
+        $images = [];
+
+        foreach ($rows as $row) {
+            $image = new HistoryImage();
+            $image->id = $row['history_image_id'];
+            $image->historyLocationId = $row['history_location_id'];
+            $image->imageUrl = $row['image_url'];
+            $image->altText = $row['alt_text'];
+            $image->isPrimary = (bool)$row['is_primary'];
+            $image->sortOrder = $row['sort_order'];
+
+            $images[] = $image;
+        }
+        return $images;
     }
 }
