@@ -10,6 +10,16 @@ use App\Models\HistoryImage;
 class HistoryRepository implements IHistoryRepository
 {
     // TOURS
+    private function mapToHistoryTours(array $row): HistoryTour
+    {
+        $historyTour = new HistoryTour();
+        $historyTour->id = $row['history_tour_id'];
+        $historyTour->sessionId = $row['session_id'];
+        $historyTour->languageId = $row['language_id'];
+        $historyTour->ticketsAvailable = $row['tickets_available'];
+
+        return $historyTour;
+    }
 
     public function getAllTours(): array
     {
@@ -19,7 +29,8 @@ class HistoryRepository implements IHistoryRepository
             'SELECT ht.history_tour_id, ht.session_id, ht.language_id, ht.tickets_available, s.start_time
             FROM history_tours ht
             INNER JOIN sessions s ON ht.session_id = s.session_id 
-            ORDER BY s.start_time DESC');
+            ORDER BY s.start_time DESC'
+        );
 
         $stmt->execute();
         $rows = $stmt->fetchAll();
@@ -27,13 +38,7 @@ class HistoryRepository implements IHistoryRepository
         $historyTours = [];
 
         foreach ($rows as $row) {
-            $historyTour = new HistoryTour();
-            $historyTour->id = $row['history_tour_id'];
-            $historyTour->sessionId = $row['session_id'];
-            $historyTour->languageId = $row['language_id'];
-            $historyTour->ticketsAvailable = $row['tickets_available'];
-
-            $historyTours[] = $historyTour;
+            $historyTours[] = $this->mapToHistoryTours($row);
         }
         return $historyTours;
     }
@@ -46,7 +51,8 @@ class HistoryRepository implements IHistoryRepository
             'SELECT ht.history_tour_id, ht.session_id, ht.language_id, ht.tickets_available, s.start_time
             FROM history_tours ht
             INNER JOIN sessions s ON ht.session_id = s.session_id 
-            WHERE ht.history_tour_id = :id');
+            WHERE ht.history_tour_id = :id'
+        );
 
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch();
@@ -54,14 +60,7 @@ class HistoryRepository implements IHistoryRepository
         if (!$row) {
             return null;
         }
-
-            $historyTour = new HistoryTour();
-            $historyTour->id = $row['history_tour_id'];
-            $historyTour->sessionId = $row['session_id'];
-            $historyTour->languageId = $row['language_id'];
-            $historyTour->ticketsAvailable = $row['tickets_available'];
-
-        return $historyTour;
+        return $this->mapToHistoryTours($row);
     }
 
     public function getToursByDate(string $date): array
@@ -73,26 +72,33 @@ class HistoryRepository implements IHistoryRepository
             FROM history_tours ht
             INNER JOIN sessions s ON ht.session_id = s.session_id 
             WHERE DATE(s.start_time) = :date
-            ORDER BY s.start_time DESC');
+            ORDER BY s.start_time DESC'
+        );
 
         $stmt->execute(['date' => $date]);
-        $rows = $stmt->fetchall();
+        $rows = $stmt->fetchAll();
 
         $historyTours = [];
 
         foreach ($rows as $row) {
-            $historyTour = new HistoryTour();
-            $historyTour->id = $row['history_tour_id'];
-            $historyTour->sessionId = $row['session_id'];
-            $historyTour->languageId = $row['language_id'];
-            $historyTour->ticketsAvailable = $row['tickets_available'];
-
-            $historyTours[] = $historyTour;
+            $historyTours[] = $this->mapToHistoryTours($row);
         }
         return $historyTours;
     }
 
     // LOCATIONS
+    private function mapToHistoryLocations(array $row): HistoryLocation
+    {
+        $historyLocation = new HistoryLocation();
+        $historyLocation->id = $row['history_location_id'];
+        $historyLocation->name = $row['name'];
+        $historyLocation->description = $row['description'];
+        $historyLocation->sortOrder = $row['sort_order'];
+        $historyLocation->slug = $row['slug'];
+        $historyLocation->pageId = $row['page_id'];
+
+        return $historyLocation;
+    }
 
     public function getAllLocations(): array
     {
@@ -101,56 +107,57 @@ class HistoryRepository implements IHistoryRepository
         $stmt = $db->prepare(
             'SELECT history_location_id, name, slug, description, page_id, sort_order
             FROM history_locations 
-            ORDER BY sort_order');
+            ORDER BY sort_order'
+        );
 
         $stmt->execute();
-        $rows = $stmt->fetchall();
+        $rows = $stmt->fetchAll();
 
         $historyLocations = [];
 
         foreach ($rows as $row) {
-            $historyLocation = new HistoryLocation();
-            $historyLocation->id = $row['history_location_id'];
-            $historyLocation->name = $row['name'];
-            $historyLocation->description = $row['description'];
-            $historyLocation->sortOrder = $row['sort_order'];
-            $historyLocation->slug = $row['slug'];
-            $historyLocation->pageId = $row['page_id'];
-
-            $historyLocations[] = $historyLocation;
+            $historyLocations[] = $this->mapToHistoryLocations($row);
         }
         return $historyLocations;
     }
 
     // IMAGES
+    private function mapToHistoryImage(array $row): HistoryImage
+    {
+        $image = new HistoryImage();
+        $image->id = $row['history_image_id'];
+        $image->historyLocationId = $row['history_location_id'];
+        $image->pageId = $row['page_id'];
+        $image->eventId = $row['event_id'];
+        $image->imageUrl = $row['image_url'];
+        $image->altText = $row['alt_text'];
+        $image->imageType = $row['image_type'];
+        $image->isPrimary = (bool)$row['is_primary'];
+        $image->sortOrder = $row['sort_order'];
+
+        return $image;
+    }
 
     public function getPrimaryImage(int $locationId): ?HistoryImage
     {
         $db = Database::getConnection();
 
         $stmt = $db->prepare(
-            'SELECT history_image_id, history_location_id, image_url, alt_text, is_primary, sort_order
-             FROM history_images
-             WHERE history_location_id = :location_id AND is_primary = 1
-             LIMIT 1'
+            'SELECT history_image_id, history_location_id, page_id, event_id,
+            image_url, alt_text, image_type, is_primary, sort_order
+            FROM history_images
+            WHERE history_location_id = :location_id
+            AND image_type = :type
+            LIMIT 1'
         );
 
-        $stmt->execute(['location_id' => $locationId]);
+        $stmt->execute(['location_id' => $locationId, 'type' => 'primary']);
         $row = $stmt->fetch();
 
         if (!$row) {
             return null;
         }
-
-        $image = new HistoryImage();
-        $image->id = $row['history_image_id'];
-        $image->historyLocationId = $row['history_location_id'];
-        $image->imageUrl = $row['image_url'];
-        $image->altText = $row['alt_text'];
-        $image->isPrimary = (bool)$row['is_primary'];
-        $image->sortOrder = $row['sort_order'];
-
-        return $image;
+        return $this->mapToHistoryImage($row);
     }
 
     public function getLocationImages(int $locationId): array
@@ -158,10 +165,11 @@ class HistoryRepository implements IHistoryRepository
         $db = Database::getConnection();
 
         $stmt = $db->prepare(
-            'SELECT history_image_id, history_location_id, image_url, alt_text, is_primary, sort_order
-             FROM history_images
-             WHERE history_location_id = :location_id
-             ORDER BY sort_order'
+            'SELECT history_image_id, history_location_id, page_id, 
+            event_id, image_url, alt_text, image_type, is_primary, sort_order
+            FROM history_images
+            WHERE history_location_id = :location_id
+            ORDER BY sort_order'
         );
 
         $stmt->execute(['location_id' => $locationId]);
@@ -170,15 +178,75 @@ class HistoryRepository implements IHistoryRepository
         $images = [];
 
         foreach ($rows as $row) {
-            $image = new HistoryImage();
-            $image->id = $row['history_image_id'];
-            $image->historyLocationId = $row['history_location_id'];
-            $image->imageUrl = $row['image_url'];
-            $image->altText = $row['alt_text'];
-            $image->isPrimary = (bool)$row['is_primary'];
-            $image->sortOrder = $row['sort_order'];
+            $images[] = $this->mapToHistoryImage($row);
+        }
+        return $images;
+    }
 
-            $images[] = $image;
+    public function getPageHeroImage(int $pageId): ?HistoryImage
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT history_image_id, history_location_id, page_id, event_id, 
+            image_url, alt_text, image_type, is_primary, sort_order
+             FROM history_images
+             WHERE page_id = :page_id
+             AND image_type = :type
+             LIMIT 1'
+        );
+
+        $stmt->execute(['page_id' => $pageId, 'type' => 'hero']);
+        $row = $stmt->fetch();
+
+        if (!$row) {
+            return null;
+        }
+        return $this->mapToHistoryImage($row);
+    }
+
+    public function getEventHeroImage(int $eventId): ?HistoryImage
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+        'SELECT history_image_id, history_location_id, page_id, event_id, 
+            image_url, alt_text, image_type, is_primary, sort_order
+            FROM history_images
+            WHERE event_id = :event_id
+            AND image_type = :type
+            LIMIT 1'
+        );
+
+        $stmt->execute(['event_id' => $eventId, 'type' => 'hero']);
+        $row = $stmt->fetch();
+
+        if (!$row) {
+            return null;
+        }
+        return $this->mapToHistoryImage($row);
+    }
+
+    public function getLocationGallery(int $locationId): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT history_image_id, history_location_id, page_id, event_id, 
+           image_url, alt_text, image_type, is_primary, sort_order
+            FROM history_images
+            WHERE history_location_id = :location_id
+            AND image_type = :type
+            ORDER BY sort_order'
+        );
+
+        $stmt->execute(['location_id' => $locationId, 'type' => 'gallery']);
+        $rows = $stmt->fetchAll();
+
+        $images = [];
+
+        foreach ($rows as $row) {
+            $images[] = $this->mapToHistoryImage($row);
         }
         return $images;
     }

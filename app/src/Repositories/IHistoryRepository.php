@@ -19,4 +19,7 @@ interface IHistoryRepository
 // IMAGES
     public function getPrimaryImage(int $locationId): ?HistoryImage;
     public function getLocationImages(int $locationId): array;
+    public function getPageHeroImage(int $pageId): ?HistoryImage;
+    public function getEventHeroImage(int $eventId): ?HistoryImage;
+    public function getLocationGallery(int $locationId): array;
 }
