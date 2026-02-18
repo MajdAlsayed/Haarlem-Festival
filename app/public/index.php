@@ -4,6 +4,21 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Controllers\HomeController;
 use App\Controllers\DanceController;
+use App\Exceptions\AppException;
+use App\Exceptions\NotFoundException;
+
+set_exception_handler(function (Throwable $e): void {
+    $code = 500;
+    $message = 'An error occurred.';
+
+    if ($e instanceof AppException) {
+        $code = $e->getHttpCode();
+        $message = $e->getMessage();
+    }
+
+    http_response_code($code);
+    require __DIR__ . '/../src/Views/error.php';
+});
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
@@ -13,7 +28,10 @@ switch ($uri) {
         (new HomeController())->index();
         break;
 
+    case '/dance':
+        (new DanceController())->index();
+        break;
+
     default:
-        http_response_code(404);
-        echo 'Page not found';
+        throw new NotFoundException('Page not found');
 }

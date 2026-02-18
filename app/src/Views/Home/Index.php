@@ -1,9 +1,14 @@
+<?php
+$page = $viewModel->page;
+$events = $viewModel->events;
+$app = (new \App\Repositories\SettingsRepository())->getAll();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($page->title) ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=14">
+    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars($app['css_version']) ?>">
 </head>
 <body>
 
