@@ -1,3 +1,4 @@
+<?php $app = $app ?? (new \App\Repositories\SettingsRepository())->getAll(); ?>
 <section id="events" class="events-section">
     <div class="container">
         <div class="section-header">
@@ -9,16 +10,9 @@
 
         <div class="cards">
             <?php foreach ($events as $event):
-                $imageMap = [
-                    'dance' => 'music.jpg',
-                    'jazz' => 'jazz.jpg',
-                    'history' => 'history.png',
-                    'yammy' => 'food.jpg',
-                    'stories' => 'stories.jpg'
-                ];
-                $eventTypeLower = strtolower($event->eventTypeName);
-                $imageName = $imageMap[$eventTypeLower] ?? strtolower($event->eventTypeName) . '.jpg';
+                $imageName = $event->cardImage ?? strtolower($event->eventTypeName ?? '') . '.jpg';
                 $imagePath = '/images/' . $imageName;
+                $infoUrl = $event->infoPath ?? '#';
             ?>
                 <article class="card event-card">
                     <div class="event-image-wrapper">
@@ -29,10 +23,10 @@
                         <div class="event-image-overlay">
                             <div class="event-content-overlay">
                                 <h3 class="event-title"><?= htmlspecialchars($event->title) ?></h3>
-                                <p class="event-location">Haarlem &mdash; Netherlands</p>
+                                <p class="event-location"><?= htmlspecialchars($app['default_event_location']) ?></p>
                                 <p class="event-description"><?= htmlspecialchars($event->description) ?></p>
                                 <div class="event-actions">
-                                    <a href="#" class="event-link">INFO &gt;</a>
+                                    <a href="<?= htmlspecialchars($infoUrl) ?>" class="event-link">INFO &gt;</a>
                                     <a href="#" class="event-link">TICKETS &gt;</a>
                                 </div>
                             </div>
