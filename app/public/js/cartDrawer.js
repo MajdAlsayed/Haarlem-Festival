@@ -31,13 +31,15 @@ document.addEventListener("DOMContentLoaded", () => {
   async function refreshCart() {
     try {
       const res = await fetch("/cart", { headers: { "Accept": "application/json" } });
+
       const data = await res.json();
 
       const count = Number(data.count ?? 0);
       const total = Number(data.total ?? 0);
 
       if (cartCountLabel) cartCountLabel.textContent = String(count);
-      if (cartTotalLabel) cartTotalLabel.textContent = total.toFixed(2);
+      if (cartTotalLabel) cartTotalLabel.textContent = total.toFixed(2);               
+      
       if (cartBadge) cartBadge.textContent = String(count);
 
       const items = data.items ?? [];
