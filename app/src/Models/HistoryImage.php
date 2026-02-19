@@ -6,8 +6,8 @@ class HistoryImage
 {
 public int $id;
 public ?int $historyLocationId;
-public ?int $page_id;
-public ?int $event_id;
+public ?int $pageId;
+public ?int $eventId;
 public string $imageUrl;
 public ?string $altText;
 public bool $isPrimary;

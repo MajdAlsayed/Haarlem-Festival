@@ -4,6 +4,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Controllers\HomeController;
 use App\Controllers\DanceController;
+use App\Controllers\HistoryController;
 use App\Exceptions\AppException;
 use App\Exceptions\NotFoundException;
 
@@ -30,6 +31,10 @@ switch ($uri) {
 
     case '/dance':
         (new DanceController())->index();
+        break;
+
+    case '/history':
+        (new HistoryController())->index();
         break;
 
     default:

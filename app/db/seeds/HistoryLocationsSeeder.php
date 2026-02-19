@@ -23,6 +23,7 @@ class HistoryLocationsSeeder extends AbstractSeed
                 'description' => 'The Church of St. Bavo rose between 1370 and 1520 as Haarlem\'s architectural and spiritual centerpiece. This magnificent Gothic cathedral, '.
                 'dedicated to a 7th-century saint who renounced wealth for faith, reflected the prosperity and religious devotion of medieval Haarlem. Its soaring 80-meter tower '.
                 'dominated the skyline, announcing the city\'s importance to travelers from across Holland.',
+                'short_description' => 'The magnificent Grote Kerk, dedicated to St. Bavo, dominates Haarlem\'s skyline with its soaring Gothic tower. Built between 1370 and 1520, this architectural masterpiece houses the legendary Müller organ, played by both Mozart and Handel.',
                 'page_id' => null,
                 'sort_order' => 1
             ],
@@ -32,6 +33,7 @@ class HistoryLocationsSeeder extends AbstractSeed
                 'description' => 'For over 700 years, the Grote Markt has been Haarlem\'s social and economic nucleus. Medieval merchants traded cloth, fish, and grain here. '.
                 'Public announcements were roclaimed from its steps. Justice was dispensed, and sometimes executed, in full public view. The square witnessed sieges, celebrations, '.
                 'and the daily rhythms of urban life.',
+                'short_description' => 'For over 700 years, the Grote Markt has been the beating heart of Haarlem. This spacious market square witnessed medieval trade fairs, public executions, celebrations, and protests that shaped the city\'s destiny.',
                 'page_id' => null,
                 'sort_order' => 2
             ],
@@ -41,6 +43,7 @@ class HistoryLocationsSeeder extends AbstractSeed
                 'description' => 'De Hallen emerged in the early 17th century as Haarlem\'s covered markets, serving the city\'s thriving trade. The Meat Hall (Vleeshal), '.
                 'designed by Lieven de Key in 1602, featured an ornate Renaissance façade decorated with ox heads and butcher symbols - a bold celebration of commercial prosperity '.
                 'during the Golden Age.',
+                'short_description' => 'De Hallen began as Haarlem\'s covered markets in the early 17th century. The magnificent Meat Hall, designed by Lieven de Key in 1602, featured an ornate Renaissance façade decorated with ox heads - a bold statement of Golden Age prosperity.',
                 'page_id' => null,
                 'sort_order' => 3
             ],

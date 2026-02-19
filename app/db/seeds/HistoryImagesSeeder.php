@@ -20,7 +20,8 @@ class HistoryImagesSeeder extends AbstractSeed
         $historyPage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history'");
         $locationsPage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history-locations'");
         $stBavoPage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history-st-bavo'");
-        $grootePage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history-grote-markt'");
+        $grotePage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history-grote-markt'");
+        $historyEvent = $this->fetchRow("SELECT event_id FROM events WHERE event_type_id = 3 ORDER BY event_id ASC LIMIT 1");
 
         $data = [];
 
@@ -29,7 +30,7 @@ class HistoryImagesSeeder extends AbstractSeed
         // Homepage
         $data[] = [
             'history_location_id' => null,
-            'page_id' => null,
+            'page_id' => $historyPage ? $historyPage['page_id'] : null,
             'event_id' => null,
             'image_url' => '/images/history/homepage-hero.jpg',
             'alt_text' => 'Historic Haarlem cityscape with church tower',
@@ -41,7 +42,7 @@ class HistoryImagesSeeder extends AbstractSeed
         // Locations overview
         $data[] = [
             'history_location_id' => null,
-            'page_id' => null,
+            'page_id' => $locationsPage ? $locationsPage['page_id'] : null,
             'event_id' => null,
             'image_url' => '/images/history/locations-hero.jpg',
             'alt_text' => 'Overview of historic Haarlem landmarks',
@@ -54,7 +55,7 @@ class HistoryImagesSeeder extends AbstractSeed
         $data[] = [
             'history_location_id' => null,
             'page_id' => null,
-            'event_id' => 4,
+            'event_id' => $historyEvent ? $historyEvent['event_id'] : null,
             'image_url' => '/images/history/tours-hero.jpg',
             'alt_text' => 'Guided walking tour through Haarlem',
             'image_type' => 'hero',
@@ -94,7 +95,7 @@ class HistoryImagesSeeder extends AbstractSeed
         // St. Bavo hero
         $data[] = [
             'history_location_id' => 1,
-            'page_id' => null,
+            'page_id' => $stBavoPage ? $stBavoPage['page_id'] : null,
             'event_id' => null,
             'image_url' => '/images/history/locations/st-bavo-hero.jpg',
             'alt_text' => 'Church of St. Bavo exterior view',
@@ -114,7 +115,6 @@ class HistoryImagesSeeder extends AbstractSeed
             'is_primary' => false,
             'sort_order' => 1
         ];
-
         $data[] = [
             'history_location_id' => 1,
             'page_id' => null,
@@ -131,7 +131,7 @@ class HistoryImagesSeeder extends AbstractSeed
         // Grote Markt hero
         $data[] = [
             'history_location_id' => 2,
-            'page_id' => null,
+            'page_id' => $grotePage ? $grotePage['page_id'] : null,
             'event_id' => null,
             'image_url' => '/images/history/locations/grote-markt-hero.jpg',
             'alt_text' => 'Grote Markt square aerial view',
@@ -151,7 +151,6 @@ class HistoryImagesSeeder extends AbstractSeed
             'is_primary' => false,
             'sort_order' => 1
         ];
-
         $data[] = [
             'history_location_id' => 2,
             'page_id' => null,
@@ -162,7 +161,6 @@ class HistoryImagesSeeder extends AbstractSeed
             'is_primary' => false,
             'sort_order' => 2
         ];
-
         $data[] = [
             'history_location_id' => 2,
             'page_id' => null,
@@ -173,7 +171,6 @@ class HistoryImagesSeeder extends AbstractSeed
             'is_primary' => false,
             'sort_order' => 3
         ];
-
         $data[] = [
             'history_location_id' => 2,
             'page_id' => null,

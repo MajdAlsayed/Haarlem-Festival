@@ -2,12 +2,13 @@
 
 namespace App\Repositories;
 
+use App\Contracts\HistoryRepositoryInterface;
 use App\Core\Database;
 use App\Models\HistoryTour;
 use App\Models\HistoryLocation;
 use App\Models\HistoryImage;
 
-class HistoryRepository implements IHistoryRepository
+class HistoryRepository implements HistoryRepositoryInterface
 {
     // TOURS
     private function mapToHistoryTours(array $row): HistoryTour
@@ -96,6 +97,7 @@ class HistoryRepository implements IHistoryRepository
         $historyLocation->sortOrder = $row['sort_order'];
         $historyLocation->slug = $row['slug'];
         $historyLocation->pageId = $row['page_id'];
+        $historyLocation->shortDescription = $row['short_description'];
 
         return $historyLocation;
     }
@@ -105,7 +107,7 @@ class HistoryRepository implements IHistoryRepository
         $db = Database::getConnection();
 
         $stmt = $db->prepare(
-            'SELECT history_location_id, name, slug, description, page_id, sort_order
+            'SELECT history_location_id, name, slug, description, short_description, page_id, sort_order
             FROM history_locations 
             ORDER BY sort_order'
         );
@@ -119,6 +121,25 @@ class HistoryRepository implements IHistoryRepository
             $historyLocations[] = $this->mapToHistoryLocations($row);
         }
         return $historyLocations;
+    }
+    public function getLocationById(int $id): ?HistoryLocation
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT history_location_id, name, slug, description, short_description, page_id, sort_order
+            FROM history_locations
+            WHERE history_location_id = :id
+            LIMIT 1'
+            );
+
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch();
+
+        if (!$row) {
+            return null;
+        }
+        return $this->mapToHistoryLocations($row);
     }
 
     // IMAGES
@@ -233,7 +254,7 @@ class HistoryRepository implements IHistoryRepository
 
         $stmt = $db->prepare(
             'SELECT history_image_id, history_location_id, page_id, event_id, 
-           image_url, alt_text, image_type, is_primary, sort_order
+            image_url, alt_text, image_type, is_primary, sort_order
             FROM history_images
             WHERE history_location_id = :location_id
             AND image_type = :type
@@ -249,5 +270,57 @@ class HistoryRepository implements IHistoryRepository
             $images[] = $this->mapToHistoryImage($row);
         }
         return $images;
+    }
+    public function getImageById(int $imageId): ?HistoryImage
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT history_image_id, history_location_id, page_id, event_id,
+        image_url, alt_text, image_type, is_primary, sort_order
+        FROM history_images
+        WHERE history_image_id = :image_id
+        LIMIT 1'
+        );
+
+        $stmt->execute(['image_id' => $imageId]);
+        $row = $stmt->fetch();
+
+        if (!$row) {
+            return null;
+        }
+        return $this->mapToHistoryImage($row);
+    }
+
+    // PAGE BLOCKS
+    public function getPageBlocks(string $slug): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT pb.block_id, pb.page_id, pb.block_type, pb.content_json, pb.sort_order
+            FROM page_blocks pb
+            INNER JOIN pages p ON pb.page_id = p.page_id
+            WHERE p.slug = :slug
+            ORDER BY pb.sort_order'
+        );
+
+        $stmt->execute(['slug' => $slug]);
+        $rows = $stmt->fetchAll();
+
+        $pageId = null;
+        $blocks = [];
+        foreach ($rows as $row) {
+            $pageId = $row['page_id'];
+            $blocks[$row['block_type']] = [
+                'block_id' => $row['block_id'],
+                'content' => json_decode($row['content_json'], true),
+                'sort_order' => $row['sort_order']
+            ];
+        }
+        return [
+            'page_id' => $pageId,
+            'blocks' => $blocks
+        ];
     }
 }
