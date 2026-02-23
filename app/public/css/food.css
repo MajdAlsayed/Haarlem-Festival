@@ -1,0 +1,304 @@
+/* ========== FOOD PAGE (cards + reviews) ========== */
+
+.food-page main {
+  background: radial-gradient(1200px 600px at 50% 0%, rgba(184, 134, 11, 0.22), rgba(0,0,0,0) 70%),
+              #000;
+  color: #fff;
+}
+
+.food-hero {
+  min-height: 320px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.food-hero-content {
+  padding: 64px 0 24px;
+}
+.food-hero-content h1 {
+  font-size: 48px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.food-intro {
+  padding: 28px 0 22px;
+}
+.food-intro-heading {
+  font-size: 40px;
+  font-weight: 800;
+  margin: 18px 0 18px;
+}
+.food-intro-text {
+  max-width: 920px;
+  font-size: 18px;
+  line-height: 1.6;
+  opacity: 0.95;
+}
+
+/* Filters */
+.food-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 22px 0 18px;
+}
+.food-filter-label {
+  margin: 0;
+  opacity: 0.9;
+}
+.food-filter-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.food-filter-btn {
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+.food-filter-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.10);
+}
+.food-filter-btn.active {
+  background: rgba(184, 134, 11, 0.35);
+  border-color: rgba(184, 134, 11, 0.65);
+}
+
+/* Restaurant cards grid */
+.food-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px;
+  padding: 8px 0 34px;
+}
+
+@media (max-width: 1100px) {
+  .food-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .food-cards-grid { grid-template-columns: 1fr; }
+}
+
+.food-card {
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(0,0,0,0.88), rgba(0,0,0,0.82));
+  box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.food-card-image-wrap {
+  height: 210px;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.food-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.food-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  opacity: 0.7;
+}
+
+.food-card-body {
+  padding: 16px 16px 14px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(184, 134, 11, 0.16));
+}
+
+.food-card-title {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #d89b1b; /* gold-ish like screenshot */
+}
+
+.food-card-tags {
+  margin: 0 0 10px;
+  font-size: 13px;
+  opacity: 0.92;
+}
+
+.food-card-stars {
+  margin: 0 0 10px;
+  letter-spacing: 2px;
+  color: #d89b1b;
+}
+
+.food-card-prices,
+.food-card-seats {
+  margin: 0 0 8px;
+  font-size: 13px;
+  opacity: 0.92;
+}
+.food-price-sep {
+  margin: 0 6px;
+  opacity: 0.7;
+}
+
+/* “First session” badge/button */
+.food-card-cta {
+  margin: 10px 0 12px;
+}
+.food-session-badge {
+  display: inline-block;
+  background: #d89b1b;
+  color: #111;
+  font-weight: 800;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.food-card-footer {
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.92;
+}
+.food-walk {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.food-card-address {
+  margin: 10px 0 0;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+/* Reviews section */
+.food-reviews {
+  padding: 46px 0 70px;
+  background: radial-gradient(1200px 700px at 30% 0%, rgba(184, 134, 11, 0.20), rgba(0,0,0,0) 70%);
+}
+
+.food-reviews-title {
+  font-size: 36px;
+  font-weight: 800;
+  margin: 0 0 22px;
+  text-transform: lowercase; /* matches screenshot */
+}
+
+.food-reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 26px;
+}
+
+@media (max-width: 1100px) {
+  .food-reviews-grid { grid-template-columns: 1fr; }
+}
+
+.food-review-card {
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.88), rgba(184, 134, 11, 0.14));
+  box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 18px;
+  min-height: 320px;
+}
+
+.food-review-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.food-review-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.food-review-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.food-review-name {
+  margin: 0;
+  font-weight: 800;
+}
+.food-review-restaurant {
+  margin: 2px 0 6px;
+  color: #d89b1b;
+  font-weight: 800;
+}
+.food-review-stars {
+  margin: 0;
+  letter-spacing: 2px;
+  color: #27d3b6; /* teal-ish like screenshot stars */
+}
+
+.food-review-body p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0.92;
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 30px 0 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-size: 16px;
+}
+
+.breadcrumbs a {
+  color: #d89b1b; /* gold */
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.breadcrumbs a:hover {
+  opacity: 0.8;
+}
+
+.breadcrumb-sep {
+  color: #d89b1b;
+  opacity: 0.8;
+}
+
+.breadcrumb-current {
+  color: #d89b1b;
+  position: relative;
+  padding-bottom: 6px;
+}
+
+/* underline under current page */
+.breadcrumb-current::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: #d89b1b;
+}

@@ -1,9 +1,11 @@
 <?php
 
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Controllers\HomeController;
 use App\Controllers\DanceController;
+use App\Controllers\FoodController;
 use App\Exceptions\AppException;
 use App\Exceptions\NotFoundException;
 
@@ -31,6 +33,10 @@ switch ($uri) {
     case '/dance':
         (new DanceController())->index();
         break;
+
+    case '/food':
+         (new FoodController())->index();
+         break;
 
     default:
         throw new NotFoundException('Page not found');
