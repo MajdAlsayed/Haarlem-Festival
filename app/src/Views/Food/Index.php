@@ -11,7 +11,7 @@ $introHeading = $foodConfig['intro_heading'] ?? 'Taste the Festival Spirit in Ha
 $introText = $foodConfig['intro_text'] ?? '';
 
 $filters = $foodConfig['filter_labels'] ?? ['All'];
-$restaurants = $foodConfig['restaurants'] ?? [];
+$restaurants = $viewModel->restaurants ?? [];
 $localsReviews = $foodConfig['locals_reviews'] ?? [];
 
 /**
@@ -102,81 +102,90 @@ $renderStars = static function(float $rating): string {
         </div>
 
         <div class="food-cards-grid" id="foodCards">
-            <?php foreach ($restaurants as $idx => $r):
-                $name = (string)($r['name'] ?? 'Restaurant');
-                $image = (string)($r['image'] ?? '');
-                $imagePath = $image ? '/images/food/' . rawurlencode($image) : '';
-                $tags = $r['tags'] ?? [];
-                $rating = (float)($r['rating'] ?? 0);
-                $price = (string)($r['price'] ?? '');
-                $kidsPrice = (string)($r['kids_price'] ?? '');
-                $seats = (int)($r['seats'] ?? 0);
-                $firstSession = (string)($r['first_session'] ?? '');
-                $walk = (string)($r['walk_to_patronaat'] ?? '');
-                $address = (string)($r['address'] ?? '');
-                $dataTags = array_map($normalize, array_map('strval', $tags));
-                $dataTagsAttr = htmlspecialchars(json_encode($dataTags, JSON_UNESCAPED_UNICODE));
-            ?>
-                <article class="food-card"
-                         data-tags="<?= $dataTagsAttr ?>"
-                         data-name="<?= htmlspecialchars($name) ?>">
-                    <div class="food-card-image-wrap">
-                        <?php if ($imagePath): ?>
-                            <img src="<?= htmlspecialchars($imagePath) ?>"
-                                 alt="<?= htmlspecialchars($name) ?>"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <?php endif; ?>
-                        <div class="food-card-placeholder" style="<?= $imagePath ? 'display:none;' : 'display:flex;' ?>">🍽️</div>
+    <?php foreach ($restaurants as $r):
+        /** @var \App\Models\Restaurant $r */
+
+        $id = (int)$r->restaurantId;
+        $name = (string)$r->name;
+        $image = (string)($r->image ?? '');
+        $imagePath = $image ? '/images/food/' . rawurlencode($image) : '';
+
+        // tags: we’ll derive from "type" because DB column is type (comma separated)
+        $tags = array_filter(array_map('trim', explode(',', (string)$r->type)));
+        $rating = (float)$r->stars; // your DB uses stars (3/4). keep renderStars().
+
+        $price = '€' . number_format((float)$r->priceAdult, 2);
+        $kidsPrice = 'Kids<' . (int)$r->kidAgeMax . ' €' . number_format((float)$r->priceKid, 2);
+
+        $seats = (int)$r->seats;
+        $firstSession = substr((string)$r->firstSession, 0, 5);
+
+        $walk = $r->walkMinutesToPatronaat !== null
+            ? ((int)$r->walkMinutesToPatronaat . ' min')
+            : '';
+
+        $address = (string)$r->address;
+
+        $dataTags = array_map($normalize, array_map('strval', $tags));
+        $dataTagsAttr = htmlspecialchars(json_encode($dataTags, JSON_UNESCAPED_UNICODE));
+    ?>
+        <a class="food-card-link"
+           href="/food/restaurant/<?= $id ?>"
+           aria-label="Open <?= htmlspecialchars($name) ?> details">
+            <article class="food-card"
+                     data-tags="<?= $dataTagsAttr ?>"
+                     data-name="<?= htmlspecialchars($name) ?>">
+
+                <div class="food-card-image-wrap">
+                    <?php if ($imagePath): ?>
+                        <img src="<?= htmlspecialchars($imagePath) ?>"
+                             alt="<?= htmlspecialchars($name) ?>"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <?php endif; ?>
+                    <div class="food-card-placeholder" style="<?= $imagePath ? 'display:none;' : 'display:flex;' ?>">🍽️</div>
+                </div>
+
+                <div class="food-card-body">
+                    <h3 class="food-card-title"><?= htmlspecialchars($name) ?></h3>
+
+                    <p class="food-card-tags">
+                        <?= htmlspecialchars(implode(', ', $tags)) ?>
+                    </p>
+
+                    <p class="food-card-stars" aria-label="Rating <?= htmlspecialchars((string)$rating) ?> out of 5">
+                        <span class="food-stars"><?= htmlspecialchars($renderStars($rating)) ?></span>
+                    </p>
+
+                    <p class="food-card-prices">
+                        <span><?= htmlspecialchars($price) ?></span>
+                        <span class="food-price-sep">•</span>
+                        <span><?= htmlspecialchars($kidsPrice) ?></span>
+                    </p>
+
+                    <p class="food-card-seats">
+                        Seats <?= htmlspecialchars((string)$seats) ?>
+                    </p>
+
+                    <div class="food-card-cta">
+                        <span class="food-session-badge">First session <?= htmlspecialchars($firstSession) ?></span>
                     </div>
 
-                    <div class="food-card-body">
-                        <h3 class="food-card-title"><?= htmlspecialchars($name) ?></h3>
-
-                        <p class="food-card-tags">
-                            <?= htmlspecialchars(implode(', ', array_map('strval', $tags))) ?>
-                        </p>
-
-                        <p class="food-card-stars" aria-label="Rating <?= htmlspecialchars((string)$rating) ?> out of 5">
-                            <span class="food-stars"><?= htmlspecialchars($renderStars($rating)) ?></span>
-                        </p>
-
-                        <p class="food-card-prices">
-                            <?php if ($price): ?>
-                                <span><?= htmlspecialchars($price) ?></span>
-                            <?php endif; ?>
-                            <?php if ($kidsPrice): ?>
-                                <span class="food-price-sep">•</span>
-                                <span><?= htmlspecialchars($kidsPrice) ?></span>
-                            <?php endif; ?>
-                        </p>
-
-                        <p class="food-card-seats">
-                            <?php if ($seats > 0): ?>
-                                Seats <?= htmlspecialchars((string)$seats) ?>
-                            <?php endif; ?>
-                        </p>
-
-                        <?php if ($firstSession): ?>
-                            <div class="food-card-cta">
-                                <span class="food-session-badge">First session <?= htmlspecialchars($firstSession) ?></span>
-                            </div>
-                        <?php endif; ?>
-
-                        <div class="food-card-footer">
-                            <?php if ($walk): ?>
-                                <span class="food-walk">
-                                    <?= htmlspecialchars($walk) ?> to the Patronaat <span aria-hidden="true">🚶</span>
-                                </span>
-                            <?php endif; ?>
-                        </div>
-
-                        <?php if ($address): ?>
-                            <p class="food-card-address"><?= htmlspecialchars($address) ?></p>
+                    <div class="food-card-footer">
+                        <?php if ($walk): ?>
+                            <span class="food-walk">
+                                <?= htmlspecialchars($walk) ?> to the Patronaat <span aria-hidden="true">🚶</span>
+                            </span>
                         <?php endif; ?>
                     </div>
-                </article>
-            <?php endforeach; ?>
-        </div>
+
+                    <?php if ($address): ?>
+                        <p class="food-card-address"><?= htmlspecialchars($address) ?></p>
+                    <?php endif; ?>
+                </div>
+            </article>
+        </a>
+    <?php endforeach; ?>
+</div>
     </section>
 
     <!-- Locals reviews -->
@@ -283,10 +292,7 @@ function hasTag(card, tag) {
 
 </body>
 </html>
-<style>/* ===== Breadcrumbs (same style as Dance page screenshot) ===== */
-
-
-
+<style>
 .breadcrumbs a {
   color: #d89b1b; /* gold */
   text-decoration: none;
@@ -317,4 +323,15 @@ function hasTag(card, tag) {
   width: 100%;
   height: 2px;
   background: #d89b1b;
+}
+.food-card-link{
+  display:block;
+  color: inherit;
+  text-decoration:none;
+}
+.food-card-link:hover{ transform: translateY(-1px); }
+.food-card-link:focus{
+  outline:2px solid #d89b1b;
+  outline-offset:4px;
+  border-radius:14px;
 }</style>

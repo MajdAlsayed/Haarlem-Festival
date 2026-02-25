@@ -1,6 +1,6 @@
 <?php
 
-
+ob_start();
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Controllers\HomeController;
@@ -24,6 +24,10 @@ set_exception_handler(function (Throwable $e): void {
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+if (preg_match('#^/food/restaurant/(\d+)$#', $uri, $m)) {
+    (new \App\Controllers\FoodController())->restaurant((int)$m[1]);
+    exit;
+}
 switch ($uri) {
     case '/':
     case '/home':
@@ -37,6 +41,7 @@ switch ($uri) {
     case '/food':
          (new FoodController())->index();
          break;
+         
 
     default:
         throw new NotFoundException('Page not found');

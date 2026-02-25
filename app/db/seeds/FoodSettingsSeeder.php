@@ -13,6 +13,7 @@ class FoodSettingsSeeder extends AbstractSeed
             ['setting_key' => 'hero_image', 'setting_value' => 'food-hero.jpg'],
             ['setting_key' => 'intro_heading', 'setting_value' => 'Taste the Festival Spirit in Haarlem'],
             ['setting_key' => 'intro_text', 'setting_value' => 'Welcome to the heart of Haarlem\'s festival season! As the city comes alive with music, culture, and vibrant celebrations, our restaurants join in the spirit offering special menus, festive drinks, and warm hospitality. Whether you’re here to enjoy the performances or simply soak in the lively atmosphere, this is the perfect moment to explore Haarlem’s culinary scene. Bon appetit and happy festival!'],
+            ['setting_key' => 'reservation_fee_per_person', 'setting_value' => 10],
 
             // Filters (same as config)
             ['setting_key' => 'filter_labels', 'setting_value' => json_encode(['All', 'Dutch', 'French', 'Vegan', 'European', 'Seafood'])],
