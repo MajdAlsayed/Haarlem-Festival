@@ -3,18 +3,22 @@
 ob_start();
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\Controllers\HomeController;
+use App\Core\Session;
+use App\Controllers\AuthController;
 use App\Controllers\DanceController;
 use App\Controllers\FoodController;
+use App\Controllers\HomeController;
 use App\Exceptions\AppException;
 use App\Exceptions\NotFoundException;
 
+Session::start();
+
 set_exception_handler(function (Throwable $e): void {
-    $code = 500;
+    $code    = 500;
     $message = 'An error occurred.';
 
     if ($e instanceof AppException) {
-        $code = $e->getHttpCode();
+        $code    = $e->getHttpCode();
         $message = $e->getMessage();
     }
 
@@ -29,6 +33,7 @@ if (preg_match('#^/food/restaurant/(\d+)$#', $uri, $m)) {
     exit;
 }
 switch ($uri) {
+
     case '/':
     case '/home':
         (new HomeController())->index();
@@ -39,9 +44,24 @@ switch ($uri) {
         break;
 
     case '/food':
-         (new FoodController())->index();
-         break;
-         
+        (new FoodController())->index();
+        break;
+
+    case '/login':
+        $c = new AuthController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') $c->login();
+        else $c->showLogin();
+        break;
+
+    case '/register':
+        $c = new AuthController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') $c->register();
+        else $c->showRegister();
+        break;
+
+    case '/logout':
+        (new AuthController())->logout();
+        break;
 
     default:
         throw new NotFoundException('Page not found');

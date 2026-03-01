@@ -229,109 +229,64 @@ $renderStars = static function(float $rating): string {
 </main>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
-
 <script>
-(function() {
-    var buttons = document.querySelectorAll('.food-filter-btn');
-    var cards = document.querySelectorAll('.food-card');
+(function () {
+  const buttons = document.querySelectorAll('.food-filter-btn');
+  const grid = document.getElementById('foodCards');
 
-    function normalize(s) {
-        return (s || '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
-    }
+  // IMPORTANT: grid items are the LINKS, not the articles
+  const items = Array.from(grid.querySelectorAll('.food-card-link'));
 
-function hasTag(card, tag) {
-  try {
-    var tags = JSON.parse(card.getAttribute('data-tags') || '[]');
-    var needle = normalize(tag);
-
-    if (needle === 'all') return true;
-
-    // substring match
-    return tags.some(function(t) {
-      t = normalize(t);
-      return t === needle || t.indexOf(needle) !== -1 || needle.indexOf(t) !== -1;
-    });
-  } catch (e) {
-    return true;
+  function normalize(s) {
+    return (s || '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
   }
-}
 
-    function applyFilter(filterLabel) {
-        var f = normalize(filterLabel);
+  function hasTag(cardEl, tag) {
+    try {
+      const tags = JSON.parse(cardEl.getAttribute('data-tags') || '[]');
+      const needle = normalize(tag);
+      if (needle === 'all') return true;
 
-        cards.forEach(function(card) {
-            var show = (f === 'all') ? true : hasTag(card, filterLabel);
-            card.style.display = show ? '' : 'none';
-        });
-
-        buttons.forEach(function(b) {
-            b.classList.remove('active');
-            b.setAttribute('aria-pressed', 'false');
-        });
-
-        var active = Array.prototype.find.call(buttons, function(b) {
-            return normalize(b.getAttribute('data-filter')) === f;
-        });
-
-        if (active) {
-            active.classList.add('active');
-            active.setAttribute('aria-pressed', 'true');
-        }
+      return tags.some(t => {
+        t = normalize(t);
+        return t === needle || t.includes(needle) || needle.includes(t);
+      });
+    } catch (e) {
+      return true;
     }
+  }
 
-    buttons.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            applyFilter(this.getAttribute('data-filter'));
-        });
+  function applyFilter(filterLabel) {
+    items.forEach(linkEl => {
+      const cardEl = linkEl.querySelector('.food-card');
+      const match = cardEl ? hasTag(cardEl, filterLabel) : true;
+
+      // Hide/show the GRID ITEM so the grid reflows
+      linkEl.style.display = match ? '' : 'none';
     });
 
-    // default
-    if (buttons.length) applyFilter(buttons[0].getAttribute('data-filter'));
+    buttons.forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
+
+    const active = Array.from(buttons).find(b =>
+      normalize(b.getAttribute('data-filter')) === normalize(filterLabel)
+    );
+    if (active) {
+      active.classList.add('active');
+      active.setAttribute('aria-pressed', 'true');
+    }
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', function () {
+      applyFilter(this.getAttribute('data-filter'));
+    });
+  });
+
+  if (buttons.length) applyFilter(buttons[0].getAttribute('data-filter'));
 })();
 </script>
-
 </body>
 </html>
-<style>
-.breadcrumbs a {
-  color: #d89b1b; /* gold */
-  text-decoration: none;
-  transition: opacity 0.2s ease;
-}
-
-.breadcrumbs a:hover {
-  opacity: 0.8;
-}
-
-.breadcrumb-sep {
-  color: #d89b1b;
-  opacity: 0.8;
-}
-
-.breadcrumb-current {
-  color: #d89b1b;
-  position: relative;
-  padding-bottom: 6px;
-}
-
-/* underline under current page */
-.breadcrumb-current::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 2px;
-  background: #d89b1b;
-}
-.food-card-link{
-  display:block;
-  color: inherit;
-  text-decoration:none;
-}
-.food-card-link:hover{ transform: translateY(-1px); }
-.food-card-link:focus{
-  outline:2px solid #d89b1b;
-  outline-offset:4px;
-  border-radius:14px;
-}</style>
