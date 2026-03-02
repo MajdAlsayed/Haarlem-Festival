@@ -1,18 +1,24 @@
 <?php
 
+ob_start();
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\Controllers\HomeController;
+use App\Core\Session;
+use App\Controllers\AuthController;
 use App\Controllers\DanceController;
+use App\Controllers\FoodController;
+use App\Controllers\HomeController;
 use App\Exceptions\AppException;
 use App\Exceptions\NotFoundException;
 
+Session::start();
+
 set_exception_handler(function (Throwable $e): void {
-    $code = 500;
+    $code    = 500;
     $message = 'An error occurred.';
 
     if ($e instanceof AppException) {
-        $code = $e->getHttpCode();
+        $code    = $e->getHttpCode();
         $message = $e->getMessage();
     }
 
@@ -22,7 +28,12 @@ set_exception_handler(function (Throwable $e): void {
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+if (preg_match('#^/food/restaurant/(\d+)$#', $uri, $m)) {
+    (new \App\Controllers\FoodController())->restaurant((int)$m[1]);
+    exit;
+}
 switch ($uri) {
+
     case '/':
     case '/home':
         (new HomeController())->index();
@@ -30,6 +41,26 @@ switch ($uri) {
 
     case '/dance':
         (new DanceController())->index();
+        break;
+
+    case '/food':
+        (new FoodController())->index();
+        break;
+
+    case '/login':
+        $c = new AuthController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') $c->login();
+        else $c->showLogin();
+        break;
+
+    case '/register':
+        $c = new AuthController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') $c->register();
+        else $c->showRegister();
+        break;
+
+    case '/logout':
+        (new AuthController())->logout();
         break;
 
     default:
