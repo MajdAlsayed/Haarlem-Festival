@@ -11,13 +11,13 @@ use App\Models\HistoryImage;
 class HistoryRepository implements HistoryRepositoryInterface
 {
     // TOURS
-    private function mapToHistoryTours(array $row): HistoryTour
+    private function mapToHistoryTours(object $row): HistoryTour
     {
         $historyTour = new HistoryTour();
-        $historyTour->id = $row['history_tour_id'];
-        $historyTour->sessionId = $row['session_id'];
-        $historyTour->languageId = $row['language_id'];
-        $historyTour->ticketsAvailable = $row['tickets_available'];
+        $historyTour->id = (int)$row->history_tour_id;
+        $historyTour->sessionId = (int)$row->session_id;
+        $historyTour->languageId = (int)$row->language_id;
+        $historyTour->ticketsAvailable = $row->tickets_available;
 
         return $historyTour;
     }
@@ -34,14 +34,9 @@ class HistoryRepository implements HistoryRepositoryInterface
         );
 
         $stmt->execute();
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
-        $historyTours = [];
-
-        foreach ($rows as $row) {
-            $historyTours[] = $this->mapToHistoryTours($row);
-        }
-        return $historyTours;
+        return array_map([$this, 'mapToHistoryTours'], $rows);
     }
 
     public function getTourById(int $id): ?HistoryTour
@@ -56,7 +51,7 @@ class HistoryRepository implements HistoryRepositoryInterface
         );
 
         $stmt->execute(['id' => $id]);
-        $row = $stmt->fetch();
+        $row = $stmt->fetch(\PDO::FETCH_OBJ);
 
         if (!$row) {
             return null;
@@ -77,27 +72,23 @@ class HistoryRepository implements HistoryRepositoryInterface
         );
 
         $stmt->execute(['date' => $date]);
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
-        $historyTours = [];
-
-        foreach ($rows as $row) {
-            $historyTours[] = $this->mapToHistoryTours($row);
-        }
-        return $historyTours;
+        return array_map([$this, 'mapToHistoryTours'], $rows);
     }
 
     // LOCATIONS
-    private function mapToHistoryLocations(array $row): HistoryLocation
+    private function mapToHistoryLocations(object $row): HistoryLocation
     {
         $historyLocation = new HistoryLocation();
-        $historyLocation->id = $row['history_location_id'];
-        $historyLocation->name = $row['name'];
-        $historyLocation->description = $row['description'];
-        $historyLocation->sortOrder = $row['sort_order'];
-        $historyLocation->slug = $row['slug'];
-        $historyLocation->pageId = $row['page_id'];
-        $historyLocation->shortDescription = $row['short_description'];
+        $historyLocation->id = (int)$row->history_location_id;
+        $historyLocation->name = $row->name;
+        $historyLocation->description1 = $row->description_1;
+        $historyLocation->description2 = $row->description_2;
+        $historyLocation->sortOrder = $row->sort_order;
+        $historyLocation->slug = $row->slug;
+        $historyLocation->pageId = (int)$row->page_id;
+        $historyLocation->shortDescription = $row->short_description;
 
         return $historyLocation;
     }
@@ -107,34 +98,30 @@ class HistoryRepository implements HistoryRepositoryInterface
         $db = Database::getConnection();
 
         $stmt = $db->prepare(
-            'SELECT history_location_id, name, slug, description, short_description, page_id, sort_order
+            'SELECT history_location_id, name, slug, description_1, description_2, short_description, page_id, sort_order
             FROM history_locations 
             ORDER BY sort_order'
         );
 
         $stmt->execute();
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
-        $historyLocations = [];
-
-        foreach ($rows as $row) {
-            $historyLocations[] = $this->mapToHistoryLocations($row);
-        }
-        return $historyLocations;
+        return array_map([$this, 'mapToHistoryLocations'], $rows);
     }
+
     public function getLocationById(int $id): ?HistoryLocation
     {
         $db = Database::getConnection();
 
         $stmt = $db->prepare(
-            'SELECT history_location_id, name, slug, description, short_description, page_id, sort_order
+            'SELECT history_location_id, name, slug, description_1, description_2, short_description, page_id, sort_order
             FROM history_locations
             WHERE history_location_id = :id
             LIMIT 1'
-            );
+        );
 
         $stmt->execute(['id' => $id]);
-        $row = $stmt->fetch();
+        $row = $stmt->fetch(\PDO::FETCH_OBJ);
 
         if (!$row) {
             return null;
@@ -143,18 +130,18 @@ class HistoryRepository implements HistoryRepositoryInterface
     }
 
     // IMAGES
-    private function mapToHistoryImage(array $row): HistoryImage
+    private function mapToHistoryImages(object $row): HistoryImage
     {
         $image = new HistoryImage();
-        $image->id = $row['history_image_id'];
-        $image->historyLocationId = $row['history_location_id'];
-        $image->pageId = $row['page_id'];
-        $image->eventId = $row['event_id'];
-        $image->imageUrl = $row['image_url'];
-        $image->altText = $row['alt_text'];
-        $image->imageType = $row['image_type'];
-        $image->isPrimary = (bool)$row['is_primary'];
-        $image->sortOrder = $row['sort_order'];
+        $image->id = (int)$row->history_image_id;
+        $image->historyLocationId = (int)$row->history_location_id;
+        $image->pageId = (int)$row->page_id;
+        $image->eventId = (int)$row->event_id;
+        $image->imageUrl = $row->image_url;
+        $image->altText = $row->alt_text;
+        $image->imageType = $row->image_type;
+        $image->isPrimary = (bool)$row->is_primary;
+        $image->sortOrder = $row->sort_order;
 
         return $image;
     }
@@ -173,12 +160,12 @@ class HistoryRepository implements HistoryRepositoryInterface
         );
 
         $stmt->execute(['location_id' => $locationId, 'type' => 'primary']);
-        $row = $stmt->fetch();
+        $row = $stmt->fetch(\PDO::FETCH_OBJ);
 
         if (!$row) {
             return null;
         }
-        return $this->mapToHistoryImage($row);
+        return $this->mapToHistoryImages($row);
     }
 
     public function getLocationImages(int $locationId): array
@@ -194,14 +181,9 @@ class HistoryRepository implements HistoryRepositoryInterface
         );
 
         $stmt->execute(['location_id' => $locationId]);
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
-        $images = [];
-
-        foreach ($rows as $row) {
-            $images[] = $this->mapToHistoryImage($row);
-        }
-        return $images;
+        return array_map([$this, 'mapToHistoryImages'], $rows);
     }
 
     public function getPageHeroImage(int $pageId): ?HistoryImage
@@ -218,12 +200,12 @@ class HistoryRepository implements HistoryRepositoryInterface
         );
 
         $stmt->execute(['page_id' => $pageId, 'type' => 'hero']);
-        $row = $stmt->fetch();
+        $row = $stmt->fetch(\PDO::FETCH_OBJ);
 
         if (!$row) {
             return null;
         }
-        return $this->mapToHistoryImage($row);
+        return $this->mapToHistoryImages($row);
     }
 
     public function getEventHeroImage(int $eventId): ?HistoryImage
@@ -231,7 +213,7 @@ class HistoryRepository implements HistoryRepositoryInterface
         $db = Database::getConnection();
 
         $stmt = $db->prepare(
-        'SELECT history_image_id, history_location_id, page_id, event_id, 
+            'SELECT history_image_id, history_location_id, page_id, event_id, 
             image_url, alt_text, image_type, is_primary, sort_order
             FROM history_images
             WHERE event_id = :event_id
@@ -240,12 +222,12 @@ class HistoryRepository implements HistoryRepositoryInterface
         );
 
         $stmt->execute(['event_id' => $eventId, 'type' => 'hero']);
-        $row = $stmt->fetch();
+        $row = $stmt->fetch(\PDO::FETCH_OBJ);
 
         if (!$row) {
             return null;
         }
-        return $this->mapToHistoryImage($row);
+        return $this->mapToHistoryImages($row);
     }
 
     public function getLocationGallery(int $locationId): array
@@ -262,34 +244,30 @@ class HistoryRepository implements HistoryRepositoryInterface
         );
 
         $stmt->execute(['location_id' => $locationId, 'type' => 'gallery']);
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
-        $images = [];
-
-        foreach ($rows as $row) {
-            $images[] = $this->mapToHistoryImage($row);
-        }
-        return $images;
+        return array_map([$this, 'mapToHistoryImages'], $rows);
     }
+
     public function getImageById(int $imageId): ?HistoryImage
     {
         $db = Database::getConnection();
 
         $stmt = $db->prepare(
             'SELECT history_image_id, history_location_id, page_id, event_id,
-        image_url, alt_text, image_type, is_primary, sort_order
-        FROM history_images
-        WHERE history_image_id = :image_id
-        LIMIT 1'
+            image_url, alt_text, image_type, is_primary, sort_order
+            FROM history_images
+            WHERE history_image_id = :image_id
+            LIMIT 1'
         );
 
         $stmt->execute(['image_id' => $imageId]);
-        $row = $stmt->fetch();
+        $row = $stmt->fetch(\PDO::FETCH_OBJ);
 
         if (!$row) {
             return null;
         }
-        return $this->mapToHistoryImage($row);
+        return $this->mapToHistoryImages($row);
     }
 
     // PAGE BLOCKS
@@ -306,16 +284,16 @@ class HistoryRepository implements HistoryRepositoryInterface
         );
 
         $stmt->execute(['slug' => $slug]);
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
         $pageId = null;
         $blocks = [];
         foreach ($rows as $row) {
-            $pageId = $row['page_id'];
-            $blocks[$row['block_type']] = [
-                'block_id' => $row['block_id'],
-                'content' => json_decode($row['content_json'], true),
-                'sort_order' => $row['sort_order']
+            $pageId = (int)$row->page_id;
+            $blocks[$row->block_type] = [
+                'block_id' => (int)$row->block_id,
+                'content' => json_decode($row->content_json, true),
+                'sort_order' => $row->sort_order
             ];
         }
         return [

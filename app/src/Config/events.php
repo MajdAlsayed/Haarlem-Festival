@@ -19,7 +19,7 @@ return [
     'info_paths' => [
         'dance' => '/dance',
         'jazz' => '#',
-        'history' => '#',
+        'history' => '/history',
         'yammy' => '#',
         'stories' => '#',
     ],

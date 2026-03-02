@@ -36,6 +36,9 @@ switch ($uri) {
     case '/history':
         (new HistoryController())->index();
         break;
+    case '/history/locations':
+        (new HistoryController())->locations();
+        break;
 
     default:
         throw new NotFoundException('Page not found');

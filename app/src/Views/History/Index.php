@@ -1,5 +1,4 @@
 <?php
-
 $blocks = $viewModel->blocks;
 $locations = $viewModel->locations;
 
@@ -9,6 +8,7 @@ $sitesHeader = $blocks['section_header']['content'] ?? [];
 $locationCards = $blocks['location_cards']['content'] ?? [];
 $experience = $blocks['text_block']['content'] ?? [];
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,12 +46,14 @@ $experience = $blocks['text_block']['content'] ?? [];
             </div>
         </div>
     </section>
+
     <!-- BREADCRUMB -->
     <nav class="history-breadcrumb" aria-label="Breadcrumb">
         <a href="/" class="history-breadcrumb-link">HOME</a>
         <span class="history-breadcrumb-separator">→</span>
-        <a href="/history" class="history-breadcrumb-link active">HISTORY</a>
+        <span class="history-breadcrumb-link active" aria-current="page">HISTORY</span>
     </nav>
+
     <!-- ABOUT BANNER -->
     <section class="history-heritage-banner">
         <h2 class="history-heritage-title"><?= htmlspecialchars($aboutBanner['title'] ?? '') ?></h2>
@@ -81,7 +83,8 @@ $experience = $blocks['text_block']['content'] ?? [];
                             <h3 class="history-card-title"><?= htmlspecialchars($location->name) ?></h3>
                             <p class="history-card-text"><?= htmlspecialchars($location->shortDescription) ?></p>
                         </div>
-                        <a href="/history/location/<?= htmlspecialchars($location->slug) ?>" class="history-read-more-button">
+                        <a href="/history/location/<?= htmlspecialchars($location->slug) ?>"
+                           class="history-read-more-button">
                             <span class="history-read-more-text">READ MORE</span>
                         </a>
                     </div>
@@ -90,7 +93,8 @@ $experience = $blocks['text_block']['content'] ?? [];
         </div>
 
         <!-- EXPLORE BUTTON -->
-        <a href="<?= htmlspecialchars($locationCards['button_url'] ?? '/history/locations') ?>" class="history-button-big">
+        <a href="<?= htmlspecialchars($locationCards['button_url'] ?? '/history/locations') ?>"
+           class="history-button-big">
             <span class="history-button-text"><?= htmlspecialchars($locationCards['button_text'] ?? '') ?></span>
         </a>
     </section>

@@ -2,7 +2,7 @@
 .history-hero-section {
     position: relative;
     width: 100%;
-    height: 735px;
+    height: 635px;
     overflow: hidden;
 }
 .history-hero-section h1,
@@ -30,7 +30,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 40px 256px;
+    padding: 40px 128px;
     display: flex;
     flex-direction: column;
     gap: 40px;
@@ -84,7 +84,7 @@
 /* Breadcrumb Start*/
 .history-breadcrumb {
     width: 100%;
-    padding: 14px 256px;
+    padding: 14px 128px;
     display: flex;
     gap: 30px;
     align-items: center;
@@ -116,7 +116,7 @@
 /* Heritage Banner Start*/
 .history-heritage-banner {
     width: 100%;
-    padding: 100px 256px;
+    padding: 100px 128px;
     background: #deccab;
     color: #292929;
     display: flex;
@@ -164,7 +164,7 @@
 
 .history-sites-header {
     width: 100%;
-    padding: 100px 256px 30px 256px;
+    padding: 100px 128px 30px 128px;
     display: flex;
     flex-direction: column;
     gap: 22px;
@@ -198,7 +198,7 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    padding: 0 80px;
+    padding: 0 100px;
     gap: 70px;
 }
 
@@ -480,3 +480,114 @@
     }
 }
 /* Responsive End */
+
+/* LOCATIONS PAGE*/
+
+.history-locations-hero-title {
+    color: #F8DC3D;
+    text-shadow: 2px 4px 2px rgba(0, 0, 0, 0.50);
+    /* H1 */
+    font-family: 'Montserrat', sans-serif;
+    font-size: 64px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 84px; /* 131.25% */
+    letter-spacing: 6.4px;
+    text-transform: uppercase;
+}
+
+/* Intro text for locations page */
+.history-intro-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 50px;
+    letter-spacing: 3.4px;
+    margin: 0;
+}
+
+/* Location Cards Section */
+.history-locations-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-location-section {
+    width: 100%;
+    padding: 100px 256px;
+    display: flex;
+    gap: 90px;
+    align-items: flex-start;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.29);
+}
+
+.history-location-image-left {
+    flex-direction: row;
+}
+
+.history-location-image-right {
+    flex-direction: row-reverse;
+}
+
+.history-location-image-container {
+    width: 580px;
+    height: 640px;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.history-location-image-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    max-width: none;
+}
+
+.history-location-content {
+    display: flex;
+    width: 568px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 40px;
+    flex-shrink: 0;
+}
+
+.history-location-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 34px;
+    line-height: 50px;
+    letter-spacing: 3.4px;
+    color: #f8dc3d;
+}
+
+.history-location-description {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.history-location-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+    color: white;
+}
+
+.history-location-section {
+    padding: 80px 80px;
+    gap: 60px;
+}
+
+.history-location-image-container {
+    width: 600px;
+    height: 520px;
+}
