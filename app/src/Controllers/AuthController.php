@@ -1,15 +1,17 @@
-<?php
-
+﻿<?php
 declare(strict_types=1);
 
 namespace App\Controllers;
 
 use App\Core\Csrf;
 use App\Core\Session;
+use App\Repositories\PasswordResetTokenRepository;
 use App\Repositories\UserRepository;
 use App\Services\AuthService;
+use App\ViewModels\ForgotPasswordViewModel;
 use App\ViewModels\LoginViewModel;
 use App\ViewModels\RegisterViewModel;
+use App\ViewModels\ResetPasswordViewModel;
 
 final class AuthController
 {
@@ -17,7 +19,10 @@ final class AuthController
 
     public function __construct()
     {
-        $this->auth = new AuthService(new UserRepository());
+        $this->auth = new AuthService(
+            new UserRepository(),
+            new PasswordResetTokenRepository()
+        );
     }
 
     // ── Login ─────────────────────────────────────────────────────

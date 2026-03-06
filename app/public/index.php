@@ -59,6 +59,18 @@ switch ($uri) {
         else $c->showRegister();
         break;
 
+    case '/reset-password':
+        $c = new AuthController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') $c->resetPassword();
+        else $c->showResetPassword();
+        break;
+
+        case '/forgot-password':
+        $c = new AuthController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {$c->forgotPassword();
+        } else $c->showForgotPassword();
+        break;
+
     case '/logout':
         (new AuthController())->logout();
         break;
