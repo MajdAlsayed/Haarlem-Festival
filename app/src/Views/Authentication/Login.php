@@ -45,7 +45,10 @@ $app = (new \App\Repositories\SettingsRepository())->getAll();
 
                 <button type="submit" class="btn btn-primary auth-btn">Login</button>
             </form>
-
+            <p class="auth-switch">
+                Forgot your password? <a href="/forgot-password">Reset your password</a>
+            </p>
+                
             <p class="auth-switch">
                 No account? <a href="/register">Register here</a>
             </p>
