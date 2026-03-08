@@ -1,13 +1,16 @@
 <?php
-$events = $viewModel->events;
-$featuredEvents = array_slice($events, 0, 3);
 $fridayEvents = $viewModel->fridayEvents;
 $saturdayEvents = $viewModel->saturdayEvents;
 $sundayEvents = $viewModel->sundayEvents;
+// Featured: B2B2B Saturday, Armin Trance Club (Sun), Hardwell Final Night (Sun)
+$featuredEvents = array_merge(
+    array_slice($saturdayEvents, 0, 1),
+    array_slice($sundayEvents, 1, 2)
+);
 
 $app = (new \App\Repositories\SettingsRepository())->getAll();
 $danceConfig = (new \App\Repositories\DanceSettingsRepository())->getAll();
-$artists = (new \App\Repositories\ArtistsRepository())->getAllOrdered();
+$artists = $viewModel->artists;
 $danceHeroImage = '/images/dance/' . rawurlencode($danceConfig['hero_image']);
 $featuredImages = $danceConfig['featured_images'];
 $fridayImages = $danceConfig['friday_images'];
@@ -54,23 +57,22 @@ $sundayGenres = $danceConfig['sunday_genres'];
         </div>
     </section>
 
-    <!-- Featured Events (3 cards from first 3 dance events) -->
+    <!-- Featured Events (3 cards from first 3 dance events - real data, no overrides) -->
     <section id="featured-events" class="dance-featured container">
         <h2 class="dance-section-title">Featured Events</h2>
         <div class="dance-cards dance-cards-featured">
             <?php
             $genreLabels = $danceConfig['featured_genre_labels'];
-            $featuredTimes = $danceConfig['featured_times'];
-            $first = $danceConfig['featured_first_card'];
             foreach ($featuredEvents as $i => $event):
                 $imagePath = '/images/dance/' . rawurlencode($featuredImages[$i] ?? $featuredImages[0]);
                 $genre = $genreLabels[$i] ?? 'DANCE';
-                $timeLine = ($i === 0) ? $first['time'] : ($featuredTimes[$i] ?? $first['time']);
-                $title = ($i === 0) ? $first['title'] : $event->title;
-                $venue = ($i === 0) ? $first['venue'] : ($event->venueName . ', ' . $event->venueCity);
-                $desc = ($i === 0) ? $first['description'] : ($event->description ?? '');
+                $dayLabel = ucfirst($event->eventDay ?? 'friday');
+                $timeLine = $dayLabel . ' • ' . ($event->startTime ?? '20:00');
+                $title = $event->title;
+                $venue = $event->venueName . ', ' . $event->venueCity;
+                $desc = $event->description ?? '';
             ?>
-                <article class="dance-card">
+                <a href="/dance/event/<?= (int) $event->id ?>" class="dance-card" style="text-decoration: none; color: inherit;">
                     <div class="dance-card-image-wrap">
                         <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= htmlspecialchars($title) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div class="dance-card-placeholder" style="display:none;">📷</div>
@@ -82,7 +84,7 @@ $sundayGenres = $danceConfig['sunday_genres'];
                         <p class="dance-card-desc"><?= htmlspecialchars($desc) ?></p>
                         <span class="dance-genre-btn"><?= htmlspecialchars($genre) ?></span>
                     </div>
-                </article>
+                </a>
             <?php endforeach; ?>
         </div>
     </section>
@@ -118,7 +120,7 @@ $sundayGenres = $danceConfig['sunday_genres'];
                     $genre = $dayGenres[$i % count($dayGenres)] ?? 'DANCE';
                     $dateTime = $dayLabel . ' • ' . ($event->startTime ?? $app['default_event_time']);
                 ?>
-                    <article class="dance-card dance-card-vertical">
+                    <a href="/dance/event/<?= (int) $event->id ?>" class="dance-card dance-card-vertical" style="text-decoration: none; color: inherit;">
                         <div class="dance-card-image-wrap">
                             <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= htmlspecialchars($event->title) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="dance-card-placeholder" style="display:none;">📷</div>
@@ -130,7 +132,7 @@ $sundayGenres = $danceConfig['sunday_genres'];
                             <p class="dance-card-desc"><?= htmlspecialchars($event->description ?? '') ?></p>
                             <span class="dance-genre-pill"><?= htmlspecialchars($genre) ?></span>
                         </div>
-                    </article>
+                    </a>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -152,7 +154,7 @@ $sundayGenres = $danceConfig['sunday_genres'];
                 <div class="dance-artist-card-body">
                     <h3 class="dance-artist-name"><?= htmlspecialchars($artist['name']) ?></h3>
                     <p class="dance-artist-bio"><?= htmlspecialchars($artist['bio']) ?></p>
-                    <a href="#" class="dance-artist-info-link">INFO &gt;</a>
+                    <a href="<?= !empty($artist['slug']) ? '/dance/artist/' . htmlspecialchars($artist['slug']) : '#' ?>" class="dance-artist-info-link">INFO &gt;</a>
                 </div>
             </article>
             <?php endforeach; ?>

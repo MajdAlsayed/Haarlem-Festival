@@ -1,7 +1,9 @@
 <?php
 $page = $viewModel->page;
-$events = $viewModel->events;
+$categories = $viewModel->categories;
+// shared for header/footer and any partial that needs them
 $app = (new \App\Repositories\SettingsRepository())->getAll();
+$navLinks = (new \App\Repositories\MenuRepository())->getNavLinks();
 ?>
 <!DOCTYPE html>
 <html lang="en">

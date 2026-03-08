@@ -12,19 +12,11 @@ return [
     'saturday_images' => ['dance-page-satuday-1.png', 'dance-page-satuday-2.png', 'dance-page-satuday-3.png', 'dance-page-satuday-4.png'],
     'sunday_images' => ['dance-page-sunday-1.png', 'dance-page-sunday-2.png', 'dance-page-sunday-3.png', 'dance-page-sunday-4.png'],
 
-    'friday_genres' => ['HOUSE', 'TRANCE', 'DANCE', 'ELECTRONIC', 'TECH HOUSE'],
+    'friday_genres' => ['HOUSE', 'TRANCE', 'DANCE', 'TRANCE', 'ELECTRONIC'],
     'saturday_genres' => ['MIXED GENRES', 'HOUSE', 'TRANCE / ELECTRO', 'ELECTROHOUSE'],
-    'sunday_genres' => ['MIXED GENRES', 'TRANCE', 'ELECTRONIC', 'DANCE'],
+    'sunday_genres' => ['MIXED GENRES', 'TRANCE', 'DANCE', 'ELECTRONIC'],
 
     'featured_genre_labels' => ['HOUSE', 'TRANCE', 'DANCE'],
-    'featured_times' => ['Saturday • 20:00', 'Sunday • 22:00', 'Sunday • 23:00'],
-
-    'featured_first_card' => [
-        'title' => 'Hardwell, Armin van Buuren, Martin Garrix — Back2Back Session',
-        'venue' => 'Lichtfabriek, Haarlem',
-        'time' => 'Saturday • 20:00',
-        'description' => 'A high-energy B2B performance blending house, electro, and festival anthems.',
-    ],
 
     'artists' => [
         [

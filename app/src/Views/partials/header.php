@@ -1,17 +1,29 @@
 <?php
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '/';
-$navLinks = (new \App\Repositories\MenuRepository())->getNavLinks();
-$app = (new \App\Repositories\SettingsRepository())->getAll();
+if (!isset($navLinks)) $navLinks = (new \App\Repositories\MenuRepository())->getNavLinks();
+if (!isset($app)) $app = (new \App\Repositories\SettingsRepository())->getAll();
+$isLoggedIn = !empty($_SESSION['auth'] ?? []);
+$username = $isLoggedIn ? htmlspecialchars($_SESSION['auth']['username'] ?? '') : '';
 ?>
 <header>
     <div class="nav-container">
+
         <div class="logo">
-            <a href="<?= htmlspecialchars($app['home_path']) ?>" class="logo-link"><img src="<?= htmlspecialchars($app['icons_path']) ?><?= rawurlencode($app['logo_filename']) ?>" alt="<?= htmlspecialchars($app['site_name']) ?>" class="logo-img"></a>
+            <a href="<?= htmlspecialchars($app['home_path']) ?>" class="logo-link">
+                <img src="<?= htmlspecialchars($app['icons_path']) ?><?= rawurlencode($app['logo_filename']) ?>"
+                     alt="<?= htmlspecialchars($app['site_name']) ?>"
+                     class="logo-img">
+            </a>
         </div>
 
         <nav class="nav-menu">
             <?php foreach ($navLinks as $link): ?>
-                <a href="<?= htmlspecialchars($link['path']) ?>" class="nav-link<?= ($currentPath === $link['path'] || ($link['path'] === '/' && ($currentPath === $app['home_path'] || $currentPath === '/home'))) ? ' active' : '' ?>"><?= htmlspecialchars($link['label']) ?></a><?php // active class = current page, highlighted in CSS ?>
+                <?php
+                $isActive = $currentPath === $link['path']
+                    || ($link['path'] === '/' && in_array($currentPath, [$app['home_path'] ?? '/', '/home'], true))
+                    || ($link['path'] !== '/' && $link['path'] !== '' && (strpos($currentPath, $link['path'] . '/') === 0));
+                ?>
+                <a href="<?= htmlspecialchars($link['path']) ?>" class="nav-link<?= $isActive ? ' active' : '' ?>"><?= htmlspecialchars($link['label']) ?></a>
             <?php endforeach; ?>
         </nav>
 
@@ -33,6 +45,18 @@ $app = (new \App\Repositories\SettingsRepository())->getAll();
             <button type="button" class="icon-btn search-btn" aria-label="Search">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             </button>
+
+<?php if ($isLoggedIn): ?>
+                <div class="nav-user">
+                    <span class="nav-username">👤 <?= $username ?></span>
+                    <a href="/logout" class="btn btn-outline nav-auth-btn">Logout</a>
+                </div>
+            <?php else: ?>
+                <div class="nav-user">
+                    <a href="/login" class="btn btn-outline nav-auth-btn">Login</a>
+                </div>
+            <?php endif; ?>
+
         </div>
     </div>
 </header>
