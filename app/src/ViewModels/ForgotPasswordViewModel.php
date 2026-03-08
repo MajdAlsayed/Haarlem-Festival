@@ -12,5 +12,6 @@ final class ForgotPasswordViewModel
         public ?string $success = null,
         public ?string $dummyLink = null,
         public string $identifier = '',
+        public array $appSettings = [],
     ) {}
 }

@@ -1,52 +1,23 @@
 ﻿<?php
+$app = $viewModel->appSettings;
+$foodConfig = $viewModel->foodSettings;
+$restaurants = $viewModel->restaurants;
 
-$app = (new \App\Repositories\SettingsRepository())->getAll();
-$foodConfig = (new \App\Repositories\FoodSettingsRepository())->getAll();
-
-// Settings from seeder/config
+$pageTitle = 'Food';
 $heroImage = '/images/food/' . rawurlencode($foodConfig['hero_image'] ?? 'food-hero.jpg');
-$pageTitle = $viewModel->pageTitle ?? 'Food';
-
 $introHeading = $foodConfig['intro_heading'] ?? 'Taste the Festival Spirit in Haarlem';
 $introText = $foodConfig['intro_text'] ?? '';
-
 $filters = $foodConfig['filter_labels'] ?? ['All'];
-$restaurants = $viewModel->restaurants ?? [];
 $localsReviews = $foodConfig['locals_reviews'] ?? [];
 
-/**
- * Helpers
- */
-$normalize = static function(string $s): string {
-    $s = mb_strtolower(trim($s));
-    $s = preg_replace('/\s+/', ' ', $s);
-    return $s;
+$normalize = static function (string $value): string {
+    $value = mb_strtolower(trim($value));
+    return preg_replace('/\s+/', ' ', $value);
 };
 
-$matchesFilter = static function(array $restaurant, string $filter, callable $normalize): bool {
-    if ($filter === 'All') return true;
-
-    $filterN = $normalize($filter);
-    $tags = $restaurant['tags'] ?? [];
-
-    foreach ($tags as $t) {
-        $tagN = $normalize((string)$t);
-
-        // exact OR partial match (so "Seafood" matches "Fish & Seafood")
-        if ($tagN === $filterN || str_contains($tagN, $filterN) || str_contains($filterN, $tagN)) {
-            return true;
-        }
-    }
-    return false;
-};  
-
-$renderStars = static function(float $rating): string {
-    // rating expected 0..5, display as full stars only (like the screenshot style)
-    $full = (int) round($rating);
-    $full = max(0, min(5, $full));
-    $out = '';
-    for ($i = 1; $i <= 5; $i++) $out .= ($i <= $full) ? '★' : '☆';
-    return $out;
+$renderStars = static function (int $stars): string {
+    $stars = max(0, min(5, $stars));
+    return str_repeat('★', $stars) . str_repeat('☆', 5 - $stars);
 };
 ?>
 <!DOCTYPE html>
@@ -55,7 +26,6 @@ $renderStars = static function(float $rating): string {
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle) ?></title>
 <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars($app['css_version']) ?>">
-<link rel="stylesheet" href="/css/food.css?v=<?= htmlspecialchars($app['css_version']) ?>">
 </head>
 
 <body class="food-page">
@@ -102,89 +72,43 @@ $renderStars = static function(float $rating): string {
         </div>
 
         <div class="food-cards-grid" id="foodCards">
-    <?php foreach ($restaurants as $r):
-        /** @var \App\Models\Restaurant $r */
-
-        $id = (int)$r->restaurantId;
-        $name = (string)$r->name;
-        $image = (string)($r->image ?? '');
-        $imagePath = $image ? '/images/food/' . rawurlencode($image) : '';
-
-        // tags: we’ll derive from "type" because DB column is type (comma separated)
-        $tags = array_filter(array_map('trim', explode(',', (string)$r->type)));
-        $rating = (float)$r->stars; // your DB uses stars (3/4). keep renderStars().
-
-        $price = '€' . number_format((float)$r->priceAdult, 2);
-        $kidsPrice = 'Kids<' . (int)$r->kidAgeMax . ' €' . number_format((float)$r->priceKid, 2);
-
-        $seats = (int)$r->seats;
-        $firstSession = substr((string)$r->firstSession, 0, 5);
-
-        $walk = $r->walkMinutesToPatronaat !== null
-            ? ((int)$r->walkMinutesToPatronaat . ' min')
-            : '';
-
-        $address = (string)$r->address;
-
-        $dataTags = array_map($normalize, array_map('strval', $tags));
-        $dataTagsAttr = htmlspecialchars(json_encode($dataTags, JSON_UNESCAPED_UNICODE));
+    <?php foreach ($restaurants as $restaurant): ?>
+    <?php
+    $tags = array_filter(array_map('trim', explode(',', $restaurant->type)));
+    $imagePath = $restaurant->image ? '/images/food/' . rawurlencode($restaurant->image) : '';
+    $dataTags = htmlspecialchars(json_encode(array_map($normalize, $tags), JSON_UNESCAPED_UNICODE));
     ?>
-        <a class="food-card-link"
-           href="/food/restaurant/<?= $id ?>"
-           aria-label="Open <?= htmlspecialchars($name) ?> details">
-            <article class="food-card"
-                     data-tags="<?= $dataTagsAttr ?>"
-                     data-name="<?= htmlspecialchars($name) ?>">
+    <a class="food-card-link"
+       href="/food/restaurant/<?= (int) $restaurant->restaurantId ?>"
+       aria-label="Open <?= htmlspecialchars($restaurant->name) ?> details">
+        <article class="food-card"
+                 data-tags="<?= $dataTags ?>"
+                 data-name="<?= htmlspecialchars($restaurant->name) ?>">
 
-                <div class="food-card-image-wrap">
-                    <?php if ($imagePath): ?>
-                        <img src="<?= htmlspecialchars($imagePath) ?>"
-                             alt="<?= htmlspecialchars($name) ?>"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <?php endif; ?>
-                    <div class="food-card-placeholder" style="<?= $imagePath ? 'display:none;' : 'display:flex;' ?>">🍽️</div>
-                </div>
+            <div class="food-card-image-wrap">
+                <?php if ($imagePath): ?>
+                    <img src="<?= htmlspecialchars($imagePath) ?>"
+                         alt="<?= htmlspecialchars($restaurant->name) ?>"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <?php endif; ?>
+                <div class="food-card-placeholder" style="<?= $imagePath ? 'display:none;' : 'display:flex;' ?>">🍽️</div>
+            </div>
 
-                <div class="food-card-body">
-                    <h3 class="food-card-title"><?= htmlspecialchars($name) ?></h3>
-
-                    <p class="food-card-tags">
-                        <?= htmlspecialchars(implode(', ', $tags)) ?>
-                    </p>
-
-                    <p class="food-card-stars" aria-label="Rating <?= htmlspecialchars((string)$rating) ?> out of 5">
-                        <span class="food-stars"><?= htmlspecialchars($renderStars($rating)) ?></span>
-                    </p>
-
-                    <p class="food-card-prices">
-                        <span><?= htmlspecialchars($price) ?></span>
-                        <span class="food-price-sep">•</span>
-                        <span><?= htmlspecialchars($kidsPrice) ?></span>
-                    </p>
-
-                    <p class="food-card-seats">
-                        Seats <?= htmlspecialchars((string)$seats) ?>
-                    </p>
-
-                    <div class="food-card-cta">
-                        <span class="food-session-badge">First session <?= htmlspecialchars($firstSession) ?></span>
-                    </div>
-
-                    <div class="food-card-footer">
-                        <?php if ($walk): ?>
-                            <span class="food-walk">
-                                <?= htmlspecialchars($walk) ?> to the Patronaat <span aria-hidden="true">🚶</span>
-                            </span>
-                        <?php endif; ?>
-                    </div>
-
-                    <?php if ($address): ?>
-                        <p class="food-card-address"><?= htmlspecialchars($address) ?></p>
-                    <?php endif; ?>
-                </div>
-            </article>
-        </a>
-    <?php endforeach; ?>
+            <div class="food-card-body">
+                <h3 class="food-card-title"><?= htmlspecialchars($restaurant->name) ?></h3>
+                <p class="food-card-tags"><?= htmlspecialchars(implode(', ', $tags)) ?></p>
+                <p class="food-card-stars"><?= htmlspecialchars($renderStars($restaurant->stars)) ?></p>
+                <p class="food-card-prices">
+                    €<?= number_format($restaurant->priceAdult, 2) ?>
+                    •
+                    Kids&lt;<?= (int) $restaurant->kidAgeMax ?> €<?= number_format($restaurant->priceKid, 2) ?>
+                </p>
+                <p class="food-card-seats">Seats <?= (int) $restaurant->seats ?></p>
+                <p class="food-card-address"><?= htmlspecialchars($restaurant->address) ?></p>
+            </div>
+        </article>
+    </a>
+<?php endforeach; ?>
 </div>
     </section>
 

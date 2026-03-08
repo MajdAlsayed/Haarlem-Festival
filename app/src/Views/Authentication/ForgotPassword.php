@@ -1,5 +1,5 @@
 <?php
-$app = (new \App\Repositories\SettingsRepository())->getAll();
+$app = $viewModel->appSettings;
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -6,6 +6,7 @@ namespace App\Controllers;
 use App\Core\Csrf;
 use App\Core\Session;
 use App\Repositories\PasswordResetTokenRepository;
+use App\Repositories\SettingsRepository;
 use App\Repositories\UserRepository;
 use App\Services\AuthService;
 use App\ViewModels\ForgotPasswordViewModel;
@@ -16,6 +17,7 @@ use App\ViewModels\ResetPasswordViewModel;
 final class AuthController
 {
     private AuthService $auth;
+    private SettingsRepository $settingsRepository;
 
     public function __construct()
     {
@@ -23,6 +25,13 @@ final class AuthController
             new UserRepository(),
             new PasswordResetTokenRepository()
         );
+
+        $this->settingsRepository = new SettingsRepository();
+    }
+
+    private function appSettings(): array
+    {
+        return $this->settingsRepository->getAll();
     }
 
     public function showLogin(): void
@@ -30,6 +39,7 @@ final class AuthController
         $viewModel = new LoginViewModel(
             csrf: Csrf::token('login'),
             error: Session::getFlash('login_error'),
+            appSettings: $this->appSettings(),
         );
 
         require __DIR__ . '/../Views/Authentication/Login.php';
@@ -88,6 +98,7 @@ final class AuthController
             email: (string)($old['email'] ?? ''),
             firstName: (string)($old['firstName'] ?? ''),
             lastName: (string)($old['lastName'] ?? ''),
+            appSettings: $this->appSettings(),
         );
 
         require __DIR__ . '/../Views/Authentication/Register.php';
@@ -159,6 +170,7 @@ final class AuthController
             success: Session::getFlash('forgot_password_success'),
             dummyLink: Session::getFlash('forgot_password_dummy_link'),
             identifier: Session::getFlash('forgot_password_old_identifier') ?? '',
+            appSettings: $this->appSettings(),
         );
 
         require __DIR__ . '/../Views/Authentication/ForgotPassword.php';
@@ -205,6 +217,7 @@ final class AuthController
             token: $token,
             error: $error,
             success: $success,
+            appSettings: $this->appSettings(),
         );
 
         require __DIR__ . '/../Views/Authentication/ResetPassword.php';

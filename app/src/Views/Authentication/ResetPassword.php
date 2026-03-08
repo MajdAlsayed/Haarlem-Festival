@@ -1,5 +1,5 @@
 <?php
-$app = (new \App\Repositories\SettingsRepository())->getAll();
+$app = $viewModel->appSettings;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -63,27 +63,7 @@ $app = (new \App\Repositories\SettingsRepository())->getAll();
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
 
-<script>
-(function () {
-    document.querySelectorAll('.auth-eye-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            var targetId = this.getAttribute('data-target');
-            var input    = document.getElementById(targetId);
-            var img      = this.querySelector('.eye-icon');
 
-            if (!input) return;
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                img.src    = '/images/eye.jpg';
-            } else {
-                input.type = 'password';
-                img.src    = '/images/eye.jpg';
-            }
-        });
-    });
-})();
-</script>
 
 </body>
 </html>
