@@ -36,7 +36,8 @@ set_exception_handler(function (Throwable $e): void {
 });
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
+$uri = rtrim((string) $uri, '/');
+if ($uri === '') $uri = '/';
 
 if (preg_match('#^/food/restaurant/(\d+)$#', $uri, $m)) {
     (new FoodController())->restaurant((int) $m[1]);
@@ -96,6 +97,10 @@ switch ($uri) {
     case '/cart/update':
         if ($method === 'POST') (new CartController())->update();
         else http_response_code(405);
+        break;
+
+    case '/dance':
+        (new DanceController())->index();
         break;
 
     case '/food':

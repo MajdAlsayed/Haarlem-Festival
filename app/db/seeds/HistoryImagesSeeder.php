@@ -6,6 +6,13 @@ use Phinx\Seed\AbstractSeed;
 
 class HistoryImagesSeeder extends AbstractSeed
 {
+    public function getDependencies(): array
+    {
+        return [
+            'HistoryLocationsSeeder',
+        ];
+    }
+
     public function run(): void
     {
         $this->execute('DELETE FROM history_images');
