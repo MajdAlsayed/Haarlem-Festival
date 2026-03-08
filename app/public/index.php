@@ -23,6 +23,12 @@ set_exception_handler(function (Throwable $e): void {
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+// Dynamic route: location detail page
+if (preg_match('#^/history/location/([a-z0-9-]+)$#', $uri, $m)) {
+    (new HistoryController())->show($m[1]);
+    exit;
+}
+
 switch ($uri) {
     case '/':
     case '/home':
@@ -36,6 +42,7 @@ switch ($uri) {
     case '/history':
         (new HistoryController())->index();
         break;
+
     case '/history/locations':
         (new HistoryController())->locations();
         break;

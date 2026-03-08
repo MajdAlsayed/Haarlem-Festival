@@ -12,4 +12,5 @@ class HistoryLocation
     public ?int $pageId;
     public int $sortOrder;
     public ?string $shortDescription = null;
+    public ?string $pageSlug = null;
 }

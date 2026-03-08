@@ -24,7 +24,7 @@ $locationCards = $blocks['location_cards']['content'] ?? [];
 
 <main>
     <!-- HERO -->
-    <section class="history-hero-section">
+    <section class="history-hero-section history-hero-section--locations">
         <div class="history-hero-background">
             <img
                     src="<?= htmlspecialchars($viewModel->heroImage?->imageUrl ?? '') ?>"
@@ -32,24 +32,30 @@ $locationCards = $blocks['location_cards']['content'] ?? [];
             >
         </div>
         <div class="history-hero-content">
-            <div class="history-hero-title-container">
-                <h1 class="history-locations-hero-title"><?= nl2br(htmlspecialchars($hero['title'] ?? '')) ?></h1>
+            <div class="container">
+                <div class="history-hero-title-container">
+                    <h1 class="history-hero-title history-hero-title--yellow"><?= nl2br(htmlspecialchars($hero['title'] ?? '')) ?></h1>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- BREADCRUMBS -->
     <nav class="history-breadcrumb" aria-label="Breadcrumb">
-        <a href="/" class="history-breadcrumb-link">HOME</a>
-        <span class="history-breadcrumb-separator">→</span>
-        <a href="/history" class="history-breadcrumb-link">HISTORY</a>
-        <span class="history-breadcrumb-separator">→</span>
-        <span class="history-breadcrumb-link active" aria-current="page">LANDMARKS</span>
+        <div class="container">
+            <a href="/" class="history-breadcrumb-link">HOME</a>
+            <span class="history-breadcrumb-separator">→</span>
+            <a href="/history" class="history-breadcrumb-link">HISTORY</a>
+            <span class="history-breadcrumb-separator">→</span>
+            <span class="history-breadcrumb-link active" aria-current="page">LANDMARKS</span>
+        </div>
     </nav>
 
     <!-- ABOUT BANNER -->
     <section class="history-heritage-banner">
-        <p class="history-intro-text"><?= htmlspecialchars($aboutBanner['text'] ?? '') ?></p>
+        <div class="container">
+            <p class="history-intro-text"><?= htmlspecialchars($aboutBanner['text'] ?? '') ?></p>
+        </div>
     </section>
 
     <!-- LOCATION CARDS -->
@@ -63,23 +69,40 @@ $locationCards = $blocks['location_cards']['content'] ?? [];
             $index++;
             ?>
             <section class="history-location-section <?= $layoutClass ?>">
-                <div class="history-location-image-container">
-                    <img
-                            src="<?= htmlspecialchars($image?->imageUrl ?? '') ?>"
-                            alt="<?= htmlspecialchars($location->name) ?>"
-                    >
-                </div>
-                <div class="history-location-content">
-                    <h2 class="history-location-title"><?= htmlspecialchars($location->name) ?></h2>
-                    <div class="history-location-description">
-                        <p class="history-location-text"><?= htmlspecialchars($location->description1 ?? '') ?></p>
-                        <p class="history-location-text"><?= htmlspecialchars($location->description2 ?? '') ?></p>
+                <div class="container">
+                    <div class="history-location-image-container">
+                        <img
+                                src="<?= htmlspecialchars($image?->imageUrl ?? '') ?>"
+                                alt="<?= htmlspecialchars($location->name) ?>"
+                        >
                     </div>
-                    <a href="/history/location/<?= htmlspecialchars($location->slug) ?>"
-                       class="history-read-more-button">
-                        <span class="history-read-more-text">READ MORE</span>
-                    </a>
+                    <div class="history-location-content">
+                        <h2 class="history-location-title"><?= htmlspecialchars($location->name) ?></h2>
+                        <div class="history-location-description">
+                            <p class="history-location-text"><?= htmlspecialchars($location->description1 ?? '') ?></p>
+                            <p class="history-location-text"><?= htmlspecialchars($location->description2 ?? '') ?></p>
+                        </div>
+                        <a href="/history/location/<?= htmlspecialchars($location->slug) ?>"
+                           class="history-read-more-button">
+                            <span class="history-read-more-text">READ MORE</span>
+                        </a>
+                    </div>
                 </div>
             </section>
         <?php endforeach; ?>
     </div>
+
+    <!-- GO BACK -->
+    <section class="history-back-section">
+        <div class="container">
+            <p class="history-back-text">Go back to the Event Page</p>
+            <a href="/history" class="history-button-big">
+                <span class="history-button-text">BACK</span>
+            </a>
+        </div>
+    </section>
+
+</main>
+<?php require __DIR__ . '/../partials/footer.php'; ?>
+</body>
+</html>

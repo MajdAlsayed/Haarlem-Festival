@@ -8,6 +8,9 @@ class HistoryImagesSeeder extends AbstractSeed
 {
     public function run(): void
     {
+        $this->execute('DELETE FROM history_images');
+        $this->execute('ALTER TABLE history_images AUTO_INCREMENT = 1');
+
         // Get page_id by slug
         $historyPage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history'");
         $locationsPage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history-locations'");
@@ -66,7 +69,7 @@ class HistoryImagesSeeder extends AbstractSeed
             6 => ['name' => 'Waalse Kerk', 'slug' => 'waalse-kerk'],
             7 => ['name' => 'Molen de Adriaan', 'slug' => 'molen-de-adriaan'],
             8 => ['name' => 'Amsterdamse Poort', 'slug' => 'amsterdamse-poort'],
-            9 => ['name' => 'Hof van Bakenes', 'slug' => 'hof-van-bakenes']
+            9 => ['name' => 'Hof van Bakenes', 'slug' => 'hofje-van-bakenes']
         ];
 
         foreach ($locations as $locationId => $location) {

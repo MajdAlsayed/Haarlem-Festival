@@ -15,5 +15,17 @@ class HistoryPagesSeeder extends AbstractSeed
             ('history-st-bavo', 'Church of St. Bavo', 1),
             ('history-grote-markt', 'Grote Markt', 1)
         ");
+
+        $this->execute("
+            UPDATE history_locations 
+            SET page_id = (SELECT page_id FROM pages WHERE slug = 'history-st-bavo')
+            WHERE slug = 'st-bavo'
+");
+
+        $this->execute("
+            UPDATE history_locations 
+            SET page_id = (SELECT page_id FROM pages WHERE slug = 'history-grote-markt')
+            WHERE slug = 'grote-markt'
+");
     }
 }

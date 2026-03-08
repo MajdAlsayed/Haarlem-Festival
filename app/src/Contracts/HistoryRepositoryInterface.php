@@ -20,6 +20,10 @@ interface HistoryRepositoryInterface
 
     public function getLocationById(int $id): ?HistoryLocation;
 
+    public function getLocationBySlug(string $slug): ?HistoryLocation;
+
+    public function getLocationBySortOrder(int $sortOrder): ?HistoryLocation;
+
     // IMAGES
     public function getPrimaryImage(int $locationId): ?HistoryImage;
 
@@ -34,6 +38,10 @@ interface HistoryRepositoryInterface
     public function getImageById(int $imageId): ?HistoryImage;
 
     // BLOCKS
+
     /** @return array{page_id: int|null, blocks: array} */
     public function getPageBlocks(string $slug): array;
+
+    /** @return array{page_id: int|null, blocks: list<array>} */
+    public function getPageBlocksList(string $slug): array;
 }

@@ -5,6 +5,8 @@ namespace App\Controllers;
 use App\Repositories\HistoryRepository;
 use App\Services\HistoryService;
 use App\ViewModels\HistoryViewModel;
+use App\ViewModels\HistoryLocationViewModel;
+use App\Exceptions\NotFoundException;
 
 class HistoryController
 {
@@ -20,11 +22,11 @@ class HistoryController
 
         // Get page blocks
         $result = $this->historyService->getPageBlocks('history');
-        $pageId = $result['page_id'];
         $blocks = $result['blocks'];
 
         // Get hero image (if no - return null)
-        $heroImage = $pageId ? $this->historyService->getPageHeroImage($pageId): null;
+        $heroImageId = $blocks['hero']['content']['image_id'] ?? null;
+        $heroImage = $heroImageId ? $this->historyService->getImageById($heroImageId) : null;
 
         // Get locations for location_cards block
         $locationIds = array_column(
@@ -55,11 +57,11 @@ class HistoryController
     {
         // Get page blocks
         $result = $this->historyService->getPageBlocks('history-locations');
-        $pageId = $result['page_id'];
         $blocks = $result['blocks'];
 
         // Get hero image (if no - return null)
-        $heroImage = $pageId ? $this->historyService->getPageHeroImage($pageId): null;
+        $heroImageId = $blocks['hero']['content']['image_id'] ?? null;
+        $heroImage = $heroImageId ? $this->historyService->getImageById($heroImageId) : null;
 
         // Get all locations from location_cards block
         $locationIds = array_column(
@@ -85,5 +87,54 @@ class HistoryController
         );
 
         require __DIR__ . '/../Views/History/Locations.php';
+    }
+
+    public function show(string $slug): void
+    {
+        $location = $this->historyService->getLocationBySlug($slug);
+
+        if ($location === null) {
+            throw new NotFoundException('Location not found');
+        }
+
+        // Get page blocks
+        $result = $this->historyService->getPageBlocksList($location->pageSlug);
+        $blocks = $result['blocks'];
+
+        $heroBlock = null;
+        foreach ($blocks as $block) {
+            if ($block['block_type'] === 'hero') {
+                $heroBlock = $block['content'];
+                break;
+            }
+        }
+
+        $contentImages = [];
+        foreach ($blocks as $block) {
+            if ($block['block_type'] === 'content_section') {
+                $imageIds = $block['content']['image_ids'] ?? [];
+                foreach ($imageIds as $imageId) {
+                    $contentImages[$imageId] = $this->historyService->getImageById($imageId);
+                }
+            }
+        }
+
+        $heroImageId = $heroBlock['image_id'] ?? null;
+        $heroImage = $heroImageId ? $this->historyService->getImageById($heroImageId) : null;
+
+        // Get previous and next locations for navigation
+        $prevLocation = $this->historyService->getLocationBySortOrder($location->sortOrder - 1);
+        $nextLocation = $this->historyService->getLocationBySortOrder($location->sortOrder + 1);
+
+        $viewModel = new HistoryLocationViewModel(
+            blocks: $blocks,
+            location: $location,
+            heroImage: $heroImage,
+            contentImages: $contentImages,
+            prevLocation: $prevLocation,
+            nextLocation: $nextLocation,
+        );
+
+        require __DIR__ . '/../Views/History/Location.php';
     }
 }

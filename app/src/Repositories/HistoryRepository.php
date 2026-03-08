@@ -89,6 +89,7 @@ class HistoryRepository implements HistoryRepositoryInterface
         $historyLocation->slug = $row->slug;
         $historyLocation->pageId = (int)$row->page_id;
         $historyLocation->shortDescription = $row->short_description;
+        $historyLocation->pageSlug = $row->page_slug ?? null;
 
         return $historyLocation;
     }
@@ -121,6 +122,49 @@ class HistoryRepository implements HistoryRepositoryInterface
         );
 
         $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(\PDO::FETCH_OBJ);
+
+        if (!$row) {
+            return null;
+        }
+        return $this->mapToHistoryLocations($row);
+    }
+
+    public function getLocationBySlug(string $slug): ?HistoryLocation
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT hl.history_location_id, hl.name, hl.slug, hl.description_1, hl.description_2, 
+            hl.short_description, hl.page_id, hl.sort_order, p.slug as page_slug
+            FROM history_locations hl
+            LEFT JOIN pages p ON hl.page_id = p.page_id
+            WHERE hl.slug = :slug
+            LIMIT 1'
+        );
+
+        $stmt->execute(['slug' => $slug]);
+        $row = $stmt->fetch(\PDO::FETCH_OBJ);
+
+        if (!$row) {
+            return null;
+        }
+        return $this->mapToHistoryLocations($row);
+    }
+
+    public function getLocationBySortOrder(int $sortOrder): ?HistoryLocation
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT history_location_id, name, slug, description_1, description_2, 
+        short_description, page_id, sort_order
+        FROM history_locations
+        WHERE sort_order = :sort_order
+        LIMIT 1'
+        );
+
+        $stmt->execute(['sort_order' => $sortOrder]);
         $row = $stmt->fetch(\PDO::FETCH_OBJ);
 
         if (!$row) {
@@ -299,6 +343,40 @@ class HistoryRepository implements HistoryRepositoryInterface
         return [
             'page_id' => $pageId,
             'blocks' => $blocks
+        ];
+    }
+
+    public function getPageBlocksList(string $slug): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT pb.block_id, pb.page_id, pb.block_type, pb.content_json, pb.sort_order
+            FROM page_blocks pb
+            INNER JOIN pages p ON pb.page_id = p.page_id
+            WHERE p.slug = :slug
+            ORDER BY pb.sort_order'
+        );
+
+        $stmt->execute(['slug' => $slug]);
+        $rows = $stmt->fetchAll(\PDO::FETCH_OBJ);
+
+        $pageId = null;
+        $blocks = [];
+
+        foreach ($rows as $row) {
+            $pageId = (int)$row->page_id;
+            // Each block is stored as a numbered element — no overwriting
+            $blocks[] = [
+                'block_id' => (int)$row->block_id,
+                'block_type' => $row->block_type,
+                'content' => json_decode($row->content_json, true),
+                'sort_order' => $row->sort_order,
+            ];
+        }
+        return [
+            'page_id' => $pageId,
+            'blocks' => $blocks,
         ];
     }
 }

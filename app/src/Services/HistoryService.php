@@ -13,6 +13,7 @@ class HistoryService
     ){
     }
 
+    // LOCATIONS
     public function getAllLocations(): array
     {
         return $this->historyRepository->getAllLocations();
@@ -23,18 +24,45 @@ class HistoryService
         return $this->historyRepository->getLocationById($id);
     }
 
+    public function getLocationBySlug(string $slug): ?HistoryLocation
+    {
+        return $this->historyRepository->getLocationBySlug($slug);
+    }
+
+    public function getLocationBySortOrder(int $sortOrder): ?HistoryLocation
+    {
+        return $this->historyRepository->getLocationBySortOrder($sortOrder);
+    }
+
+    //IMAGES
     public function getPrimaryImage(int $locationId): ?HistoryImage
     {
         return $this->historyRepository->getPrimaryImage($locationId);
     }
 
+    public function getPageHeroImage(int $pageId): ?HistoryImage
+    {
+        return $this->historyRepository->getPageHeroImage($pageId);
+    }
+
+    public function getLocationGallery(int $locationId): array
+    {
+        return $this->historyRepository->getLocationGallery($locationId);
+    }
+
+    public function getImageById(int $imageId): ?HistoryImage
+    {
+        return $this->historyRepository->getImageById($imageId);
+    }
+
+    // BLOCKS
     public function getPageBlocks(string $slug): array
     {
         return $this->historyRepository->getPageBlocks($slug);
     }
 
-    public function getPageHeroImage(int $pageId): ?HistoryImage
+    public function getPageBlocksList(string $slug): array
     {
-        return $this->historyRepository->getPageHeroImage($pageId);
+        return $this->historyRepository->getPageBlocksList($slug);
     }
 }
