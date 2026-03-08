@@ -8,6 +8,10 @@ final class CreateStoriesTable extends AbstractMigration
 {
     public function change(): void
     {
+        if ($this->hasTable('stories')) {
+            return;
+        }
+
         $table = $this->table('stories', ['id' => false, 'primary_key' => 'story_id']);
 
         $table
