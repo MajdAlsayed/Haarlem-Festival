@@ -10,6 +10,7 @@ use App\Controllers\EventDetailController;
 use App\Controllers\ArtistController;
 use App\Controllers\FoodController;
 use App\Controllers\HomeController;
+use App\Controllers\HistoryController;
 use App\Exceptions\AppException;
 use App\Exceptions\NotFoundException;
 
@@ -43,6 +44,11 @@ if (preg_match('#^/dance/artist/([a-z0-9-]+)$#', $uri, $m)) {
     exit;
 }
 
+if (preg_match('#^/history/location/([a-z0-9-]+)$#', $uri, $m)) {
+    (new HistoryController())->show($m[1]);
+    exit;
+}
+
 switch ($uri) {
     case '/':
     case '/home':
@@ -71,6 +77,14 @@ switch ($uri) {
 
     case '/logout':
         (new AuthController())->logout();
+        break;
+
+    case '/history':
+        (new HistoryController())->index();
+        break;
+
+    case '/history/locations':
+        (new HistoryController())->locations();
         break;
 
     default:

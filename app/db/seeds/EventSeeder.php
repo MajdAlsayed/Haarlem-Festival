@@ -184,6 +184,39 @@ class EventSeeder extends AbstractSeed
                 'event_day' => 'sunday',
                 'start_time' => '21:00',
             ],
+            // History events (4 days)
+            [
+                'event_type_id' => 3,
+                'venue_id' => 2,
+                'title' => 'A Stroll Through History',
+                'description' => 'Discover Haarlem\'s rich heritage through a guided walking tour.',
+                'event_day' => 'thursday',
+                'start_time' => '10:00',
+            ],
+            [
+                'event_type_id' => 3,
+                'venue_id' => 2,
+                'title' => 'A Stroll Through History',
+                'description' => 'Discover Haarlem\'s rich heritage through a guided walking tour.',
+                'event_day' => 'friday',
+                'start_time' => '10:00',
+            ],
+            [
+                'event_type_id' => 3,
+                'venue_id' => 2,
+                'title' => 'A Stroll Through History',
+                'description' => 'Discover Haarlem\'s rich heritage through a guided walking tour.',
+                'event_day' => 'saturday',
+                'start_time' => '10:00',
+            ],
+            [
+                'event_type_id' => 3,
+                'venue_id' => 2,
+                'title' => 'A Stroll Through History',
+                'description' => 'Discover Haarlem\'s rich heritage through a guided walking tour.',
+                'event_day' => 'sunday',
+                'start_time' => '10:00',
+            ],
             // Other categories (for homepage one-per-category)
             [
                 'event_type_id' => 2,
@@ -200,14 +233,6 @@ class EventSeeder extends AbstractSeed
                 'description' => 'Taste food from all around the world.',
                 'event_day' => 'friday',
                 'start_time' => '12:00',
-            ],
-            [
-                'event_type_id' => 3,
-                'venue_id' => 2,
-                'title' => 'Historic City Tour',
-                'description' => 'Explore centuries of stories, architecture, and heritage.',
-                'event_day' => 'friday',
-                'start_time' => '10:00',
             ],
             [
                 'event_type_id' => 5,

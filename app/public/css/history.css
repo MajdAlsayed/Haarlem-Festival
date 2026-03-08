@@ -1,0 +1,881 @@
+/* Hero Section Start */
+.history-hero-section {
+    position: relative;
+    width: 100%;
+    min-height: 520px;
+    overflow: hidden;
+}
+.history-hero-section h1,
+.history-hero-section p {
+    margin: 0;
+}
+.history-hero-bottom .history-button-big {
+    width: fit-content;
+}
+.history-hero-background {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.history-hero-background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.history-hero-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 40px;
+    z-index: 1;
+    padding-bottom: 40px;
+}
+
+.history-hero-title-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.history-hero-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.history-hero-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 48px;
+    line-height: 64px;
+    letter-spacing: 3px;
+    color: white;
+    text-shadow: 2px 4px 2px rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+}
+
+.history-hero-title--yellow {
+    color: #f8dc3d;
+}
+
+.history-hero-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 24px;
+    line-height: 36px;
+    letter-spacing: 2px;
+    color: #f8dc3d;
+    text-shadow: 2px 4px 2px rgba(0, 0, 0, 0.5);
+}
+
+.history-hero-description {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 26px;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 2px 4px 2px rgba(0, 0, 0, 0.5);
+}
+
+.history-hero-section--locations .history-hero-background img {
+    object-position: center 80%;
+}
+
+.history-hero-section--st-bavo .history-hero-background img {
+    object-position: center 60%;
+}
+/* Hero Section End */
+
+/* Breadcrumb Start*/
+.history-breadcrumb {
+    width: 100%;
+    gap: 30px;
+    align-items: center;
+}
+
+.history-breadcrumb-link {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 22px;
+    color: white;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+.history-breadcrumb-link.active {
+    color: #e58708;
+}
+
+.history-breadcrumb-separator {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: white;
+    text-transform: uppercase;
+}
+/* Breadcrumb End */
+
+/* Heritage Banner Start*/
+.history-heritage-banner {
+    width: 100%;
+    padding: 50px 0;
+    background: #deccab;
+    color: #292929;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-heritage-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 36px;
+    line-height: 48px;
+    letter-spacing: 2px;
+    color: #292929;
+    margin: 0;
+}
+
+.history-heritage-content {
+    display: flex;
+    gap: 110px;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+.history-heritage-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.75;
+    color: #292929;
+    margin: 0;
+}
+/* Heritage Banner End */
+
+/* 9 Sites Section Start */
+.history-sites-section {
+    width: 100%;
+    padding: 80px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 70px;
+    align-items: center;
+}
+
+.history-sites-header {
+    width: 100%;
+}
+
+.history-sites-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 32px;
+    line-height: 48px;
+    letter-spacing: 2px;
+    color: #f8dc3d;
+    text-transform: uppercase;
+    margin: 0 0 12px 0;
+}
+
+.history-sites-description {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 2px;
+    color: white;
+    margin: 0 0 40px 0;
+}
+.history-sites-section .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+/* 9 Sites Section End */
+
+/* History Card Start*/
+.history-cards-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    align-items: stretch;
+    margin: 0 0 40px 0;
+}
+
+.history-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.history-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+.history-card-title,
+.history-card-text {
+    margin: 0;
+}
+.history-card-image {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 75%;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.history-card-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.history-card:hover .history-card-image img {
+    transform: scale(1.05);
+}
+
+.history-card-content {
+    flex: 1;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(
+            rgba(255, 255, 255, 0.09) 0%,
+            rgba(255, 255, 255, 0) 100%
+    ),
+    linear-gradient(
+            90deg,
+            rgba(16, 9, 12, 0.6) 0%,
+            rgba(16, 9, 12, 0.6) 100%
+    );
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.history-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-self: stretch;
+    margin-bottom: 20px
+}
+
+.history-card-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1.3;
+    letter-spacing: 2px;
+    color: #f8dc3d;
+    text-align: left;
+}
+
+.history-card-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: white;
+    margin: 0;
+}
+/* History Card End */
+
+/* Read More Button Start */
+.history-read-more-button {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: left;
+    height: 22px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    text-decoration: none;
+    margin-top: auto;
+}
+
+.history-read-more-button:hover {
+    opacity: 0.8;
+}
+
+.history-read-more-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 2px;
+    color: #e58708;
+    text-transform: uppercase;
+}
+/* Read More Button End */
+
+/* Button Start */
+.history-button-big {
+    padding: 12px 26px;
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 3px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.history-button-big:hover {
+    box-shadow: 3px 6px 8px 0px rgba(0, 0, 0, 0.35);
+    transform: translateY(-2px);
+}
+
+.history-button-big:active {
+    transform: translateY(0);
+    box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+.history-button-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    color: #292929;
+    text-transform: uppercase;
+}
+/* Button End */
+
+/* Experience Section Start */
+.history-experience-section {
+    width: 100%;
+    padding: 80px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.29);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.29);
+}
+
+.history-experience-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 32px;
+    line-height: 48px;
+    letter-spacing: 2px;
+    color: #f8dc3d;
+    text-align: center;
+    margin: 0 0 12px 0;
+}
+
+.history-experience-description {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.75;
+    color: white;
+    text-align: center;
+    max-width: 745px;
+    margin: 0 0 28px 0;
+}
+
+.history-experience-section .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+/* Experience Section End */
+
+/* Responsive Start */
+@media (max-width: 1440px) {
+    .history-heritage-banner,
+    .history-breadcrumb {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .history-heritage-content {
+        gap: 60px;
+    }
+
+    .history-heritage-text {
+        width: calc(50% - 30px);
+    }
+
+    .history-sites-description {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 1200px) {
+    .history-hero-title {
+        font-size: 48px;
+        line-height: 60px;
+    }
+
+    .history-hero-subtitle {
+        font-size: 32px;
+        line-height: 48px;
+    }
+
+    .history-heritage-content {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .history-heritage-text {
+        width: 100%;
+    }
+
+    .history-cards-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .history-hero-title {
+        font-size: 36px;
+        line-height: 48px;
+    }
+
+    .history-hero-subtitle {
+        font-size: 24px;
+        line-height: 36px;
+    }
+
+    .history-hero-description {
+        font-size: 18px;
+        line-height: 28px;
+    }
+
+    .history-sites-title {
+        font-size: 32px;
+        line-height: 48px;
+    }
+
+    .history-cards-container {
+        grid-template-columns: 1fr;
+    }
+}
+/* Responsive End */
+
+/* LOCATIONS PAGE*/
+
+/* Intro text for locations page */
+.history-intro-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.75;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+/* Location Cards Section Start*/
+.history-locations-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-location-section {
+    width: 100%;
+    padding: 80px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.29);
+}
+.history-location-section .container {
+    display: flex;
+    gap: 60px;
+    align-items: stretch;
+}
+
+.history-location-image-left .container{
+    flex-direction: row;
+}
+
+.history-location-image-right .container{
+    flex-direction: row-reverse;
+}
+
+.history-location-image-container {
+    width: 45%;
+    aspect-ratio: 4/3;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.history-location-image-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    max-width: none;
+}
+
+.history-location-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    justify-content: space-between;
+}
+
+.history-location-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    line-height: 40px;
+    letter-spacing: 2px;
+    color: #f8dc3d;
+    margin: 0;
+}
+
+.history-location-description {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.history-location-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.75;
+    color: white;
+}
+
+/* Back Section Start */
+.history-back-section {
+    width: 100%;
+    padding: 80px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.29);
+}
+
+.history-back-section .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+}
+
+.history-back-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: white;
+    margin: 0;
+}
+/* Back Section End */
+
+/* Stats Bar Start */
+.history-stats-banner{
+    width: 100%;
+    padding: 40px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.29);
+}
+
+.history-stats-banner .container{
+    display: flex;
+    justify-content: space-between
+}
+
+.history-stats-item{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.history-stats-value{
+    color: #F8DC3D;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 48px;
+    line-height: 64px;
+    letter-spacing: 2px;
+}
+.history-stats-label{
+    color: white;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 120px;
+}
+/* Stats Bar End */
+
+/* Content Section */
+.history-content-section {
+    width: 100%;
+    padding: 80px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.29);
+}
+
+.history-content-section .container {
+    display: flex;
+    gap: 140px;
+    align-items: flex-start;
+}
+
+/* Layout: text left, image right */
+.history-image-right .container {
+    flex-direction: row;
+}
+
+/* Layout: image left, text right */
+.history-image-left .container {
+    flex-direction: row-reverse;
+}
+
+.history-content-text-block {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.history-content-section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 32px;
+    line-height: 48px;
+    letter-spacing: 2px;
+    color: #f8dc3d;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.history-content-section-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: #e58708;
+    text-transform: uppercase;
+    margin: 0 0 5px 0;
+}
+
+.history-content-section-paragraph {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.75;
+    color: white;
+    margin: 0;
+}
+
+.history-content-section-item {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.history-content-media {
+    width: 35%;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 75px;
+}
+
+.history-content-image {
+    width: 100%;
+    aspect-ratio: 4/3;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.history-content-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Did You Know */
+.history-did-you-know {
+    background: #e58708;
+    border-radius: 12px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.history-did-you-know-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: white;
+    margin: 0;
+}
+
+.history-did-you-know-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.75;
+    color: white;
+    margin: 0;
+}
+
+/* */
+
+/* Experience Banner */
+.history-experience-banner {
+    width: 100%;
+    padding: 60px 0;
+    background: #deccab;
+}
+
+.history-experience-banner .container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.history-experience-banner-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 36px;
+    line-height: 48px;
+    letter-spacing: 3px;
+    color: #292929;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+/* Experience Cards */
+.history-experience-cards {
+    display: flex;
+    gap: 40px;
+    align-items: stretch;
+}
+
+.history-experience-cards .container {
+    display: flex;
+    gap: 40px;
+
+}
+
+.history-experience-card {
+    flex: 1;
+    padding: 40px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.history-experience-card--white {
+    background: white;
+}
+
+.history-experience-card--orange {
+    background: #e58708;
+}
+
+.history-experience-card-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0;
+}
+.history-experience-card-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.history-experience-card-title--dark {
+    color: #292929;
+}
+.history-experience-card--white .history-experience-card-title {
+    color: #292929;
+}
+
+.history-experience-card--orange .history-experience-card-title {
+    color: white;
+}
+
+.history-experience-card-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.history-experience-card--white .history-experience-card-text {
+    color: #292929;
+}
+
+.history-experience-card--orange .history-experience-card-text {
+    color: white;
+}
+
+.history-experience-card-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #292929;
+    margin: 0;
+}
+
+.history-experience-card-detail {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 0.7;
+    color: #292929;
+    margin: 0;
+}
+
+.history-experience-card-detail-label {
+    font-weight: 700;
+}
+
+/* Location Buttons Start */
+.history-location-nav {
+    width: 100%;
+    padding: 60px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.29);
+}
+
+.history-location-nav .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+}
+/* Location Buttons End */
