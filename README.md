@@ -35,8 +35,10 @@ To run a specific seeder:
 ```bash
 docker compose run --rm php vendor/bin/phinx seed:run -s PageSeeder
 docker compose run --rm php vendor/bin/phinx seed:run -s EventSeeder
+docker compose run --rm php vendor/bin/phinx seed:run -s ArtistsSeeder
+docker compose run --rm php vendor/bin/phinx seed:run -s ArtistPhotosSeeder
+docker compose run --rm php vendor/bin/phinx seed:run -s PhotosSeeder
 docker compose run --rm php vendor/bin/phinx seed:run -s DancePageSeeder
 ```
 
-**Pages:** Each person can add their own page seeder (e.g. `DancePageSeeder`). Use `INSERT IGNORE` so seed order doesn’t matter. In app code and when inserting into `page_blocks`, always get `page_id` by slug — never hardcode IDs.
-
+**Pages:** Each person can add their own page seeder (example `DancePageSeeder`). Use `INSERT IGNORE` so seed order doesn’t matter. In app code and when inserting into `page_blocks`, always get `page_id` by slug — never hardcode IDs.   

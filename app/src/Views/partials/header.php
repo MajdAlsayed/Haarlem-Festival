@@ -1,7 +1,7 @@
 <?php
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '/';
-$navLinks = (new \App\Repositories\MenuRepository())->getNavLinks();
-$app = (new \App\Repositories\SettingsRepository())->getAll();
+if (!isset($navLinks)) $navLinks = (new \App\Repositories\MenuRepository())->getNavLinks();
+if (!isset($app)) $app = (new \App\Repositories\SettingsRepository())->getAll();
 ?>
 <header>
     <div class="nav-container">
@@ -10,7 +10,12 @@ $app = (new \App\Repositories\SettingsRepository())->getAll();
         </div>
         <nav class="nav-menu">
             <?php foreach ($navLinks as $link): ?>
-                <a href="<?= htmlspecialchars($link['path']) ?>" class="nav-link<?= ($currentPath === $link['path'] || ($link['path'] === '/' && ($currentPath === $app['home_path'] || $currentPath === '/home'))) ? ' active' : '' ?>"><?= htmlspecialchars($link['label']) ?></a><?php // active class = current page, highlighted in CSS ?>
+                <?php
+                $isActive = $currentPath === $link['path']
+                    || ($link['path'] === '/' && in_array($currentPath, [$app['home_path'] ?? '/', '/home'], true))
+                    || ($link['path'] !== '/' && $link['path'] !== '' && (strpos($currentPath, $link['path'] . '/') === 0));
+                ?>
+                <a href="<?= htmlspecialchars($link['path']) ?>" class="nav-link<?= $isActive ? ' active' : '' ?>"><?= htmlspecialchars($link['label']) ?></a>
             <?php endforeach; ?>
         </nav>
         <div class="nav-actions">

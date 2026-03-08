@@ -6,16 +6,13 @@ namespace App\Repositories;
 
 use App\Core\Database;
 
+/** site_settings: app config (css_version, home_path, footer_*, etc.). Cached. */
 class SettingsRepository
 {
-    /** @var array<string, string>|null */
+    /** @var array<string, mixed>|null */
     private static ?array $cache = null;
 
-    /**
-     * All settings as key => value. JSON values (footer_*) are decoded to arrays.
-     *
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     public function getAll(): array
     {
         if (self::$cache !== null) {
@@ -39,6 +36,7 @@ class SettingsRepository
             self::$cache = require __DIR__ . '/../Config/app.php';
             return self::$cache;
         }
+        // normalize to known keys + defaults
         $app = [
             'site_name' => $out['site_name'] ?? 'Haarlem Festival',
             'home_path' => $out['home_path'] ?? '/',
@@ -58,6 +56,7 @@ class SettingsRepository
         return $app;
     }
 
+    /** Single key; returns null if not set or not a string. */
     public function get(string $key): ?string
     {
         $all = $this->getAll();

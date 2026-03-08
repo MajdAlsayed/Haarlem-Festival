@@ -1,4 +1,4 @@
-<?php $app = (new \App\Repositories\SettingsRepository())->getAll(); ?>
+<?php if (!isset($app)) $app = (new \App\Repositories\SettingsRepository())->getAll(); ?>
 <footer class="site-footer">
     <div class="footer-container">
         <div class="footer-logo">
