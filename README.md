@@ -39,6 +39,7 @@ docker compose run --rm php vendor/bin/phinx seed:run -s ArtistsSeeder
 docker compose run --rm php vendor/bin/phinx seed:run -s ArtistPhotosSeeder
 docker compose run --rm php vendor/bin/phinx seed:run -s PhotosSeeder
 docker compose run --rm php vendor/bin/phinx seed:run -s DancePageSeeder
+docker compose run --rm php vendor/bin/phinx seed:run -s StoriesSeeder
 ```
 
 **Pages:** Each person can add their own page seeder (example `DancePageSeeder`). Use `INSERT IGNORE` so seed order doesn’t matter. In app code and when inserting into `page_blocks`, always get `page_id` by slug — never hardcode IDs.   

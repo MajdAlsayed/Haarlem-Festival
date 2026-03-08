@@ -29,25 +29,21 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['auth']['username'] ?? '') 
 
         <div class="nav-actions">
 
-            <button type="button" class="icon-btn search-btn" aria-label="Search">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="m21 21-4.35-4.35"/>
-                </svg>
-            </button>
+            <button class="icon-btn search-btn" type="button" aria-label="Search">🔍</button>
 
-            <div class="language-selector" role="button" tabindex="0" aria-label="Language">
+            <div class="language-selector" role="button" tabindex="0" aria-label="Language selector">
                 <span>EN</span>
                 <span class="dropdown">▼</span>
             </div>
 
-            <button type="button" class="icon-btn cart-btn" aria-label="Cart">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                    <line x1="3" y1="6" x2="21" y2="6"/>
-                    <path d="M16 10a4 4 0 0 1-8 0"/>
-                </svg>
-                <span class="cart-badge">0</span>
+            <!-- Cart button (opens drawer) -->
+            <button id="cartOpenBtn" class="icon-btn cart-btn" type="button" aria-label="Open cart">
+                🛒
+                <span id="cartBadge" class="cart-badge">0</span>
+
+            <?php // Search + cart: inline SVG. viewBox, path d=, cx/cy are drawing coords — they render the icon shape, not as text ?>
+            <button type="button" class="icon-btn search-btn" aria-label="Search">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             </button>
 
 <?php if ($isLoggedIn): ?>

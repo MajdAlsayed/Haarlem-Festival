@@ -1,8 +1,13 @@
 <?php
+session_start();
 
 ob_start();
 require_once __DIR__ . '/../vendor/autoload.php';
+$uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
+$uri = rtrim($uri, '/');
+if ($uri === '') $uri = '/';
 use App\Core\Session;
 use App\Controllers\AuthController;
 use App\Controllers\DanceController;
@@ -13,6 +18,7 @@ use App\Controllers\HomeController;
 use App\Controllers\HistoryController;
 use App\Exceptions\AppException;
 use App\Exceptions\NotFoundException;
+use App\Controllers\StoriesController;
 
 Session::start();
 
@@ -30,6 +36,7 @@ set_exception_handler(function (Throwable $e): void {
 });
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
 
 if (preg_match('#^/food/restaurant/(\d+)$#', $uri, $m)) {
     (new FoodController())->restaurant((int) $m[1]);
@@ -52,11 +59,43 @@ if (preg_match('#^/history/location/([a-z0-9-]+)$#', $uri, $m)) {
 switch ($uri) {
     case '/':
     case '/home':
-        (new HomeController())->index();
+        if ($method === 'GET') (new HomeController())->index();
+        else http_response_code(405);
         break;
 
-    case '/dance':
-        (new DanceController())->index();
+    case '/stories':
+        if ($method === 'GET') (new StoriesController())->index();
+        else http_response_code(405);
+        break;
+
+    case '/stories/venue':
+        if ($method === 'GET') (new StoriesController())->venue();
+        else http_response_code(405);
+        break;
+
+    case '/stories/detail':
+        if ($method === 'GET') (new StoriesController())->detail();
+        else http_response_code(405);
+        break;
+
+    case '/cart':
+        if ($method === 'GET') (new CartController())->get();
+        else http_response_code(405);
+        break;
+
+    case '/cart/add':
+        if ($method === 'POST') (new CartController())->add();
+        else http_response_code(405);
+        break;
+
+    case '/cart/remove':
+        if ($method === 'POST') (new CartController())->remove();
+        else http_response_code(405);
+        break;
+
+    case '/cart/update':
+        if ($method === 'POST') (new CartController())->update();
+        else http_response_code(405);
         break;
 
     case '/food':
@@ -100,5 +139,7 @@ switch ($uri) {
         break;
 
     default:
-        throw new NotFoundException('Page not found');
+        http_response_code(404);
+        echo 'Page not found';
+        break;
 }
