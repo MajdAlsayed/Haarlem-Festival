@@ -1,8 +1,7 @@
 <?php
-/** @var \App\Models\Restaurant $restaurant */
 
-$app = (new \App\Repositories\SettingsRepository())->getAll();
-$foodSettings = (new \App\Repositories\FoodSettingsRepository())->getAll();
+$app = $appSettings;
+$foodConfig = $foodSettings;
 
 $reservationFee = $foodSettings['reservation_fee_per_person'] ?? 10;
 
@@ -36,7 +35,6 @@ $mapSrc = "https://www.google.com/maps?q={$mapQ}&output=embed";
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars($app['css_version']) ?>">
-    <link rel="stylesheet" href="/css/food.css?v=<?= htmlspecialchars($app['css_version']) ?>">
 </head>
 
 <body class="food-detail-page">
@@ -124,16 +122,6 @@ $mapSrc = "https://www.google.com/maps?q={$mapQ}&output=embed";
         <div class="restaurant-location">
             <div class="restaurant-location__info">
                 <p class="restaurant-address"><?= htmlspecialchars($restaurant->address) ?></p>
-
-                <?php if (!empty($restaurant->website)): ?>
-                    <p><a href="<?= htmlspecialchars($restaurant->website) ?>" target="_blank" rel="noopener">Our Website</a></p>
-                <?php endif; ?>
-
-                <?php if (!empty($restaurant->phone)): ?>
-                    <p><?= htmlspecialchars($restaurant->phone) ?></p>
-                <?php endif; ?>
-            </div>
-
             <div class="restaurant-map">
                 <iframe
                     src="<?= htmlspecialchars($mapSrc) ?>"

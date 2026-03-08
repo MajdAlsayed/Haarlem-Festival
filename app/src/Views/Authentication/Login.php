@@ -1,13 +1,13 @@
 <?php
-$app = (new \App\Repositories\SettingsRepository())->getAll();
+$app = $viewModel->appSettings;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login — <?= htmlspecialchars($app['site_name']) ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars($app['css_version']) ?>">
-    <link rel="stylesheet" href="/css/auth.css?v=<?= htmlspecialchars($app['css_version']) ?>">
+    <title>Login — <?= htmlspecialchars((string)($app['site_name'] ?? 'Haarlem Festival')) ?></title>
+    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string)($app['css_version'] ?? '1.0')) ?>">
+    <link rel="stylesheet" href="/css/auth.css?v=<?= htmlspecialchars((string)($app['css_version'] ?? '1.0')) ?>">
 </head>
 <body class="auth-page">
 
@@ -29,8 +29,8 @@ $app = (new \App\Repositories\SettingsRepository())->getAll();
                 <input type="hidden" name="_csrf" value="<?= htmlspecialchars($viewModel->csrf) ?>">
 
                 <div class="auth-field">
-                <label for="identifier">Email or username</label>
-                <input type="text" id="identifier" name="identifier" required autofocus autocomplete="username">
+                    <label for="identifier">Email or username</label>
+                    <input type="text" id="identifier" name="identifier" required autofocus autocomplete="username">
                 </div>
 
                 <div class="auth-field">
@@ -47,6 +47,10 @@ $app = (new \App\Repositories\SettingsRepository())->getAll();
             </form>
 
             <p class="auth-switch">
+                Forgot your password? <a href="/forgot-password">Reset your password</a>
+            </p>
+
+            <p class="auth-switch">
                 No account? <a href="/register">Register here</a>
             </p>
 
@@ -61,17 +65,17 @@ $app = (new \App\Repositories\SettingsRepository())->getAll();
     document.querySelectorAll('.auth-eye-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
             var targetId = this.getAttribute('data-target');
-            var input    = document.getElementById(targetId);
-            var img      = this.querySelector('.eye-icon');
+            var input = document.getElementById(targetId);
+            var img = this.querySelector('.eye-icon');
 
             if (!input) return;
 
             if (input.type === 'password') {
                 input.type = 'text';
-                img.src    = '/images/eye.jpg';
+                img.src = '/images/eye.jpg';
             } else {
                 input.type = 'password';
-                img.src    = '/images/eye.jpg';
+                img.src = '/images/eye.jpg';
             }
         });
     });

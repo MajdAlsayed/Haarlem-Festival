@@ -6,20 +6,20 @@ use App\Models\Restaurant;
 
 class FoodViewModel
 {
-    public array $events;
+    public array $appSettings;
     public array $foodSettings;
 
     /** @var Restaurant[] */
     public array $restaurants;
 
     /**
-     * @param array $events
+     * @param array $appSettings
      * @param array $foodSettings
      * @param Restaurant[] $restaurants
      */
-    public function __construct(array $events, array $foodSettings, array $restaurants = [])
+    public function __construct(array $appSettings, array $foodSettings, array $restaurants)
     {
-        $this->events = $events;
+        $this->appSettings = $appSettings;
         $this->foodSettings = $foodSettings;
         $this->restaurants = $restaurants;
     }
