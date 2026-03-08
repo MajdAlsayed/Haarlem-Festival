@@ -8,11 +8,10 @@ class HistoryLocationsBlocksSeeder extends AbstractSeed
 {
     public function run(): void
     {
-        $this->execute('TRUNCATE TABLE page_blocks');
-
         // Get page id for locations page
         $locationsPage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history-locations'");
         $pageId = $locationsPage['page_id'];
+        $this->execute("DELETE FROM page_blocks WHERE page_id = $pageId");
 
         // Get hero image by page id
         $heroImage = $this->fetchRow(
