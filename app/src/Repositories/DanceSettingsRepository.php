@@ -6,16 +6,13 @@ namespace App\Repositories;
 
 use App\Core\Database;
 
+/** dance_settings table: hero_image, featured_images, day images/genres. JSON values decoded. */
 class DanceSettingsRepository
 {
     /** @var array<string, mixed>|null */
     private static ?array $cache = null;
 
-    /**
-     * All dance settings. JSON values decoded to arrays.
-     *
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     public function getAll(): array
     {
         if (self::$cache !== null) {
@@ -35,6 +32,7 @@ class DanceSettingsRepository
                 $out[$key] = $val;
             }
         }
+        // no rows in DB = use config file
         if ($rows === []) {
             $fallback = require __DIR__ . '/../Config/dance.php';
             self::$cache = $fallback;

@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Contracts\EventRepositoryInterface;
+use App\Contracts\ServiceInterface\EventServiceInterface;
 use App\Models\Event;
 use App\Validation\Validator;
 
-class EventService
+/** Event listing by category/day; validates input then delegates to repo. */
+class EventService implements EventServiceInterface
 {
     public function __construct(
         private EventRepositoryInterface $eventRepository
@@ -31,5 +33,10 @@ class EventService
     {
         Validator::validateEventCategory($eventTypeName);
         return $this->eventRepository->getByCategoryAndDay(trim($eventTypeName), trim($eventDay));
+    }
+
+    public function getById(int $id): ?Event
+    {
+        return $this->eventRepository->getById($id);
     }
 }

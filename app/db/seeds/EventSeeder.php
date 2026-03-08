@@ -68,47 +68,53 @@ class EventSeeder extends AbstractSeed
                 'city' => 'Haarlem',
                 'capacity' => 600,
             ],
+            [
+                'name' => 'Puncher Comedy Club',
+                'address' => 'Grote Markt 12',
+                'city' => 'Haarlem',
+                'capacity' => 400,
+            ],
         ])->saveData();
 
         $this->table('events')->insert([
-            // Friday dance (5)
+            // Friday dance (5) – per Figma
             [
                 'event_type_id' => 1,
-                'venue_id' => 1,
-                'title' => 'Opening Dance Night',
-                'description' => 'Kickoff festival with live dance performances.',
+                'venue_id' => 4,
+                'title' => 'Nicky Romero & Afrojack – Back2Back Session',
+                'description' => 'A massive house & electro B2B performance by two Dutch superstars.',
                 'event_day' => 'friday',
                 'start_time' => '20:00',
             ],
             [
                 'event_type_id' => 1,
-                'venue_id' => 4,
-                'title' => 'Tiësto — Club Session',
-                'description' => 'An intimate club night featuring Tiësto\'s signature trance, techno, and electro classics.',
+                'venue_id' => 7,
+                'title' => 'Tiësto – Club Session',
+                'description' => 'An intimate club night showcasing Tiësto\'s iconic blend of trance, techno, and electro.',
                 'event_day' => 'friday',
                 'start_time' => '22:00',
             ],
             [
                 'event_type_id' => 1,
                 'venue_id' => 5,
-                'title' => 'Hardwell — Exclusive Club Night',
-                'description' => 'A powerful dance and house set from Hardwell inside a historic Haarlem location.',
+                'title' => 'Hardwell – Club Night',
+                'description' => 'A high-energy dance and house set from Hardwell in a unique church-turned-club venue.',
                 'event_day' => 'friday',
                 'start_time' => '23:00',
             ],
             [
                 'event_type_id' => 1,
-                'venue_id' => 4,
-                'title' => 'Nicky Romero & Afrojack — Back2Back Session',
-                'description' => 'A massive house & electro B2B performance by two Dutch superstars.',
+                'venue_id' => 8,
+                'title' => 'Armin van Buuren – Tech Trance Set',
+                'description' => 'A signature Armin set blending trance melodies with modern techno drops.',
                 'event_day' => 'friday',
                 'start_time' => '22:00',
             ],
             [
                 'event_type_id' => 1,
-                'venue_id' => 2,
-                'title' => 'Armin van Buuren — Tech Trance Set',
-                'description' => 'A signature Armin set blending trance melodies with modern techno drops.',
+                'venue_id' => 9,
+                'title' => 'Martin Garrix – Exclusive Club Show',
+                'description' => 'A rare small-venue performance featuring Garrix\'s biggest future house & electronic hits.',
                 'event_day' => 'friday',
                 'start_time' => '22:00',
             ],
@@ -116,7 +122,7 @@ class EventSeeder extends AbstractSeed
             [
                 'event_type_id' => 1,
                 'venue_id' => 6,
-                'title' => 'Hardwell / Garrix / Armin – B2B2B Outdoor Show',
+                'title' => 'Hardwell / Garrix / Armin - B2B2B Outdoor Show',
                 'description' => 'Three headliners for a once-in-a-lifetime outdoor B2B set in Haarlem\'s forest amphitheater.',
                 'event_day' => 'saturday',
                 'start_time' => '14:00',
@@ -124,7 +130,7 @@ class EventSeeder extends AbstractSeed
             [
                 'event_type_id' => 1,
                 'venue_id' => 5,
-                'title' => 'Afrojack — Club Night',
+                'title' => 'Afrojack – Club Night',
                 'description' => 'A high-energy house set with Afrojack\'s signature bass-driven festival sound.',
                 'event_day' => 'saturday',
                 'start_time' => '22:00',
@@ -132,7 +138,7 @@ class EventSeeder extends AbstractSeed
             [
                 'event_type_id' => 1,
                 'venue_id' => 7,
-                'title' => 'TiëstoWorld — Special Career Show',
+                'title' => 'TiëstoWorld – Special Career Show',
                 'description' => 'A unique Tiësto experience featuring classics, remixes, and special guest appearances.',
                 'event_day' => 'saturday',
                 'start_time' => '21:00',
@@ -149,15 +155,23 @@ class EventSeeder extends AbstractSeed
             [
                 'event_type_id' => 1,
                 'venue_id' => 6,
-                'title' => 'Afrojack / Tiësto / Nicky Romero — B2B2B Session',
+                'title' => 'Afrojack / Tiësto / Nicky Romero - B2B2B Session',
                 'description' => 'A massive daytime show featuring three global icons performing together on one stage.',
                 'event_day' => 'sunday',
                 'start_time' => '14:00',
             ],
             [
                 'event_type_id' => 1,
+                'venue_id' => 7,
+                'title' => 'Martin Garrix – Club Session',
+                'description' => 'A rare, intimate Garrix set delivering big-room energy in a small venue.',
+                'event_day' => 'sunday',
+                'start_time' => '18:00',
+            ],
+            [
+                'event_type_id' => 1,
                 'venue_id' => 5,
-                'title' => 'Armin van Buuren — Trance Club Set',
+                'title' => 'Armin van Buuren – Trance Club Set',
                 'description' => 'A powerful, emotional trance performance from Armin inside a historic church venue.',
                 'event_day' => 'sunday',
                 'start_time' => '19:00',
@@ -165,20 +179,11 @@ class EventSeeder extends AbstractSeed
             [
                 'event_type_id' => 1,
                 'venue_id' => 8,
-                'title' => 'Hardwell — Final Night Club Show',
+                'title' => 'Hardwell – Final Night Club Show',
                 'description' => 'Hardwell closes the festival with a dance-heavy, high-energy finale.',
                 'event_day' => 'sunday',
                 'start_time' => '21:00',
             ],
-            [
-                'event_type_id' => 1,
-                'venue_id' => 7,
-                'title' => 'Martin Garrix — Club Session',
-                'description' => 'A rare, intimate Garrix set delivering big-room energy in a small venue.',
-                'event_day' => 'sunday',
-                'start_time' => '18:00',
-            ],
-
             // History events (4 days)
             [
                 'event_type_id' => 3,

@@ -1,4 +1,13 @@
-<?php $app = $app ?? (new \App\Repositories\SettingsRepository())->getAll(); ?>
+<?php
+$app = $app ?? (new \App\Repositories\SettingsRepository())->getAll();
+$categoryDisplayLabels = [
+    'dance' => 'Music & Culture',
+    'jazz' => 'Jazz',
+    'history' => 'History & Culture',
+    'yammy' => 'Food & Drinks',
+    'stories' => 'Stories',
+];
+?>
 <section id="events" class="events-section">
     <div class="container">
         <div class="section-header">
@@ -9,22 +18,23 @@
         </div>
 
         <div class="cards">
-            <?php foreach ($events as $event):
-                $imageName = $event->cardImage ?? strtolower($event->eventTypeName ?? '') . '.jpg';
+            <?php foreach ($categories as $category):
+                $imageName = $category->cardImage ?? strtolower($category->name) . '.jpg';
                 $imagePath = '/images/' . $imageName;
-                $infoUrl = $event->infoPath ?? '#';
+                $infoUrl = $category->infoPath ?? '#';
+                $cardTitle = $categoryDisplayLabels[strtolower($category->name)] ?? ucfirst($category->name);
             ?>
                 <article class="card event-card">
                     <div class="event-image-wrapper">
-                        <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= htmlspecialchars($event->title) ?>" class="event-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= htmlspecialchars($cardTitle) ?>" class="event-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                         <div class="event-image-placeholder" style="display:none;">
                             <div class="placeholder-icon">📷</div>
                         </div>
                         <div class="event-image-overlay">
                             <div class="event-content-overlay">
-                                <h3 class="event-title"><?= htmlspecialchars($event->title) ?></h3>
+                                <h3 class="event-title"><?= htmlspecialchars($cardTitle) ?></h3>
                                 <p class="event-location"><?= htmlspecialchars($app['default_event_location']) ?></p>
-                                <p class="event-description"><?= htmlspecialchars($event->description) ?></p>
+                                <p class="event-description"><?= htmlspecialchars($category->description) ?></p>
                                 <div class="event-actions">
                                     <a href="<?= htmlspecialchars($infoUrl) ?>" class="event-link">INFO &gt;</a>
                                     <a href="#" class="event-link">TICKETS &gt;</a>

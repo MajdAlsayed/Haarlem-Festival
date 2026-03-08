@@ -7,7 +7,7 @@ use App\Models\Event;
 class DanceViewModel
 {
     public function __construct(
-        /** @var Event[] For featured section (e.g. first 3 of all dance) */
+        /** @var Event[] */
         public array $events,
         /** @var Event[] */
         public array $fridayEvents,
@@ -15,6 +15,8 @@ class DanceViewModel
         public array $saturdayEvents,
         /** @var Event[] */
         public array $sundayEvents,
+        /** @var array<int, array{name: string, slug: string|null, bio: string|null, image: string}> */
+        public array $artists = [],
         public string $pageTitle = 'Dance Festival'
     ) {
     }
