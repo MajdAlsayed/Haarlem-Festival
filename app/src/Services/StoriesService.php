@@ -7,7 +7,7 @@ use App\Repositories\StoriesRepository;
 class StoriesService
 {
     public function __construct(private StoriesRepository $repo) {}
-// prepre for the view 
+
     public function getStoriesHomeData(?string $day = null): array
     {
         $stories = $this->repo->getStories($day);
@@ -33,18 +33,18 @@ class StoriesService
 
         $storiesFiltered = $this->repo->getStoriesByVenue((int)$venue['venue_id'], $day);
 
-        // all stories from all venues
         $allStories = $this->repo->getStories('all');
-        
-        $explorePool = array_values(array_filter($allStories, function (array $story) use ($venue): bool {
-            $storyVenueId = (int)($story['venue_id'] ?? 0);
-            $currentVenueId = (int)($venue['venue_id'] ?? 0);
-            $day = strtolower(trim((string)($story['event_day'] ?? '')));
 
-            return $storyVenueId !== $currentVenueId
-                && in_array($day, ['friday', 'saturday', 'sunday'], true)
-                && !empty($story['story_id']);
-        }));
+        $explorePool = array_values(array_filter(
+            $allStories,
+            function (array $story) use ($venue): bool {
+                $storyVenueId = (int)($story['venue_id'] ?? 0);
+                $currentVenueId = (int)($venue['venue_id'] ?? 0);
+                $storyId = (int)($story['story_id'] ?? 0);
+
+                return $storyVenueId !== $currentVenueId && $storyId > 0;
+            }
+        ));
 
         shuffle($explorePool);
         $exploreMore = array_slice($explorePool, 0, 4);
@@ -72,6 +72,11 @@ class StoriesService
         $more = [];
         if (!empty($story['venue_id'])) {
             $more = $this->repo->getStoriesByVenue((int)$story['venue_id'], 'all');
+
+            $more = array_values(array_filter(
+                $more,
+                fn(array $item): bool => (int)($item['story_id'] ?? 0) !== (int)$storyId
+            ));
         }
 
         return [
@@ -96,10 +101,18 @@ class StoriesService
                 continue;
             }
 
+            $start = trim((string)($s['start_time'] ?? ''));
+            $end = trim((string)($s['end_time'] ?? ''));
+
+            $time = $start;
+            if ($start !== '' && $end !== '') {
+                $time = $start . '-' . $end;
+            }
+
             $out[$lang][$day][] = [
-                'time'  => (string)($s['start_time'] ?? ''),
+                'time' => $time,
                 'title' => (string)($s['story_name'] ?? $s['name'] ?? $s['title'] ?? ''),
-                'age'   => (string)($s['age'] ?? ''),
+                'age' => (string)($s['age'] ?? ''),
             ];
         }
 
