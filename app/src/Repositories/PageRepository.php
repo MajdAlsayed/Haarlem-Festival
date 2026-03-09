@@ -6,6 +6,7 @@ use App\Contracts\PageRepositoryInterface;
 use App\Core\Database;
 use App\Models\Page;
 
+/** pages table lookup by slug. Used by PageService. */
 class PageRepository implements PageRepositoryInterface
 {
     public function getBySlug(string $slug): ?Page
@@ -28,6 +29,7 @@ class PageRepository implements PageRepositoryInterface
         return $this->mapRowToPage($row);
     }
 
+    /** DB row → Page (private). */
     private function mapRowToPage(array $row): Page
     {
         $page = new Page();

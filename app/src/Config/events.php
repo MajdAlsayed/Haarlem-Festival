@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 declare(strict_types=1);
 
 /**
@@ -15,10 +15,10 @@ return [
     ],
 
     'info_paths' => [
-        'dance' => '/dance',
-        'jazz' => '/jazz',   // ✅ IMPORTANT
-        'history' => '#',
-        'yammy' => '#',
+        'dance'   => '/dance',
+        'jazz'    => '/jazz',    // INFO on homepage Jazz card goes to Jazz page
+        'history' => '/history', // History has its own section
+        'yammy'   => '#',
         'stories' => '#',
     ],
 ];

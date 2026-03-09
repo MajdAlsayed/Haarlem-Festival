@@ -18,4 +18,4 @@ Back end and front end both need to be done before end of sprint.
 
 ## Notes
 - Controllers should depend on **interfaces** (e.g. `EventRepositoryInterface`) so you can swap implementations or mock in tests.
-- When you add a service, inject the repo (or its interface) into the service; inject the service into the controller.
+- When you add a service, inject the repo (interface) into the service; inject the service into the controller.

@@ -6,6 +6,7 @@ use App\Contracts\EventRepositoryInterface;
 use App\Core\Database;
 use App\Models\Event;
 
+/** events + event_types + venues (JOIN). Used by EventService. */
 class EventRepository implements EventRepositoryInterface
 {
     public function getAll(): array
@@ -59,7 +60,8 @@ class EventRepository implements EventRepositoryInterface
              FROM events e
              JOIN event_types et ON e.event_type_id = et.event_type_id
              JOIN venues v ON e.venue_id = v.venue_id
-             WHERE LOWER(et.name) = LOWER(:event_type_name)'
+             WHERE LOWER(et.name) = LOWER(:event_type_name)
+             ORDER BY FIELD(e.event_day, "friday", "saturday", "sunday"), e.start_time' 
         );
 
         $stmt->execute(['event_type_name' => $eventTypeName]);
@@ -92,11 +94,12 @@ class EventRepository implements EventRepositoryInterface
              JOIN event_types et ON e.event_type_id = et.event_type_id
              JOIN venues v ON e.venue_id = v.venue_id
              WHERE LOWER(et.name) = LOWER(:event_type_name)
-               AND LOWER(TRIM(COALESCE(e.event_day, "friday"))) = LOWER(:event_day)'
+               AND LOWER(TRIM(COALESCE(e.event_day, "friday"))) = LOWER(:event_day)
+             ORDER BY e.start_time'
         );
 
         $stmt->execute([
-            'event_type_name' => trim($eventTypeName),
+            'event_type_name' => $eventTypeName,
             'event_day' => trim($eventDay),
         ]);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -125,6 +128,7 @@ class EventRepository implements EventRepositoryInterface
                     et.card_image,
                     et.info_path,
                     v.name AS venue_name,
+                    v.address AS venue_address,
                     v.city AS venue_city
              FROM events e
              JOIN event_types et ON e.event_type_id = et.event_type_id
@@ -143,27 +147,23 @@ class EventRepository implements EventRepositoryInterface
         return $this->mapRowToEvent($row);
     }
 
+    /** DB row → Event (private so only this repo builds entities). */
     private function mapRowToEvent(array $row): Event
     {
         $event = new Event();
         $event->id = (int) $row['event_id'];
         $event->eventTypeId = (int) $row['event_type_id'];
         $event->venueId = (int) $row['venue_id'];
-        $event->title = (string)$row['title'];
+        $event->title = $row['title'];
         $event->description = $row['description'] ?? null;
-        $event->eventDay = isset($row['event_day']) ? (string)$row['event_day'] : null;
-        $event->startTime = isset($row['start_time']) ? (string)$row['start_time'] : null;
-        $event->eventTypeName = (string)$row['event_type_name'];
-        $event->venueName = (string)$row['venue_name'];
-
-        $settings = (new SettingsRepository())->getAll();
-        $event->venueCity = !empty($row['venue_city'])
-            ? (string)$row['venue_city']
-            : (string)($settings['default_venue_city'] ?? 'Haarlem');
-
-        $event->cardImage = isset($row['card_image']) ? (string)$row['card_image'] : null;
-        $event->infoPath = isset($row['info_path']) ? (string)$row['info_path'] : null;
-
+        $event->eventDay = isset($row['event_day']) ? (string) $row['event_day'] : null;
+        $event->startTime = isset($row['start_time']) ? (string) $row['start_time'] : null;
+        $event->eventTypeName = $row['event_type_name'];
+        $event->venueName = $row['venue_name'];
+        $event->venueCity = !empty($row['venue_city']) ? $row['venue_city'] : (new SettingsRepository())->getAll()['default_venue_city']; // fallback from settings
+        $event->venueAddress = isset($row['venue_address']) ? (string) $row['venue_address'] : null;
+        $event->cardImage = isset($row['card_image']) ? (string) $row['card_image'] : null;
+        $event->infoPath = isset($row['info_path']) ? (string) $row['info_path'] : null;
         return $event;
     }
 }

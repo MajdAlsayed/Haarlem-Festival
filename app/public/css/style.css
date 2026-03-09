@@ -3,6 +3,1254 @@
     box-sizing: border-box;
 }
 
+/* =========================
+   JAZZ – Page layout & hero
+   ========================= */
+
+.jazz-page {
+    background-color: #0A0A0A;
+}
+
+.jazz-hero {
+    position: relative;
+    min-height: 420px;
+    color: #fff;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+}
+
+.jazz-hero-content {
+    padding: 80px 40px;
+}
+
+.jazz-hero-title {
+    font-size: 48px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+}
+
+.jazz-hero-subtitle {
+    font-size: 18px;
+    color: #e8e8e8;
+    max-width: 520px;
+    margin: 0;
+}
+
+.jazz-breadcrumbs {
+    font-size: 13px;
+    color: #aaa;
+    margin: 24px 0 18px;
+    text-align: left;
+}
+
+.jazz-breadcrumbs a {
+    color: #f5b400;
+    text-decoration: none;
+}
+
+.jazz-breadcrumbs a:hover {
+    text-decoration: underline;
+}
+
+.jazz-lead {
+    max-width: 720px;
+    margin: 0 auto 18px;
+    font-size: 16px;
+    color: #d8d8d8;
+    line-height: 1.7;
+}
+
+/* =========================
+   JAZZ - Events grid cards
+   ========================= */
+
+.jazz-intro {
+    text-align: center;
+}
+
+/* Filter bar: prototype – active purple, inactive dark with thin white border */
+.jazz-filterbar {
+    display: inline-flex;
+    flex-wrap: wrap;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 10px auto 24px auto;
+    background: transparent;
+}
+
+.jazz-filterbtn {
+    background: rgba(30,30,35,0.9);
+    color: #fff;
+    border: 0;
+    border-right: 1px solid rgba(255,255,255,0.2);
+    padding: 12px 20px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.jazz-filterbtn:last-of-type {
+    border-right: 0;
+}
+
+.jazz-filterbtn:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+.jazz-filterbtn.is-active {
+    background: #7b2cbf;
+    color: #fff;
+    border-right-color: rgba(255,255,255,0.2);
+}
+
+/* All Events: 6 columns; Day filter: 3 columns (2 rows) */
+.jazz-events-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(140px, 1fr));
+    gap: 20px;
+    padding: 10px 0 32px 0;
+    text-align: left;
+}
+
+.jazz-filter-day .jazz-events-grid {
+    grid-template-columns: repeat(3, minmax(200px, 1fr));
+}
+
+@media (max-width: 1200px) {
+    .jazz-events-grid {
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
+    }
+    .jazz-filter-day .jazz-events-grid {
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .jazz-events-grid {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+    }
+    .jazz-filter-day .jazz-events-grid {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .jazz-events-grid,
+    .jazz-filter-day .jazz-events-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Cards: prototype – light grey to stand out from dark page, rounded */
+.jazz-event-card {
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(55,55,62,0.95);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.12);
+    text-align: left;
+}
+
+.jazz-event-card.is-hidden {
+    display: none;
+}
+
+/* All Events: show compact line only; hide full time/venue + description */
+.jazz-filter-all .jazz-card-day-only {
+    display: none !important;
+}
+
+/* Day filter (Thu–Sun): show full time/venue, description, price */
+.jazz-filter-day .jazz-card-compact-only {
+    display: none !important;
+}
+
+.jazz-event-media {
+    position: relative;
+    height: 190px;
+    background: rgba(255,255,255,0.06);
+}
+
+.jazz-event-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Heart: prototype – red filled icon top-right on image */
+.jazz-heart-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 0;
+    cursor: pointer;
+    background: rgba(0,0,0,0.4);
+    color: #e63946;
+    font-size: 18px;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+    line-height: 1;
+}
+
+.jazz-heart-btn:hover {
+    background: rgba(0,0,0,0.6);
+    color: #ff6b7a;
+}
+
+.jazz-heart-btn.is-saved {
+    color: #e63946;
+    background: rgba(0,0,0,0.5);
+}
+
+.jazz-event-body {
+    padding: 14px 16px 16px 16px;
+    text-align: left;
+}
+
+.jazz-event-whenwhere,
+.jazz-event-whenwhere-compact,
+.jazz-event-desc {
+    text-align: left;
+}
+
+/* Card title centered (prototype); time, description, buttons left-aligned */
+.jazz-event-title {
+    margin: 0 0 8px 0;
+    font-size: 17px;
+    font-weight: 800;
+    color: #fff;
+    text-align: center;
+}
+
+.jazz-event-whenwhere {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    color: rgba(255,255,255,0.88);
+}
+
+.jazz-event-whenwhere-compact {
+    margin: 0 0 14px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+}
+
+.jazz-event-desc {
+    margin: 0 0 14px 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.88);
+}
+
+.jazz-event-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    text-align: left;
+}
+
+.jazz-btn {
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.jazz-btn-primary {
+    background: #e68a00;
+    color: #fff;
+}
+
+.jazz-btn-primary:hover {
+    background: #f0a020;
+}
+
+/* Day view: Artist details = solid orange; Save to program = outline (orange border) */
+.jazz-btn-secondary {
+    background: transparent;
+    color: #e68a00;
+    border: 2px solid #e68a00;
+}
+
+.jazz-btn-secondary:hover {
+    background: rgba(230,138,0,0.15);
+}
+
+.jazz-btn:disabled,
+.jazz-btn[aria-disabled="true"] {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* =========================
+   JAZZ - Artist pages
+   ========================= */
+
+.jazz-artist-page {
+    background: radial-gradient(circle at top, #25201a 0, #0c0c0c 45%, #050505 100%);
+}
+
+.jazz-artist-hero {
+    min-height: 300px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+}
+
+.jazz-artist-hero-content {
+    padding: 46px 0 26px 0;
+}
+
+.jazz-artist-tagline {
+    margin: 8px 0 0 0;
+    color: #e0e0e0;
+}
+
+.jazz-artist-body {
+    padding: 36px 0 60px 0;
+}
+
+.jazz-section-title {
+    margin-top: 18px;
+    margin-bottom: 10px;
+    font-size: 26px;
+    color: #f0a020;
+}
+
+.jazz-section-subtitle {
+    margin: 24px 0 12px;
+    font-size: 20px;
+    color: #f0a020;
+    text-align: left;
+}
+
+.jazz-artist-bio {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #d0d0d0;
+    max-width: 720px;
+}
+
+.jazz-muted {
+    color: #aaaaaa;
+    font-size: 14px;
+}
+
+.jazz-plan-section {
+    margin-top: 32px;
+}
+
+.jazz-plan-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+    .jazz-plan-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.jazz-plan-media-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+}
+
+.jazz-plan-card {
+    background: linear-gradient(145deg, #2a2825 0%, #22201d 100%);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 16px 16px 18px 16px;
+}
+
+.jazz-plan-card-img {
+    width: 100%;
+    height: 180px;
+    border-radius: 10px;
+    object-fit: cover;
+    display: block;
+}
+
+.jazz-plan-card-title {
+    margin: 14px 0 6px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.jazz-plan-card-text {
+    margin: 0;
+    font-size: 14px;
+    color: #d0d0d0;
+    line-height: 1.6;
+}
+
+.jazz-schedule {
+    margin-top: 10px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(240,160,32,0.25);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.jazz-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.jazz-table th,
+.jazz-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 14px;
+}
+
+.jazz-table th {
+    text-align: left;
+    color: rgba(255,255,255,0.85);
+    background: rgba(240,160,32,0.12);
+}
+
+.jazz-primary-slot {
+    margin-top: 16px;
+    font-size: 14px;
+    color: #e0e0e0;
+}
+
+/* Band members */
+.jazz-band {
+    margin-top: 36px;
+}
+
+.jazz-band-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+@media (max-width: 900px) {
+    .jazz-band-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .jazz-band-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.jazz-band-card {
+    background: #211b14;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 16px 14px 18px;
+    text-align: center;
+}
+
+.jazz-band-name {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.jazz-band-role {
+    margin: 0;
+    font-size: 13px;
+    color: #d0d0d0;
+}
+
+.jazz-highlights {
+    margin-top: 32px;
+}
+
+.jazz-highlight-text {
+    font-size: 14px;
+    color: #d0d0d0;
+    max-width: 780px;
+    line-height: 1.7;
+}
+
+.jazz-back {
+    margin: 28px 0 40px 0;
+    text-align: center;
+}
+
+.jazz-gumbo-page .jazz-back {
+    text-align: center;
+}
+
+.jazz-back-btn {
+    display: inline-block;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.10);
+}
+
+.jazz-back-btn:hover {
+    background: rgba(255,255,255,0.13);
+}
+
+/* =========================
+   JAZZ - Gumbo Kings artist page (prototype)
+   ========================= */
+
+.jazz-gumbo-hero-content {
+    text-align: left;
+}
+
+.jazz-gumbo-hero-content h1 {
+    text-transform: none;
+}
+
+.jazz-gumbo-intro {
+    margin-top: 18px;
+    text-align: left;
+}
+
+.jazz-gumbo-intro .jazz-artist-bio {
+    max-width: none;
+}
+
+.jazz-gumbo-bio-justified {
+    text-align: justify;
+}
+
+.jazz-gumbo-page .jazz-section-title,
+.jazz-gumbo-page .jazz-section-subtitle {
+    text-align: left;
+}
+
+.jazz-gumbo-plan .jazz-section-subtitle {
+    margin-top: 32px;
+}
+
+.jazz-gumbo-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .jazz-gumbo-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+.jazz-gumbo-card {
+    background: linear-gradient(145deg, #2a2825 0%, #22201d 100%);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 16px 16px 18px 16px;
+}
+
+.jazz-gumbo-card-media {
+    width: 100%;
+    height: 190px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.3);
+    margin-bottom: 14px;
+}
+
+.jazz-gumbo-video-thumb {
+    background: linear-gradient(135deg, #4a3a20 0%, #2a2218 100%);
+}
+
+.jazz-gumbo-play {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.95);
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    padding-left: 4px;
+}
+
+.jazz-gumbo-album-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.jazz-gumbo-card-desc {
+    margin: 0 0 14px 0;
+    font-size: 14px;
+    color: #d0d0d0;
+    line-height: 1.6;
+}
+
+.jazz-gumbo-card-btn {
+    display: inline-block;
+    text-decoration: none;
+}
+
+.jazz-gumbo-schedule-wrap {
+    margin-top: 28px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(230,138,0,0.35);
+    border-radius: 12px;
+    padding: 18px;
+}
+
+.jazz-gumbo-plan-visit {
+    margin: 0 0 14px 0;
+    font-size: 15px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.jazz-gumbo-cal-icon {
+    font-size: 18px;
+}
+
+.jazz-gumbo-table th,
+.jazz-gumbo-table td {
+    padding: 10px 12px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.jazz-gumbo-add-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.jazz-gumbo-schedule-note {
+    margin: 12px 0 0 0;
+    font-size: 13px;
+    color: #aaa;
+}
+
+/* Career Highlights: years in orange */
+.jazz-gumbo-year {
+    color: #e68a00;
+    font-weight: 700;
+}
+
+/* Band Members: prototype – striped background, centered title & text, orange panels */
+.jazz-gumbo-band {
+    margin-top: 48px;
+    padding: 40px 24px 48px;
+    background-color: #2a2820;
+    background-image: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 4px,
+        rgba(60,55,45,0.4) 4px,
+        rgba(60,55,45,0.4) 8px
+    );
+    border-radius: 12px;
+}
+
+.jazz-gumbo-band-title {
+    margin-top: 0;
+    margin-bottom: 28px;
+    text-align: center;
+    color: #e68a00;
+}
+
+.jazz-gumbo-members {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+    margin-top: 20px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 1000px) {
+    .jazz-gumbo-members {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 640px;
+    }
+}
+
+@media (max-width: 640px) {
+    .jazz-gumbo-members {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 400px;
+    }
+}
+
+.jazz-gumbo-member {
+    text-align: center;
+}
+
+.jazz-gumbo-member-img {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+    background: rgba(0,0,0,0.3);
+    margin: 0 auto;
+}
+
+.jazz-gumbo-member-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.jazz-gumbo-member-info {
+    background: #e68a00;
+    color: #fff;
+    padding: 14px 12px;
+    border-radius: 0 0 8px 8px;
+    font-size: 14px;
+    text-align: center;
+    margin-left: -6px;
+    margin-right: -6px;
+    width: calc(100% + 12px);
+    box-sizing: content-box;
+}
+
+.jazz-gumbo-member-name {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #fff;
+}
+
+.jazz-gumbo-member-role {
+    display: block;
+    font-size: 13px;
+    color: rgba(255,255,255,0.95);
+}
+
+/* =========================
+   JAZZ - Karsu artist page
+   ========================= */
+
+.jazz-karsu-centered {
+    text-align: center;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.jazz-karsu-centered .jazz-karsu-plan-layout,
+.jazz-karsu-centered .jazz-karsu-schedule-block,
+.jazz-karsu-centered .jazz-karsu-discography {
+    text-align: left;
+}
+
+.jazz-karsu-centered .jazz-section-title,
+.jazz-karsu-centered .jazz-section-subtitle,
+.jazz-karsu-centered .jazz-artist-bio,
+.jazz-karsu-centered .jazz-highlight-text,
+.jazz-karsu-centered .jazz-karsu-list {
+    text-align: center;
+}
+
+.jazz-karsu-centered .jazz-karsu-list {
+    list-style: none;
+    padding-left: 0;
+    display: inline-block;
+    text-align: left;
+}
+
+.jazz-karsu-page .jazz-section-title {
+    color: #e68a00;
+}
+
+.jazz-karsu-alt-bg {
+    background: linear-gradient(145deg, #4a4035 0%, #352d24 100%);
+    border-radius: 12px;
+    padding: 28px 24px 32px;
+    margin-top: 28px;
+    text-align: center;
+}
+
+.jazz-karsu-alt-bg .jazz-section-subtitle {
+    color: #1a1510;
+}
+
+.jazz-karsu-alt-bg .jazz-highlight-text,
+.jazz-karsu-alt-bg .jazz-karsu-list {
+    color: #1a1510;
+    text-align: center;
+}
+
+.jazz-karsu-alt-bg .jazz-highlight-text {
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.jazz-karsu-alt-bg .jazz-karsu-list {
+    list-style: none;
+    padding-left: 0;
+    display: inline-block;
+    text-align: left;
+}
+
+.jazz-karsu-intro {
+    margin-top: 18px;
+}
+
+.jazz-karsu-intro .jazz-artist-bio + .jazz-artist-bio {
+    margin-top: 14px;
+}
+
+.jazz-karsu-plan-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 32px;
+    margin-top: 24px;
+}
+
+@media (max-width: 900px) {
+    .jazz-karsu-plan-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.jazz-karsu-video-block {
+    background: linear-gradient(145deg, #3a3026 0%, #241d16 100%);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 18px 18px 20px 18px;
+}
+
+.jazz-karsu-video-thumb {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: radial-gradient(circle at top, #4b3b26 0%, #1d1710 55%, #120f0a 100%);
+    margin-bottom: 12px;
+}
+
+.jazz-karsu-video-play {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.jazz-karsu-video-play .jazz-btn-primary {
+    border-radius: 999px;
+}
+
+.jazz-karsu-video-caption {
+    margin: 0;
+    font-size: 13px;
+    color: #e0e0e0;
+}
+
+.jazz-karsu-schedule-block {
+    background: linear-gradient(145deg, #2c251c 0%, #1a1510 100%);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 18px 18px 20px 18px;
+}
+
+.jazz-karsu-schedule-heading {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.jazz-karsu-schedule-sub {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    color: #d0d0d0;
+}
+
+.jazz-karsu-table-buy {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.jazz-btn-buy {
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: #f0a020;
+    color: #1a1206;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.jazz-karsu-discography {
+    margin-top: 40px;
+}
+
+.jazz-karsu-albums {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 360px;
+    margin-bottom: 14px;
+}
+
+.jazz-karsu-album-cover {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+}
+
+.jazz-karsu-track-info {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    color: #b0b0b0;
+}
+
+.jazz-karsu-player {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.jazz-karsu-player-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 0;
+    background: #f0a020;
+    color: #1a1206;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.jazz-karsu-player-play {
+    width: 52px;
+    height: 52px;
+    font-size: 20px;
+    background: #c62828;
+    color: #fff;
+}
+
+.jazz-karsu-progress {
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    margin-bottom: 16px;
+    max-width: 320px;
+}
+
+.jazz-karsu-progress-bar {
+    width: 35%;
+    height: 100%;
+    background: #f0a020;
+    border-radius: 2px;
+}
+
+.jazz-karsu-listen-btn {
+    display: inline-block;
+    text-decoration: none;
+}
+
+/* =========================
+   JAZZ - Gare du Nord artist page
+   ========================= */
+
+.jazz-gare-page .jazz-section-title,
+.jazz-gare-page .jazz-section-subtitle {
+    color: #e68a00;
+}
+
+.jazz-gare-hero-content {
+    text-align: left;
+}
+
+.jazz-gare-breadcrumbs a {
+    color: #e68a00;
+}
+
+.jazz-gare-breadcrumbs .breadcrumb-sep,
+.jazz-gare-breadcrumbs .breadcrumb-current {
+    color: #fff;
+}
+
+.jazz-gare-intro {
+    margin-bottom: 32px;
+}
+
+.jazz-gare-intro .jazz-artist-bio {
+    color: #d0d0d0;
+    line-height: 1.65;
+    max-width: 900px;
+}
+
+.jazz-gare-plan {
+    margin-top: 40px;
+}
+
+.jazz-gare-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 28px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .jazz-gare-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.jazz-gare-video-card {
+    background: rgba(30, 22, 17, 0.95);
+    border: 1px solid rgba(123, 44, 191, 0.5);
+    box-shadow: 0 0 24px rgba(123, 44, 191, 0.25);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.jazz-gare-video-thumb {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, #2a1f2e 0%, #1a1518 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+
+.jazz-gare-play {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    padding-left: 4px;
+}
+
+.jazz-gare-video-title {
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 8px 0;
+    font-size: 15px;
+}
+
+.jazz-gare-video-desc {
+    color: #d0d0d0;
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 0 0 14px 0;
+}
+
+.jazz-gare-video-btn {
+    display: inline-block;
+    text-decoration: none;
+}
+
+.jazz-gare-schedule-wrap {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(230, 138, 0, 0.35);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.jazz-gare-schedule-heading {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.jazz-gare-schedule-icon {
+    font-size: 18px;
+}
+
+.jazz-gare-schedule-intro {
+    margin: 0 0 14px 0;
+    font-size: 14px;
+    color: #b0b0b0;
+    line-height: 1.5;
+}
+
+.jazz-gare-table th {
+    color: #e68a00;
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.jazz-gare-table td {
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #d0d0d0;
+}
+
+.jazz-gare-buy-btn,
+.jazz-gare-add-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.jazz-gare-add-btn {
+    cursor: pointer;
+    border: none;
+}
+
+.jazz-gare-schedule-note {
+    margin: 14px 0 0 0;
+    font-size: 13px;
+    color: #aaa;
+}
+
+.jazz-gare-highlights .jazz-highlight-text {
+    color: #d0d0d0;
+    line-height: 1.65;
+    margin-bottom: 16px;
+}
+
+.jazz-gare-highlights .jazz-highlight-text:last-child {
+    margin-bottom: 0;
+}
+
+.jazz-gare-band {
+    margin-top: 48px;
+    padding: 40px 24px 48px;
+    background-color: #2a2820;
+    background-image: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 4px,
+        rgba(60, 55, 45, 0.4) 4px,
+        rgba(60, 55, 45, 0.4) 8px
+    );
+    border-radius: 12px;
+}
+
+.jazz-gare-band-title {
+    margin-top: 0;
+    margin-bottom: 28px;
+    text-align: center;
+    color: #e68a00;
+}
+
+.jazz-gare-members {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+@media (max-width: 700px) {
+    .jazz-gare-members {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.jazz-gare-member {
+    text-align: center;
+}
+
+.jazz-gare-member-img {
+    width: 100%;
+    max-width: 180px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 12px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.jazz-gare-member-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.jazz-gare-member-info {
+    background: #e68a00;
+    color: #fff;
+    padding: 12px 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    max-width: 180px;
+    margin: 0 auto;
+}
+
+.jazz-gare-member-name {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 2px;
+    color: #fff;
+}
+
+.jazz-gare-member-role {
+    display: block;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.jazz-gare-back-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #1a1a1a;
+    border-radius: 24px;
+    font-size: 14px;
+    text-decoration: none;
+    margin-top: 24px;
+}
+
+.jazz-gare-back-btn:hover {
+    background: #fff;
+    color: #000;
+}
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
@@ -1592,1046 +2840,2485 @@ main {
     line-height: 1.5;
 }
 
+/* STORIES PAGE */
+.stories-filter { margin-top: 30px; }
+.stories-filter-top { display:flex; align-items:center; gap:20px; }
+.stories-filter-label { font-size:12px; opacity:.7; }
 
-/* =========================
-   JAZZ – Page layout & hero
-   ========================= */
+.stories-tabs { display:flex; gap:10px; flex-wrap:wrap; }
+.stories-tab{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 18px;
+  border-radius:10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  color:#eee; text-decoration:none; font-weight:700; font-size:12px;
+}
+.stories-tab.active{ background:#f5b400; color:#000; border-color:#f5b400; }
 
-.jazz-page {
-    background-color: #0A0A0A;
+.stories-schedule{
+  margin-top: 26px;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+.stories-schedule-title{ font-weight:800; margin-bottom:10px; }
+.stories-schedule-grid{ display:flex; gap:14px; flex-wrap:wrap; }
+.stories-schedule-box{
+  background:#f5e35a;
+  color:#000;
+  border-radius:10px;
+  padding:10px 12px;
+  min-width: 170px;
+  font-weight:800;
+}
+.stories-schedule-box .t{ font-size:12px; }
+.stories-schedule-box .n{ font-size:12px; margin-top:2px; }
+.stories-schedule-box .a{ font-size:12px; margin-top:4px; }
+
+.stories-cards{ margin: 30px 0 80px; }
+.stories-cards-grid{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+.stories-card{
+  background: rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+.stories-card-img{
+  height: 220px;
+  background-size: cover;
+  background-position:center;
+}
+.stories-card-body{ padding:16px; }
+.stories-card-title{ margin:0 0 8px; font-size:18px; font-weight:900; }
+.stories-card-meta{ font-size:12px; opacity:.85; display:grid; gap:4px; margin-bottom:10px; }
+.stories-card-desc{ font-size:13px; opacity:.8; line-height:1.6; min-height: 50px; }
+.stories-card-actions{ display:flex; gap:10px; margin-top:12px; }
+.stories-card-actions .btn{ flex:1; text-align:center; }
+
+/* Map toolbar pills */
+.map-toolbar {
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin: 18px 0 18px;
+}
+.map-pill{
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color:#fff;
+  font-weight:700;
+  font-size:12px;
+  cursor:pointer;
+  transition: 0.2s ease;
+}
+.map-pill:hover{
+  border-color: rgba(245,180,0,0.45);
+  color:#f5b400;
 }
 
-.jazz-hero {
+/* Fullscreen overlay map */
+.map-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 2000;
+  display:none;
+}
+.map-overlay.is-open{ display:block; }
+
+.map-overlay-bar{
+  height: 56px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 0 18px;
+  background: #0c0c0c;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.map-overlay-title{
+  font-weight:900;
+  color:#f5b400;
+}
+.map-overlay-close{
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+}
+.map-overlay-close:hover{ color:#f5b400; }
+
+.map-overlay-body{
+  height: calc(100vh - 56px);
+  padding: 14px;
+}
+.map-iframe-big{
+  width:100%;
+  height:100%;
+  border-radius: 14px;
+}
+=======
+/* ---------- Event Detail page ---------- */
+.event-detail-page {
+    --gold: #F5A623;
+    --gold-light: #ffc247;
+    --bg-dark: #0c0c0c;
+    --bg-card: #161412;
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --text-muted: #a0a0a0;
+    --font-heading: 'Syne', sans-serif;
+    --font-body: 'DM Sans', -apple-system, sans-serif;
+    font-family: var(--font-body);
+}
+
+html { scroll-behavior: smooth; }
+
+.event-detail-hero {
     position: relative;
-    min-height: 420px;
-    color: #fff;
-    background-size: cover;
-    background-position: center;
+    min-height: 480px;
     display: flex;
-    align-items: flex-end;
-}
-
-.jazz-hero-content {
-    padding: 80px 40px;
-}
-
-.jazz-hero-title {
-    font-size: 48px;
-    font-weight: 700;
-    margin: 0 0 10px;
-    color: #ffffff;
-    letter-spacing: -0.02em;
-}
-
-.jazz-hero-subtitle {
-    font-size: 18px;
-    color: #e8e8e8;
-    max-width: 520px;
-    margin: 0;
-}
-
-.jazz-breadcrumbs {
-    font-size: 13px;
-    color: #aaa;
-    margin: 24px 0 18px;
-    text-align: left;
-}
-
-.jazz-breadcrumbs a {
-    color: #f5b400;
-    text-decoration: none;
-}
-
-.jazz-breadcrumbs a:hover {
-    text-decoration: underline;
-}
-
-.jazz-lead {
-    max-width: 720px;
-    margin: 0 auto 18px;
-    font-size: 16px;
-    color: #d8d8d8;
-    line-height: 1.7;
-}
-
-/* =========================
-   JAZZ - Events grid cards
-   ========================= */
-
-.jazz-intro {
-    text-align: center;
-}
-
-/* Filter bar: prototype – active purple, inactive dark with thin white border */
-.jazz-filterbar {
-    display: inline-flex;
-    flex-wrap: wrap;
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 8px;
-    overflow: hidden;
-    margin: 10px auto 24px auto;
-    background: transparent;
-}
-
-.jazz-filterbtn {
-    background: rgba(30,30,35,0.9);
-    color: #fff;
-    border: 0;
-    border-right: 1px solid rgba(255,255,255,0.2);
-    padding: 12px 20px;
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 14px;
-}
-
-.jazz-filterbtn:last-of-type {
-    border-right: 0;
-}
-
-.jazz-filterbtn:hover {
-    background: rgba(255,255,255,0.08);
-}
-
-.jazz-filterbtn.is-active {
-    background: #7b2cbf;
-    color: #fff;
-    border-right-color: rgba(255,255,255,0.2);
-}
-
-/* All Events: 6 columns; Day filter: 3 columns (2 rows) */
-.jazz-events-grid {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(140px, 1fr));
-    gap: 20px;
-    padding: 10px 0 32px 0;
-    text-align: left;
-}
-
-.jazz-filter-day .jazz-events-grid {
-    grid-template-columns: repeat(3, minmax(200px, 1fr));
-}
-
-@media (max-width: 1200px) {
-    .jazz-events-grid {
-        grid-template-columns: repeat(3, minmax(160px, 1fr));
-    }
-    .jazz-filter-day .jazz-events-grid {
-        grid-template-columns: repeat(3, minmax(180px, 1fr));
-    }
-}
-
-@media (max-width: 900px) {
-    .jazz-events-grid {
-        grid-template-columns: repeat(2, minmax(180px, 1fr));
-    }
-    .jazz-filter-day .jazz-events-grid {
-        grid-template-columns: repeat(2, minmax(180px, 1fr));
-    }
-}
-
-@media (max-width: 600px) {
-    .jazz-events-grid,
-    .jazz-filter-day .jazz-events-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Cards: prototype – light grey to stand out from dark page, rounded */
-.jazz-event-card {
-    border-radius: 12px;
-    overflow: hidden;
-    background: rgba(55,55,62,0.95);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.12);
-    text-align: left;
-}
-
-.jazz-event-card.is-hidden {
-    display: none;
-}
-
-/* All Events: show compact line only; hide full time/venue + description */
-.jazz-filter-all .jazz-card-day-only {
-    display: none !important;
-}
-
-/* Day filter (Thu–Sun): show full time/venue, description, price */
-.jazz-filter-day .jazz-card-compact-only {
-    display: none !important;
-}
-
-.jazz-event-media {
-    position: relative;
-    height: 190px;
-    background: rgba(255,255,255,0.06);
-}
-
-.jazz-event-media img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-/* Heart: prototype – red filled icon top-right on image */
-.jazz-heart-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 0;
-    cursor: pointer;
-    background: rgba(0,0,0,0.4);
-    color: #e63946;
-    font-size: 18px;
-    font-weight: 900;
-    display: grid;
-    place-items: center;
-    line-height: 1;
-}
-
-.jazz-heart-btn:hover {
-    background: rgba(0,0,0,0.6);
-    color: #ff6b7a;
-}
-
-.jazz-heart-btn.is-saved {
-    color: #e63946;
-    background: rgba(0,0,0,0.5);
-}
-
-.jazz-event-body {
-    padding: 14px 16px 16px 16px;
-    text-align: left;
-}
-
-.jazz-event-whenwhere,
-.jazz-event-whenwhere-compact,
-.jazz-event-desc {
-    text-align: left;
-}
-
-/* Card title centered (prototype); time, description, buttons left-aligned */
-.jazz-event-title {
-    margin: 0 0 8px 0;
-    font-size: 17px;
-    font-weight: 800;
-    color: #fff;
-    text-align: center;
-}
-
-.jazz-event-whenwhere {
-    margin: 0 0 10px 0;
-    font-size: 13px;
-    color: rgba(255,255,255,0.88);
-}
-
-.jazz-event-whenwhere-compact {
-    margin: 0 0 14px 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.9);
-}
-
-.jazz-event-desc {
-    margin: 0 0 14px 0;
-    font-size: 13px;
-    line-height: 1.5;
-    color: rgba(255,255,255,0.88);
-}
-
-.jazz-event-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    text-align: left;
-}
-
-.jazz-btn {
-    border: 0;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-weight: 700;
-    font-size: 13px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
     align-items: center;
     justify-content: center;
-}
-
-.jazz-btn-primary {
-    background: #e68a00;
-    color: #fff;
-}
-
-.jazz-btn-primary:hover {
-    background: #f0a020;
-}
-
-/* Day view: Artist details = solid orange; Save to program = outline (orange border) */
-.jazz-btn-secondary {
-    background: transparent;
-    color: #e68a00;
-    border: 2px solid #e68a00;
-}
-
-.jazz-btn-secondary:hover {
-    background: rgba(230,138,0,0.15);
-}
-
-.jazz-btn:disabled,
-.jazz-btn[aria-disabled="true"] {
-    opacity: 0.35;
-    cursor: not-allowed;
-}
-
-/* =========================
-   JAZZ - Artist pages
-   ========================= */
-
-.jazz-artist-page {
-    background: radial-gradient(circle at top, #25201a 0, #0c0c0c 45%, #050505 100%);
-}
-
-.jazz-artist-hero {
-    min-height: 300px;
     background-size: cover;
     background-position: center;
+}
+
+.event-detail-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.5) 100%);
+    pointer-events: none;
+}
+
+.event-detail-hero-content {
+    position: relative;
+    z-index: 1;
     display: flex;
-    align-items: flex-end;
-}
-
-.jazz-artist-hero-content {
-    padding: 46px 0 26px 0;
-}
-
-.jazz-artist-tagline {
-    margin: 8px 0 0 0;
-    color: #e0e0e0;
-}
-
-.jazz-artist-body {
-    padding: 36px 0 60px 0;
-}
-
-.jazz-section-title {
-    margin-top: 18px;
-    margin-bottom: 10px;
-    font-size: 26px;
-    color: #f0a020;
-}
-
-.jazz-section-subtitle {
-    margin: 24px 0 12px;
-    font-size: 20px;
-    color: #f0a020;
-    text-align: left;
-}
-
-.jazz-artist-bio {
-    font-size: 15px;
-    line-height: 1.7;
-    color: #d0d0d0;
-    max-width: 720px;
-}
-
-.jazz-muted {
-    color: #aaaaaa;
-    font-size: 14px;
-}
-
-.jazz-plan-section {
-    margin-top: 32px;
-}
-
-.jazz-plan-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-    gap: 24px;
-    align-items: flex-start;
-}
-
-@media (max-width: 900px) {
-    .jazz-plan-layout {
-        grid-template-columns: 1fr;
-    }
-}
-
-.jazz-plan-media-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 18px;
-}
-
-.jazz-plan-card {
-    background: linear-gradient(145deg, #2a2825 0%, #22201d 100%);
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.06);
-    padding: 16px 16px 18px 16px;
-}
-
-.jazz-plan-card-img {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 64px 10%;
+    max-width: 1200px;
     width: 100%;
-    height: 180px;
-    border-radius: 10px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.event-detail-hero-venue {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.event-detail-hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin: 0 0 28px;
+}
+
+.event-detail-hero-title .title-orange {
+    color: #F5A623;
+}
+
+.event-detail-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: #FFFFFF;
+    color: #000000;
+    text-decoration: none;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: opacity 0.25s;
+    border: 1px solid rgba(0,0,0,0.15);
+}
+
+.event-detail-hero-btn:hover {
+    opacity: 0.9;
+}
+
+.event-detail-breadcrumbs {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 40px 0;
+    box-sizing: border-box;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+}
+
+.event-detail-breadcrumbs a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.event-detail-breadcrumbs a:hover {
+    color: var(--gold);
+}
+
+.event-detail-breadcrumbs .breadcrumb-sep {
+    margin: 0 10px;
+    color: var(--text-muted);
+}
+
+.event-detail-breadcrumbs .breadcrumb-current {
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.event-detail-section {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 80px 40px;
+    box-sizing: border-box;
+}
+
+.event-detail-section.event-detail-section-alt {
+    background: #161412;
+}
+
+.event-detail-section h2 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin: 0 0 28px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.event-detail-overview {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 64px;
+    align-items: center;
+    justify-items: start;
+}
+
+.event-detail-overview-info h2 {
+    margin: 0 0 32px;
+}
+
+.event-detail-overview-image {
+    max-width: 675px;
+    width: 100%;
+    display: block;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+
+.event-detail-overview-image img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 675/446;
     object-fit: cover;
     display: block;
+    filter: saturate(0.85) contrast(1.02);
+    transition: transform 0.5s ease, filter 0.3s ease;
 }
 
-.jazz-image-placeholder {
-    width: 100%;
-    height: 180px;
-    border-radius: 10px;
-    background: radial-gradient(circle at top, #4b3b26 0%, #1d1710 55%, #120f0a 100%);
-    opacity: 0.6;
+.event-detail-overview-image:hover img {
+    transform: scale(1.03);
+    filter: saturate(1) contrast(1.05);
 }
 
-.jazz-plan-card-title {
-    margin: 14px 0 6px;
-    font-size: 16px;
-    font-weight: 700;
-    color: #ffffff;
-}
-
-.jazz-plan-card-text {
+.event-detail-info-list {
+    list-style: none;
+    padding: 0;
     margin: 0;
-    font-size: 14px;
-    color: #d0d0d0;
+}
+
+.event-detail-info-list li {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+    align-items: flex-start;
+    padding-left: 0;
+}
+
+.event-detail-info-list .icon-wrap {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245,166,35,0.1);
+    border-radius: 12px;
+}
+
+.event-detail-info-list .icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.event-detail-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.event-detail-info-list .label {
+    font-weight: 600;
+    color: var(--gold);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.event-detail-info-list .value {
+    color: var(--text-primary);
+    font-size: 1.15rem;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.event-detail-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+    justify-items: start;
+}
+
+.event-detail-desc-text {
+    text-align: left;
+    width: 100%;
+}
+
+.event-detail-desc-text h2 {
+    color: var(--gold);
+    margin-bottom: 20px;
+}
+
+.event-detail-desc-text .event-detail-desc-paragraphs {
+    color: var(--text-secondary);
+    font-size: 1.15rem;
+    line-height: 1.85;
+    margin-bottom: 32px;
+}
+
+.event-detail-desc-text .event-detail-desc-paragraphs p {
+    margin: 0 0 1.2em;
+}
+
+.event-detail-desc-text .event-detail-desc-paragraphs p:last-child {
+    margin-bottom: 0;
+}
+
+.event-detail-features-heading {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin: 0 0 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.event-detail-features ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.event-detail-features li {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+.event-detail-features li .feat-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    object-fit: contain;
+    opacity: 0.9;
+}
+
+.event-detail-desc-image {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.event-detail-desc-image img {
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 549/788;
+    object-fit: cover;
+    border-radius: 20px;
+    box-shadow: 0 20px 48px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: block;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.event-detail-desc-image:hover img {
+    transform: translateY(-4px);
+    box-shadow: 0 28px 56px rgba(0,0,0,0.6);
+}
+
+.event-detail-expect-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.event-detail-expect-list li {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 16px;
+    padding-left: 1.75em;
+    position: relative;
+}
+
+.event-detail-expect-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+}
+
+.event-detail-tickets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.event-detail-ticket-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+}
+
+.event-detail-ticket-card.vip {
+    border-color: #f5b400;
+}
+
+.event-detail-ticket-card-full {
+    grid-column: 1 / -1;
+}
+
+.event-detail-ticket-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #f5b400;
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.event-detail-ticket-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 8px;
+}
+
+.event-detail-ticket-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin: 0 0 16px;
+}
+
+.event-detail-ticket-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+    font-size: 0.9rem;
+    color: #c0c0c0;
     line-height: 1.6;
 }
 
-.jazz-schedule {
-    margin-top: 10px;
-    background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(240,160,32,0.25);
-    border-radius: 12px;
-    overflow: hidden;
+.event-detail-ticket-features-list li {
+    padding-left: 1.25em;
+    position: relative;
 }
 
-.jazz-table {
-    width: 100%;
-    border-collapse: collapse;
+.event-detail-ticket-features-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-weight: 700;
 }
 
-.jazz-table th,
-.jazz-table td {
-    padding: 12px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    font-size: 14px;
-}
-
-.jazz-table th {
-    text-align: left;
-    color: rgba(255,255,255,0.85);
-    background: rgba(240,160,32,0.12);
-}
-
-.jazz-primary-slot {
+.event-detail-tickets-cta {
+    grid-column: 1 / -1;
+    text-align: center;
     margin-top: 16px;
-    font-size: 14px;
-    color: #e0e0e0;
 }
 
-/* Band members */
-
-.jazz-band {
-    margin-top: 36px;
+.event-detail-tickets-cta .btn {
+    width: 100%;
 }
 
-.jazz-band-grid {
+/* ========== FOOD PAGE (cards + reviews) ========== */
+
+.food-page main {
+    background: radial-gradient(1200px 600px at 50% 0%, rgba(184, 134, 11, 0.22), rgba(0,0,0,0) 70%), #000;
+    color: #fff;
+}
+
+.food-hero {
+    min-height: 320px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.food-hero-content {
+    padding: 64px 0 24px;
+}
+
+    .food-hero-content h1 {
+        font-size: 48px;
+        font-weight: 800;
+        margin: 0;
+    }
+
+.food-intro {
+    padding: 28px 0 22px;
+}
+
+.food-intro-heading {
+    font-size: 40px;
+    font-weight: 800;
+    margin: 18px 0 18px;
+}
+
+.food-intro-text {
+    max-width: 920px;
+    font-size: 18px;
+    line-height: 1.6;
+    opacity: 0.95;
+}
+
+/* Filters */
+.food-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin: 22px 0 18px;
+}
+
+.food-filter-label {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.food-filter-pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.food-filter-btn {
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+    .food-filter-btn:hover {
+        transform: translateY(-1px);
+        background: rgba(255,255,255,0.10);
+    }
+
+    .food-filter-btn.active {
+        background: rgba(184, 134, 11, 0.35);
+        border-color: rgba(184, 134, 11, 0.65);
+    }
+
+/* Restaurant cards grid */
+.food-cards-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px;
+    padding: 8px 0 34px;
 }
 
-@media (max-width: 900px) {
-    .jazz-band-grid {
+@media (max-width: 1100px) {
+    .food-cards-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
-@media (max-width: 600px) {
-    .jazz-band-grid {
+@media (max-width: 640px) {
+    .food-cards-grid {
         grid-template-columns: 1fr;
     }
 }
 
-.jazz-band-card {
-    background: #211b14;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.06);
-    padding: 16px 14px 18px;
-    text-align: center;
-}
-
-.jazz-band-image-placeholder {
-    width: 100%;
-    height: 140px;
-    border-radius: 10px;
-    background: radial-gradient(circle at top, #3a2c22 0%, #150f0a 55%, #0b0806 100%);
-    margin-bottom: 10px;
-}
-
-.jazz-band-name {
-    margin: 0 0 4px;
-    font-size: 15px;
-    font-weight: 700;
-    color: #ffffff;
-}
-
-.jazz-band-role {
-    margin: 0;
-    font-size: 13px;
-    color: #d0d0d0;
-}
-
-.jazz-highlights {
-    margin-top: 32px;
-}
-
-.jazz-highlight-text {
-    font-size: 14px;
-    color: #d0d0d0;
-    max-width: 780px;
-    line-height: 1.7;
-}
-
-.jazz-back {
-    margin: 28px 0 40px 0;
-    text-align: center;
-}
-
-.jazz-gumbo-page .jazz-back {
-    text-align: center;
-}
-
-.jazz-back-btn {
-    display: inline-block;
-    padding: 10px 14px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    text-decoration: none;
-    border: 1px solid rgba(255,255,255,0.10);
-}
-
-.jazz-back-btn:hover {
-    background: rgba(255,255,255,0.13);
-}
-
-/* =========================
-   JAZZ - Gumbo Kings artist page (prototype)
-   ========================= */
-
-.jazz-gumbo-hero-content {
-    text-align: left;
-}
-
-.jazz-gumbo-hero-content h1 {
-    text-transform: none;
-}
-
-.jazz-gumbo-intro {
-    margin-top: 18px;
-    text-align: left;
-}
-
-.jazz-gumbo-intro .jazz-artist-bio {
-    max-width: none;
-}
-
-.jazz-gumbo-bio-justified {
-    text-align: justify;
-}
-
-.jazz-gumbo-page .jazz-section-title,
-.jazz-gumbo-page .jazz-section-subtitle {
-    text-align: left;
-}
-
-.jazz-gumbo-plan .jazz-section-subtitle {
-    margin-top: 32px;
-}
-
-.jazz-gumbo-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-top: 20px;
-}
-
-@media (max-width: 768px) {
-    .jazz-gumbo-cards {
-        grid-template-columns: 1fr;
-    }
-}
-
-.jazz-gumbo-card {
-    background: linear-gradient(145deg, #2a2825 0%, #22201d 100%);
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.06);
-    padding: 16px;
-    text-align: left;
-}
-
-.jazz-gumbo-card-media {
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 10px;
+.food-card {
+    border-radius: 18px;
     overflow: hidden;
-    background: rgba(0,0,0,0.3);
-    margin-bottom: 14px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.88), rgba(0,0,0,0.82));
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.food-card-image-wrap {
+    height: 210px;
+    background: #111;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.jazz-gumbo-video-thumb {
-    background: linear-gradient(135deg, #4a3a20 0%, #2a2218 100%);
-}
-
-.jazz-gumbo-play {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.95);
-    color: #1a1a1a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    padding-left: 4px;
-}
-
-.jazz-gumbo-album-img {
+.food-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
 
-.jazz-gumbo-card-desc {
-    margin: 0 0 14px 0;
-    font-size: 14px;
-    color: #d0d0d0;
-    line-height: 1.6;
-}
-
-.jazz-gumbo-card-btn {
-    display: inline-block;
-    text-decoration: none;
-}
-
-.jazz-gumbo-schedule-wrap {
-    margin-top: 28px;
-    background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(230,138,0,0.35);
-    border-radius: 12px;
-    padding: 18px;
-}
-
-.jazz-gumbo-plan-visit {
-    margin: 0 0 14px 0;
-    font-size: 15px;
-    color: #fff;
+.food-card-placeholder {
+    width: 100%;
+    height: 100%;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    opacity: 0.7;
+}
+
+.food-card-body {
+    padding: 16px 16px 14px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(184, 134, 11, 0.16));
+}
+
+.food-card-title {
+    margin: 0 0 10px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #d89b1b; /* gold-ish like screenshot */
+}
+
+.food-card-tags {
+    margin: 0 0 10px;
+    font-size: 13px;
+    opacity: 0.92;
+}
+
+.food-card-stars {
+    margin: 0 0 10px;
+    letter-spacing: 2px;
+    color: #d89b1b;
+}
+
+.food-card-prices,
+.food-card-seats {
+    margin: 0 0 8px;
+    font-size: 13px;
+    opacity: 0.92;
+}
+
+.food-price-sep {
+    margin: 0 6px;
+    opacity: 0.7;
+}
+
+/* “First session” badge/button */
+.food-card-cta {
+    margin: 10px 0 12px;
+}
+
+.food-session-badge {
+    display: inline-block;
+    background: #d89b1b;
+    color: #111;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+.food-card-footer {
+    margin-top: 6px;
+    font-size: 13px;
+    opacity: 0.92;
+}
+
+.food-walk {
+    display: inline-flex;
     align-items: center;
     gap: 8px;
 }
 
-.jazz-gumbo-cal-icon {
-    font-size: 18px;
+.event-detail-ticket-features {
+    font-size: 0.9rem;
+    color: #c0c0c0;
+    line-height: 1.6;
+    margin: 0 0 20px;
 }
 
-.jazz-gumbo-table th,
-.jazz-gumbo-table td {
-    padding: 10px 12px;
-    font-size: 14px;
-    text-align: left;
-}
-
-.jazz-gumbo-add-btn {
-    padding: 8px 14px;
-    font-size: 13px;
-    white-space: nowrap;
-}
-
-.jazz-gumbo-schedule-note {
-    margin: 12px 0 0 0;
-    font-size: 13px;
-    color: #aaa;
-}
-
-/* Career Highlights: years in orange */
-.jazz-gumbo-year {
-    color: #e68a00;
-    font-weight: 700;
-}
-
-/* Band Members: prototype – striped background, centered title & text, orange panels */
-.jazz-gumbo-band {
-    margin-top: 48px;
-    padding: 40px 24px 48px;
-    background-color: #2a2820;
-    background-image: repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent 4px,
-        rgba(60,55,45,0.4) 4px,
-        rgba(60,55,45,0.4) 8px
-    );
-    border-radius: 12px;
-}
-
-.jazz-gumbo-band-title {
-    margin-top: 0;
-    margin-bottom: 28px;
-    text-align: center;
-    color: #e68a00;
-}
-
-.jazz-gumbo-members {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 24px;
-    margin-top: 20px;
-    max-width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-@media (max-width: 1000px) {
-    .jazz-gumbo-members {
-        grid-template-columns: repeat(3, 1fr);
-        max-width: 640px;
-    }
-}
-
-@media (max-width: 640px) {
-    .jazz-gumbo-members {
-        grid-template-columns: repeat(2, 1fr);
-        max-width: 400px;
-    }
-}
-
-.jazz-gumbo-member {
-    text-align: center;
-}
-
-.jazz-gumbo-member-img {
+.event-detail-ticket-card .btn {
     width: 100%;
-    aspect-ratio: 1;
-    border-radius: 8px 8px 0 0;
-    overflow: hidden;
-    background: rgba(0,0,0,0.3);
+}
+
+.event-detail-location {
+    background: #1e1b18;
+    padding: 64px 40px;
+}
+
+.event-detail-location-inner {
+    max-width: 1280px;
     margin: 0 auto;
 }
 
-.jazz-gumbo-member-img img {
+.event-detail-location h2 {
+    font-family: var(--font-heading);
+    color: var(--gold);
+    font-size: 1.35rem;
+    margin: 0 0 12px;
+}
+
+.event-detail-location-address {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.event-detail-location-hint {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 8px 0 24px;
+}
+
+.event-detail-map {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: 340px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    background: #2a2825;
+    overflow: hidden;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+}
+
+.event-detail-map iframe {
     display: block;
+    border: 0;
 }
 
-.jazz-gumbo-member-info {
-    background: #e68a00;
-    color: #fff;
-    padding: 14px 12px;
-    border-radius: 0 0 8px 8px;
-    font-size: 14px;
-    text-align: center;
-    margin-left: -6px;
-    margin-right: -6px;
-    width: calc(100% + 12px);
-    box-sizing: content-box;
+.event-detail-location .btn {
+    padding: 14px 28px;
+    font-weight: 600;
+    border-radius: 10px;
 }
 
-.jazz-gumbo-member-name {
-    display: block;
-    font-weight: 700;
-    margin-bottom: 4px;
-    color: #fff;
-}
-
-.jazz-gumbo-member-role {
-    display: block;
-    font-size: 13px;
-    color: rgba(255,255,255,0.95);
-}
-
-/* =========================
-   JAZZ - Karsu artist page
-   ========================= */
-
-/* Center-aligned content block */
-.jazz-karsu-centered {
-    text-align: center;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.jazz-karsu-centered .jazz-karsu-plan-layout,
-.jazz-karsu-centered .jazz-karsu-schedule-block,
-.jazz-karsu-centered .jazz-karsu-discography {
-    text-align: left;
-}
-
-.jazz-karsu-centered .jazz-section-title,
-.jazz-karsu-centered .jazz-section-subtitle,
-.jazz-karsu-centered .jazz-artist-bio,
-.jazz-karsu-centered .jazz-highlight-text,
-.jazz-karsu-centered .jazz-karsu-list {
-    text-align: center;
-}
-
-.jazz-karsu-centered .jazz-karsu-list {
-    list-style: none;
-    padding-left: 0;
-    display: inline-block;
-    text-align: left;
-}
-
-.jazz-karsu-page .jazz-section-title {
-    color: #e68a00;
-}
-
-/* Light brown background sections (About, Karsu's Music, etc.) */
-.jazz-karsu-alt-bg {
-    background: linear-gradient(145deg, #4a4035 0%, #352d24 100%);
-    border-radius: 12px;
-    padding: 28px 24px 32px;
-    margin-top: 28px;
-    text-align: center;
-}
-
-.jazz-karsu-alt-bg .jazz-section-subtitle {
-    color: #1a1510;
-}
-
-.jazz-karsu-alt-bg .jazz-highlight-text,
-.jazz-karsu-alt-bg .jazz-karsu-list {
-    color: #1a1510;
-    text-align: center;
-}
-
-.jazz-karsu-alt-bg .jazz-highlight-text {
-    max-width: 720px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.jazz-karsu-alt-bg .jazz-karsu-list {
-    list-style: none;
-    padding-left: 0;
-    display: inline-block;
-    text-align: left;
-}
-
-.jazz-karsu-intro {
-    margin-top: 18px;
-}
-
-.jazz-karsu-intro .jazz-artist-bio + .jazz-artist-bio {
-    margin-top: 14px;
-}
-
-.jazz-karsu-plan-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
-    gap: 24px;
-    align-items: start;
-    margin-top: 16px;
-}
-
-@media (max-width: 900px) {
-    .jazz-karsu-plan-layout {
+@media (max-width: 1024px) {
+    .event-detail-overview,
+    .event-detail-features {
         grid-template-columns: 1fr;
+        gap: 48px;
+    }
+    .event-detail-desc-image {
+        max-width: 100%;
+        justify-content: center;
+    }
+    .event-detail-desc-image img {
+        max-width: 400px;
+        margin: 0 auto;
     }
 }
 
-.jazz-karsu-video-block {
-    background: linear-gradient(145deg, #2a2520 0%, #1a1612 100%);
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.06);
-    padding: 16px;
+@media (max-width: 768px) {
+    .event-detail-section { padding: 48px 24px; }
+    .event-detail-breadcrumbs { padding: 20px 24px 0; }
+    .event-detail-tickets { grid-template-columns: 1fr; }
+    .event-detail-hero { min-height: 420px; }
+    .event-detail-hero-content { padding: 48px 24px; }
+    .event-detail-location { padding: 48px 24px; }
 }
 
-.jazz-karsu-video-thumb {
-    width: 100%;
-    aspect-ratio: 16/9;
-    background: linear-gradient(135deg, #3d2a4a 0%, #2a1f35 100%);
-    border-radius: 10px;
+/* ---------- Artist Detail page (Figma-matched) ---------- */
+.artist-detail-page {
+    --accent: #d4a574;
+    --accent-hover: #e5b882;
+    --text-light: #e8e8e8;
+    --text-muted: #b0b0b0;
+    --bg-dark: #0c0c0c;
+    --bg-section: #161412;
+    --bg-alt: #1e1c19;
+    --font-heading: 'Syne', sans-serif;
+    --font-body: 'DM Sans', -apple-system, sans-serif;
+    font-family: var(--font-body);
+    background: var(--bg-dark);
+}
+
+.artist-detail-hero {
+    position: relative;
+    min-height: 520px;
+    background: var(--bg-dark) center/cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 12px;
+    text-align: center;
+    overflow: hidden;
 }
-
-.jazz-karsu-video-play {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.95);
-    color: #1a1a1a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    padding-left: 4px;
+.artist-detail-hero-hardwell {
+    /* Position so face is visible: favor top of image */
+    background-position: 70% 30%;
 }
-
-.jazz-karsu-video-title {
-    margin: 0 0 4px 0;
-    font-size: 15px;
+.artist-detail-hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 100px 24px 80px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+.artist-detail-hero-name {
+    font-family: var(--font-body);
+    font-size: clamp(2.75rem, 6vw, 4.5rem);
     font-weight: 700;
     color: #fff;
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.6);
 }
-
-.jazz-karsu-video-meta {
-    margin: 0 0 6px 0;
-    font-size: 13px;
-    color: #d0d0d0;
+.artist-detail-hero-tagline {
+    font-family: var(--font-body);
+    font-size: clamp(2.75rem, 6vw, 4.5rem);
+    font-weight: 600;
+    color: #f5b400;
+    margin: 0 0 28px;
+    letter-spacing: 0.02em;
 }
-
-.jazz-karsu-video-desc {
-    margin: 0 0 12px 0;
-    font-size: 13px;
-    color: #d0d0d0;
-}
-
-.jazz-karsu-video-btn {
-    display: inline-block;
+.artist-detail-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: #1a1916;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
     text-decoration: none;
+    border: 1px solid rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.artist-detail-hero-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255,255,255,0.2);
+    color: #1a1916;
 }
 
-.jazz-karsu-schedule-block {
-    background: linear-gradient(180deg, rgba(180,100,40,0.12) 0%, rgba(20,18,15,0.95) 100%);
-    border-radius: 14px;
-    border: 1px solid rgba(240,160,32,0.2);
-    padding: 18px;
-}
-
-.jazz-karsu-schedule-intro {
-    margin: 0 0 14px 0;
-    font-size: 14px;
-    color: #e0e0e0;
-}
-
-.jazz-karsu-schedule-table {
-    margin-top: 0;
-}
-
-.jazz-table-buy th,
-.jazz-table-buy td {
-    padding: 10px 12px;
+.artist-detail-breadcrumbs {
+    padding: 28px 40px 0;
+    max-width: 1280px;
+    margin: 0 auto;
     font-size: 13px;
+    letter-spacing: 0.1em;
 }
-
-.jazz-btn-buy {
-    padding: 6px 14px;
-    font-size: 12px;
-    font-weight: 800;
-    text-transform: uppercase;
+.artist-detail-breadcrumbs a {
+    color: #fff;
     text-decoration: none;
+    transition: color 0.2s ease;
+}
+.artist-detail-breadcrumbs a:hover { color: #f5b400; }
+.artist-detail-breadcrumbs .breadcrumb-sep {
+    color: #fff;
+    margin: 0 10px;
+    font-weight: 400;
+}
+.artist-detail-breadcrumbs .breadcrumb-current {
+    color: #f5b400;
+    font-weight: 600;
 }
 
-.jazz-karsu-schedule-note {
-    margin: 12px 0 0 0;
-    font-size: 13px;
-    color: #b0b0b0;
+.artist-detail-section {
+    padding: 64px 40px 80px;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+.artist-detail-section-alt {
+    background: var(--bg-alt);
+}
+.artist-detail-section-title {
+    font-family: var(--font-body);
+    font-size: 2rem;
+    font-weight: 700;
+    color: #f5b400;
+    margin: 0 0 28px;
+    letter-spacing: -0.02em;
 }
 
-.jazz-karsu-list {
-    margin: 12px 0 0 0;
-    padding-left: 20px;
-    color: #d0d0d0;
-    font-size: 14px;
-    line-height: 1.7;
+.artist-detail-about {
     max-width: 780px;
 }
-
-.jazz-karsu-list li {
-    margin-bottom: 8px;
+.artist-detail-about .artist-detail-section-title { margin-bottom: 24px; }
+.artist-detail-about p {
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1.75;
+    margin: 0 0 18px;
 }
+.artist-detail-about p:last-child { margin-bottom: 0; }
 
-.jazz-karsu-discography {
-    margin-top: 40px;
-}
-
-.jazz-karsu-albums {
+.artist-detail-features {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    max-width: 360px;
-    margin-bottom: 14px;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+}
+.artist-detail-desc-text .artist-detail-section-title { margin-bottom: 24px; }
+.artist-detail-highlights {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.artist-detail-highlights li {
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1.6;
+    padding: 10px 0 10px 32px;
+    position: relative;
+}
+.artist-detail-highlights li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 1.1em;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    background: #f5b400;
+    border-radius: 50%;
+}
+.artist-detail-desc-image {
+    position: relative;
+}
+.artist-detail-desc-image img {
+    width: 491px;
+    height: 491px;
+    max-width: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+    border: 1px solid #FFFFFF;
+    box-shadow: 0 4px 4px rgba(0,0,0,0.25);
 }
 
-.jazz-karsu-album-cover {
+/* Schedule with timeline (Figma-aligned) */
+.artist-detail-schedule-section {
+    background: var(--bg-section);
+    padding: 72px 40px 80px;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.artist-detail-schedule-title {
+    font-family: var(--font-body);
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 40px;
+}
+.artist-detail-schedule-title-main {
+    color: #f5b400;
+}
+.artist-detail-schedule-title-sub {
+    color: rgba(245,180,0,0.85);
+    font-weight: 600;
+}
+.artist-detail-schedule-wrap {
+    display: grid;
+    grid-template-columns: 1fr minmax(320px, 440px);
+    gap: 64px;
+    align-items: center;
+    margin-bottom: 48px;
+}
+.artist-detail-schedule-timeline {
+    position: relative;
+    padding-left: 0;
+}
+.artist-detail-schedule-timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: linear-gradient(to bottom, #f5b400 0%, rgba(245,180,0,0.3) 100%);
+    border-radius: 1px;
+}
+.artist-detail-schedule-item {
+    position: relative;
+    margin-bottom: 36px;
+    padding-left: 40px;
+}
+.artist-detail-schedule-item:last-child { margin-bottom: 0; }
+.artist-detail-schedule-dot {
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 20px;
+    height: 20px;
+    background: #f5b400;
+    border-radius: 50%;
+    border: 4px solid var(--bg-section);
+    box-shadow: 0 0 0 1px rgba(245,180,0,0.5);
+}
+.artist-detail-schedule-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.artist-detail-schedule-time {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    color: #f5b400;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.artist-detail-schedule-day { }
+.artist-detail-schedule-hour { }
+.artist-detail-schedule-icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+.artist-detail-schedule-venue {
+    font-family: var(--font-body);
+    color: rgba(245,180,0,0.9);
+    font-size: 0.9rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.artist-detail-schedule-type {
+    color: rgba(245,180,0,0.9);
+}
+.artist-detail-schedule-desc {
+    font-family: var(--font-body);
+    color: #e8e8e8;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 8px 0 0;
+}
+.artist-detail-schedule-cta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.artist-detail-schedule-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: #1a1916;
+    padding: 14px 32px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.artist-detail-schedule-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,255,255,0.15);
+    color: #1a1916;
+}
+.artist-detail-schedule-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.artist-detail-schedule-image img {
     width: 100%;
-    aspect-ratio: 1;
+    max-width: 400px;
+    border-radius: 20px;
     object-fit: cover;
-    border-radius: 8px;
+    aspect-ratio: 3/4;
+    border: 1px solid rgba(255,255,255,0.25);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+/* Gallery (Figma-aligned) */
+.artist-detail-gallery-section {
+    background: #2a2419;
+    padding: 72px 40px 96px;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+.artist-detail-gallery-header {
+    margin-bottom: 36px;
+}
+.artist-detail-gallery-title {
+    font-family: var(--font-body);
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+}
+.artist-detail-gallery-title-line {
+    display: block;
+    width: 48px;
+    height: 3px;
+    background: #f5b400;
+    margin-bottom: 12px;
+}
+.artist-detail-gallery-sub {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin: 0;
+}
+.artist-detail-gallery {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr;
+    grid-template-rows: 340px 340px;
+    gap: 24px;
+    margin-bottom: 48px;
+}
+.artist-detail-gallery-item {
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.08);
+}
+.artist-detail-gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 42% 38%;
     display: block;
 }
 
-.jazz-karsu-track-info {
-    margin: 0 0 12px 0;
-    font-size: 13px;
-    color: #b0b0b0;
+.artist-detail-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+.artist-detail-stat {
+    background: #3d3528;
+    padding: 32px 24px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    text-align: center;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.artist-detail-stat:hover {
+    background: #4a4132;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+}
+.artist-detail-stat-num {
+    font-family: var(--font-heading);
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #fff;
+    display: block;
+    margin-bottom: 6px;
+}
+.artist-detail-stat-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
 }
 
-.jazz-karsu-player {
+.artist-detail-back-wrap {
+    margin-top: 48px;
+    text-align: center;
+}
+.artist-detail-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: #1a1916;
+    padding: 14px 32px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.artist-detail-back-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255,255,255,0.2);
+    color: #1a1916;
+}
+
+@media (max-width: 1024px) {
+    .artist-detail-schedule-wrap {
+        grid-template-columns: 1fr;
+    }
+    .artist-detail-schedule-image {
+        position: static;
+        max-width: 400px;
+    }
+}
+@media (max-width: 768px) {
+    .artist-detail-breadcrumbs { padding: 24px 24px 0; }
+    .artist-detail-section,
+    .artist-detail-schedule-section,
+    .artist-detail-gallery-section {
+        padding: 48px 24px 64px;
+    }
+    .artist-detail-features {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    .artist-detail-desc-image img {
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1;
+    }
+    .artist-detail-gallery {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, 260px);
+    }
+    .artist-detail-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---------- Artist Music Section (streaming-style) ---------- */
+.artist-music-section {
+    background: #000;
+    padding: 48px 40px 64px;
+}
+.artist-music-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+.artist-music-top {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: flex-start;
+}
+@media (min-width: 1024px) {
+    .artist-music-top {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+}
+.artist-music-profile {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+.artist-music-avatar {
+    width: 128px;
+    height: 128px;
+    min-width: 128px;
+    min-height: 128px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 4px solid #1f2937;
+    background: linear-gradient(135deg, #374151 0%, #111827 100%);
+    position: relative;
+}
+.artist-music-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    object-fit: cover;
+    object-position: center;
+}
+.artist-music-avatar-fallback {
+    display: none;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #fff;
+}
+.artist-music-avatar img[style*="display: none"] + .artist-music-avatar-fallback { display: flex; }
+.artist-music-info { display: flex; flex-direction: column; gap: 8px; }
+.artist-music-name-row {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 10px;
 }
-
-.jazz-karsu-player-btn {
-    width: 40px;
-    height: 40px;
+.artist-music-name {
+    font-family: var(--font-body);
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    margin: 0;
+}
+.artist-music-verified {
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    border: 0;
-    background: #f0a020;
-    color: #1a1206;
-    font-size: 18px;
+    background: #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+.artist-music-real { color: #9ca3af; margin: 0; font-size: 1rem; }
+.artist-music-location { color: #6b7280; margin: 0; font-size: 0.875rem; }
+.artist-music-featured {
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    border: 1px solid #475569;
+    border-radius: 12px;
+    padding: 24px;
+    width: 100%;
+    max-width: 384px;
+}
+.artist-music-featured-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.artist-music-featured-cover {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    min-height: 64px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #16a34a 0%, #166534 100%);
+}
+.artist-music-featured-cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    min-width: 0;
+    min-height: 0;
+    object-fit: cover;
+    object-position: center;
+}
+.artist-music-featured-info { flex: 1; }
+.artist-music-featured-title { font-weight: 600; color: #fff; margin: 0 0 4px; font-size: 1rem; }
+.artist-music-featured-sub { color: #9ca3af; margin: 0; font-size: 0.875rem; }
+.artist-music-featured-btn {
+    width: 100%;
+    background: #fff;
+    color: #000;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s;
+}
+.artist-music-featured-btn { margin-top: 8px; }
+.artist-music-featured-btn:hover { background: #f3f4f6; }
+.artist-music-featured-src { font-size: 0.75rem; color: #6b7280; margin: 8px 0 0; text-align: right; }
+.artist-music-album { display: flex; flex-direction: column; gap: 24px; }
+.artist-music-album-header {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+.artist-music-album-cover {
+    width: 192px;
+    height: 192px;
+    min-width: 192px;
+    min-height: 192px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #16a34a 0%, #14532d 100%);
+}
+.artist-music-album-cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    min-width: 0;
+    min-height: 0;
+    object-fit: cover;
+    object-position: center;
+}
+.artist-music-album-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    justify-content: center;
+}
+.artist-music-album-artist { color: #9ca3af; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; }
+.artist-music-album-title { font-size: 1.875rem; font-weight: 700; color: #fff; margin: 0; }
+.artist-music-album-meta { color: #9ca3af; font-size: 0.875rem; }
+.artist-music-waveform-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.artist-music-waveform-row .artist-music-waveform { flex: 1; }
+.artist-music-vol-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.artist-music-vol-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #fff;
+    font-size: 1rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0;
+    transition: background 0.2s;
 }
-
-.jazz-karsu-player-play {
-    width: 52px;
-    height: 52px;
-    font-size: 20px;
-    background: #c62828;
+.artist-music-vol-btn:hover { background: rgba(255,255,255,0.2); }
+.artist-music-vol-label {
+    min-width: 36px;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-align: center;
+}
+.artist-music-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+.artist-music-progress-wrap {
+    flex: 1;
+    height: 8px;
+    background: rgba(245, 180, 0, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: hidden;
+}
+.artist-music-progress-bar {
+    height: 100%;
+    background: #f5b400;
+    border-radius: 4px;
+    transition: width 0.1s linear;
+}
+.artist-music-progress-row .artist-music-time {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    min-width: 36px;
+}
+.artist-music-waveform {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 48px;
+}
+.artist-music-wave-bar {
+    width: 4px;
+    flex-shrink: 0;
+    background: #4b5563;
+    border-radius: 2px;
+    transition: background 0.2s;
+}
+.artist-music-waveform:hover .artist-music-wave-bar { background: #f5b400; }
+.artist-music-tag {
+    display: inline-block;
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+.artist-music-tracklist { display: flex; flex-direction: column; gap: 8px; }
+.artist-music-track-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+.artist-music-track-row:hover { background: rgba(255,255,255,0.05); }
+.artist-music-track-play {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+    transition: background 0.2s, color 0.2s;
+}
+.artist-music-track-row:hover .artist-music-track-play {
+    background: #fff;
+    color: #000;
+}
+.artist-music-track-num { color: #9ca3af; font-size: 0.875rem; width: 24px; flex-shrink: 0; }
+.artist-music-track-thumb {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #16a34a 0%, #14532d 100%);
+}
+.artist-music-track-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    min-width: 0;
+    min-height: 0;
+    object-fit: cover;
+    object-position: center;
+}
+.artist-music-track-title { flex: 1; color: #fff; }
+.artist-music-track-dur { color: #9ca3af; font-size: 0.875rem; }
+.artist-music-tracks { display: flex; flex-direction: column; gap: 24px; }
+.artist-music-track-card {
+    display: flex;
+    gap: 24px;
+    padding: 16px;
+    border-radius: 12px;
+    transition: background 0.2s;
+}
+.artist-music-track-card:hover { background: rgba(255,255,255,0.05); }
+.artist-music-track-card-cover {
+    width: 128px;
+    height: 128px;
+    min-width: 128px;
+    min-height: 128px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+}
+.artist-music-track-card-cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    min-width: 0;
+    min-height: 0;
+    object-fit: cover;
+    object-position: center;
+}
+.artist-music-track-card-fallback {
+    display: none;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
     color: #fff;
 }
+.artist-music-track-card-cover img[style*="display: none"] + .artist-music-track-card-fallback { display: flex; }
+.artist-music-track-card-body { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.artist-music-track-card-top { display: flex; align-items: center; gap: 16px; }
+.artist-music-track-card-play {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #fff;
+    color: #000;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+.artist-music-track-card-play:hover { transform: scale(1.05); }
+.artist-music-track-card-artist { color: #9ca3af; font-size: 0.875rem; margin: 0 0 4px; }
+.artist-music-track-card-title { font-size: 1.25rem; font-weight: 600; color: #fff; margin: 0; }
+.artist-music-waveform-sm { height: 40px; }
 
-.jazz-karsu-progress {
-    height: 4px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 2px;
-    margin-bottom: 16px;
-    max-width: 320px;
+/* Spotify embed player overlay */
+.artist-music-spotify-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.95);
+    padding: 20px 24px 24px;
+    z-index: 9999;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+.artist-music-spotify-player.is-open {
+    transform: translateY(0);
+}
+.artist-music-spotify-inner {
+    max-width: 540px;
+    margin: 0 auto;
+    position: relative;
+}
+.artist-music-spotify-close {
+    position: absolute;
+    top: -36px;
+    right: 0;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.artist-music-spotify-close:hover { background: rgba(255,255,255,0.2); }
+.artist-music-spotify-player iframe {
+    width: 100%;
+    height: 152px;
+    border-radius: 12px;
 }
 
-.jazz-karsu-progress-bar {
-    width: 35%;
-    height: 100%;
-    background: #f0a020;
-    border-radius: 2px;
+@media (max-width: 767px) {
+    .artist-music-section { padding: 32px 24px 48px; }
+    .artist-music-album-header { flex-direction: column; }
+    .artist-music-album-cover { width: 160px; height: 160px; }
+    .artist-music-track-card { flex-direction: column; }
+    .artist-music-track-card-cover { width: 100%; max-width: 200px; aspect-ratio: 1; }
 }
 
-.jazz-karsu-listen-btn {
-    display: inline-block;
+.food-card-address {
+    margin: 10px 0 0;
+    font-size: 12px;
+    opacity: 0.75;
+}
+
+/* Reviews section */
+.food-reviews {
+    padding: 46px 0 70px;
+    background: radial-gradient(1200px 700px at 30% 0%, rgba(184, 134, 11, 0.20), rgba(0,0,0,0) 70%);
+}
+
+.food-reviews-title {
+    font-size: 36px;
+    font-weight: 800;
+    margin: 0 0 22px;
+    text-transform: lowercase; /* matches screenshot */
+}
+
+.food-reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 26px;
+}
+
+@media (max-width: 1100px) {
+    .food-reviews-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.food-review-card {
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.88), rgba(184, 134, 11, 0.14));
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 18px;
+    min-height: 320px;
+}
+
+.food-review-head {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.food-review-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+    .food-review-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.food-review-name {
+    margin: 0;
+    font-weight: 800;
+}
+
+.food-review-restaurant {
+    margin: 2px 0 6px;
+    color: #d89b1b;
+    font-weight: 800;
+}
+
+.food-review-stars {
+    margin: 0;
+    letter-spacing: 2px;
+    color: #27d3b6; /* teal-ish like screenshot stars */
+}
+
+.food-review-body p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0.92;
+}
+/* ===== Breadcrumbs (same style as Dance page screenshot) ===== */
+
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 30px 0 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-size: 16px;
+}
+
+    .breadcrumbs a {
+        color: #d89b1b; /* gold */
+        text-decoration: none;
+        transition: opacity 0.2s ease;
+    }
+
+        .breadcrumbs a:hover {
+            opacity: 0.8;
+        }
+
+.breadcrumb-sep {
+    color: #d89b1b;
+    opacity: 0.8;
+}
+
+.breadcrumb-current {
+    color: #d89b1b;
+    position: relative;
+    padding-bottom: 6px;
+}
+
+    /* underline under current page */
+    .breadcrumb-current::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 2px;
+        background: #d89b1b;
+    }
+
+.food-card-link {
+    display: block;
+    color: inherit;
     text-decoration: none;
 }
+
+    .food-card-link:focus {
+        outline: 2px solid #d89b1b;
+        outline-offset: 4px;
+        border-radius: 14px;
+    }
+/* ===== Restaurant Detail Page ===== */
+.food-detail-page {
+    background: #000;
+}
+
+.restaurant-hero {
+    position: relative;
+    height: 420px;
+    overflow: hidden;
+}
+
+.restaurant-hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.02);
+}
+
+.restaurant-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.20) 0%, rgba(0,0,0,0.95) 70%, rgba(0,0,0,1) 100%);
+}
+
+.restaurant-hero__content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 24px;
+    z-index: 2;
+}
+
+.restaurant-breadcrumbs {
+    font-size: 12px;
+    opacity: .85;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+    .restaurant-breadcrumbs a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .restaurant-breadcrumbs .active {
+        color: #d89b1b;
+    }
+
+.restaurant-hero__grid {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    align-items: center;
+}
+
+.restaurant-title {
+    font-size: 42px;
+    margin: 0 0 6px 0;
+}
+
+.restaurant-stars {
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.restaurant-type {
+    opacity: .9;
+    margin: 0 0 12px 0;
+    max-width: 480px;
+}
+
+.restaurant-pill {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: #d89b1b;
+    color: #000;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.restaurant-cta {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn--light {
+    background: #fff;
+    color: #000;
+    padding: 14px 26px;
+    border-radius: 4px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.restaurant-section {
+    padding: 40px 0;
+}
+
+    .restaurant-section h2 {
+        font-size: 20px;
+        margin-bottom: 18px;
+    }
+
+.restaurant-about {
+    max-width: 760px;
+    opacity: .9;
+    line-height: 1.6;
+}
+
+.muted {
+    opacity: .75;
+}
+
+.restaurant-photos {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr 1fr;
+    grid-auto-rows: 160px;
+    gap: 14px;
+}
+
+.restaurant-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+    .restaurant-photo:first-child {
+        grid-row: span 2;
+    }
+
+.restaurant-location {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 18px;
+    align-items: start;
+}
+
+.restaurant-map iframe {
+    width: 100%;
+    height: 260px;
+    border: 0;
+    border-radius: 10px;
+}
+
+.restaurant-address {
+    margin: 0 0 10px 0;
+    opacity: .9;
+}
+
+.restaurant-bottom {
+    padding: 60px 0;
+    background: radial-gradient(circle at 30% 10%, rgba(216,155,27,0.25) 0%, rgba(0,0,0,0) 55%), #000;
+}
+
+.restaurant-bottom__cta {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 28px;
+}
+
+.restaurant-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.25);
+    margin: 28px 0;
+}
+
+.restaurant-reviews {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: 20px 0 10px 0;
+}
+
+.review-card {
+    border-radius: 12px;
+    background: rgba(0,0,0,0.75);
+    padding: 18px 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    max-width: 760px;
+}
+
+.review-header {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.review-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+}
+
+.review-name {
+    font-weight: 700;
+}
+
+.review-sub {
+    color: #d89b1b;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.review-stars {
+    letter-spacing: 2px;
+    margin-top: 4px;
+}
+
+.review-text {
+    opacity: .9;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.reservation-note {
+    margin-top: 18px;
+    opacity: .9;
+    line-height: 1.6;
+}
+
+.special-request {
+    margin-top: 16px;
+    max-width: 760px;
+}
+
+    .special-request textarea {
+        width: 100%;
+        margin-top: 8px;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.06);
+        color: #fff;
+    }
+/* ========== NAV AUTH BUTTONS ========== */
+
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-username {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f5b400;
+    white-space: nowrap;
+}
+
+.nav-auth-btn {
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+.food-cards-grid {
+    align-items: start;
+}
+.breadcrumbs a {
+  color: #d89b1b; /* gold */
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.breadcrumbs a:hover {
+  opacity: 0.8;
+}
+
+.breadcrumb-sep {
+  color: #d89b1b;
+  opacity: 0.8;
+}
+
+.breadcrumb-current {
+  color: #d89b1b;
+  position: relative;
+  padding-bottom: 6px;
+}
+
+/* underline under current page */
+.breadcrumb-current::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: #d89b1b;
+}
+.food-card-link{
+  display:block;
+  color: inherit;
+  text-decoration:none;
+}
+.food-card-link:hover{ transform: translateY(-1px); }
+.food-card-link:focus{
+  outline:2px solid #d89b1b;
+  outline-offset:4px;
+  border-radius:14px;
+}
+/* =========================================================
+   RESTAURANT DETAIL PAGE
+   ========================================================= */
+
+.food-detail-page {
+  background: #000000;
+  color: #fff;
+}
+
+/* ================= HERO ================= */
+
+.restaurant-hero {
+  position: relative;
+  height: 460px;
+  overflow: hidden;
+}
+
+.restaurant-hero__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+}
+
+.restaurant-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.85) 65%, #000 100%);
+}
+
+.restaurant-hero__content {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+}
+
+.restaurant-breadcrumbs {
+  font-size: 13px;
+  opacity: .85;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.restaurant-breadcrumbs a {
+  color: #d89b1b;
+  text-decoration: none;
+}
+
+.restaurant-breadcrumbs .active {
+  color: #d89b1b;
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.restaurant-breadcrumbs .active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: #d89b1b;
+}
+
+.restaurant-hero__grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+}
+
+.restaurant-title {
+  font-size: 46px;
+  margin: 0 0 10px 0;
+  font-weight: 700;
+}
+
+.restaurant-stars {
+  font-size: 18px;
+  letter-spacing: 3px;
+  color: #f7c948;
+  margin-bottom: 10px;
+}
+
+.restaurant-type {
+  opacity: .85;
+  margin-bottom: 15px;
+  max-width: 500px;
+}
+
+.restaurant-pill {
+  display: inline-block;
+  background: #d89b1b;
+  color: #000;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.restaurant-cta {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn--light {
+  background: #fff;
+  color: #000;
+  padding: 16px 28px;
+  border-radius: 6px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all .2s ease;
+}
+
+.btn--light:hover {
+  background: #e6e6e6;
+  transform: translateY(-2px);
+}
+
+/* ================= SECTIONS ================= */
+
+.restaurant-section {
+  padding: 60px 0;
+}
+
+.restaurant-section h2 {
+  font-size: 22px;
+  margin-bottom: 24px;
+}
+
+.restaurant-about {
+  max-width: 800px;
+  line-height: 1.7;
+  opacity: .9;
+}
+
+/* ================= PHOTOS GRID ================= */
+
+.restaurant-photos {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  grid-auto-rows: 180px;
+  gap: 16px;
+}
+
+.restaurant-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  transition: transform .3s ease;
+}
+
+.restaurant-photo:hover {
+  transform: scale(1.03);
+}
+
+.restaurant-photo:first-child {
+  grid-row: span 2;
+}
+
+/* ================= LOCATION ================= */
+
+.restaurant-location {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 30px;
+}
+
+.restaurant-address {
+  font-size: 15px;
+  margin-bottom: 10px;
+  opacity: .85;
+}
+
+.restaurant-map iframe {
+  width: 100%;
+  height: 280px;
+  border: 0;
+  border-radius: 14px;
+}
+
+/* ================= BOTTOM SECTION ================= */
+
+.restaurant-bottom {
+  padding: 80px 0;
+  background:
+    radial-gradient(circle at 30% 10%, rgba(216,155,27,0.35) 0%, rgba(0,0,0,0) 60%),
+    #000;
+}
+
+.restaurant-bottom__cta {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.restaurant-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.25);
+  margin: 40px 0;
+}
+
+/* ================= REVIEWS ================= */
+
+.restaurant-reviews {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.review-card {
+  max-width: 820px;
+  padding: 22px 24px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.75);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  position: relative;
+}
+
+.review-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.review-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+}
+
+.review-name {
+  font-weight: 700;
+}
+
+.review-sub {
+  font-size: 13px;
+  color: #d89b1b;
+  margin-top: 3px;
+}
+
+.review-stars {
+  letter-spacing: 3px;
+  margin-top: 6px;
+  color: #00c6a2;
+}
+
+.review-text {
+  line-height: 1.7;
+  opacity: .9;
+  margin: 0;
+}
+
+/* ================= RESERVATION NOTE ================= */
+
+.reservation-note {
+  max-width: 820px;
+  margin-top: 20px;
+  line-height: 1.6;
+  opacity: .9;
+}
+
+.special-request {
+  margin-top: 20px;
+  max-width: 820px;
+}
+
+.special-request textarea {
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  resize: vertical;
+}
+
+.special-request textarea:focus {
+  outline: none;
+  border-color: #d89b1b;
+  box-shadow: 0 0 0 2px rgba(216,155,27,0.3);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+
+  .restaurant-hero__grid {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .restaurant-location {
+    grid-template-columns: 1fr;
+  }
+
+  .restaurant-photos {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .restaurant-photo:first-child {
+    grid-row: span 1;
+  }
+}
+

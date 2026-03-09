@@ -1,14 +1,21 @@
 <?php
 $page = $viewModel->page;
-$events = $viewModel->events;
+$categories = $viewModel->categories;
+// shared for header/footer and any partial that needs them
 $app = (new \App\Repositories\SettingsRepository())->getAll();
+$navLinks = (new \App\Repositories\MenuRepository())->getNavLinks();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
+    <title><?= htmlspecialchars($page->title ?? 'Haarlem Festival') ?></title>
+    <link rel="stylesheet" href="/css/style.css?v=20">
+
     <title><?= htmlspecialchars($page->title) ?></title>
     <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars($app['css_version']) ?>">
+
 </head>
 <body>
 

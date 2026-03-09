@@ -8,6 +8,7 @@ class SiteSettingsSeeder extends AbstractSeed
 {
     public function run(): void
     {
+        $this->table('site_settings')->getAdapter()->execute('DELETE FROM site_settings');
         $data = [
             ['setting_key' => 'site_name', 'setting_value' => 'Haarlem Festival'],
             ['setting_key' => 'home_path', 'setting_value' => '/'],

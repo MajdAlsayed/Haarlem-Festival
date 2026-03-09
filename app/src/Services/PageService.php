@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Contracts\PageRepositoryInterface;
+use App\Contracts\ServiceInterface\PageServiceInterface;
 use App\Models\Page;
 use App\Validation\Validator;
 
-class PageService
+/** Page by slug; normalizes + validates then repo. */
+class PageService implements PageServiceInterface
 {
     public function __construct(
         private PageRepositoryInterface $pageRepository
