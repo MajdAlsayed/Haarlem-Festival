@@ -96,7 +96,7 @@ class EventRepository implements EventRepositoryInterface
         );
 
         $stmt->execute([
-            'event_type_name' => $eventTypeName,
+            'event_type_name' => trim($eventTypeName),
             'event_day' => trim($eventDay),
         ]);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -109,21 +109,61 @@ class EventRepository implements EventRepositoryInterface
         return $events;
     }
 
+    public function getById(int $id): ?Event
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT e.event_id,
+                    e.event_type_id,
+                    e.venue_id,
+                    e.title,
+                    e.description,
+                    e.event_day,
+                    e.start_time,
+                    et.name AS event_type_name,
+                    et.card_image,
+                    et.info_path,
+                    v.name AS venue_name,
+                    v.city AS venue_city
+             FROM events e
+             JOIN event_types et ON e.event_type_id = et.event_type_id
+             JOIN venues v ON e.venue_id = v.venue_id
+             WHERE e.event_id = :id
+             LIMIT 1'
+        );
+
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            return null;
+        }
+
+        return $this->mapRowToEvent($row);
+    }
+
     private function mapRowToEvent(array $row): Event
     {
         $event = new Event();
         $event->id = (int) $row['event_id'];
         $event->eventTypeId = (int) $row['event_type_id'];
         $event->venueId = (int) $row['venue_id'];
-        $event->title = $row['title'];
+        $event->title = (string)$row['title'];
         $event->description = $row['description'] ?? null;
-        $event->eventDay = isset($row['event_day']) ? (string) $row['event_day'] : null;
-        $event->startTime = isset($row['start_time']) ? (string) $row['start_time'] : null;
-        $event->eventTypeName = $row['event_type_name'];
-        $event->venueName = $row['venue_name'];
-        $event->venueCity = !empty($row['venue_city']) ? $row['venue_city'] : (new SettingsRepository())->getAll()['default_venue_city'];
-        $event->cardImage = isset($row['card_image']) ? (string) $row['card_image'] : null;
-        $event->infoPath = isset($row['info_path']) ? (string) $row['info_path'] : null;
+        $event->eventDay = isset($row['event_day']) ? (string)$row['event_day'] : null;
+        $event->startTime = isset($row['start_time']) ? (string)$row['start_time'] : null;
+        $event->eventTypeName = (string)$row['event_type_name'];
+        $event->venueName = (string)$row['venue_name'];
+
+        $settings = (new SettingsRepository())->getAll();
+        $event->venueCity = !empty($row['venue_city'])
+            ? (string)$row['venue_city']
+            : (string)($settings['default_venue_city'] ?? 'Haarlem');
+
+        $event->cardImage = isset($row['card_image']) ? (string)$row['card_image'] : null;
+        $event->infoPath = isset($row['info_path']) ? (string)$row['info_path'] : null;
+
         return $event;
     }
 }

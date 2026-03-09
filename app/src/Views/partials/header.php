@@ -6,7 +6,7 @@ $app = (new \App\Repositories\SettingsRepository())->getAll();
 <header>
     <div class="nav-container">
         <div class="logo">
-            <a href="<?= htmlspecialchars($app['home_path']) ?>" class="logo-link"><img src="<?= htmlspecialchars($app['icons_path']) ?><?= rawurlencode($app['logo_filename']) ?>" alt="<?= htmlspecialchars($app['site_name']) ?>" class="logo-img"></a>
+            <a href="<?= htmlspecialchars($app['home_path']) ?>" class="logo-link"><img src="<?= htmlspecialchars($app['logo_src'] ?? $app['icons_path'] . $app['logo_filename']) ?>" alt="<?= htmlspecialchars($app['site_name']) ?>" class="logo-img"></a>
         </div>
         <nav class="nav-menu">
             <?php foreach ($navLinks as $link): ?>

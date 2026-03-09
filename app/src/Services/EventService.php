@@ -32,4 +32,12 @@ class EventService
         Validator::validateEventCategory($eventTypeName);
         return $this->eventRepository->getByCategoryAndDay(trim($eventTypeName), trim($eventDay));
     }
+
+    public function getById(int $id): ?Event
+    {
+        if ($id <= 0) {
+            return null;
+        }
+        return $this->eventRepository->getById($id);
+    }
 }

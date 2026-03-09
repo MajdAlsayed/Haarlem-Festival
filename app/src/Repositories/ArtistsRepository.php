@@ -9,7 +9,7 @@ use App\Core\Database;
 class ArtistsRepository
 {
     /**
-     * @return array<int, array{name: string, bio: string|null, image_filename: string}>
+     * @return array<int, array{name: string, bio: string|null, image: string}>
      */
     public function getAllOrdered(): array
     {

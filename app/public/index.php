@@ -1,9 +1,12 @@
 <?php
 
+ob_start();
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Controllers\HomeController;
 use App\Controllers\DanceController;
+use App\Controllers\JazzController;
 use App\Exceptions\AppException;
 use App\Exceptions\NotFoundException;
 
@@ -16,6 +19,9 @@ set_exception_handler(function (Throwable $e): void {
         $message = $e->getMessage();
     }
 
+    if (ob_get_level()) {
+        ob_end_clean();
+    }
     http_response_code($code);
     require __DIR__ . '/../src/Views/error.php';
 });
@@ -30,6 +36,24 @@ switch ($uri) {
 
     case '/dance':
         (new DanceController())->index();
+        break;
+
+    // JAZZ ROUTES
+    case '/jazz':
+    case '/jazz/':
+        (new JazzController())->index();
+        break;
+
+    case '/jazz/gumbo-kings':
+        (new JazzController())->gumboKings();
+        break;
+
+    case '/jazz/karsu':
+        (new JazzController())->karsu();
+        break;
+
+    case '/jazz/gare-du-nord':
+        (new JazzController())->gareDuNord();
         break;
 
     default:

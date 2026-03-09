@@ -2,7 +2,7 @@
 <footer class="site-footer">
     <div class="footer-container">
         <div class="footer-logo">
-            <img src="<?= htmlspecialchars($app['icons_path']) ?><?= rawurlencode($app['logo_filename']) ?>" alt="<?= htmlspecialchars($app['site_name']) ?>" class="footer-logo-img">
+            <img src="<?= htmlspecialchars($app['logo_src'] ?? $app['icons_path'] . $app['logo_filename']) ?>" alt="<?= htmlspecialchars($app['site_name']) ?>" class="footer-logo-img">
         </div>
 
         <nav class="footer-nav" aria-label="Footer navigation">
