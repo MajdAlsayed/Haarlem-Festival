@@ -10,7 +10,12 @@ class HistoryHomeBlocksSeeder extends AbstractSeed
     {
         // Get page id for history homepage
         $historyPage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history'");
-        $pageId = $historyPage['page_id'];
+        if (!$historyPage || !isset($historyPage['page_id'])) {
+            // If the history page does not exist yet, skip seeding these blocks
+            // rather than failing the whole seed run.
+            return;
+        }
+        $pageId = (int)$historyPage['page_id'];
         $this->execute("DELETE FROM page_blocks WHERE page_id = $pageId");
 
         // Get hero image dynamicaly
