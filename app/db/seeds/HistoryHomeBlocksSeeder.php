@@ -8,15 +8,17 @@ class HistoryHomeBlocksSeeder extends AbstractSeed
 {
     public function run(): void
     {
+        // Ensure history page exists (HistoryPagesSeeder may not have run yet)
+        $this->getAdapter()->execute(
+            "INSERT IGNORE INTO pages (slug, title, is_published) VALUES ('history', 'A Stroll Through History', 1)"
+        );
         // Get page id for history homepage
         $historyPage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history'");
-        if (!$historyPage || !isset($historyPage['page_id'])) {
-            // If the history page does not exist yet, skip seeding these blocks
-            // rather than failing the whole seed run.
+        if (!$historyPage) {
             return;
         }
-        $pageId = (int)$historyPage['page_id'];
-        $this->execute("DELETE FROM page_blocks WHERE page_id = $pageId");
+        $pageId = (int) $historyPage['page_id'];
+        $this->execute("DELETE FROM page_blocks WHERE page_id = " . $pageId);
 
         // Get hero image dynamicaly
         $heroImage = $this->fetchRow(
