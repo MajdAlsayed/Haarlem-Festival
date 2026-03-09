@@ -9,6 +9,7 @@ $locationCards = $blocks['location_cards']['content'] ?? [];
 $experience = $blocks['text_block']['content'] ?? [];
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
