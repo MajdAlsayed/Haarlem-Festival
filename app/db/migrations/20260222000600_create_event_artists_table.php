@@ -11,8 +11,8 @@ final class CreateEventArtistsTable extends AbstractMigration
             return;
         }
 
-        // Use Phinx's foreign key helpers so types stay aligned with
-        // events.event_id and artists.id, avoiding errno 150 on fresh DBs.
+        // Create the pivot table without DB-level foreign keys to avoid
+        // engine/collation/type mismatches causing errno 150 on fresh DBs.
         $this->table('event_artists', [
                 'id' => false,
                 'primary_key' => ['event_id', 'artist_id'],
@@ -21,14 +21,6 @@ final class CreateEventArtistsTable extends AbstractMigration
             ->addColumn('artist_id', 'integer', ['null' => false])
             ->addIndex(['event_id'])
             ->addIndex(['artist_id'])
-            ->addForeignKey('event_id', 'events', 'event_id', [
-                'delete' => 'CASCADE',
-                'update' => 'CASCADE',
-            ])
-            ->addForeignKey('artist_id', 'artists', 'id', [
-                'delete' => 'CASCADE',
-                'update' => 'CASCADE',
-            ])
             ->create();
     }
 }
