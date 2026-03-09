@@ -1,9 +1,9 @@
 <?php
-
 declare(strict_types=1);
 
 /**
- * Homepage event cards: event type name (from event_types.name) => image filename in /public/images/
+ * Homepage event cards: event type name (lowercase) => image filename in /public/images/
+ * Info paths control the INFO button on homepage cards.
  */
 return [
     'card_images' => [
@@ -13,12 +13,10 @@ return [
         'yammy' => 'food.jpg',
         'stories' => 'stories.jpg',
     ],
-    /**
-     * INFO button URL per event type. Key = event type name (lowercase). Value = path or #.
-     */
+
     'info_paths' => [
         'dance' => '/dance',
-        'jazz' => '#',
+        'jazz' => '/jazz',
         'history' => '/history',
         'yammy' => '#',
         'stories' => '#',

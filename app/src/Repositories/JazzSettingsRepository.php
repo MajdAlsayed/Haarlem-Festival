@@ -1,13 +1,11 @@
 <?php
-
 declare(strict_types=1);
 
 namespace App\Repositories;
 
 use App\Core\Database;
 
-/** dance_settings table: hero_image, featured_images, day images/genres. JSON values decoded. */
-class DanceSettingsRepository
+final class JazzSettingsRepository
 {
     /** @var array<string, mixed>|null */
     private static ?array $cache = null;
@@ -15,34 +13,40 @@ class DanceSettingsRepository
     /** @return array<string, mixed> */
     public function getAll(): array
     {
-        if (self::$cache !== null) {
-            return self::$cache;
-        }
+        if (self::$cache !== null) return self::$cache;
+
         try {
             $db = Database::getConnection();
-            $stmt = $db->query('SELECT setting_key, setting_value FROM dance_settings');
+            $stmt = $db->query('SELECT setting_key, setting_value FROM jazz_settings');
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Throwable $e) {
-            self::$cache = require __DIR__ . '/../Config/dance.php';
+            self::$cache = require __DIR__ . '/../Config/jazz.php';
             return self::$cache;
         }
+
+        if ($rows === []) {
+            self::$cache = require __DIR__ . '/../Config/jazz.php';
+            return self::$cache;
+        }
+
         $out = [];
         foreach ($rows as $row) {
-            $key = $row['setting_key'];
+            $key = (string)$row['setting_key'];
             $val = $row['setting_value'];
             if ($val !== null) {
                 $decoded = json_decode($val, true);
                 $out[$key] = (is_array($decoded) || is_object($decoded)) ? $decoded : $val;
             } else {
-                $out[$key] = $val;
+                $out[$key] = null;
             }
         }
-        // no rows in DB = use config file
-        if ($rows === []) {
-            $fallback = require __DIR__ . '/../Config/dance.php';
-            self::$cache = $fallback;
-            return $fallback;
+
+        // normalize to match config keys if they are stored as raw strings
+        if (!isset($out['artist_pages'])) {
+            $fallback = require __DIR__ . '/../Config/jazz.php';
+            $out['artist_pages'] = $fallback['artist_pages'];
         }
+
         self::$cache = $out;
         return $out;
     }

@@ -41,6 +41,7 @@ class SettingsRepository
             'site_name' => $out['site_name'] ?? 'Haarlem Festival',
             'home_path' => $out['home_path'] ?? '/',
             'logo_filename' => $out['logo_filename'] ?? 'Logo.png',
+            'logo_src' => $out['logo_src'] ?? '/images/jazz/Logo.jpg',
             'icons_path' => $out['icons_path'] ?? '/images/icons/',
             'default_event_location' => $out['default_event_location'] ?? 'Haarlem — Netherlands',
             'default_venue_city' => $out['default_venue_city'] ?? 'Haarlem',
