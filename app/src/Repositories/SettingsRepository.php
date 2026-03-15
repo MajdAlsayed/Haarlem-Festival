@@ -1,26 +1,29 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Repositories;
 
 use App\Core\Database;
 
-/** site_settings: app config (css_version, home_path, footer_*, etc.). Cached. */
+/**
+ * Reads site_settings from the database (css_version, home_path, footer, etc.).
+ * If the database fails or has no rows, we use the config file.
+ */
 class SettingsRepository
 {
-    /** @var array<string, mixed>|null */
-    private static ?array $cache = null;
-
-    /** @return array<string, mixed> */
     public function getAll(): array
     {
-        if (self::$cache !== null) {
-            return self::$cache;
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->query('SELECT setting_key, setting_value FROM site_settings');
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            return require __DIR__ . '/../Config/app.php';
         }
-        $db = Database::getConnection();
-        $stmt = $db->query('SELECT setting_key, setting_value FROM site_settings');
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (empty($rows)) {
+            return require __DIR__ . '/../Config/app.php';
+        }
+
         $out = [];
         foreach ($rows as $row) {
             $key = $row['setting_key'];
@@ -32,12 +35,8 @@ class SettingsRepository
                 $out[$key] = $val;
             }
         }
-        if ($rows === []) {
-            self::$cache = require __DIR__ . '/../Config/app.php';
-            return self::$cache;
-        }
-        // normalize to known keys + defaults
-        $app = [
+
+        return [
             'site_name' => $out['site_name'] ?? 'Haarlem Festival',
             'home_path' => $out['home_path'] ?? '/',
             'logo_filename' => $out['logo_filename'] ?? 'Logo.png',
@@ -53,11 +52,8 @@ class SettingsRepository
                 'app_labels' => $out['footer_app_labels'] ?? [],
             ],
         ];
-        self::$cache = $app;
-        return $app;
     }
 
-    /** Single key; returns null if not set or not a string. */
     public function get(string $key): ?string
     {
         $all = $this->getAll();

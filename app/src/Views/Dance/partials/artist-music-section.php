@@ -1,37 +1,26 @@
 <?php
-/** Artist profile + featured release + album player + track cards. Uses $artist (from parent) for slug; Tiësto data set in ArtistDetail. */
-$musicPhotos = new \App\Repositories\PhotosRepository();
-$musicSlug = $artist['slug'] ?? 'hardwell';
-$profileKey = $musicSlug === 'tiesto' ? 'profile_tiesto' : 'profile';
-$albumKey = $musicSlug === 'tiesto' ? 'album_cover_tiesto' : 'album_cover';
-$track1Key = $musicSlug === 'tiesto' ? 'track_1_tiesto' : 'track_1';
-$track2Key = $musicSlug === 'tiesto' ? 'track_2_tiesto' : 'track_2';
-$artistImg = '/images/dance/' . ($musicPhotos->getFilename('dance_artist_music', $profileKey) ?? ($musicSlug === 'tiesto' ? 'Artist/tiesto1.png' : 'Artist/hardwell1.png'));
-$albumCover = '/images/dance/' . ($musicPhotos->getFilename('dance_artist_music', $albumKey) ?? ($musicSlug === 'tiesto' ? 'Artist/tiesto2.png' : 'Artist/hardwell2.jpg'));
-if (!isset($musicTracks)) {
-    $musicTracks = [
-        ['title' => 'The Partycrasher', 'duration' => '2:54', 'audio' => '/audio/Hardwell & Chuckie - The Partycrasher (Hardwell & Friends Vol. 04).mp3'],
-        ['title' => 'Lights Out', 'duration' => '4:54', 'audio' => '/audio/Hardwell & Olly James - Lights Out (Hardwell & Friends Vol. 04).mp3'],
-        ['title' => 'Rise Again', 'duration' => '2:78', 'audio' => '/audio/Hardwell & Ryos - Rise Again (Hardwell & Friends Vol. 04).mp3'],
-    ];
+/** @var \App\ViewModels\ArtistDetailViewModel $viewModel */
+if (!isset($viewModel)) {
+    return;
 }
-if (!isset($musicExtraTracks)) {
-    $musicExtraTracks = [
-        ['artist' => 'Hardwell, Dyro', 'title' => 'Not Alone', 'tag' => 'Dance', 'cover' => '/images/dance/' . ($musicPhotos->getFilename('dance_artist_music', $track1Key) ?? 'Artist/hardwell3.jpg'), 'audio' => '/audio/Hardwell & Dyro - Not Alone (Official Music Video).mp3'],
-        ['artist' => 'Hardwell, Maddix', 'title' => 'Rave Till My Grave (feat. Villain)', 'tag' => 'Dance', 'cover' => '/images/dance/' . ($musicPhotos->getFilename('dance_artist_music', $track2Key) ?? 'Artist/hardwell4.jpg'), 'audio' => '/audio/Hardwell & Maddix feat. Villain - Rave Till My Grave.mp3'],
-    ];
+$artist = $viewModel->artist;
+$artistImg = $viewModel->profileImage;
+$albumCover = $viewModel->albumCoverImage;
+$tracks = $viewModel->musicTracks;
+$extraTracks = $viewModel->musicExtraTracks;
+foreach ($extraTracks as $i => $t) {
+    if (isset($t['cover']) && strpos($t['cover'], '/images/') !== 0) {
+        $extraTracks[$i]['cover'] = '/images/dance/' . $t['cover'];
+    }
 }
-$tracks = $musicTracks;
-$extraTracks = $musicExtraTracks;
-$displayName = $musicDisplayName ?? 'HARDWELL';
-$realName = $musicRealName ?? 'Robbert Hardwell';
-$location = $musicLocation ?? 'Breda, Netherlands';
-$albumTitle = $musicAlbumTitle ?? 'Hardwell & Friends Vol. 04';
-$albumSub = $musicAlbumSub ?? 'VOL. 04';
+$displayName = $viewModel->musicDisplayName;
+$realName = $viewModel->musicRealName;
+$location = $viewModel->musicLocation;
+$albumTitle = $viewModel->albumTitle;
+$albumSub = $viewModel->albumSub;
 ?>
 <section class="artist-music-section">
     <div class="artist-music-inner">
-        <!-- Top: Artist Profile + Featured Release -->
         <div class="artist-music-top">
             <div class="artist-music-profile">
                 <div class="artist-music-avatar">
@@ -64,7 +53,7 @@ $albumSub = $musicAlbumSub ?? 'VOL. 04';
             </div>
         </div>
 
-        <!-- Album Player -->
+        <?php if (!empty($tracks)): ?>
         <div class="artist-music-album">
             <div class="artist-music-album-header">
                 <div class="artist-music-album-cover">
@@ -108,8 +97,9 @@ $albumSub = $musicAlbumSub ?? 'VOL. 04';
                 <?php endforeach; ?>
             </div>
         </div>
+        <?php endif; ?>
 
-        <!-- Extra Track Cards -->
+        <?php if (!empty($extraTracks)): ?>
         <div class="artist-music-tracks">
             <?php foreach ($extraTracks as $t): ?>
                 <div class="artist-music-track-card" data-audio="<?= htmlspecialchars($t['audio'] ?? '') ?>">
@@ -147,6 +137,7 @@ $albumSub = $musicAlbumSub ?? 'VOL. 04';
             </div>
             <?php endforeach; ?>
         </div>
+        <?php endif; ?>
     </div>
     <audio id="artist-music-audio" preload="metadata"></audio>
 </section>
