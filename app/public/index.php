@@ -2,6 +2,7 @@
 session_start();
 
 ob_start();
+
 require_once __DIR__ . '/../vendor/autoload.php';
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -16,9 +17,11 @@ use App\Controllers\ArtistController;
 use App\Controllers\FoodController;
 use App\Controllers\HomeController;
 use App\Controllers\HistoryController;
+use App\Controllers\JazzController;
 use App\Exceptions\AppException;
 use App\Exceptions\NotFoundException;
 use App\Controllers\StoriesController;
+use App\Controllers\CartController;
 
 Session::start();
 
@@ -31,12 +34,16 @@ set_exception_handler(function (Throwable $e): void {
         $message = $e->getMessage();
     }
 
+    if (ob_get_level()) {
+        ob_end_clean();
+    }
     http_response_code($code);
     require __DIR__ . '/../src/Views/error.php';
 });
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
+$uri = rtrim((string) $uri, '/');
+if ($uri === '') $uri = '/';
 
 if (preg_match('#^/food/restaurant/(\d+)$#', $uri, $m)) {
     (new FoodController())->restaurant((int) $m[1]);
@@ -98,6 +105,10 @@ switch ($uri) {
         else http_response_code(405);
         break;
 
+    case '/dance':
+        (new DanceController())->index();
+        break;
+
     case '/food':
         (new FoodController())->index();
         break;
@@ -120,10 +131,10 @@ switch ($uri) {
         else $c->showResetPassword();
         break;
 
-        case '/forgot-password':
+    case '/forgot-password':
         $c = new AuthController();
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {$c->forgotPassword();
-        } else $c->showForgotPassword();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') $c->forgotPassword();
+        else $c->showForgotPassword();
         break;
 
     case '/logout':
@@ -136,6 +147,23 @@ switch ($uri) {
 
     case '/history/locations':
         (new HistoryController())->locations();
+        break;
+
+    case '/jazz':
+    case '/jazz/':
+        (new JazzController())->index();
+        break;
+
+    case '/jazz/gumbo-kings':
+        (new JazzController())->gumboKings();
+        break;
+
+    case '/jazz/karsu':
+        (new JazzController())->karsu();
+        break;
+
+    case '/jazz/gare-du-nord':
+        (new JazzController())->gareDuNord();
         break;
 
     default:

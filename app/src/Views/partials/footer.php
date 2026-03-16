@@ -2,7 +2,7 @@
 <footer class="site-footer">
     <div class="footer-container">
         <div class="footer-logo">
-            <img src="<?= htmlspecialchars($app['icons_path']) ?><?= rawurlencode($app['logo_filename']) ?>" alt="<?= htmlspecialchars($app['site_name']) ?>" class="footer-logo-img">
+            <img src="<?= htmlspecialchars($app['logo_src'] ?? $app['icons_path'] . $app['logo_filename']) ?>" alt="<?= htmlspecialchars($app['site_name']) ?>" class="footer-logo-img">
         </div>
 
         <nav class="footer-nav" aria-label="Footer navigation">
@@ -72,4 +72,6 @@
 </footer>
 
 <?php include __DIR__ . '/cartDrawer.php'; ?>
-<script src="/js/cartDrawer.js?v=1" defer></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/cartDrawer.js?v=2" defer></script>

@@ -6,6 +6,11 @@ use Phinx\Seed\AbstractSeed;
 
 final class StoriesSeeder extends AbstractSeed
 {
+    public function getDependencies(): array
+    {
+        return ['EventSeeder'];
+    }
+
     public function run(): void
     {
         $events = $this->fetchAll("

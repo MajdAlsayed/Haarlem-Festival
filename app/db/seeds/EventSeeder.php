@@ -234,6 +234,7 @@ class EventSeeder extends AbstractSeed
                 'event_day' => 'friday',
                 'start_time' => '12:00',
             ],
+
             [
                 'event_type_id' => 5,
                 'venue_id' => 1,

@@ -8,6 +8,7 @@ class MenuItemsSeeder extends AbstractSeed
 {
     public function run(): void
     {
+        $this->table('menu_items')->getAdapter()->execute('DELETE FROM menu_items');
         $data = [
             ['path' => '/', 'label' => 'FESTIVAL', 'sort_order' => 1],
             ['path' => '/jazz', 'label' => 'JAZZ', 'sort_order' => 2],

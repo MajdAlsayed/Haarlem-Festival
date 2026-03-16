@@ -30,6 +30,8 @@ docker compose run --rm php vendor/bin/phinx migrate
 docker compose run --rm php vendor/bin/phinx seed:run
 ```
 
+For a first-time setup, run all seeders (no `-s`) so dependencies run in the right order. To re-seed only one part:
+
 To run a specific seeder:
 
 ```bash

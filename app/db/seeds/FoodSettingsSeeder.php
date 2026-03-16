@@ -8,6 +8,7 @@ class FoodSettingsSeeder extends AbstractSeed
 {
     public function run(): void
     {
+        $this->table('food_settings')->getAdapter()->execute('DELETE FROM food_settings');
         $data = [
             // Header / intro (matches your page header + intro text)
             ['setting_key' => 'hero_image', 'setting_value' => 'food-hero.jpg'],

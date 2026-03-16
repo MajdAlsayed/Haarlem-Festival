@@ -6,6 +6,7 @@ return [
     'site_name' => 'Haarlem Festival',
     'home_path' => '/',
     'logo_filename' => 'Logo.png',
+    'logo_src' => '/images/jazz/Logo.jpg',
     'icons_path' => '/images/icons/',
     'default_event_location' => 'Haarlem — Netherlands',
     'default_venue_city' => 'Haarlem',

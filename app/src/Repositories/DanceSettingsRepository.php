@@ -18,9 +18,14 @@ class DanceSettingsRepository
         if (self::$cache !== null) {
             return self::$cache;
         }
-        $db = Database::getConnection();
-        $stmt = $db->query('SELECT setting_key, setting_value FROM dance_settings');
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->query('SELECT setting_key, setting_value FROM dance_settings');
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            self::$cache = require __DIR__ . '/../Config/dance.php';
+            return self::$cache;
+        }
         $out = [];
         foreach ($rows as $row) {
             $key = $row['setting_key'];
