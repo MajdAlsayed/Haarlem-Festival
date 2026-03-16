@@ -235,14 +235,6 @@ class EventSeeder extends AbstractSeed
                 'start_time' => '12:00',
             ],
 
-            [
-                'event_type_id' => 5,
-                'venue_id' => 1,
-                'title' => 'Stories of Haarlem',
-                'description' => 'Immersive storytelling and cultural moments.',
-                'event_day' => 'friday',
-                'start_time' => '19:00',
-            ],
 
             // Stories (event_type_id = 5)
 [
