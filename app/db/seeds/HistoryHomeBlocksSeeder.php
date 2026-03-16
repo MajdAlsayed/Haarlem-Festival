@@ -6,6 +6,11 @@ use Phinx\Seed\AbstractSeed;
 
 class HistoryHomeBlocksSeeder extends AbstractSeed
 {
+    public function getDependencies(): array
+    {
+        return ['HistoryImagesSeeder'];
+    }
+
     public function run(): void
     {
         // Ensure history page exists (HistoryPagesSeeder may not have run yet)
