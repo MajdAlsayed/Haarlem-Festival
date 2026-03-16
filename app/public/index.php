@@ -21,6 +21,7 @@ use App\Controllers\JazzController;
 use App\Exceptions\AppException;
 use App\Exceptions\NotFoundException;
 use App\Controllers\StoriesController;
+use App\Controllers\CartController;
 
 Session::start();
 

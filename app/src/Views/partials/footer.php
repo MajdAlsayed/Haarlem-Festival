@@ -72,4 +72,6 @@
 </footer>
 
 <?php include __DIR__ . '/cartDrawer.php'; ?>
-<script src="/js/cartDrawer.js?v=1" defer></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/cartDrawer.js?v=2" defer></script>
