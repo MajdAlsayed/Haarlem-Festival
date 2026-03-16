@@ -18,6 +18,7 @@ use App\Controllers\FoodController;
 use App\Controllers\HomeController;
 use App\Controllers\HistoryController;
 use App\Controllers\JazzController;
+use App\Controllers\CartController;
 use App\Exceptions\AppException;
 use App\Exceptions\NotFoundException;
 use App\Controllers\StoriesController;
