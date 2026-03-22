@@ -6,14 +6,6 @@ use Phinx\Seed\AbstractSeed;
 
 class HistoryLocationsSeeder extends AbstractSeed
 {
-    /**
-     * Run Method.
-     *
-     * Write your database seeder using this method.
-     *
-     * More information on writing seeders is available here:
-     * https://book.cakephp.org/phinx/0/en/seeding.html
-     */
     public function run(): void
     {
         $this->execute('SET FOREIGN_KEY_CHECKS = 0');
@@ -34,7 +26,9 @@ class HistoryLocationsSeeder extends AbstractSeed
                 'short_description' => 'The magnificent Grote Kerk, dedicated to St. Bavo, dominates Haarlem\'s skyline with its soaring Gothic tower. Built between 1370 and 1520, '.
                     'this architectural masterpiece houses the legendary Müller organ, played by both Mozart and Handel.',
                 'page_id' => null,
-                'sort_order' => 1
+                'sort_order' => 1,
+                'lat' => 52.3810,
+                'lng' => 4.6372
             ],
             [
                 'name' => 'Grote Markt',
@@ -48,7 +42,9 @@ class HistoryLocationsSeeder extends AbstractSeed
                 'short_description' => 'For over 700 years, the Grote Markt has been the beating heart of Haarlem. This spacious market square witnessed medieval trade fairs, public '.
                     'executions, celebrations, and protests that shaped the city\'s destiny.',
                 'page_id' => null,
-                'sort_order' => 2
+                'sort_order' => 2,
+                'lat' => 52.3814,
+                'lng' => 4.6359
             ],
             [
                 'name' => 'De Hallen',
@@ -61,7 +57,9 @@ class HistoryLocationsSeeder extends AbstractSeed
                 'short_description' => 'De Hallen began as Haarlem\'s covered markets in the early 17th century. The magnificent Meat Hall, designed by Lieven de Key in 1602, '.
                     'featured an ornate Renaissance façade decorated with ox heads - a bold statement of Golden Age prosperity.',
                 'page_id' => null,
-                'sort_order' => 3
+                'sort_order' => 3,
+                'lat' => 52.3811,
+                'lng' => 4.6360
             ],
             [
                 'name' => 'Proveniershof',
@@ -75,7 +73,9 @@ class HistoryLocationsSeeder extends AbstractSeed
                 'short_description' =>'Established in 1591, the Proveniershof was a unique retirement community where wealthy citizens paid an entrance fee for lifelong care. '.
                     'This tranquil hofje remains one of Haarlem\'s most peaceful hidden courtyards.',
                 'page_id' => null,
-                'sort_order' => 4
+                'sort_order' => 4,
+                'lat' => 52.3773,
+                'lng' =>  4.6307
             ],
             [
                 'name' => 'Jopenkerk',
@@ -88,7 +88,9 @@ class HistoryLocationsSeeder extends AbstractSeed
                 'short_description' =>'Built in 1878 as a neo-Gothic Catholic church, the Jopenkerk found a second life as a craft brewery. Its soaring arches and stained glass now shelter '.
                     'gleaming copper brewing vats — sacred architecture reimagined.',
                 'page_id' => null,
-                'sort_order' => 5
+                'sort_order' => 5,
+                'lat' => 52.3812,
+                'lng' => 4.6297
             ],
             [
                 'name' => 'Waalse Kerk',
@@ -101,7 +103,9 @@ class HistoryLocationsSeeder extends AbstractSeed
                 'short_description' =>'Granted to Walloon refugees in 1591, the Waalse Kerk reflects Haarlem\'s tradition of tolerance. These Protestant craftsmen, fleeing Spanish persecution, '.
                     'enriched the city\'s culture and trade during the Dutch Golden Age.',
                 'page_id' => null,
-                'sort_order' => 6
+                'sort_order' => 6,
+                'lat' => 52.3825,
+                'lng' => 4.6390
             ],
             [
                 'name' => 'Molen de Adriaan',
@@ -115,7 +119,9 @@ class HistoryLocationsSeeder extends AbstractSeed
                 'short_description' =>'Built in 1779 on the Spaarne River, Molen de Adriaan is Haarlem\'s iconic working windmill. Destroyed by fire in 1932 and restored in 2002, it represents the '.
                     'Dutch mastery of wind power that shaped a nation.',
                 'page_id' => null,
-                'sort_order' => 7
+                'sort_order' => 7,
+                'lat' => 52.3838,
+                'lng' => 4.6427
             ],
             [
                 'name' => 'Amsterdamse Poort',
@@ -128,7 +134,9 @@ class HistoryLocationsSeeder extends AbstractSeed
                 'short_description' =>'Built around 1355, the Amsterdamse Poort is the last surviving medieval city gate of Haarlem. This Gothic gatehouse once controlled all traffic from Amsterdam, one '.
                     'of the best-preserved medieval gates in the Netherlands.',
                 'page_id' => null,
-                'sort_order' => 8
+                'sort_order' => 8,
+                'lat' => 52.3806,
+                'lng' => 4.6464
             ],
             [
                 'name' => 'Hof van Bakenes',
@@ -141,7 +149,9 @@ class HistoryLocationsSeeder extends AbstractSeed
                 'short_description' =>'Founded around 1395, the Hof van Bakenes is one of Haarlem\'s oldest hofjes, built to house poor women. Hidden behind an unassuming entrance, this serene courtyard '.
                     'offers a glimpse into six centuries of charitable life.',
                 'page_id' => null,
-                'sort_order' => 9
+                'sort_order' => 9,
+                'lat' => 52.3815,
+                'lng' => 4.6399
             ]
 
         ])->saveData();

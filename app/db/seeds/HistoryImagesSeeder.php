@@ -24,6 +24,7 @@ class HistoryImagesSeeder extends AbstractSeed
         $stBavoPage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history-st-bavo'");
         $grotePage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history-grote-markt'");
         $historyEvent = $this->fetchRow("SELECT event_id FROM events WHERE event_type_id = 3 ORDER BY event_id ASC LIMIT 1");
+        $toursPage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history-tours'");
 
         $data = [];
 
@@ -46,7 +47,7 @@ class HistoryImagesSeeder extends AbstractSeed
             'history_location_id' => null,
             'page_id' => $locationsPage ? $locationsPage['page_id'] : null,
             'event_id' => null,
-            'image_url' => '/images/history/locations-hero.JPG',
+            'image_url' => '/images/history/locations-hero.jpg',
             'alt_text' => 'Overview of historic Haarlem landmarks',
             'image_type' => 'hero',
             'is_primary' => false,
@@ -56,9 +57,9 @@ class HistoryImagesSeeder extends AbstractSeed
         // Tours page
         $data[] = [
             'history_location_id' => null,
-            'page_id' => null,
-            'event_id' => $historyEvent ? $historyEvent['event_id'] : null,
-            'image_url' => '/images/history/tours-hero.JPG',
+            'page_id' => $toursPage ? $toursPage['page_id'] : null,
+            'event_id' => null,
+            'image_url' => '/images/history/tours-hero.jpg',
             'alt_text' => 'Guided walking tour through Haarlem',
             'image_type' => 'hero',
             'is_primary' => false,
@@ -84,7 +85,7 @@ class HistoryImagesSeeder extends AbstractSeed
                 'history_location_id' => $locationId,
                 'page_id' => null,
                 'event_id' => null,
-                'image_url' => "/images/history/locations/{$location['slug']}-primary." . (in_array($location['slug'], ['st-bavo', 'grote-markt', 'de-hallen', 'waalse-kerk', 'amsterdamse-poort'], true) ? 'JPG' : 'jpg'),
+                'image_url' => "/images/history/locations/{$location['slug']}-primary.jpg",
                 'alt_text' => $location['name'],
                 'image_type' => 'primary',
                 'is_primary' => true,
@@ -99,7 +100,7 @@ class HistoryImagesSeeder extends AbstractSeed
             'history_location_id' => 1,
             'page_id' => $stBavoPage ? $stBavoPage['page_id'] : null,
             'event_id' => null,
-            'image_url' => '/images/history/locations/st-bavo-hero.JPG',
+            'image_url' => '/images/history/locations/st-bavo-hero.jpg',
             'alt_text' => 'Church of St. Bavo exterior view',
             'image_type' => 'hero',
             'is_primary' => false,
@@ -121,7 +122,7 @@ class HistoryImagesSeeder extends AbstractSeed
             'history_location_id' => 1,
             'page_id' => null,
             'event_id' => null,
-            'image_url' => '/images/history/locations/st-bavo-gallery-2.JPG',
+            'image_url' => '/images/history/locations/st-bavo-gallery-2.jpg',
             'alt_text' => 'Interior of Church of St. Bavo with organ',
             'image_type' => 'gallery',
             'is_primary' => false,
@@ -135,7 +136,7 @@ class HistoryImagesSeeder extends AbstractSeed
             'history_location_id' => 2,
             'page_id' => $grotePage ? $grotePage['page_id'] : null,
             'event_id' => null,
-            'image_url' => '/images/history/locations/grote-markt-hero.JPG',
+            'image_url' => '/images/history/locations/grote-markt-hero.jpg',
             'alt_text' => 'Grote Markt square aerial view',
             'image_type' => 'hero',
             'is_primary' => false,
@@ -147,7 +148,7 @@ class HistoryImagesSeeder extends AbstractSeed
             'history_location_id' => 2,
             'page_id' => null,
             'event_id' => null,
-            'image_url' => '/images/history/locations/grote-markt-gallery-1.JPG',
+            'image_url' => '/images/history/locations/grote-markt-gallery-1.jpg',
             'alt_text' => 'Market day at Grote Markt',
             'image_type' => 'gallery',
             'is_primary' => false,
@@ -177,7 +178,7 @@ class HistoryImagesSeeder extends AbstractSeed
             'history_location_id' => 2,
             'page_id' => null,
             'event_id' => null,
-            'image_url' => '/images/history/locations/grote-markt-gallery-4.JPG',
+            'image_url' => '/images/history/locations/grote-markt-gallery-4.jpg',
             'alt_text' => 'Market at Grote Markt',
             'image_type' => 'gallery',
             'is_primary' => false,

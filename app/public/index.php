@@ -214,6 +214,14 @@ switch ($uri) {
         (new HistoryController())->locations();
         break;
 
+    case '/history/tours':
+        (new HistoryController())->tours();
+        break;
+
+    case '/history/tours/schedule':
+        (new HistoryController())->toursSchedule();
+        break;
+
     case '/jazz':
     case '/jazz/':
         (new JazzController())->index();
