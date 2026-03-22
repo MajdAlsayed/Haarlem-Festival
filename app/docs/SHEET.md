@@ -1,4 +1,6 @@
-# Demo notes (what I built + why)
+# Demo notes — sprint 3
+
+what i built + why
 
 Orders
 
