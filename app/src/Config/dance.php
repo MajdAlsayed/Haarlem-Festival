@@ -6,6 +6,20 @@ declare(strict_types=1);
  * Dance page: image filenames (in /public/images/dance/), genres, featured first card override, artists.
  */
 return [
+    /** Shown in &lt;h1&gt; and &lt;title&gt; (editable via /admin/cms/dance). */
+    'dance_page_title' => 'Dance Festival',
+    'about_section_heading' => 'About Dance',
+    'featured_section_title' => 'Featured Events',
+    'all_events_section_title' => 'All Events',
+    'artists_section_title' => 'Artist(s)',
+    'hero_cta_label' => 'View Dance Events',
+    'hero_subtitle' => 'Experience Haarlem\'s biggest nights of house, techno, and trance.',
+    'about_paragraphs' => [
+        'Haarlem Dance brings the world\'s best house, techno and trance DJs to iconic Haarlem locations.',
+        'Across three nights, visitors experience Back2Back headline sets, immersive club sessions and unique experimental performances.',
+        'Join thousands of music lovers for the most energetic part of the Festival.',
+    ],
+
     'hero_image' => 'Dance page front picture.png',
     'featured_images' => ['Dance-page-1.png', 'Dance-page-2.png', 'Dance-page-3.png'],
     'friday_images' => ['dance-page-friday-1.png', 'dance-page-friday-2.png', 'dance-page-friday-3.png', 'dance-page-friday-4.png', 'dance-page-friday-5.png'],

@@ -28,7 +28,7 @@ class DanceService
      */
     public function getEventsGroupedByDay(): array
     {
-        $settings = $this->danceSettingsRepository->getAll();
+        $settings = $this->danceSettingsRepository->getMergedWithConfig();
         $venueOrderFriday = $this->getVenueOrder($settings, 'venue_order_friday');
         $venueOrderSaturday = $this->getVenueOrder($settings, 'venue_order_saturday');
         $venueOrderSunday = $this->getVenueOrder($settings, 'venue_order_sunday');
@@ -86,7 +86,7 @@ class DanceService
      */
     public function getArtistsOrdered(): array
     {
-        $settings = $this->danceSettingsRepository->getAll();
+        $settings = $this->danceSettingsRepository->getMergedWithConfig();
         $artists = $settings['artists'] ?? null;
         if (is_array($artists) && $artists !== []) {
             return $artists;
@@ -97,6 +97,6 @@ class DanceService
 
     public function getDanceSettings(): array
     {
-        return $this->danceSettingsRepository->getAll();
+        return $this->danceSettingsRepository->getMergedWithConfig();
     }
 }
