@@ -3,14 +3,17 @@
 namespace App\Services;
 
 use App\Contracts\HistoryRepositoryInterface;
+use App\Contracts\ServiceInterface\HistoryServiceInterface;
 use App\Models\HistoryLocation;
 use App\Models\HistoryImage;
+use App\Models\HistoryTour;
 
-class HistoryService
+class HistoryService implements HistoryServiceInterface
 {
     public function __construct(
         private HistoryRepositoryInterface $historyRepository
-    ){
+    )
+    {
     }
 
     // LOCATIONS
@@ -65,4 +68,18 @@ class HistoryService
     {
         return $this->historyRepository->getPageBlocksList($slug);
     }
+
+    // TOURS
+    public function getToursWithDetailsByDate(string $date): array
+    {
+        return $this->historyRepository->getToursWithDetailsByDate($date);
+
+    }
+
+    public function getTourDates(): array
+    {
+        return $this->historyRepository->getTourDates();
+    }
+
+
 }

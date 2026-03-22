@@ -143,6 +143,14 @@ switch ($uri) {
         (new HistoryController())->locations();
         break;
 
+    case '/history/tours':
+        (new HistoryController())->tours();
+        break;
+
+    case '/history/tours/schedule':
+        (new HistoryController())->toursSchedule();
+        break;
+
     default:
         http_response_code(404);
         echo 'Page not found';

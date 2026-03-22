@@ -40,8 +40,13 @@ class HistoryHomeBlocksSeeder extends AbstractSeed
                 'block_type' => 'about_banner',
                 'content_json' => json_encode([
                     'title' => "HAARLEM'S RICH HISTORICAL HERITAGE",
-                    'text_1' => 'Haarlem, the captivating capital of North Holland, has been a chartered city since 1245. During the Dutch Golden Age of the 17th century, it flourished as a center of art, culture, and commerce. Wealthy merchants  commissioned grand buildings and patronized renowned artists like Frans Hals, whose legacy still resonates through the city\'s museums and galleries.',
-                    'text_2' => 'The nine landmarks featured in our journey represent the essence of Haarlem\'s story: from medieval defenses and magnificent churches to unique hofjes that reflect the city\'s charitable traditions. Together, they paint a vivid picture of how this remarkable Dutch city evolved into the cultural treasure it is today.'
+                    'text' => 'Haarlem, the captivating capital of North Holland, has been a chartered city since 1245. '.
+                        'During the Dutch Golden Age of the 17th century, it flourished as a center of art, culture, and '.
+                        'commerce. Wealthy merchants commissioned grand buildings and patronized renowned artists like Frans '.
+                        'Hals, whose legacy still resonates through the city\'s museums and galleries. The nine landmarks '.
+                        'featured in our journey represent the essence of Haarlem\'s story: from medieval defenses and '.
+                        'magnificent churches to unique hofjes that reflect the city\'s charitable traditions. Together, they '.
+                        'paint a vivid picture of how this remarkable Dutch city evolved into the cultural treasure it is today.'
                 ]),
                 'sort_order' => 2
             ],
@@ -50,7 +55,8 @@ class HistoryHomeBlocksSeeder extends AbstractSeed
                 'block_type' => 'section_header',
                 'content_json' => json_encode([
                     'title' => '9 SITES THAT TELL HAARLEM\'S STORY',
-                    'description' => 'From grand churches to hidden courtyards, each landmark offers a window into Haarlem\'s transformation from medieval town to cultural treasure.'
+                    'description' => 'From grand churches to hidden courtyards, each landmark offers a window into Haarlem\'s '.
+                        'transformation from medieval town to cultural treasure.'
                 ]),
                 'sort_order' => 3
             ],
@@ -73,7 +79,9 @@ class HistoryHomeBlocksSeeder extends AbstractSeed
                 'block_type' => 'text_block',
                 'content_json' => json_encode([
                     'title' => 'EXPERIENCE THIS HISTORY',
-                    'description' => 'Join our expert-led walking tour to discover these landmarks in person. Our knowledgeable guides bring centuries of history to life with captivating stories and fascinating insights about Haarlem\'s remarkable past.',
+                    'description' => 'Join our expert-led walking tour to discover these landmarks in person. Our knowledgeable '.
+                        'guides bring centuries of history to life with captivating stories and fascinating insights about '.
+                        'Haarlem\'s remarkable past.',
                     'button_text' => 'VIEW TOUR DETAILS',
                     'button_url' => '/history/tours'
                 ]),
