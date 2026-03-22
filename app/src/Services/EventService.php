@@ -37,6 +37,9 @@ class EventService implements EventServiceInterface
 
     public function getById(int $id): ?Event
     {
+        if ($id <= 0) {
+            return null;
+        }
         return $this->eventRepository->getById($id);
     }
 }

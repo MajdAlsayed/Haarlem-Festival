@@ -12,7 +12,7 @@ final class CreateArtistPhotosTable extends AbstractMigration
             return;
         }
         $table = $this->table('artist_photos');
-        $table->addColumn('artist_id', 'integer', ['null' => false])
+        $table->addColumn('artist_id', 'integer', ['null' => false, 'signed' => false])
             ->addColumn('filename', 'string', ['limit' => 255, 'null' => false])
             ->addColumn('sort_order', 'integer', ['default' => 0])
             ->addForeignKey('artist_id', 'artists', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])

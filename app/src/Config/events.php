@@ -15,10 +15,10 @@ return [
     ],
 
     'info_paths' => [
-        'dance'   => '/dance',
-        'jazz'    => '/jazz',    // INFO on homepage Jazz card goes to Jazz page
-        'history' => '/history', // History has its own section
-        'yammy'   => '#',
+        'dance' => '/dance',
+        'jazz' => '/jazz',
+        'history' => '/history',
+        'yammy' => '#',
         'stories' => '#',
     ],
 ];

@@ -7,25 +7,20 @@ final class CreateEventArtistsTable extends AbstractMigration
 {
     public function change(): void
     {
-        $table = $this->table('event_artists', [
-            'id' => false,
-            'primary_key' => ['event_id', 'artist_id'],
-        ]);
+        if ($this->hasTable('event_artists')) {
+            return;
+        }
 
-        $table
-            ->addColumn('event_id', 'integer')
-            ->addColumn('artist_id', 'integer')
+        // Create the pivot table without DB-level foreign keys to avoid
+        // engine/collation/type mismatches causing errno 150 on fresh DBs.
+        $this->table('event_artists', [
+                'id' => false,
+                'primary_key' => ['event_id', 'artist_id'],
+            ])
+            ->addColumn('event_id', 'integer', ['null' => false])
+            ->addColumn('artist_id', 'integer', ['null' => false])
             ->addIndex(['event_id'])
             ->addIndex(['artist_id'])
             ->create();
-
-        // Add FKs (if your DB already has these tables)
-        $this->execute('ALTER TABLE event_artists 
-            ADD CONSTRAINT fk_event_artists_event 
-            FOREIGN KEY (event_id) REFERENCES events(event_id) ON DELETE CASCADE');
-
-        $this->execute('ALTER TABLE event_artists 
-            ADD CONSTRAINT fk_event_artists_artist 
-            FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE');
     }
 }

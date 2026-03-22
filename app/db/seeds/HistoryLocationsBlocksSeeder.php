@@ -8,10 +8,17 @@ class HistoryLocationsBlocksSeeder extends AbstractSeed
 {
     public function run(): void
     {
+        // Ensure history-locations page exists (HistoryPagesSeeder may not have run yet)
+        $this->getAdapter()->execute(
+            "INSERT IGNORE INTO pages (slug, title, is_published) VALUES ('history-locations', 'Historic Locations of Haarlem', 1)"
+        );
         // Get page id for locations page
         $locationsPage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history-locations'");
-        $pageId = $locationsPage['page_id'];
-        $this->execute("DELETE FROM page_blocks WHERE page_id = $pageId");
+        if (!$locationsPage) {
+            return;
+        }
+        $pageId = (int) $locationsPage['page_id'];
+        $this->execute("DELETE FROM page_blocks WHERE page_id = " . $pageId);
 
         // Get hero image by page id
         $heroImage = $this->fetchRow(

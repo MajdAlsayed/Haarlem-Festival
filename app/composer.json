@@ -2,6 +2,7 @@
     "name": "docker-template/app",
     "type": "project",
     "require": {
+        "ezyang/htmlpurifier": "^4.18",
         "robmorgan/phinx": "^0.16.10"
     },
     "autoload": {

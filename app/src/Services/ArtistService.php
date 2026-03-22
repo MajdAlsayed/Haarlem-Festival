@@ -25,9 +25,6 @@ class ArtistService
         }
 
         $galleryImages = $this->artistsRepository->getPhotoFilenamesByArtistId($artist['id']);
-        if (($artist['slug'] ?? '') === 'tiesto') {
-            $galleryImages = ['Artist/tiesto4.png', 'Artist/tiesto5.png', 'Artist/tiesto6.png', 'Artist/tiesto7.png']; // fallback if seeder not run
-        }
 
         $allEvents = $this->eventRepository->getByCategory('dance');
         $searchName = $artist['slug'] === 'hardwell' ? 'Hardwell' : $artist['name']; // event titles use "Hardwell"

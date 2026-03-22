@@ -20,6 +20,9 @@ class DanceSettingsSeeder extends AbstractSeed
             ['setting_key' => 'saturday_genres', 'setting_value' => json_encode(['MIXED GENRES', 'HOUSE', 'TRANCE / ELECTRO', 'ELECTROHOUSE'])],
             ['setting_key' => 'sunday_genres', 'setting_value' => json_encode(['MIXED GENRES', 'TRANCE', 'DANCE', 'ELECTRONIC'])],
             ['setting_key' => 'featured_genre_labels', 'setting_value' => json_encode(['HOUSE', 'TRANCE', 'DANCE'])],
+            ['setting_key' => 'venue_order_friday', 'setting_value' => json_encode([4, 7, 5, 8, 9])],
+            ['setting_key' => 'venue_order_saturday', 'setting_value' => json_encode([6, 5, 7])],
+            ['setting_key' => 'venue_order_sunday', 'setting_value' => json_encode([6, 5, 8, 7])],
         ];
         $this->table('dance_settings')->insert($data)->saveData();
     }

@@ -1,49 +1,88 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Repositories;
 
 use App\Core\Database;
+use PDO;
 
-/** dance_settings table: hero_image, featured_images, day images/genres. JSON values decoded. */
+/**
+ * Reads dance_settings from the database (hero_image, featured_images, genres, etc.).
+ * JSON values are decoded. If the database fails or has no rows, we use the config file.
+ * getMergedWithConfig() overlays DB on dance.php so partial CMS updates never drop defaults.
+ */
 class DanceSettingsRepository
 {
-    /** @var array<string, mixed>|null */
-    private static ?array $cache = null;
-
-    /** @return array<string, mixed> */
     public function getAll(): array
     {
-        if (self::$cache !== null) {
-            return self::$cache;
-        }
         try {
             $db = Database::getConnection();
             $stmt = $db->query('SELECT setting_key, setting_value FROM dance_settings');
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Throwable $e) {
-            self::$cache = require __DIR__ . '/../Config/dance.php';
-            return self::$cache;
+            return require __DIR__ . '/../Config/dance.php';
         }
+
+        if (empty($rows)) {
+            return require __DIR__ . '/../Config/dance.php';
+        }
+
         $out = [];
         foreach ($rows as $row) {
             $key = $row['setting_key'];
             $val = $row['setting_value'];
-            if ($val !== null) {
-                $decoded = json_decode($val, true);
-                $out[$key] = (is_array($decoded) || is_object($decoded)) ? $decoded : $val;
-            } else {
-                $out[$key] = $val;
-            }
+            $out[$key] = $this->decodeSettingValue($val);
         }
-        // no rows in DB = use config file
-        if ($rows === []) {
-            $fallback = require __DIR__ . '/../Config/dance.php';
-            self::$cache = $fallback;
-            return $fallback;
-        }
-        self::$cache = $out;
+
         return $out;
+    }
+
+    /**
+     * Config defaults + DB overrides (use for public Dance page and CMS form).
+     *
+     * @return array<string, mixed>
+     */
+    public function getMergedWithConfig(): array
+    {
+        $base = require __DIR__ . '/../Config/dance.php';
+
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->query('SELECT setting_key, setting_value FROM dance_settings');
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            return $base;
+        }
+
+        foreach ($rows as $row) {
+            $key = $row['setting_key'];
+            $base[$key] = $this->decodeSettingValue($row['setting_value']);
+        }
+
+        return $base;
+    }
+
+    public function upsertSetting(string $key, string $value): bool
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            'INSERT INTO dance_settings (setting_key, setting_value) VALUES (:k, :v)
+             ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)'
+        );
+
+        return $stmt->execute(['k' => $key, 'v' => $value]);
+    }
+
+    private function decodeSettingValue(?string $val): mixed
+    {
+        if ($val === null) {
+            return null;
+        }
+
+        $decoded = json_decode($val, true);
+        if (is_array($decoded) || is_object($decoded)) {
+            return $decoded;
+        }
+
+        return $val;
     }
 }
