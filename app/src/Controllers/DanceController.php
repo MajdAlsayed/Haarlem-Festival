@@ -49,6 +49,10 @@ class DanceController
             ['label' => 'DANCE', 'url' => null],
         ];
 
+        $pageTitle = isset($danceSettings['dance_page_title']) && is_string($danceSettings['dance_page_title']) && $danceSettings['dance_page_title'] !== ''
+            ? $danceSettings['dance_page_title']
+            : 'Dance Festival';
+
         $viewModel = new DanceViewModel(
             $events,
             $fridayEvents,
@@ -59,7 +63,7 @@ class DanceController
             $appSettings,
             $danceSettings,
             $breadcrumbs,
-            'Dance Festival'
+            $pageTitle
         );
 
         require __DIR__ . '/../Views/Dance/Index.php';

@@ -6,6 +6,7 @@ use App\Contracts\ServiceInterface\PageServiceInterface;
 use App\Exceptions\NotFoundException;
 use App\Repositories\EventTypeRepository;
 use App\Repositories\PageRepository;
+use App\Repositories\SettingsRepository;
 use App\Services\PageService;
 use App\ViewModels\HomeViewModel;
 
@@ -29,7 +30,8 @@ class HomeController
 
         $categories = $this->eventTypeRepository->getAllWithDisplay();
 
-        $viewModel = new HomeViewModel($page, $categories);
+        $cmsHome = (new SettingsRepository())->getMergedCmsHome();
+        $viewModel = new HomeViewModel($page, $categories, $cmsHome);
 
         require __DIR__ . '/../Views/Home/Index.php';
     }

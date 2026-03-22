@@ -5116,3 +5116,31 @@ html { scroll-behavior: smooth; }
     display: inline-block;
     text-decoration: none;
 }
+
+/* CMS rich text (admin WYSIWYG + HtmlSanitizer output) */
+.cms-html p {
+    margin: 0 0 0.75em;
+}
+.cms-html p:last-child {
+    margin-bottom: 0;
+}
+.cms-html ul,
+.cms-html ol {
+    margin: 0.5em 0;
+    padding-left: 1.25em;
+}
+.cms-html a {
+    text-decoration: underline;
+}
+.welcome-text .cms-html {
+    margin-bottom: 1rem;
+}
+.welcome-text .cms-html:last-child {
+    margin-bottom: 0;
+}
+.dance-about-content .cms-html {
+    margin-bottom: 1rem;
+}
+.dance-about-content .cms-html:last-child {
+    margin-bottom: 0;
+}

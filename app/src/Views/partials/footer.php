@@ -72,4 +72,10 @@
 </footer>
 
 <?php include __DIR__ . '/cartDrawer.php'; ?>
-<script src="/js/cartDrawer.js?v=1" defer></script>
+<?php
+$cartCsrf = \App\Core\Csrf::token('cart');
+?>
+<script>
+window.__CSRF_CART__ = <?= json_encode($cartCsrf, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+</script>
+<script src="/js/cartDrawer.js?v=2" defer></script>

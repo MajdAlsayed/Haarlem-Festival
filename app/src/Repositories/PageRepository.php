@@ -29,6 +29,31 @@ class PageRepository implements PageRepositoryInterface
         return $this->mapRowToPage($row);
     }
 
+    public function findBySlugForAdmin(string $slug): ?Page
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            'SELECT page_id, slug, title FROM pages WHERE slug = :slug LIMIT 1'
+        );
+        $stmt->execute(['slug' => strtolower(trim($slug))]);
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $row ? $this->mapRowToPage($row) : null;
+    }
+
+    public function updateTitleBySlug(string $slug, string $title): bool
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            'UPDATE pages SET title = :title WHERE slug = :slug LIMIT 1'
+        );
+
+        return $stmt->execute([
+            'title' => $title,
+            'slug' => strtolower(trim($slug)),
+        ]);
+    }
+
     /** DB row → Page (private). */
     private function mapRowToPage(array $row): Page
     {
