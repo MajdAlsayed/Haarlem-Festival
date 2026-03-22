@@ -5,105 +5,162 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Csrf;
+use App\Repositories\CartRepository;
+use App\Services\CartService;
 
 /**
- * Shopping cart API (JSON). All mutating POST requests require CSRF token (form key: cart).
+ * Cart JSON API. Mutating POSTs need CSRF (form key cart); send _csrf in JSON body.
  */
 final class CartController
 {
+    private CartService $cartService;
+
+    public function __construct()
+    {
+        $this->cartService = new CartService(new CartRepository());
+    }
+
     public function get(): void
     {
-        header('Content-Type: application/json; charset=UTF-8');
-        header('Cache-Control: no-store');
-        $items = $_SESSION['cart'] ?? [];
         $csrf = Csrf::peek('cart') ?? Csrf::token('cart');
-        echo json_encode([
-            'ok' => true,
-            'items' => array_values($items),
-            'total' => $this->computeTotal($items),
+        $this->json([
+            'success' => true,
+            'cart' => $this->cartService->getCurrentCart()->toArray(),
             'csrf' => $csrf,
         ]);
     }
 
     public function add(): void
     {
-        $this->mutate(function (): void {
-            $ticketDetailsId = (int) ($_POST['ticket_details_id'] ?? 0);
-            $quantity = max(1, (int) ($_POST['quantity'] ?? 1));
-            if ($ticketDetailsId <= 0) {
-                return;
-            }
-            $_SESSION['cart'] ??= [];
-            $key = 'td_' . $ticketDetailsId;
-            $_SESSION['cart'][$key] = [
-                'ticket_details_id' => $ticketDetailsId,
-                'quantity' => (int) ($_SESSION['cart'][$key]['quantity'] ?? 0) + $quantity,
-            ];
-        });
-    }
+        $data = $this->getInputData();
+        if (!$this->requireCsrf($data)) {
+            return;
+        }
+        unset($data['_csrf']);
 
-    public function remove(): void
-    {
-        $this->mutate(function (): void {
-            $key = trim((string) ($_POST['key'] ?? ''));
-            if ($key !== '' && isset($_SESSION['cart'][$key])) {
-                unset($_SESSION['cart'][$key]);
-            }
-        });
-    }
+        $ticketDetailsId = (int) ($data['ticket_details_id'] ?? 0);
+        $quantity = (int) ($data['quantity'] ?? 1);
 
-    public function update(): void
-    {
-        $this->mutate(function (): void {
-            $key = trim((string) ($_POST['key'] ?? ''));
-            $quantity = (int) ($_POST['quantity'] ?? 0);
-            if ($key === '' || !isset($_SESSION['cart'][$key])) {
-                return;
-            }
-            if ($quantity <= 0) {
-                unset($_SESSION['cart'][$key]);
-            } else {
-                $_SESSION['cart'][$key]['quantity'] = $quantity;
-            }
-        });
-    }
-
-    private function mutate(callable $fn): void
-    {
-        header('Content-Type: application/json; charset=UTF-8');
-        header('Cache-Control: no-store');
-
-        if (!Csrf::validate('cart', $_POST['_csrf'] ?? null)) {
-            http_response_code(403);
-            echo json_encode([
-                'ok' => false,
-                'error' => 'Invalid or expired security token.',
-                'csrf' => Csrf::token('cart'),
-            ]);
+        if ($ticketDetailsId <= 0) {
+            $this->json([
+                'success' => false,
+                'message' => 'ticket_details_id is required.',
+            ], 422);
 
             return;
         }
 
-        $fn();
+        try {
+            $cart = $this->cartService->addItem($ticketDetailsId, $quantity);
 
-        $items = $_SESSION['cart'] ?? [];
-        echo json_encode([
-            'ok' => true,
-            'items' => array_values($items),
-            'total' => $this->computeTotal($items),
+            $this->json([
+                'success' => true,
+                'message' => 'Item added to cart.',
+                'cart' => $cart->toArray(),
+                'csrf' => Csrf::token('cart'),
+            ]);
+        } catch (\Throwable $e) {
+            $this->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
+    public function update(): void
+    {
+        $data = $this->getInputData();
+        if (!$this->requireCsrf($data)) {
+            return;
+        }
+        unset($data['_csrf']);
+
+        $cartItemId = (int) ($data['cart_item_id'] ?? 0);
+        $quantity = (int) ($data['quantity'] ?? 0);
+
+        if ($cartItemId <= 0) {
+            $this->json([
+                'success' => false,
+                'message' => 'cart_item_id is required.',
+            ], 422);
+
+            return;
+        }
+
+        $cart = $this->cartService->updateItem($cartItemId, $quantity);
+
+        $this->json([
+            'success' => true,
+            'message' => 'Cart updated.',
+            'cart' => $cart->toArray(),
             'csrf' => Csrf::token('cart'),
         ]);
     }
 
-    /** @param array<string, array{ticket_details_id: int, quantity: int}> $items */
-    private function computeTotal(array $items): string
+    public function remove(): void
     {
-        // Placeholder until prices are loaded from DB; keeps API stable for frontend.
-        $sum = 0.0;
-        foreach ($items as $row) {
-            $sum += (float) ($row['quantity'] ?? 0) * 10.0;
+        $data = $this->getInputData();
+        if (!$this->requireCsrf($data)) {
+            return;
+        }
+        unset($data['_csrf']);
+
+        $cartItemId = (int) ($data['cart_item_id'] ?? 0);
+
+        if ($cartItemId <= 0) {
+            $this->json([
+                'success' => false,
+                'message' => 'cart_item_id is required.',
+            ], 422);
+
+            return;
         }
 
-        return number_format($sum, 2, '.', '');
+        $cart = $this->cartService->removeItem($cartItemId);
+
+        $this->json([
+            'success' => true,
+            'message' => 'Item removed.',
+            'cart' => $cart->toArray(),
+            'csrf' => Csrf::token('cart'),
+        ]);
+    }
+
+    /** @param array<string, mixed> $data */
+    private function requireCsrf(array $data): bool
+    {
+        $token = isset($data['_csrf']) && is_string($data['_csrf']) ? $data['_csrf'] : null;
+        if (Csrf::validate('cart', $token)) {
+            return true;
+        }
+
+        $this->json([
+            'success' => false,
+            'message' => 'Invalid or expired security token.',
+            'csrf' => Csrf::token('cart'),
+        ], 403);
+
+        return false;
+    }
+
+    private function getInputData(): array
+    {
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        if (str_contains($contentType, 'application/json')) {
+            $raw = file_get_contents('php://input');
+            $decoded = json_decode($raw ?: '{}', true);
+
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return $_POST;
+    }
+
+    private function json(array $data, int $statusCode = 200): void
+    {
+        http_response_code($statusCode);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($data);
+        exit;
     }
 }
