@@ -7,7 +7,9 @@ $isLoggedIn = !empty($_SESSION['auth'] ?? []);
 $username = $isLoggedIn ? htmlspecialchars($_SESSION['auth']['username'] ?? '') : '';
 ?>
 
+<!-- Bootstrap first (cart offcanvas); site CSS after so Haarlem styles win over Bootstrap reboot -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string) ($app['css_version'] ?? '1')) ?>">
 
 <header>
     <div class="nav-container">
