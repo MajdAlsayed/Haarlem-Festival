@@ -10,7 +10,13 @@ use App\Core\Database;
 /** Reads artists + artist_photos; used by ArtistService. */
 class ArtistsRepository implements ArtistsRepositoryInterface
 {
+<<<<<<< HEAD
     /** @return array<int, array{name: string, slug: string|null, bio: string|null, image: string}> */
+=======
+    /**
+     * @return array<int, array{name: string, bio: string|null, image: string}>
+     */
+>>>>>>> origin/Jazz
     public function getAllOrdered(): array
     {
         $db = Database::getConnection();

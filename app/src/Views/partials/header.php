@@ -5,6 +5,14 @@ if (!isset($navLinks)) $navLinks = (new \App\Repositories\MenuRepository())->get
 if (!isset($app)) $app = (new \App\Repositories\SettingsRepository())->getAll();
 $isLoggedIn = !empty($_SESSION['auth'] ?? []);
 $username = $isLoggedIn ? htmlspecialchars($_SESSION['auth']['username'] ?? '') : '';
+$isAdmin = $isLoggedIn && (int) ($_SESSION['auth']['role_id'] ?? 0) === 1;
+$adminNavActive = strpos($currentPath, '/admin') === 0;
+$cartBadgeCount = 0;
+if (!empty($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+    foreach ($_SESSION['cart'] as $ci) {
+        $cartBadgeCount += max(1, (int) ($ci['qty'] ?? 1));
+    }
+}
 ?>
 <header>
     <div class="nav-container">
@@ -40,7 +48,7 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['auth']['username'] ?? '') 
             <!-- Cart button (opens drawer) -->
             <button id="cartOpenBtn" class="icon-btn cart-btn" type="button" aria-label="Open cart">
                 🛒
-                <span id="cartBadge" class="cart-badge">0</span>
+                <span id="cartBadge" class="cart-badge"><?= (int) $cartBadgeCount ?></span>
             </button>
 
             <button type="button" class="icon-btn search-btn" aria-label="Search">
@@ -49,7 +57,13 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['auth']['username'] ?? '') 
 
 <?php if ($isLoggedIn): ?>
                 <div class="nav-user">
-                    <span class="nav-username">👤 <?= $username ?></span>
+                    <?php if ($isAdmin): ?>
+                        <a href="/admin"
+                           class="nav-username nav-username--dashboard<?= $adminNavActive ? ' is-active' : '' ?>"
+                           aria-label="Open admin dashboard">👤 <?= $username ?></a>
+                    <?php else: ?>
+                        <span class="nav-username">👤 <?= $username ?></span>
+                    <?php endif; ?>
                     <a href="/logout" class="btn btn-outline nav-auth-btn">Logout</a>
                 </div>
             <?php else: ?>

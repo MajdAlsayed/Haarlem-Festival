@@ -18,10 +18,14 @@ use App\Controllers\FoodController;
 use App\Controllers\HomeController;
 use App\Controllers\HistoryController;
 use App\Controllers\JazzController;
-use App\Controllers\CartController;
 use App\Exceptions\AppException;
 use App\Exceptions\NotFoundException;
 use App\Controllers\StoriesController;
+use App\Controllers\AdminController;
+use App\Controllers\AdminJazzController;
+use App\Controllers\AdminTicketsController;
+use App\Controllers\CartController;
+use App\Controllers\TicketsController;
 
 Session::start();
 
@@ -113,6 +117,11 @@ switch ($uri) {
         (new FoodController())->index();
         break;
 
+    case '/tickets':
+        if ($method === 'GET') (new TicketsController())->index();
+        else http_response_code(405);
+        break;
+
     case '/login':
         $c = new AuthController();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') $c->login();
@@ -164,6 +173,97 @@ switch ($uri) {
 
     case '/jazz/gare-du-nord':
         (new JazzController())->gareDuNord();
+        break;
+
+    case '/admin':
+        (new AdminController())->index();
+        break;
+
+    case '/admin/pages':
+        (new AdminController())->pages();
+        break;
+
+    case '/admin/pages/edit':
+        (new AdminController())->editPage();
+        break;
+
+    case '/admin/pages/update':
+        if ($method === 'POST') (new AdminController())->updatePage();
+        else { header('Location: /admin/pages'); exit; }
+        break;
+
+    case '/admin/jazz':
+        (new AdminJazzController())->index();
+        break;
+
+    case '/admin/jazz/events':
+        (new AdminJazzController())->events();
+        break;
+
+    case '/admin/jazz/events/new':
+        (new AdminJazzController())->newEvent();
+        break;
+
+    case '/admin/jazz/events/edit':
+        (new AdminJazzController())->editEvent();
+        break;
+
+    case '/admin/jazz/events/save':
+        if ($method === 'POST') (new AdminJazzController())->saveEvent();
+        else { header('Location: /admin/jazz/events'); exit; }
+        break;
+
+    case '/admin/jazz/events/delete':
+        if ($method === 'POST') (new AdminJazzController())->deleteEvent();
+        else { header('Location: /admin/jazz/events'); exit; }
+        break;
+
+    case '/admin/jazz/settings':
+        (new AdminJazzController())->settings();
+        break;
+
+    case '/admin/jazz/discography':
+        (new AdminJazzController())->discography();
+        break;
+
+    case '/admin/jazz/discography/edit':
+        (new AdminJazzController())->editDiscTrack();
+        break;
+
+    case '/admin/jazz/discography/save':
+        if ($method === 'POST') (new AdminJazzController())->saveDiscTrack();
+        else { header('Location: /admin/jazz/discography'); exit; }
+        break;
+
+    case '/admin/jazz/discography/delete':
+        if ($method === 'POST') (new AdminJazzController())->deleteDiscTrack();
+        else { header('Location: /admin/jazz/discography'); exit; }
+        break;
+
+    case '/admin/tickets':
+        (new AdminTicketsController())->index();
+        break;
+
+    case '/admin/tickets/settings':
+        (new AdminTicketsController())->settings();
+        break;
+
+    case '/admin/tickets/edit':
+        (new AdminTicketsController())->edit();
+        break;
+
+    case '/admin/tickets/new':
+        (new AdminTicketsController())->newTicket();
+        break;
+
+    case '/admin/tickets/save':
+        if ($method === 'POST') (new AdminTicketsController())->save();
+        else { header('Location: /admin/tickets'); exit; }
+        break;
+
+    case '/admin/tickets/delete':
+        if ($method === 'POST') (new AdminTicketsController())->delete();
+        else { header('Location: /admin/tickets'); exit; }
         break;
 
     default:
