@@ -7,9 +7,11 @@
 /** @var ?string $cartFlash */
 /** @var ?string $cartFlashError */
 
+use App\Core\Csrf;
 use App\Repositories\TicketsRepository;
 
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+$cartFormCsrf = Csrf::peek('cart') ?? Csrf::token('cart');
 $dayLabel = static fn(string $d): string => ucfirst(strtolower(trim($d)));
 
 $tabs = TicketsRepository::CATEGORIES;
@@ -85,6 +87,8 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                         <?php if (empty($p['is_free'])): ?>
                             <form method="post" action="/cart/add" class="tickets-buy-form">
                                 <input type="hidden" name="ticket_details_id" value="<?= (int) $p['ticket_details_id'] ?>">
+                                <input type="hidden" name="quantity" value="1">
+                                <input type="hidden" name="_csrf" value="<?= $h($cartFormCsrf) ?>">
                                 <input type="hidden" name="return" value="<?= $h($returnUrl) ?>">
                                 <button type="submit" class="tickets-btn-buy">BUY ›</button>
                             </form>
@@ -112,6 +116,8 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                         <?php if (empty($p['is_free'])): ?>
                             <form method="post" action="/cart/add" class="tickets-buy-form">
                                 <input type="hidden" name="ticket_details_id" value="<?= (int) $p['ticket_details_id'] ?>">
+                                <input type="hidden" name="quantity" value="1">
+                                <input type="hidden" name="_csrf" value="<?= $h($cartFormCsrf) ?>">
                                 <input type="hidden" name="return" value="<?= $h($returnUrl) ?>">
                                 <button type="submit" class="tickets-btn-buy">BUY ›</button>
                             </form>
@@ -152,6 +158,8 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                             <?php if (empty($e['is_free'])): ?>
                                 <form method="post" action="/cart/add" class="tickets-buy-form">
                                     <input type="hidden" name="ticket_details_id" value="<?= (int) $e['ticket_details_id'] ?>">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <input type="hidden" name="_csrf" value="<?= $h($cartFormCsrf) ?>">
                                     <input type="hidden" name="return" value="<?= $h($returnUrl) ?>">
                                     <button type="submit" class="tickets-btn-buy">BUY ›</button>
                                 </form>

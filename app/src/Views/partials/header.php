@@ -8,12 +8,12 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['auth']['username'] ?? '') 
 $isAdmin = $isLoggedIn && (int) ($_SESSION['auth']['role_id'] ?? 0) === 1;
 $adminNavActive = strpos($currentPath, '/admin') === 0;
 $cartBadgeCount = 0;
-if (!empty($_SESSION['cart']) && is_array($_SESSION['cart'])) {
-    foreach ($_SESSION['cart'] as $ci) {
-        $cartBadgeCount += max(1, (int) ($ci['qty'] ?? 1));
-    }
-}
 ?>
+
+<!-- Bootstrap first (cart offcanvas); site CSS after so Haarlem styles win over Bootstrap reboot -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string) ($app['css_version'] ?? '1')) ?>">
+
 <header>
     <div class="nav-container">
 
@@ -45,17 +45,20 @@ if (!empty($_SESSION['cart']) && is_array($_SESSION['cart'])) {
                 <span class="dropdown">▼</span>
             </div>
 
-            <!-- Cart button (opens drawer) -->
-            <button id="cartOpenBtn" class="icon-btn cart-btn" type="button" aria-label="Open cart">
+            <button
+                id="cartOpenBtn"
+                class="icon-btn cart-btn"
+                type="button"
+                aria-label="Open cart"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#cartOffcanvas"
+                aria-controls="cartOffcanvas"
+            >
                 🛒
                 <span id="cartBadge" class="cart-badge"><?= (int) $cartBadgeCount ?></span>
             </button>
 
-            <button type="button" class="icon-btn search-btn" aria-label="Search">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            </button>
-
-<?php if ($isLoggedIn): ?>
+            <?php if ($isLoggedIn): ?>
                 <div class="nav-user">
                     <?php if ($isAdmin): ?>
                         <a href="/admin"

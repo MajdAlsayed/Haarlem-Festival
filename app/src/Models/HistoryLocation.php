@@ -13,4 +13,6 @@ class HistoryLocation
     public int $sortOrder;
     public ?string $shortDescription = null;
     public ?string $pageSlug = null;
+    public ?float $lat = null;
+    public ?float $lng = null;
 }

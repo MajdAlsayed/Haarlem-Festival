@@ -19,6 +19,15 @@ $saturdayGenres = isset($danceSettings['saturday_genres']) && is_array($danceSet
 $sundayGenres = isset($danceSettings['sunday_genres']) && is_array($danceSettings['sunday_genres']) ? $danceSettings['sunday_genres'] : [];
 $genreLabels = isset($danceSettings['featured_genre_labels']) && is_array($danceSettings['featured_genre_labels']) ? $danceSettings['featured_genre_labels'] : ['DANCE', 'DANCE', 'DANCE'];
 $defaultEventTime = isset($appSettings['default_event_time']) ? (string) $appSettings['default_event_time'] : '22:00';
+$heroSubtitle = isset($danceSettings['hero_subtitle']) && is_string($danceSettings['hero_subtitle']) ? $danceSettings['hero_subtitle'] : 'Experience Haarlem\'s biggest nights of house, techno, and trance.';
+$aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceSettings['about_paragraphs']) ? $danceSettings['about_paragraphs'] : [];
+if ($aboutParagraphs === []) {
+    $aboutParagraphs = [
+        'Haarlem Dance brings the world\'s best house, techno and trance DJs to iconic Haarlem locations.',
+        'Across three nights, visitors experience Back2Back headline sets, immersive club sessions and unique experimental performances.',
+        'Join thousands of music lovers for the most energetic part of the Festival.',
+    ];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,8 +46,8 @@ $defaultEventTime = isset($appSettings['default_event_time']) ? (string) $appSet
         <div class="dance-hero-overlay"></div>
         <div class="dance-hero-content">
             <h1><?= htmlspecialchars($viewModel->pageTitle) ?></h1>
-            <p class="dance-hero-subtitle">Experience Haarlem's biggest nights of house, techno, and trance.</p>
-            <a href="#featured-events" class="btn btn-primary btn-white">View Dance Events</a>
+            <div class="dance-hero-subtitle cms-html"><?= \App\Core\HtmlSanitizer::purify($heroSubtitle) ?></div>
+            <a href="#featured-events" class="btn btn-primary btn-white"><?= htmlspecialchars(isset($danceSettings['hero_cta_label']) && is_string($danceSettings['hero_cta_label']) ? $danceSettings['hero_cta_label'] : 'View Dance Events') ?></a>
         </div>
     </section>
 
@@ -53,16 +62,18 @@ $defaultEventTime = isset($appSettings['default_event_time']) ? (string) $appSet
                 <?php endif; ?>
             <?php endforeach; ?>
         </nav>
-        <h2 class="dance-about-heading">About Dance</h2>
+        <h2 class="dance-about-heading"><?= htmlspecialchars(isset($danceSettings['about_section_heading']) && is_string($danceSettings['about_section_heading']) ? $danceSettings['about_section_heading'] : 'About Dance') ?></h2>
         <div class="dance-about-content">
-            <p>Haarlem Dance brings the world's best house, techno and trance DJs to iconic Haarlem locations.</p>
-            <p>Across three nights, visitors experience Back2Back headline sets, immersive club sessions and unique experimental performances.</p>
-            <p>Join thousands of music lovers for the most energetic part of the Festival.</p>
+            <?php foreach ($aboutParagraphs as $para): ?>
+                <?php if (is_string($para) && !\App\Core\HtmlSanitizer::isEmptyHtml($para)): ?>
+                    <div class="cms-html"><?= \App\Core\HtmlSanitizer::purify($para) ?></div>
+                <?php endif; ?>
+            <?php endforeach; ?>
         </div>
     </section>
 
     <section id="featured-events" class="dance-featured container">
-        <h2 class="dance-section-title">Featured Events</h2>
+        <h2 class="dance-section-title"><?= htmlspecialchars(isset($danceSettings['featured_section_title']) && is_string($danceSettings['featured_section_title']) ? $danceSettings['featured_section_title'] : 'Featured Events') ?></h2>
         <div class="dance-cards dance-cards-featured">
             <?php foreach ($featuredEvents as $i => $event): ?>
                 <?php
@@ -95,7 +106,7 @@ $defaultEventTime = isset($appSettings['default_event_time']) ? (string) $appSet
     </section>
 
     <section class="dance-all container">
-        <h2 class="dance-section-title">All Events</h2>
+        <h2 class="dance-section-title"><?= htmlspecialchars(isset($danceSettings['all_events_section_title']) && is_string($danceSettings['all_events_section_title']) ? $danceSettings['all_events_section_title'] : 'All Events') ?></h2>
         <div class="dance-date-filters" role="tablist">
             <button type="button" class="dance-filter-btn active" data-filter="friday" aria-pressed="true">Friday</button>
             <button type="button" class="dance-filter-btn" data-filter="saturday" aria-pressed="false">Saturday</button>
@@ -146,7 +157,7 @@ $defaultEventTime = isset($appSettings['default_event_time']) ? (string) $appSet
     </section>
 
     <section class="dance-artists container">
-        <h2 class="dance-section-title">Artist(s)</h2>
+        <h2 class="dance-section-title"><?= htmlspecialchars(isset($danceSettings['artists_section_title']) && is_string($danceSettings['artists_section_title']) ? $danceSettings['artists_section_title'] : 'Artist(s)') ?></h2>
         <div class="dance-artists-grid">
             <?php foreach ($artists as $artist): ?>
                 <?php

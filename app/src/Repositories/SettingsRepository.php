@@ -51,7 +51,79 @@ class SettingsRepository
                 'app_icons' => $out['footer_app_icons'] ?? [],
                 'app_labels' => $out['footer_app_labels'] ?? [],
             ],
+            'cms_home' => $this->mergeCmsHomeFromRaw($out),
         ];
+    }
+
+    /**
+     * Homepage CMS: config defaults + site_settings overlay (keys cms_home_*).
+     *
+     * @return array<string, string>
+     */
+    public function getMergedCmsHome(): array
+    {
+        $app = require __DIR__ . '/../Config/app.php';
+        $defaults = $app['cms_home'] ?? [];
+
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->query("SELECT setting_key, setting_value FROM site_settings WHERE setting_key LIKE 'cms_home_%'");
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            return $defaults;
+        }
+
+        $prefix = 'cms_home_';
+        foreach ($rows as $row) {
+            $key = (string) $row['setting_key'];
+            if (!str_starts_with($key, $prefix)) {
+                continue;
+            }
+            $sub = substr($key, strlen($prefix));
+            if (array_key_exists($sub, $defaults)) {
+                $defaults[$sub] = (string) ($row['setting_value'] ?? '');
+            }
+        }
+
+        return $defaults;
+    }
+
+    /**
+     * @param array<string, mixed> $rawRows key => value from site_settings (partial)
+     *
+     * @return array<string, string>
+     */
+    private function mergeCmsHomeFromRaw(array $rawRows): array
+    {
+        $app = require __DIR__ . '/../Config/app.php';
+        $defaults = $app['cms_home'] ?? [];
+        $prefix = 'cms_home_';
+        foreach ($rawRows as $key => $val) {
+            if (!is_string($key) || !str_starts_with($key, $prefix)) {
+                continue;
+            }
+            $sub = substr($key, strlen($prefix));
+            if (array_key_exists($sub, $defaults) && is_string($val)) {
+                $defaults[$sub] = $val;
+            }
+        }
+
+        return $defaults;
+    }
+
+    public function upsertSetting(string $key, string $value): bool
+    {
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->prepare(
+                'INSERT INTO site_settings (setting_key, setting_value) VALUES (:k, :v)
+                 ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)'
+            );
+
+            return $stmt->execute(['k' => $key, 'v' => $value]);
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     public function get(string $key): ?string

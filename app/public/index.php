@@ -24,10 +24,17 @@ use App\Controllers\StoriesController;
 use App\Controllers\AdminController;
 use App\Controllers\AdminJazzController;
 use App\Controllers\AdminTicketsController;
+use App\Controllers\AdminOrderExportController;
+use App\Controllers\AdminOrdersController;
+use App\Controllers\AdminHomepageController;
+use App\Controllers\AdminCmsUploadController;
+use App\Controllers\AdminDanceController;
 use App\Controllers\CartController;
 use App\Controllers\TicketsController;
+use App\Core\SecurityHeaders;
 
 Session::start();
+SecurityHeaders::send();
 
 set_exception_handler(function (Throwable $e): void {
     $code    = 500;
@@ -90,23 +97,35 @@ switch ($uri) {
         break;
 
     case '/cart':
-        if ($method === 'GET') (new CartController())->get();
-        else http_response_code(405);
+        if ($method === 'GET') {
+            (new CartController())->get();
+        } else {
+            http_response_code(405);
+        }
         break;
 
     case '/cart/add':
-        if ($method === 'POST') (new CartController())->add();
-        else http_response_code(405);
+        if ($method === 'POST') {
+            (new CartController())->add();
+        } else {
+            http_response_code(405);
+        }
         break;
 
     case '/cart/remove':
-        if ($method === 'POST') (new CartController())->remove();
-        else http_response_code(405);
+        if ($method === 'POST') {
+            (new CartController())->remove();
+        } else {
+            http_response_code(405);
+        }
         break;
 
     case '/cart/update':
-        if ($method === 'POST') (new CartController())->update();
-        else http_response_code(405);
+        if ($method === 'POST') {
+            (new CartController())->update();
+        } else {
+            http_response_code(405);
+        }
         break;
 
     case '/dance':
@@ -150,12 +169,66 @@ switch ($uri) {
         (new AuthController())->logout();
         break;
 
+    case '/admin/orders/export':
+        if ($method === 'GET' || $method === 'POST') {
+            (new AdminOrderExportController())->handle();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/orders':
+        if ($method === 'GET') {
+            (new AdminOrdersController())->index();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/cms/homepage':
+        $cms = new AdminHomepageController();
+        if ($method === 'GET') {
+            $cms->showForm();
+        } elseif ($method === 'POST') {
+            $cms->save();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/cms/dance':
+        $danceCms = new AdminDanceController();
+        if ($method === 'GET') {
+            $danceCms->showForm();
+        } elseif ($method === 'POST') {
+            $danceCms->save();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/cms/upload':
+        if ($method === 'POST') {
+            (new AdminCmsUploadController())->handle();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
     case '/history':
         (new HistoryController())->index();
         break;
 
     case '/history/locations':
         (new HistoryController())->locations();
+        break;
+
+    case '/history/tours':
+        (new HistoryController())->tours();
+        break;
+
+    case '/history/tours/schedule':
+        (new HistoryController())->toursSchedule();
         break;
 
     case '/jazz':

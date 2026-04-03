@@ -32,9 +32,7 @@ docker compose run --rm php vendor/bin/phinx seed:run
 
 This run includes **`AdminUserSeeder`** (admin login below), **`JazzSeeder`**, **`JazzSettingsSeeder`**, discography/audio seeders, and the rest. Use it after migrations so you can sign in and open **`/admin/jazz`** without extra steps.
 
-For a first-time setup, run all seeders (no `-s`) so dependencies run in the right order. To re-seed only one part:
-
-To run a specific seeder:
+For a first-time setup, run all seeders (no `-s`) so dependencies run in the right order. To run a specific seeder:
 
 ```bash
 docker compose run --rm php vendor/bin/phinx seed:run -s PageSeeder
@@ -47,16 +45,16 @@ docker compose run --rm php vendor/bin/phinx seed:run -s StoriesSeeder
 docker compose run --rm php vendor/bin/phinx seed:run -s AdminOrdersSampleSeeder
 ```
 
-(`AdminOrdersSampleSeeder` adds one sample paid order only when the `orders` table is empty; run after `EventSeeder`.)
+**`AdminOrdersSampleSeeder`** ensures **`admin@haarlem.test`** and inserts **demo orders** (paid/pending) for **`/admin/orders/export`** when the `orders` table is empty. If orders already exist, it skips inserting demo orders but still ensures the demo admin user.
 
-### 5. Admin login (pages CMS + Jazz CMS)
+### 5. Admin login (pages CMS + Jazz CMS + tickets CMS)
 
 Sign in at **`/login`** with:
 
 - **Email:** `admin@haarlem.test`
 - **Password:** `Admin123!`
 
-Then open **`/admin`** for pages, or **`/admin/jazz`** for the jazz CMS (same account).
+Then open **`/admin`** for pages, **`/admin/jazz`** for the jazz CMS, or **`/admin/tickets`** for ticket copy (same account).
 
 If the admin user is missing (e.g. you never ran full seeds), run:
 
@@ -76,4 +74,55 @@ After logging in as admin, open **`/admin/jazz`** (or use the **Jazz** card on t
 
 Public jazz pages read settings from **`jazz_settings`** merged with defaults in `app/src/Config/jazz.php`. If a key is not in the database, the file default is used.
 
-**Pages:** Each person can add their own page seeder (example `DancePageSeeder`). Use `INSERT IGNORE` so seed order doesn’t matter. In app code and when inserting into `page_blocks`, always get `page_id` by slug — never hardcode IDs.   
+**Pages:** Each person can add their own page seeder (example `DancePageSeeder`). Use `INSERT IGNORE` so seed order does not matter. In app code and when inserting into `page_blocks`, always get `page_id` by slug — never hardcode IDs.
+
+---
+
+## Test the site & admin export (local)
+
+1. **Start Docker** (from the repo root):
+   ```bash
+   docker compose up -d
+   ```
+
+2. **Open the site:** [http://localhost](http://localhost) (nginx on port **80**).
+
+3. **Database UI (phpMyAdmin):** [http://localhost:8080](http://localhost:8080)  
+   - Server: `mysql` (if asked from host, use `127.0.0.1` port **3307**, user `developer`, password `secret123`, database `HaarlemFestivaldb`).
+
+4. **Migrations & seeds** (if not done yet):
+   ```bash
+   docker compose run --rm php vendor/bin/phinx migrate
+   docker compose run --rm php vendor/bin/phinx seed:run
+   ```
+
+5. **Demo admin + sample orders** (for **Export orders** CMS), if needed:
+   ```bash
+   docker compose run --rm php vendor/bin/phinx seed:run -s AdminOrdersSampleSeeder
+   ```
+
+6. **Export orders page (admin only):** after login, open  
+   **[http://localhost/admin/orders/export](http://localhost/admin/orders/export)**  
+   Choose columns (include **Total amount** and **Paid at**), pick CSV or Excel, download.
+
+---
+
+## Security overview
+
+See **`app/docs/SECURITY.md`** for SQL injection / XSS / CSRF / CAPTCHA / ticket tokens and HTTP headers.
+
+---
+
+## Admin CMS (administrator only)
+
+Log in with an **admin** user (see **Admin login** above if you need the seeded account).  
+CMS needs **`composer install`** so **`ezyang/htmlpurifier`** is present (HTML cleanup for TinyMCE fields).
+
+| URL | What |
+|-----|------|
+| `/admin/orders` | **View orders** — table of all orders (read-only) |
+| `/admin/orders/export` | **Export orders** — CSV / Excel, selectable columns |
+| `/admin/cms/homepage` | **Edit homepage** — title (`pages` slug `home`) + hero / welcome / about (`site_settings` `cms_home_*`) |
+| `/admin/cms/dance` | **Edit Dance page** — copy, headings, hero, image lists (`dance_settings` + merge with `config/dance.php`) |
+
+Each page includes links to the other admin CMS screens.

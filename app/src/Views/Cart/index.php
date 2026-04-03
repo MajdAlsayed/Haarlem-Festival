@@ -3,7 +3,10 @@
 /** @var list<array<string,mixed>> $lines */
 /** @var float $total */
 /** @var ?string $success */
+use App\Core\Csrf;
+
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+$cartCsrf = Csrf::peek('cart') ?? Csrf::token('cart');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -38,7 +41,8 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                         <div style="display:flex;gap:0.5rem;align-items:center;">
                             <span class="tickets-price">€<?= $h(number_format((float) $line['line'], 2)) ?></span>
                             <form method="post" action="/cart/remove">
-                                <input type="hidden" name="ticket_details_id" value="<?= (int) $line['ticket_details_id'] ?>">
+                                <input type="hidden" name="cart_item_id" value="<?= (int) $line['cart_item_id'] ?>">
+                                <input type="hidden" name="_csrf" value="<?= $h($cartCsrf) ?>">
                                 <button type="submit" class="tickets-btn-buy" style="background:transparent;border:1px solid currentColor;">Remove</button>
                             </form>
                         </div>
