@@ -60,6 +60,19 @@ if (preg_match('#^/food/restaurant/(\d+)$#', $uri, $m)) {
     (new FoodController())->restaurant((int) $m[1]);
     exit;
 }
+if (preg_match('#^/food/restaurant/(\d+)/booking$#', $uri, $m)) {
+    if ($method !== 'GET' && $method !== 'POST') {
+        http_response_code(405);
+        exit;
+    }
+    (new FoodController())->booking((int) $m[1]);
+    exit;
+}
+if (preg_match('#^/food/restaurant/(\d+)/booking/overview$#', $uri, $m)) {
+    if ($method !== 'GET' && $method !== 'POST') { http_response_code(405); exit; }
+    (new FoodController())->bookingOverview((int) $m[1]);
+    exit;
+}
 if (preg_match('#^/dance/event/(\d+)$#', $uri, $m)) {
     (new EventDetailController())->show((int) $m[1]);
     exit;
