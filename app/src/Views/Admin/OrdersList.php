@@ -41,6 +41,7 @@ $app = $viewModel->appSettings;
                     <th>Paid at</th>
                     <th>Created</th>
                     <th>Lines</th>
+                    <th>Tickets</th>
                 </tr>
             </thead>
             <tbody>
@@ -55,6 +56,9 @@ $app = $viewModel->appSettings;
                         <td><?= htmlspecialchars((string)($row['paid_at'] ?? '')) ?></td>
                         <td><?= htmlspecialchars((string)($row['created_at'] ?? '')) ?></td>
                         <td><?= htmlspecialchars((string)($row['line_items_count'] ?? '')) ?></td>
+                        <td>
+                            <a href="/admin/orders/tickets?order_id=<?= htmlspecialchars((string)($row['order_id'] ?? '0')) ?>">Codes</a>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

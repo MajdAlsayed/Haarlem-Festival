@@ -10,6 +10,16 @@ use PDO;
 
 final class UserRepository
 {
+    public function findById(int $userId): ?User
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare('SELECT * FROM users WHERE user_id = :id LIMIT 1');
+        $stmt->execute(['id' => $userId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? $this->mapRowToUser($row) : null;
+    }
+
     public function findByEmail(string $email): ?User
     {
         $db = Database::getConnection();

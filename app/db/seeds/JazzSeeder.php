@@ -63,7 +63,7 @@ final class JazzSeeder extends AbstractSeed
         ];
 
         foreach ($events as $e) {
-            $hasSeats = count($e) >= 10;
+            // Rows may be [..., hall, price] (9 elems) or [..., hall, seats, price] (10 elems).
             $typeId   = $e[0];
             $venueId  = $e[1];
             $title    = $e[2];
@@ -72,8 +72,15 @@ final class JazzSeeder extends AbstractSeed
             $start    = $e[5];
             $end      = $e[6];
             $hall     = $e[7];
-            $price    = $hasSeats ? $e[9] : $e[8];
-            $seats    = $hasSeats ? (int)$e[8] : null;
+            if (count($e) >= 10) {
+                $seats = $e[8] !== null && $e[8] !== '' ? (int) $e[8] : null;
+                $price = $e[9];
+            } else {
+                $price = $e[8];
+                // Paid shows in a hall get a default cap (was always NULL before: count($e) >= 10 was never true).
+                $priceNum = is_numeric($price) ? (float) $price : 0.0;
+                $seats = ($priceNum > 0.0 && $hall !== null && $hall !== '') ? 150 : null;
+            }
 
             $titleEsc = addslashes($title);
             $descEsc  = addslashes($desc);

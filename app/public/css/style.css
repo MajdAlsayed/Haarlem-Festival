@@ -2985,12 +2985,15 @@ body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
     line-height: 1.05;
     text-shadow: 0 2px 24px rgba(0,0,0,0.6);
 }
-.artist-detail-hero-tagline {
+/* Hero blurb: fixed size so it stays smaller than the name. */
+.artist-detail-hero .artist-detail-hero-content p.artist-detail-hero-tagline {
     font-family: var(--font-body);
-    font-size: clamp(2.75rem, 6vw, 4.5rem);
-    font-weight: 600;
-    color: #f5b400;
-    margin: 0 0 28px;
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    line-height: 1.55 !important;
+    color: #f5b400 !important;
+    margin: 0 auto 28px !important;
+    max-width: 36rem !important;
     letter-spacing: 0.02em;
 }
 .artist-detail-hero-btn {
@@ -5245,6 +5248,74 @@ a.nav-username--dashboard.is-active {
     font-weight: 700;
     border-radius: 6px;
     white-space: nowrap;
+}
+
+/* Logged-in account dropdown (header) */
+.nav-user-dropdown {
+    position: relative;
+    z-index: 1080;
+}
+
+.nav-user-dropdown .nav-user-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-color: #f5b400;
+    color: #f5b400;
+}
+
+.nav-user-dropdown .nav-user-menu-toggle::after {
+    margin-left: 0.15rem;
+}
+
+.nav-user-dropdown .nav-user-menu-label {
+    max-width: 9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav-user-menu {
+    --bs-dropdown-min-width: 11rem;
+    background: #121214;
+    border: 1px solid rgba(245, 180, 0, 0.45);
+    border-radius: 8px;
+    padding: 0.35rem 0;
+    margin-top: 0.35rem !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.nav-user-menu .dropdown-item {
+    color: #f5e6b8;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+}
+
+.nav-user-menu .dropdown-item:hover,
+.nav-user-menu .dropdown-item:focus {
+    background: rgba(245, 180, 0, 0.15);
+    color: #ffe08a;
+}
+
+.nav-user-menu .dropdown-item.active {
+    background: rgba(245, 180, 0, 0.22);
+    color: #fff;
+}
+
+.nav-user-menu .dropdown-divider {
+    border-color: rgba(245, 180, 0, 0.2);
+    margin: 0.35rem 0;
+    opacity: 1;
+}
+
+.nav-user-menu .nav-user-menu-logout {
+    color: #f5a5a5;
+}
+
+.nav-user-menu .nav-user-menu-logout:hover,
+.nav-user-menu .nav-user-menu-logout:focus {
+    color: #ffc4c4;
+    background: rgba(220, 80, 80, 0.15);
 }
 .food-cards-grid {
     align-items: start;

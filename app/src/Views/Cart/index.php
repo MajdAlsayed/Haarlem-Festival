@@ -51,6 +51,16 @@ $cartCsrf = Csrf::peek('cart') ?? Csrf::token('cart');
             <?php endforeach; ?>
         </div>
         <p class="tickets-price" style="font-size:1.25rem;margin-top:1rem;">Total: €<?= $h(number_format($total, 2)) ?></p>
+        <?php
+        $loggedIn = !empty($_SESSION['auth']['user_id'] ?? null);
+        ?>
+        <?php if ($loggedIn): ?>
+            <p style="margin-top:1rem;"><a href="/checkout" class="tickets-btn-buy" style="display:inline-block;text-decoration:none;">Proceed to checkout</a></p>
+        <?php else: ?>
+            <p class="tickets-card-sub" style="margin-top:1rem;">
+                <a href="/login?return=/checkout">Log in</a> to complete your purchase.
+            </p>
+        <?php endif; ?>
         <p class="tickets-card-sub"><a href="/tickets">Continue shopping</a></p>
     <?php endif; ?>
 </main>

@@ -30,10 +30,16 @@ use App\Controllers\AdminHomepageController;
 use App\Controllers\AdminCmsUploadController;
 use App\Controllers\AdminDanceController;
 use App\Controllers\CartController;
+use App\Controllers\CheckoutController;
+use App\Controllers\TicketScanController;
 use App\Controllers\TicketsController;
+use App\Controllers\AccountController;
+use App\Controllers\ProgramController;
 use App\Core\SecurityHeaders;
+use App\Services\PendingOrderMaintenance;
 
 Session::start();
+PendingOrderMaintenance::run();
 SecurityHeaders::send();
 
 set_exception_handler(function (Throwable $e): void {
@@ -84,6 +90,15 @@ if (preg_match('#^/dance/artist/([a-z0-9-]+)$#', $uri, $m)) {
 
 if (preg_match('#^/history/location/([a-z0-9-]+)$#', $uri, $m)) {
     (new HistoryController())->show($m[1]);
+    exit;
+}
+
+if (preg_match('#^/account/order/(\d+)$#', $uri, $m)) {
+    if ($method === 'GET') {
+        (new AccountController())->orderDetail((int) $m[1]);
+    } else {
+        http_response_code(405);
+    }
     exit;
 }
 
@@ -141,6 +156,81 @@ switch ($uri) {
         }
         break;
 
+    case '/checkout':
+        if ($method === 'GET') {
+            (new CheckoutController())->show();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/pay':
+        if ($method === 'POST') {
+            (new CheckoutController())->pay();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/pay-stripe':
+        if ($method === 'POST') {
+            (new CheckoutController())->payStripe();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/pay-later':
+        if ($method === 'POST') {
+            (new CheckoutController())->payLater();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/pay-pending':
+        if ($method === 'POST') {
+            (new CheckoutController())->payPending();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/pay-pending-stripe':
+        if ($method === 'POST') {
+            (new CheckoutController())->payPendingStripe();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/cancel':
+        if ($method === 'GET') {
+            (new CheckoutController())->cancel();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/success':
+        if ($method === 'GET') {
+            (new CheckoutController())->success();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/scan':
+        $scan = new TicketScanController();
+        if ($method === 'POST') {
+            $scan->scan();
+        } elseif ($method === 'GET') {
+            $scan->index();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
     case '/dance':
         (new DanceController())->index();
         break;
@@ -152,6 +242,22 @@ switch ($uri) {
     case '/tickets':
         if ($method === 'GET') (new TicketsController())->index();
         else http_response_code(405);
+        break;
+
+    case '/account/orders':
+        if ($method === 'GET') {
+            (new AccountController())->orders();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/my-program':
+        if ($method === 'GET') {
+            (new ProgramController())->index();
+        } else {
+            http_response_code(405);
+        }
         break;
 
     case '/login':
@@ -193,6 +299,14 @@ switch ($uri) {
     case '/admin/orders':
         if ($method === 'GET') {
             (new AdminOrdersController())->index();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/orders/tickets':
+        if ($method === 'GET') {
+            (new AdminOrdersController())->tickets();
         } else {
             http_response_code(405);
         }

@@ -73,6 +73,15 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
             <?php foreach ($dayPasses as $p): ?>
                 <article class="tickets-card tickets-card--pass">
                     <h3 class="tickets-card-title"><?= $h($p['name']) ?></h3>
+                    <?php
+                    $pst = $p['stock'] ?? null;
+                    if (is_array($pst) && !empty($pst['sold_out'])): ?>
+                        <p class="tickets-stock-badge tickets-stock-badge--soldout">Sold out</p>
+                    <?php elseif (is_array($pst) && !empty($pst['nearly'])): ?>
+                        <p class="tickets-stock-badge tickets-stock-badge--nearly">Almost sold out</p>
+                    <?php elseif (is_array($pst) && !empty($pst['low_stock'])): ?>
+                        <p class="tickets-stock-badge tickets-stock-badge--low">Only <?= $h((string) (int) ($pst['remaining'] ?? 0)) ?> left</p>
+                    <?php endif; ?>
                     <p class="tickets-card-sub"><?= $h($p['description']) ?></p>
                     <div class="tickets-card-meta">
                         <?php if (($p['pass_day'] ?? '') !== ''): ?>
@@ -84,7 +93,7 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                     </div>
                     <div class="tickets-card-footer">
                         <span class="tickets-price"><?= !empty($p['is_free']) ? 'FREE' : '€' . $h(number_format((float) $p['price'], 0)) ?></span>
-                        <?php if (empty($p['is_free'])): ?>
+                        <?php if (empty($p['is_free']) && empty(($p['stock']['sold_out'] ?? false))): ?>
                             <form method="post" action="/cart/add" class="tickets-buy-form">
                                 <input type="hidden" name="ticket_details_id" value="<?= (int) $p['ticket_details_id'] ?>">
                                 <input type="hidden" name="quantity" value="1">
@@ -92,6 +101,8 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                                 <input type="hidden" name="return" value="<?= $h($returnUrl) ?>">
                                 <button type="submit" class="tickets-btn-buy">BUY ›</button>
                             </form>
+                        <?php elseif (empty($p['is_free'])): ?>
+                            <span class="tickets-btn-buy tickets-btn-buy--disabled" aria-disabled="true">Sold out</span>
                         <?php else: ?>
                             <span class="tickets-btn-buy tickets-btn-buy--disabled" aria-disabled="true">FREE</span>
                         <?php endif; ?>
@@ -102,6 +113,15 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
             <?php foreach ($allAccessPasses as $p): ?>
                 <article class="tickets-card tickets-card--pass tickets-card--wide">
                     <h3 class="tickets-card-title"><?= $h($p['name']) ?></h3>
+                    <?php
+                    $pst = $p['stock'] ?? null;
+                    if (is_array($pst) && !empty($pst['sold_out'])): ?>
+                        <p class="tickets-stock-badge tickets-stock-badge--soldout">Sold out</p>
+                    <?php elseif (is_array($pst) && !empty($pst['nearly'])): ?>
+                        <p class="tickets-stock-badge tickets-stock-badge--nearly">Almost sold out</p>
+                    <?php elseif (is_array($pst) && !empty($pst['low_stock'])): ?>
+                        <p class="tickets-stock-badge tickets-stock-badge--low">Only <?= $h((string) (int) ($pst['remaining'] ?? 0)) ?> left</p>
+                    <?php endif; ?>
                     <p class="tickets-card-sub"><?= $h($p['description']) ?></p>
                     <div class="tickets-card-meta">
                         <?php if (($p['schedule_display'] ?? '') !== ''): ?>
@@ -113,7 +133,7 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                     </div>
                     <div class="tickets-card-footer">
                         <span class="tickets-price"><?= !empty($p['is_free']) ? 'FREE' : '€' . $h(number_format((float) $p['price'], 0)) ?></span>
-                        <?php if (empty($p['is_free'])): ?>
+                        <?php if (empty($p['is_free']) && empty(($p['stock']['sold_out'] ?? false))): ?>
                             <form method="post" action="/cart/add" class="tickets-buy-form">
                                 <input type="hidden" name="ticket_details_id" value="<?= (int) $p['ticket_details_id'] ?>">
                                 <input type="hidden" name="quantity" value="1">
@@ -121,6 +141,8 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                                 <input type="hidden" name="return" value="<?= $h($returnUrl) ?>">
                                 <button type="submit" class="tickets-btn-buy">BUY ›</button>
                             </form>
+                        <?php elseif (empty($p['is_free'])): ?>
+                            <span class="tickets-btn-buy tickets-btn-buy--disabled" aria-disabled="true">Sold out</span>
                         <?php endif; ?>
                     </div>
                 </article>
@@ -146,6 +168,15 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                     ?>
                     <article class="tickets-card">
                         <h3 class="tickets-card-title"><?= $h($e['name']) ?></h3>
+                        <?php
+                        $est = $e['stock'] ?? null;
+                        if (is_array($est) && !empty($est['sold_out'])): ?>
+                            <p class="tickets-stock-badge tickets-stock-badge--soldout">Sold out</p>
+                        <?php elseif (is_array($est) && !empty($est['nearly'])): ?>
+                            <p class="tickets-stock-badge tickets-stock-badge--nearly">Almost sold out</p>
+                        <?php elseif (is_array($est) && !empty($est['low_stock'])): ?>
+                            <p class="tickets-stock-badge tickets-stock-badge--low">Only <?= $h((string) (int) ($est['remaining'] ?? 0)) ?> left</p>
+                        <?php endif; ?>
                         <?php if ($venueLine !== ''): ?>
                             <p class="tickets-card-venue"><?= $h($venueLine) ?></p>
                         <?php endif; ?>
@@ -155,7 +186,7 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                         </div>
                         <div class="tickets-card-footer">
                             <span class="tickets-price"><?= !empty($e['is_free']) ? 'FREE' : '€' . $h(number_format((float) $e['price'], 0)) ?></span>
-                            <?php if (empty($e['is_free'])): ?>
+                            <?php if (empty($e['is_free']) && empty(($e['stock']['sold_out'] ?? false))): ?>
                                 <form method="post" action="/cart/add" class="tickets-buy-form">
                                     <input type="hidden" name="ticket_details_id" value="<?= (int) $e['ticket_details_id'] ?>">
                                     <input type="hidden" name="quantity" value="1">
@@ -163,6 +194,8 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                                     <input type="hidden" name="return" value="<?= $h($returnUrl) ?>">
                                     <button type="submit" class="tickets-btn-buy">BUY ›</button>
                                 </form>
+                            <?php elseif (empty($e['is_free'])): ?>
+                                <span class="tickets-btn-buy tickets-btn-buy--disabled" aria-disabled="true">Sold out</span>
                             <?php else: ?>
                                 <span class="tickets-btn-buy tickets-btn-buy--disabled" aria-disabled="true">FREE</span>
                             <?php endif; ?>

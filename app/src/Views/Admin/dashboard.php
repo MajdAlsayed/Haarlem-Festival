@@ -43,6 +43,11 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                 <h2 class="admin-card-title">Tickets</h2>
                 <p class="admin-card-desc">Passes, event prices, tickets page intro.</p>
             </a>
+            <a href="/admin/scan" class="admin-card">
+                <span class="admin-card-icon">📱</span>
+                <h2 class="admin-card-title">Scan tickets</h2>
+                <p class="admin-card-desc">Check admission codes at the door (admin).</p>
+            </a>
         </section>
     </div>
 </main>

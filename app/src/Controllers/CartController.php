@@ -7,8 +7,11 @@ namespace App\Controllers;
 use App\Core\Csrf;
 use App\Core\Session;
 use App\Repositories\CartRepository;
+use App\Repositories\PersonalProgramRepository;
 use App\Repositories\SettingsRepository;
+use App\Repositories\TicketRepository;
 use App\Services\CartService;
+use App\Services\TicketAvailabilityService;
 
 /**
  * Cart: JSON for cart drawer (fetch); HTML for /cart page; form POSTs from tickets redirect after add.
@@ -20,7 +23,17 @@ final class CartController
 
     public function __construct()
     {
-        $this->cartService = new CartService(new CartRepository());
+        $this->cartService = $this->makeCartService();
+    }
+
+    private function makeCartService(): CartService
+    {
+        $cartRepo = new CartRepository();
+
+        return new CartService(
+            $cartRepo,
+            new TicketAvailabilityService($cartRepo, new TicketRepository())
+        );
     }
 
     public function get(): void
@@ -87,6 +100,11 @@ final class CartController
 
         try {
             $cart = $this->cartService->addItem($ticketDetailsId, $quantity);
+
+            $loggedUserId = isset($_SESSION['auth']['user_id']) ? (int) $_SESSION['auth']['user_id'] : 0;
+            if ($loggedUserId > 0) {
+                (new PersonalProgramRepository())->addItem($loggedUserId, $ticketDetailsId);
+            }
 
             if ($formPost) {
                 Session::setFlash('cart_success', 'Added to your cart.');
