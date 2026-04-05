@@ -29,191 +29,206 @@ final class StoriesSeeder extends AbstractSeed
             return strtolower(trim((string)$s));
         };
 
-        $eventByTitle = [];
+        $eventByTitle    = [];
         $eventByTitleDay = [];
-        $titleCounts = [];
+        $titleCounts     = [];
 
         foreach ($events as $e) {
             $titleKey = $norm((string)$e['title']);
             $dayKey   = $normDay((string)($e['event_day'] ?? ''));
             $fullKey  = $titleKey . '|' . $dayKey;
 
-            $eventByTitle[$titleKey] = $e;
-            $eventByTitleDay[$fullKey] = $e;
-            $titleCounts[$titleKey] = ($titleCounts[$titleKey] ?? 0) + 1;
+            $eventByTitle[$titleKey]    = $e;
+            $eventByTitleDay[$fullKey]  = $e;
+            $titleCounts[$titleKey]     = ($titleCounts[$titleKey] ?? 0) + 1;
         }
 
         $rows = [
             [
                 'event_title' => 'Winnie de Poeh',
-                'event_day' => 'thursday',
-                'name' => 'Winnie de Poeh',
-                'slug' => 'winnie-de-poeh',
+                'event_day'   => 'thursday',
+                'name'        => 'Winnie de Poeh',
+                'slug'        => 'winnie-de-poeh',
                 'description' => "Warm and playful storytelling session.\nA story that brings a beloved children's book to life.",
-                'image_path' => '/images/Stories/cards/card-image-2.jpg',
-                'story_type' => 'Story',
-                'age' => '4+',
-                'language' => 'NL',
+                'image_path'  => '/images/Stories/cards/card-image-2.jpg',
+                'story_type'  => 'Story',
+                'age'         => '4+',
+                'language'    => 'NL',
+                'template'    => 'generic',
             ],
             [
                 'event_title' => 'Omdenken Podcast',
-                'event_day' => 'thursday',
-                'name' => 'Omdenken Podcast',
-                'slug' => 'omdenken-podcast',
+                'event_day'   => 'thursday',
+                'name'        => 'Omdenken Podcast',
+                'slug'        => 'omdenken-podcast',
                 'description' => "A funny and smart talk about thinking differently.\nLive recording with audience.",
-                'image_path' => '/images/Stories/details/omdenken-main.jpg',
-                'story_type' => 'Podcast',
-                'age' => '16+',
-                'language' => 'NL',
+                'image_path'  => '/images/Stories/details/omdenken-main.jpg',
+                'story_type'  => 'Podcast',
+                'age'         => '16+',
+                'language'    => 'NL',
+                'template'    => 'omdenken',
             ],
             [
                 'event_title' => 'The Story of Buurderij Haarlem',
-                'event_day' => 'thursday',
-                'name' => 'The Story of Buurderij Haarlem',
-                'slug' => 'the-story-of-buurderij-haarlem',
+                'event_day'   => 'thursday',
+                'name'        => 'The Story of Buurderij Haarlem',
+                'slug'        => 'the-story-of-buurderij-haarlem',
                 'description' => "Local community story.\nHow Buurderij connects people with food and farmers.",
-                'image_path' => '/images/Stories/cards/card-image-3.jpg',
-                'story_type' => 'Story',
-                'age' => '16+',
-                'language' => 'ENG',
+                'image_path'  => '/images/Stories/cards/card-image-3.jpg',
+                'story_type'  => 'Story',
+                'age'         => '16+',
+                'language'    => 'ENG',
+                'template'    => 'buurderij',
             ],
             [
                 'event_title' => 'Corrie voor kinderen',
-                'event_day' => 'friday',
-                'name' => 'Corrie voor kinderen',
-                'slug' => 'corrie-voor-kinderen',
+                'event_day'   => 'friday',
+                'name'        => 'Corrie voor kinderen',
+                'slug'        => 'corrie-voor-kinderen',
                 'description' => "A kids storytelling performance.\nFun, easy, family-friendly.",
-                'image_path' => '/images/Stories/cards/card-image-1.jpg',
-                'story_type' => 'Kids',
-                'age' => '10+',
-                'language' => 'NL',
+                'image_path'  => '/images/Stories/cards/card-image-1.jpg',
+                'story_type'  => 'Kids',
+                'age'         => '10+',
+                'language'    => 'NL',
+                'template'    => 'generic',
             ],
             [
                 'event_title' => 'Winnaars van verhalenvertel wedstrijd, verhalen voor Haarlem',
-                'event_day' => 'friday',
-                'name' => 'Winnaars van verhalenvertel wedstrijd, verhalen voor Haarlem',
-                'slug' => 'winnaars-van-verhalenvertel-wedstrijd-verhalen-voor-haarlem',
+                'event_day'   => 'friday',
+                'name'        => 'Winnaars van verhalenvertel wedstrijd, verhalen voor Haarlem',
+                'slug'        => 'winnaars-van-verhalenvertel-wedstrijd-verhalen-voor-haarlem',
                 'description' => "A warm and playful storytelling session that brings a beloved children's story to life.",
-                'image_path' => '/images/Stories/cards/card-image-7.jpg',
-                'story_type' => 'Competition',
-                'age' => '12+',
-                'language' => 'NL',
+                'image_path'  => '/images/Stories/cards/card-image-7.jpg',
+                'story_type'  => 'Competition',
+                'age'         => '12+',
+                'language'    => 'NL',
+                'template'    => 'generic',
             ],
             [
                 'event_title' => 'Het verhaal van de Oeserzwammerij',
-                'event_day' => 'friday',
-                'name' => 'Het verhaal van de Oeserzwammerij',
-                'slug' => 'het-verhaal-van-de-oeserzwammerij',
+                'event_day'   => 'friday',
+                'name'        => 'Het verhaal van de Oeserzwammerij',
+                'slug'        => 'het-verhaal-van-de-oeserzwammerij',
                 'description' => "A local story about sustainable food, community, and how Haarlem connects.",
-                'image_path' => '/images/Stories/cards/card-image-8.jpg',
-                'story_type' => 'Story',
-                'age' => '16+',
-                'language' => 'NL',
+                'image_path'  => '/images/Stories/cards/card-image-8.jpg',
+                'story_type'  => 'Story',
+                'age'         => '16+',
+                'language'    => 'NL',
+                'template'    => 'generic',
             ],
             [
                 'event_title' => 'Flip Thinking Podcast',
-                'event_day' => 'friday',
-                'name' => 'Flip Thinking Podcast',
-                'slug' => 'flip-thinking-podcast',
+                'event_day'   => 'friday',
+                'name'        => 'Flip Thinking Podcast',
+                'slug'        => 'flip-thinking-podcast',
                 'description' => "A local story about sustainable food, community, and how Haarlem connects.",
-                'image_path' => '/images/Stories/venues/link-1.jpg',
-                'story_type' => 'Podcast',
-                'age' => '16+',
-                'language' => 'ENG',
+                'image_path'  => '/images/Stories/venues/link-1.jpg',
+                'story_type'  => 'Podcast',
+                'age'         => '16+',
+                'language'    => 'ENG',
+                'template'    => 'generic',
             ],
             [
                 'event_title' => 'Meneer Anansi',
-                'event_day' => 'saturday',
-                'name' => 'Meneer Anansi',
-                'slug' => 'meneer-anansi-saturday',
+                'event_day'   => 'saturday',
+                'name'        => 'Meneer Anansi',
+                'slug'        => 'meneer-anansi-saturday',
                 'description' => "A meaningful space where Haarlem's past is kept alive through stories.",
-                'image_path' => '/images/Stories/cards/card-image-9.jpg',
-                'story_type' => 'Story',
-                'age' => '2-102',
-                'language' => 'NL',
+                'image_path'  => '/images/Stories/cards/card-image-9.jpg',
+                'story_type'  => 'Story',
+                'age'         => '2-102',
+                'language'    => 'NL',
+                'template'    => 'generic',
             ],
             [
                 'event_title' => 'Mister Anansi',
-                'event_day' => 'saturday',
-                'name' => 'Mister Anansi',
-                'slug' => 'mister-anansi-saturday',
+                'event_day'   => 'saturday',
+                'name'        => 'Mister Anansi',
+                'slug'        => 'mister-anansi-saturday',
                 'description' => "A meaningful space where Haarlem's past is kept alive through stories.",
-                'image_path' => '/images/Stories/cards/card-image-10.jpg',
-                'story_type' => 'Story',
-                'age' => '2-102',
-                'language' => 'ENG',
+                'image_path'  => '/images/Stories/cards/card-image-10.jpg',
+                'story_type'  => 'Story',
+                'age'         => '2-102',
+                'language'    => 'ENG',
+                'template'    => 'generic',
             ],
             [
                 'event_title' => 'Podcastlast Haarlem Special',
-                'event_day' => 'saturday',
-                'name' => 'Podcastlast Haarlem Special',
-                'slug' => 'podcastlast-haarlem-special',
+                'event_day'   => 'saturday',
+                'name'        => 'Podcastlast Haarlem Special',
+                'slug'        => 'podcastlast-haarlem-special',
                 'description' => "A special live recording where local voices and stories come together on stage.",
-                'image_path' => '/images/Stories/cards/card-image-8.jpg',
-                'story_type' => 'Podcast',
-                'age' => '12+',
-                'language' => 'NL',
+                'image_path'  => '/images/Stories/cards/card-image-8.jpg',
+                'story_type'  => 'Podcast',
+                'age'         => '12+',
+                'language'    => 'NL',
+                'template'    => 'generic',
             ],
             [
                 'event_title' => 'De geschiedenis van familie ten Boom',
-                'event_day' => 'saturday',
-                'name' => 'De geschiedenis van familie ten Boom',
-                'slug' => 'de-geschiedenis-van-familie-ten-boom',
+                'event_day'   => 'saturday',
+                'name'        => 'De geschiedenis van familie ten Boom',
+                'slug'        => 'de-geschiedenis-van-familie-ten-boom',
                 'description' => "A child-friendly story introducing the life and values of Corrie ten Boom.",
-                'image_path' => '/images/Stories/cards/card-image-10.jpg',
-                'story_type' => 'History',
-                'age' => '12+',
-                'language' => 'NL',
+                'image_path'  => '/images/Stories/cards/card-image-10.jpg',
+                'story_type'  => 'History',
+                'age'         => '12+',
+                'language'    => 'NL',
+                'template'    => 'generic',
             ],
             [
                 'event_title' => 'Mister Anansi',
-                'event_day' => 'sunday',
-                'name' => 'Mister Anansi',
-                'slug' => 'mister-anansi-sunday',
+                'event_day'   => 'sunday',
+                'name'        => 'Mister Anansi',
+                'slug'        => 'mister-anansi-sunday',
                 'description' => "A meaningful story session where Haarlem's past is brought to life in an engaging way.",
-                'image_path' => '/images/Stories/cards/card-image-2.jpg',
-                'story_type' => 'Story',
-                'age' => '2-102',
-                'language' => 'ENG',
+                'image_path'  => '/images/Stories/cards/card-image-2.jpg',
+                'story_type'  => 'Story',
+                'age'         => '2-102',
+                'language'    => 'ENG',
+                'template'    => 'generic',
             ],
             [
                 'event_title' => 'Meneer Anansi',
-                'event_day' => 'sunday',
-                'name' => 'Meneer Anansi',
-                'slug' => 'meneer-anansi-sunday',
+                'event_day'   => 'sunday',
+                'name'        => 'Meneer Anansi',
+                'slug'        => 'meneer-anansi-sunday',
                 'description' => "A meaningful story session where Haarlem's past is brought to life in an engaging way.",
-                'image_path' => '/images/Stories/cards/card-image-9.jpg',
-                'story_type' => 'Story',
-                'age' => '2-102',
-                'language' => 'NL',
+                'image_path'  => '/images/Stories/cards/card-image-9.jpg',
+                'story_type'  => 'Story',
+                'age'         => '2-102',
+                'language'    => 'NL',
+                'template'    => 'generic',
             ],
             [
                 'event_title' => 'The history of the Ten Boom Family',
-                'event_day' => 'sunday',
-                'name' => 'The history of the Ten Boom Family',
-                'slug' => 'the-history-of-the-ten-boom-family',
+                'event_day'   => 'sunday',
+                'name'        => 'The history of the Ten Boom Family',
+                'slug'        => 'the-history-of-the-ten-boom-family',
                 'description' => "A child-friendly story introducing the life and values of Corrie ten Boom.",
-                'image_path' => '/images/Stories/cards/card-image-8.jpg',
-                'story_type' => 'History',
-                'age' => '12+',
-                'language' => 'ENG',
+                'image_path'  => '/images/Stories/cards/card-image-8.jpg',
+                'story_type'  => 'History',
+                'age'         => '12+',
+                'language'    => 'ENG',
+                'template'    => 'generic',
             ],
             [
                 'event_title' => 'Winners of story telling competition, soties for Haarlem',
-                'event_day' => 'sunday',
-                'name' => 'Winners of story telling competition, soties for Haarlem',
-                'slug' => 'winners-of-story-telling-competition-soties-for-haarlem-sunday',
+                'event_day'   => 'sunday',
+                'name'        => 'Winners of story telling competition, soties for Haarlem',
+                'slug'        => 'winners-of-story-telling-competition-soties-for-haarlem-sunday',
                 'description' => "A warm and playful storytelling session that brings a beloved children's story to life.",
-                'image_path' => '/images/Stories/cards/card-image-1.jpg',
-                'story_type' => 'Competition',
-                'age' => '12+',
-                'language' => 'ENG',
+                'image_path'  => '/images/Stories/cards/card-image-1.jpg',
+                'story_type'  => 'Competition',
+                'age'         => '12+',
+                'language'    => 'ENG',
+                'template'    => 'generic',
             ],
         ];
 
         $this->execute("DELETE FROM stories");
 
-        $pdo = $this->getAdapter()->getConnection();
+        $pdo      = $this->getAdapter()->getConnection();
         $inserted = 0;
         $seenSlugs = [];
 
@@ -221,7 +236,7 @@ final class StoriesSeeder extends AbstractSeed
             $slug = trim((string)$r['slug']);
 
             if (isset($seenSlugs[$slug])) {
-                echo "[SKIP] Duplicate slug in seeder rows: {$slug}\n";
+                echo "[SKIP] Duplicate slug: {$slug}\n";
                 continue;
             }
 
@@ -232,29 +247,31 @@ final class StoriesSeeder extends AbstractSeed
             $fullKey  = $titleKey . '|' . $rowDay;
 
             if (($titleCounts[$titleKey] ?? 0) > 1 && $rowDay === '') {
-                echo "[SKIP] Ambiguous title, add event_day in seeder row: {$r['event_title']}\n";
+                echo "[SKIP] Ambiguous title, add event_day: {$r['event_title']}\n";
                 continue;
             }
 
             if ($rowDay !== '') {
                 if (!isset($eventByTitleDay[$fullKey])) {
-                    echo "[SKIP] Not found in events (title/day mismatch): {$r['event_title']} | {$rowDay}\n";
+                    echo "[SKIP] Not found (title/day): {$r['event_title']} | {$rowDay}\n";
                     continue;
                 }
                 $event = $eventByTitleDay[$fullKey];
             } else {
                 if (!isset($eventByTitle[$titleKey])) {
-                    echo "[SKIP] Not found in events (title mismatch): {$r['event_title']}\n";
+                    echo "[SKIP] Not found (title): {$r['event_title']}\n";
                     continue;
                 }
                 $event = $eventByTitle[$titleKey];
             }
 
-            $eventId = (int)$event['event_id'];
-            $venueId = (int)$event['venue_id'];
+            $eventId  = (int)$event['event_id'];
+            $venueId  = (int)$event['venue_id'];
+            $template = $pdo->quote((string)($r['template'] ?? 'generic'));
 
             $this->execute("
-                INSERT INTO stories (name, slug, description, image_path, story_type, age, language, venue_id, event_id)
+                INSERT INTO stories
+                    (name, slug, description, image_path, story_type, age, language, template, venue_id, event_id)
                 VALUES (
                     " . $pdo->quote(trim((string)$r['name'])) . ",
                     " . $pdo->quote($slug) . ",
@@ -263,6 +280,7 @@ final class StoriesSeeder extends AbstractSeed
                     " . $pdo->quote((string)$r['story_type']) . ",
                     " . $pdo->quote((string)$r['age']) . ",
                     " . $pdo->quote((string)$r['language']) . ",
+                    {$template},
                     {$venueId},
                     {$eventId}
                 )

@@ -9,17 +9,41 @@ final class AddJazzFieldsToEvents extends AbstractMigration
     {
         $table = $this->table('events');
 
-        // These fields are used only by Jazz cards/pages. Other categories can leave them NULL.
-        $table
-            ->addColumn('hall', 'string', ['limit' => 80, 'null' => true, 'after' => 'description'])
-            ->addColumn('end_time', 'string', ['limit' => 10, 'null' => true, 'after' => 'start_time'])
-            ->addColumn('price', 'decimal', ['precision' => 10, 'scale' => 2, 'null' => true, 'after' => 'end_time'])
+        if (!$table->hasColumn('hall')) {
+            $table->addColumn('hall', 'string', [
+                'limit' => 80,
+                'null' => true,
+                'after' => 'description'
+            ]);
+        }
 
-            // Prevent accidental duplicates for the same slot
-            ->addIndex(['event_type_id', 'title', 'event_day', 'start_time'], [
-                'unique' => true,
-                'name' => 'uniq_event_slot'
-            ])
-            ->update();
+        if (!$table->hasColumn('end_time')) {
+            $table->addColumn('end_time', 'string', [
+                'limit' => 10,
+                'null' => true,
+                'after' => 'start_time'
+            ]);
+        }
+
+        if (!$table->hasColumn('price')) {
+            $table->addColumn('price', 'decimal', [
+                'precision' => 10,
+                'scale' => 2,
+                'null' => true,
+                'after' => 'end_time'
+            ]);
+        }
+
+        if (!$table->hasIndex(['event_type_id', 'title', 'event_day', 'start_time'])) {
+            $table->addIndex(
+                ['event_type_id', 'title', 'event_day', 'start_time'],
+                [
+                    'unique' => true,
+                    'name' => 'uniq_event_slot'
+                ]
+            );
+        }
+
+        $table->update();
     }
 }

@@ -2,11 +2,15 @@
 
 namespace App\Services;
 
-use App\Repositories\StoriesRepository;
+use App\Contracts\IStoriesRepository;
+use App\Contracts\ServiceInterface\StoriesServiceInterface;
 
-class StoriesService
+class StoriesService implements StoriesServiceInterface
 {
-    public function __construct(private StoriesRepository $repo) {}
+    public function __construct(private IStoriesRepository $repo)
+    {
+    }
+
 
     public function getStoriesHomeData(?string $day = null): array
     {
@@ -24,24 +28,23 @@ class StoriesService
 
         if (!$venue) {
             return [
-                'venue' => null,
-                'stories' => [],
+                'venue'           => null,
+                'stories'         => [],
                 'allVenueStories' => [],
-                'schedule' => ['NL' => [], 'ENG' => []],
+                'schedule'        => ['NL' => [], 'ENG' => []],
             ];
         }
 
         $storiesFiltered = $this->repo->getStoriesByVenue((int)$venue['venue_id'], $day);
+        $allStories      = $this->repo->getStories('all');
 
-        $allStories = $this->repo->getStories('all');
 
         $explorePool = array_values(array_filter(
             $allStories,
             function (array $story) use ($venue): bool {
-                $storyVenueId = (int)($story['venue_id'] ?? 0);
-                $currentVenueId = (int)($venue['venue_id'] ?? 0);
-                $storyId = (int)($story['story_id'] ?? 0);
-
+                $storyVenueId   = (int)($story['venue_id']  ?? 0);
+                $currentVenueId = (int)($venue['venue_id']  ?? 0);
+                $storyId        = (int)($story['story_id']  ?? 0);
                 return $storyVenueId !== $currentVenueId && $storyId > 0;
             }
         ));
@@ -50,10 +53,10 @@ class StoriesService
         $exploreMore = array_slice($explorePool, 0, 4);
 
         return [
-            'venue' => $venue,
-            'stories' => $storiesFiltered,
+            'venue'           => $venue,
+            'stories'         => $storiesFiltered,
             'allVenueStories' => $exploreMore,
-            'schedule' => $this->buildSchedule($storiesFiltered),
+            'schedule'        => $this->buildSchedule($storiesFiltered),
         ];
     }
 
@@ -63,56 +66,141 @@ class StoriesService
 
         if (!$story) {
             return [
-                'story' => null,
-                'stories' => [],
-                'schedule' => ['NL' => [], 'ENG' => []],
+                'story'      => null,
+                'stories'    => [],
+                'schedule'   => ['NL' => [], 'ENG' => []],
+                'detailPage' => null,
             ];
         }
 
         $more = [];
         if (!empty($story['venue_id'])) {
             $more = $this->repo->getStoriesByVenue((int)$story['venue_id'], 'all');
-
             $more = array_values(array_filter(
                 $more,
-                fn(array $item): bool => (int)($item['story_id'] ?? 0) !== (int)$storyId
+                fn(array $item): bool => (int)($item['story_id'] ?? 0) !== $storyId
             ));
         }
 
         return [
-            'story' => $story,
-            'stories' => $more,
-            'schedule' => $this->buildSchedule($more),
+            'story'      => $story,
+            'stories'    => $more,
+            'schedule'   => $this->buildSchedule($more),
+            'detailPage' => $this->repo->getDetailPageByStoryId($storyId),
         ];
     }
+
+
+
+    public function getAllStoriesForAdmin(): array
+    {
+        return $this->repo->getAllStoriesForAdmin();
+    }
+
+    public function getStoryForEdit(int $storyId): ?array
+    {
+        return $this->repo->getStoryById($storyId);
+    }
+
+    public function createStory(array $data): int
+    {
+        return $this->repo->createStory($data);
+    }
+
+    public function updateStory(int $storyId, array $data): bool
+    {
+        return $this->repo->updateStory($storyId, $data);
+    }
+
+    public function deleteStory(int $storyId): bool
+    {
+        return $this->repo->deleteStory($storyId);
+    }
+
+    public function hasDetailPage(int $storyId): bool
+    {
+        return $this->repo->hasDetailPage($storyId);
+    }
+
+
+    public function getDetailPageForCms(string $slug): array
+    {
+        $story = $this->repo->getStoryBySlug($slug);
+
+        if (!$story) {
+            return [
+                'story'      => null,
+                'detailPage' => null,
+            ];
+        }
+
+        $detailPage = $this->repo->getDetailPageByStoryId((int)$story['story_id']);
+
+        return [
+            'story'      => $story,
+            'detailPage' => $detailPage,
+        ];
+    }
+
+    public function saveDetailPage(int $storyId, array $data): bool
+    {
+        $highlights = isset($data['highlights']) && is_array($data['highlights'])
+            ? $data['highlights']
+            : [];
+
+        $gallery = isset($data['gallery']) && is_array($data['gallery'])
+            ? $data['gallery']
+            : [];
+
+        $payload = [
+            'hero_image'            => isset($data['hero_image'])            && $data['hero_image']            !== '' ? $data['hero_image']            : null,
+            'hero_heading'          => isset($data['hero_heading'])          && $data['hero_heading']          !== '' ? $data['hero_heading']          : null,
+            'hero_description'      => isset($data['hero_description'])      && $data['hero_description']      !== '' ? $data['hero_description']      : null,
+            'article_title'         => isset($data['article_title'])         && $data['article_title']         !== '' ? $data['article_title']         : null,
+            'article_image'         => isset($data['article_image'])         && $data['article_image']         !== '' ? $data['article_image']         : null,
+            'article_image_caption' => isset($data['article_image_caption']) && $data['article_image_caption'] !== '' ? $data['article_image_caption'] : null,
+            'article_paragraph_1'   => isset($data['article_paragraph_1'])   && $data['article_paragraph_1']   !== '' ? $data['article_paragraph_1']   : null,
+            'article_paragraph_2'   => isset($data['article_paragraph_2'])   && $data['article_paragraph_2']   !== '' ? $data['article_paragraph_2']   : null,
+            'article_paragraph_3'   => isset($data['article_paragraph_3'])   && $data['article_paragraph_3']   !== '' ? $data['article_paragraph_3']   : null,
+            'highlights'            => json_encode($highlights, JSON_UNESCAPED_UNICODE),
+            'gallery'               => json_encode($gallery,    JSON_UNESCAPED_UNICODE),
+        ];
+
+        return $this->repo->saveDetailPage($storyId, $payload);
+    }
+
 
     private function buildSchedule(array $stories): array
     {
         $out = ['NL' => [], 'ENG' => []];
 
-        foreach ($stories as $s) {
-            $lang = strtoupper(trim((string)($s['language'] ?? '')));
-            if ($lang !== 'NL' && $lang !== 'ENG') {
+        foreach ($stories as $story) {
+            
+            $lang = strtoupper(trim((string)($story['language'] ?? '')));
+            $day  = strtolower(trim((string)($story['event_day'] ?? '')));
+
+           
+            if ($lang === '' || $day === '') {
                 continue;
             }
 
-            $day = strtolower(trim((string)($s['event_day'] ?? '')));
-            if ($day === '') {
-                continue;
+           
+            if (!isset($out[$lang])) {
+                $out[$lang] = [];
             }
 
-            $start = trim((string)($s['start_time'] ?? ''));
-            $end = trim((string)($s['end_time'] ?? ''));
+            $start = isset($story['start_time']) ? trim((string)$story['start_time']) : '';
+            $end   = isset($story['end_time'])   ? trim((string)$story['end_time'])   : '';
 
             $time = $start;
             if ($start !== '' && $end !== '') {
-                $time = $start . '-' . $end;
+                $time = $start . '–' . $end;
             }
 
             $out[$lang][$day][] = [
-                'time' => $time,
-                'title' => (string)($s['story_name'] ?? $s['name'] ?? $s['title'] ?? ''),
-                'age' => (string)($s['age'] ?? ''),
+                'time'  => $time,
+                'title' => (string)($story['story_name'] ?? $story['name'] ?? $story['title'] ?? ''),
+                'age'   => (string)($story['age'] ?? ''),
             ];
         }
 

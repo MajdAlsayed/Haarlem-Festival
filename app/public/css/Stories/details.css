@@ -1,2383 +1,1114 @@
 /* =========================================================
-   STORIES DETAIL PAGE
-   SHARED / DEFAULT / OTHER EVENTS
+   STORIES BREADCRUMB
+   Canonical — used on ALL stories pages. Do not define elsewhere.
    ========================================================= */
 
-body.stories-detail-page{
-  background:#0b0b0b;
-  color:#f0f0f0;
-  font-family:system-ui,-apple-system,sans-serif;
+.stories-breadcrumb {
+    background: #0a0a1f;
+    padding: 14px 0;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-.detail-page{
-  width:100%;
-  max-width:1920px;
-  margin:0 auto;
+.stories-breadcrumb-inner {
+    max-width: 1420px;
+    margin: 0 auto;
+    padding: 0 34px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-.detail-not-found{
-  color:#f5b400;
+.stories-breadcrumb-link {
+    color: #ffffff;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    transition: color 0.15s;
 }
 
-.gold-section{
-  background:linear-gradient(180deg, #111 0%, #2a1b00 100%);
-  border:1px solid rgba(255,255,255,0.08);
-  box-shadow:0 12px 34px rgba(0,0,0,0.45);
+.stories-breadcrumb-link:hover { color: #ffcc00; }
+.stories-breadcrumb-link.active { color: #ffcc00; }
+
+.stories-breadcrumb-separator {
+    color: rgba(255,255,255,0.45);
+    font-size: 15px;
 }
 
-.detail-top-hero{
-  position:relative;
-  min-height:420px;
-  border-radius:0 0 12px 12px;
-  overflow:hidden;
-  margin-bottom:28px;
-  background-size:cover;
-  background-position:center;
+@media (max-width: 600px) {
+    .stories-breadcrumb-inner { padding: 0 16px; }
+    .stories-breadcrumb-link { font-size: 12px; }
 }
 
-.detail-top-hero::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(90deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.18) 100%);
+
+/* =========================================================
+   SHARED BASE STYLES
+   ========================================================= */
+
+body.stories-detail-page {
+    background: #0b0b0b;
+    color: #f0f0f0;
+    font-family: system-ui, -apple-system, sans-serif;
 }
 
-.detail-top-inner{
-  position:relative;
-  z-index:2;
-  width:100%;
-  max-width:1420px;
-  margin:0 auto;
-  padding:52px 34px;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-end;
-  min-height:420px;
+.detail-page {
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
 }
 
-.detail-title-xl{
-  font-size:2.5rem;
-  line-height:1.05;
-  font-weight:900;
-  color:#fff;
-  margin:0 0 14px;
-  max-width:760px;
-  text-transform:uppercase;
-  letter-spacing:.03em;
-}
+.detail-not-found { color: #f5b400; }
 
-.detail-subtitle{
-  color:#f3f3f3;
-  font-size:1.02rem;
-  max-width:720px;
-  margin:0;
-  line-height:1.7;
-}
-
-.section-wrap{
-  padding:0 0 26px;
-}
-
-.section-grid-2{
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:28px;
-  align-items:start;
-  margin-top:24px;
-}
-
-.section-grid-2-equal{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:24px;
-  align-items:start;
-  margin-top:22px;
-}
-
-.section-space-top{
-  margin-top:24px;
-}
-
-.content-card{
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:12px;
-  padding:22px;
-  box-shadow:0 10px 28px rgba(0,0,0,0.35);
+.content-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
 }
 
 .content-card h2,
-.content-card h3{
-  margin:0 0 10px;
-  color:#ffcc00;
-  font-weight:900;
-  letter-spacing:.03em;
+.content-card h3 {
+    margin: 0 0 10px;
+    color: #ffcc00;
+    font-weight: 900;
+    letter-spacing: .03em;
 }
 
-.content-card p{
-  margin:0;
-  color:#d7d7d7;
-  font-size:14px;
-  line-height:1.8;
+.content-card p {
+    margin: 0;
+    color: #d7d7d7;
+    font-size: 14px;
+    line-height: 1.8;
 }
 
-.meta-panel{
-  background:rgba(0,0,0,0.42);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:12px;
-  padding:22px;
+.btnx {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-weight: 900;
+    font-size: 12px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    border-radius: 8px;
+    padding: 12px 16px;
+    transition: .2s;
+    border: 1px solid rgba(255,153,0,0.65);
+    min-width: 120px;
 }
 
-.meta-list{
-  display:grid;
-  gap:12px;
-  font-size:14px;
-  color:#e6e6e6;
-}
-
-.meta-item strong{
-  color:#ffcc00;
-  display:inline-block;
-  min-width:90px;
-}
-
-.image-box{
-  border-radius:12px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,0.08);
-  box-shadow:0 10px 28px rgba(0,0,0,0.35);
-  background:#111;
-}
-
-.image-box img{
-  display:block;
-  width:100%;
-  height:auto;
-  object-fit:cover;
-}
-
-.gallery-3{
-  display:grid;
-  grid-template-columns:repeat(3, 1fr);
-  gap:18px;
-  margin-top:20px;
-}
-
-.gallery-3 .gallery-item{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-.gallery-3 img{
-  width:100%;
-  height:220px;
-  object-fit:cover;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,0.08);
-  box-shadow:0 10px 24px rgba(0,0,0,0.35);
-  background:#111;
-}
-
-.gallery-caption{
-  font-size:12px;
-  color:#cfcfcf;
-  line-height:1.55;
-}
-
-.ticket-bar{
-  margin-top:24px;
-  padding-top:20px;
-  border-top:1px solid rgba(255,255,255,0.12);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  flex-wrap:wrap;
-}
-
-.ticket-bar-default{
-  margin-top:18px;
-  padding-top:0;
-  border-top:none;
-}
-
-.ticket-note{
-  color:#cfcfcf;
-  font-size:12px;
-  line-height:1.6;
-}
-
-.ticket-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.btnx{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  text-decoration:none;
-  font-weight:900;
-  font-size:12px;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  border-radius:8px;
-  padding:12px 16px;
-  transition:.2s;
-  border:1px solid rgba(255,153,0,0.65);
-  min-width:120px;
-}
-
-.btnx.primary{
-  background:#ffb400;
-  border-color:#ffb400;
-  color:#000;
-}
-
-.btnx.primary:hover{
-  background:#ffcc55;
-  border-color:#ffcc55;
-  transform:translateY(-1px);
-}
-
-.btnx.outline{
-  background:rgba(0,0,0,0.25);
-  color:#ffb400;
-}
-
-.btnx.outline:hover{
-  background:#ff9900;
-  color:#000;
-  border-color:#ff9900;
-  transform:translateY(-1px);
-}
+.btnx.primary { background: #ffb400; border-color: #ffb400; color: #000; }
+.btnx.primary:hover { background: #ffcc55; border-color: #ffcc55; transform: translateY(-1px); }
+.btnx.outline { background: rgba(0,0,0,0.25); color: #ffb400; }
+.btnx.outline:hover { background: #ff9900; color: #000; border-color: #ff9900; transform: translateY(-1px); }
 
 
 /* =========================================================
-   OMDENKEN CUSTOM DETAIL PAGE
+   OMDENKEN DETAIL PAGE
    ========================================================= */
 
-.omdenken-page{
-  background:linear-gradient(180deg, #050505 0%, #0a0a0a 36%, #6c4704 100%);
-  border:1px solid rgba(255,255,255,0.06);
-  box-shadow:0 12px 34px rgba(0,0,0,0.45);
-  overflow:hidden;
-  margin-bottom:28px;
+.omdenken-page {
+    background: linear-gradient(180deg, #050505 0%, #0a0a0a 36%, #6c4704 100%);
+    overflow: hidden;
+    margin-bottom: 28px;
 }
 
-.omdenken-hero{
-  background:#070707;
+.omdenken-hero { background: #070707; }
+
+.omdenken-hero-image {
+    position: relative;
+    width: 100%;
+    height: 540px;
+    overflow: hidden;
 }
 
-.omdenken-hero-image{
-  position:relative;
-  width:100%;
-  height:540px;
-  overflow:hidden;
+.omdenken-hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
 }
 
-.omdenken-hero-image img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:center center;
-  display:block;
+.omdenken-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.22) 50%, rgba(0,0,0,0.82) 100%);
 }
 
-.omdenken-hero-overlay{
-  position:absolute;
-  inset:0;
-  background:linear-gradient(
-    180deg,
-    rgba(0,0,0,0.08) 0%,
-    rgba(0,0,0,0.18) 48%,
-    rgba(0,0,0,0.82) 100%
-  );
+.omdenken-hero-copy {
+    position: absolute;
+    left: 48px;
+    bottom: 44px;
+    z-index: 2;
+    max-width: 680px;
 }
 
-.omdenken-hero-copy{
-  position:absolute;
-  left:28px;
-  bottom:36px;
-  z-index:2;
-  max-width:640px;
+.omdenken-title {
+    margin: 0 0 12px;
+    color: #fff;
+    font-size: 64px;
+    line-height: calc(84/64);
+    font-weight: 900;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.5);
 }
 
-.omdenken-title{
-  margin:0 0 10px;
-  color:#fff;
-  font-size:2.7rem;
-  line-height:1.02;
-  font-weight:900;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-  max-width:620px;
-  text-shadow:0 3px 10px rgba(0,0,0,0.45);
+.omdenken-subtitle {
+    margin: 0 0 12px;
+    color: #f3f3f3;
+    font-size: 20px;
+    line-height: calc(28/20);
+    font-weight: 700;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.35);
 }
 
-.omdenken-subtitle{
-  margin:0 0 14px;
-  color:#f3f3f3;
-  font-size:1.05rem;
-  line-height:1.45;
-  max-width:600px;
-  font-weight:700;
-  text-shadow:0 2px 8px rgba(0,0,0,0.35);
+.omdenken-hero-text {
+    margin: 0;
+    color: #ededed;
+    font-size: 16px;
+    line-height: calc(22/16);
+    max-width: 580px;
 }
 
-.omdenken-hero-text{
-  margin:0;
-  color:#ededed;
-  font-size:.74rem;
-  line-height:1.7;
-  max-width:560px;
+.omdenken-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 48px 56px;
 }
 
-.omdenken-content{
-  max-width:1080px;
-  margin:0 auto;
-  padding:10px 28px 46px;
+.omdenken-top-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 48px;
+    align-items: start;
+    margin-bottom: 48px;
 }
 
-.omdenken-top-grid{
-  display:grid;
-  grid-template-columns:320px 1fr;
-  gap:46px;
-  align-items:start;
-  margin-bottom:34px;
+.omdenken-poster-card {
+    width: 100%;
+    background: #111;
+    overflow: hidden;
+    border-radius: 4px;
 }
 
-.omdenken-poster-card{
-  width:100%;
-  max-width:300px;
-  background:#111;
-  overflow:hidden;
+.omdenken-poster-card img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
 }
 
-.omdenken-poster-card img{
-  width:100%;
-  display:block;
-  object-fit:cover;
+.omdenken-event-meta { padding-top: 8px; }
+
+.omdenken-meta-line {
+    display: flex;
+    align-items: baseline;
+    color: #fff;
+    font-size: 20px;
+    line-height: calc(28/20);
 }
 
-.omdenken-event-meta{
-  padding-top:0;
-  max-width:none;
+.omdenken-meta-line span {
+    display: inline-block;
+    min-width: 130px;
+    color: #fff;
+    font-weight: 900;
 }
 
-.omdenken-meta-line{
-  color:#fff;
-  font-size:1rem;
-  line-height:2.15;
-  letter-spacing:.01em;
+.omdenken-story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+    margin-bottom: 48px;
 }
 
-.omdenken-meta-line span{
-  display:inline-block;
-  min-width:140px;
-  color:#fff;
-  font-weight:900;
+.omdenken-story-grid-second { margin-bottom: 48px; }
+
+.omdenken-text-block h3 {
+    margin: 0 0 14px;
+    color: #f0b316;
+    font-size: 20px;
+    line-height: calc(30/20);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .03em;
 }
 
-.omdenken-story-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:90px;
-  align-items:start;
-  margin-bottom:42px;
+.omdenken-text-block p {
+    margin: 0;
+    color: #d0d0d0;
+    font-size: 16px;
+    line-height: calc(22/16);
 }
 
-.omdenken-story-grid-second{
-  margin-top:14px;
-  margin-bottom:42px;
+.omdenken-text-block-right { display: flex; align-items: flex-start; }
+
+.omdenken-right-copy {
+    margin: 0;
+    color: #d8d8d8;
+    font-size: 16px;
+    line-height: calc(22/16);
+    padding-top: 0;
 }
 
-.omdenken-text-block h3{
-  margin:0 0 16px;
-  color:#f0b316;
-  font-size:1rem;
-  line-height:1.3;
-  font-weight:900;
+.omdenken-host-image-wrap { display: flex; align-items: flex-start; }
+
+.omdenken-host-image-wrap img {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    object-fit: cover;
+    border-radius: 4px;
 }
 
-.omdenken-text-block p{
-  margin:0;
-  color:#d7d7d7;
-  font-size:.76rem;
-  line-height:1.9;
-  max-width:420px;
+.omdenken-player-section {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    align-items: stretch;
+    background: #0a0a0a;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 44px;
 }
 
-.omdenken-bullet-list{
-  margin:0;
-  padding-left:18px;
-  color:#d7d7d7;
-  font-size:.75rem;
-  line-height:2;
-  max-width:420px;
+.omdenken-player-poster {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: #050505;
 }
 
-.omdenken-bullet-list li{
-  margin-bottom:5px;
+.omdenken-player-poster img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
 }
 
-.omdenken-text-block-right{
-  display:block;
+.omdenken-poster-caption { padding-top: 10px; }
+
+.omdenken-poster-caption strong {
+    display: block;
+    color: #fff;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 600;
 }
 
-.omdenken-right-copy{
-  margin:0;
-  color:#e5e5e5;
-  font-size:.78rem;
-  line-height:1.9;
-  max-width:420px;
-  padding-top:52px;
+.omdenken-poster-caption span {
+    display: block;
+    color: #b9b9b9;
+    font-size: 15px;
+    line-height: 1;
+    margin-top: 3px;
 }
 
-.omdenken-host-image-wrap{
-  display:flex;
-  justify-content:flex-start;
-  align-items:flex-start;
-  padding-top:4px;
+.omdenken-player-ui {
+    background: linear-gradient(180deg, #141414 0%, #101010 100%);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 6px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.omdenken-host-image-wrap img{
-  width:100%;
-  max-width:430px;
-  display:block;
-  object-fit:cover;
-}
-
-.omdenken-player-section{
-  display:grid;
-  grid-template-columns:280px 1fr;
-  gap:28px;
-  align-items:stretch;
-  background:#0a0a0a;
-  padding:28px;
-  margin:12px auto 42px;
-  max-width:1080px;
-}
-
-.omdenken-player-poster{
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  align-items:flex-start;
-  background:#050505;
-}
-
-.omdenken-player-poster img{
-  width:100%;
-  max-width:240px;
-  aspect-ratio:1 / 1;
-  object-fit:cover;
-  display:block;
-  background:#111;
-}
-
-.omdenken-poster-caption{
-  padding-top:12px;
-  text-align:center;
-  max-width:240px;
-}
-
-.omdenken-poster-caption strong{
-  display:block;
-  color:#fff;
-  font-size:1.05rem;
-  font-weight:500;
-}
-
-.omdenken-poster-caption span{
-  display:block;
-  color:#b9b9b9;
-  font-size:.66rem;
-  margin-top:3px;
-}
-
-.omdenken-player-ui{
-  background:linear-gradient(180deg, #141414 0%, #101010 100%);
-  border:1px solid rgba(255,255,255,0.05);
-  padding:22px 22px 16px;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-}
-
-.player-top-row{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:22px;
-  margin-bottom:16px;
+.player-top-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
 }
 
 .player-mini-btn,
-.player-play-btn{
-  border:none;
-  background:transparent;
-  color:#f0f0f0;
-  cursor:pointer;
-  padding:0;
-  line-height:1;
+.player-play-btn {
+    border: none;
+    background: transparent;
+    color: #f0f0f0;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
 }
 
-.player-mini-btn{
-  font-size:14px;
-  opacity:.9;
+.player-mini-btn { font-size: 15px; opacity: .85; }
+
+.player-play-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f0c419;
+    color: #111;
+    font-size: 15px;
+    font-weight: 900;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.player-play-btn{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  background:#f0c419;
-  color:#111;
-  font-size:15px;
-  font-weight:900;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
+.player-time-row {
+    display: flex;
+    justify-content: space-between;
+    color: #c8c8c8;
+    font-size: 15px;
+    line-height: 1;
 }
 
-.player-time-row{
-  display:flex;
-  justify-content:space-between;
-  color:#c8c8c8;
-  font-size:.62rem;
-  margin-bottom:6px;
+.player-progress-bar {
+    height: 2px;
+    background: rgba(255,255,255,0.15);
+    overflow: hidden;
+    border-radius: 1px;
 }
 
-.player-progress-wrap{
-  width:100%;
-  margin-bottom:18px;
+.player-progress-fill { width: 36%; height: 100%; background: #d9d9d9; }
+
+.player-volume-row {
+    display: grid;
+    grid-template-columns: 20px 1fr 20px;
+    gap: 10px;
+    align-items: center;
+    color: #cfcfcf;
+    font-size: 15px;
+    line-height: 1;
 }
 
-.player-progress-bar{
-  height:2px;
-  background:rgba(255,255,255,0.15);
-  overflow:hidden;
+.player-volume-bar { height: 2px; background: rgba(255,255,255,0.15); }
+.player-volume-fill { width: 55%; height: 100%; background: #d9d9d9; }
+.player-recent-title { color: #b9b9b9; font-size: 15px; line-height: 1; }
+
+.player-tracklist { display: grid; gap: 8px; }
+
+.track-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: center;
+    color: #d7d7d7;
+    background: rgba(255,255,255,0.04);
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 15px;
+    line-height: 1;
 }
 
-.player-progress-fill{
-  width:36%;
-  height:100%;
-  background:#d9d9d9;
+.track-row.active { border-left: 3px solid #5a67ff; }
+.track-info strong { display: block; color: #fff; font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.track-info small { display: block; color: #9f9f9f; font-size: 15px; }
+
+.omdenken-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
 }
 
-.player-volume-row{
-  display:grid;
-  grid-template-columns:20px 1fr 20px;
-  gap:10px;
-  align-items:center;
-  color:#cfcfcf;
-  font-size:.8rem;
-  margin-bottom:18px;
+.omdenken-stat-card {
+    background: #eea311;
+    color: #111;
+    padding: 18px 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 4px;
 }
 
-.player-volume-bar{
-  height:2px;
-  background:rgba(255,255,255,0.15);
-  position:relative;
+.omdenken-stat-icon { font-size: 20px; line-height: 1; }
+.omdenken-stat-title { font-size: 15px; line-height: 1; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+.omdenken-stat-value { font-size: 16px; line-height: calc(22/16); font-weight: 700; }
+
+.omdenken-note-row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 20px;
+    align-items: start;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.14);
+    margin-bottom: 24px;
 }
 
-.player-volume-fill{
-  width:55%;
-  height:100%;
-  background:#d9d9d9;
+.omdenken-note-label { color: #f0c419; font-size: 16px; line-height: calc(22/16); font-weight: 900; text-align: right; padding-top: 2px; }
+.omdenken-note-text  { color: #efefef; font-size: 16px; line-height: calc(22/16); }
+
+.omdenken-ticket-row { display: flex; justify-content: center; }
+
+.omdenken-ticket-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 0 28px;
+    background: #eea311;
+    color: #111;
+    text-decoration: none;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    border-radius: 4px;
 }
 
-.player-recent-title{
-  color:#b9b9b9;
-  font-size:.62rem;
-  margin-bottom:8px;
+.omdenken-ticket-btn:hover { filter: brightness(1.08); }
+
+@media (max-width: 1100px) {
+    .omdenken-content { padding: 28px 28px 44px; }
+    .omdenken-top-grid { grid-template-columns: 240px 1fr; gap: 32px; }
+    .omdenken-story-grid { gap: 40px; }
 }
 
-.player-tracklist{
-  display:grid;
-  gap:8px;
+@media (max-width: 900px) {
+    .omdenken-hero-image { height: 400px; }
+    .omdenken-hero-copy { left: 20px; right: 20px; bottom: 24px; }
+    .omdenken-top-grid,
+    .omdenken-story-grid,
+    .omdenken-player-section,
+    .omdenken-stats-row,
+    .omdenken-note-row { grid-template-columns: 1fr; }
+    .omdenken-content { padding: 20px 18px 36px; }
+    .omdenken-title { font-size: 40px; }
+    .omdenken-note-label { text-align: left; }
 }
 
-.track-row{
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:16px;
-  align-items:center;
-  color:#d7d7d7;
-  background:rgba(255,255,255,0.04);
-  padding:10px 12px;
-  border-radius:4px;
-  font-size:.74rem;
-}
-
-.track-row.active{
-  border-left:3px solid #5a67ff;
-}
-
-.track-info strong{
-  display:block;
-  color:#fff;
-  font-size:.7rem;
-  font-weight:600;
-  margin-bottom:2px;
-}
-
-.track-info small{
-  display:block;
-  color:#9f9f9f;
-  font-size:.58rem;
-}
-
-.omdenken-stats-row{
-  display:grid;
-  grid-template-columns:repeat(3, 1fr);
-  gap:20px;
-  max-width:760px;
-  margin:0 auto 28px;
-}
-
-.omdenken-stat-card{
-  background:#eea311;
-  color:#111;
-  min-height:92px;
-  padding:12px 12px;
-  text-align:center;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 10px 18px rgba(0,0,0,0.2);
-}
-
-.omdenken-stat-icon{
-  font-size:1.2rem;
-  line-height:1;
-  margin-bottom:8px;
-}
-
-.omdenken-stat-title{
-  font-size:.82rem;
-  font-weight:900;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-  margin-bottom:5px;
-}
-
-.omdenken-stat-value{
-  font-size:.74rem;
-  font-weight:700;
-}
-
-.omdenken-note-row{
-  max-width:980px;
-  margin:0 auto;
-  padding:18px 0 0;
-  border-top:1px solid rgba(255,255,255,0.16);
-  display:grid;
-  grid-template-columns:120px 1fr;
-  gap:18px;
-  align-items:start;
-}
-
-.omdenken-note-label{
-  color:#f0c419;
-  font-size:.86rem;
-  font-weight:900;
-  text-align:right;
-}
-
-.omdenken-note-text{
-  color:#efefef;
-  font-size:.72rem;
-  line-height:1.7;
-  max-width:350px;
-}
-
-.omdenken-ticket-row{
-  display:flex;
-  justify-content:center;
-  margin-top:18px;
-}
-
-.omdenken-ticket-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-width:116px;
-  height:32px;
-  background:#eea311;
-  color:#111;
-  text-decoration:none;
-  font-size:.74rem;
-  font-weight:900;
-  letter-spacing:.05em;
-  text-transform:uppercase;
-  border-radius:4px;
-  box-shadow:0 8px 16px rgba(0,0,0,0.24);
-}
-
-.omdenken-ticket-btn:hover{
-  filter:brightness(1.06);
+@media (max-width: 600px) {
+    .omdenken-hero-image { height: 300px; }
+    .omdenken-title   { font-size: 28px; }
+    .omdenken-subtitle { font-size: 16px; }
+    .omdenken-hero-text { font-size: 15px; }
+    .omdenken-content { padding: 16px 14px 28px; }
 }
 
 
 /* =========================================================
-   RESPONSIVE - OMDENKEN
+   BUURDERIJ DETAIL PAGE
    ========================================================= */
 
-@media (max-width:1100px){
-  .omdenken-content{
-    padding:10px 34px 40px;
-  }
-
-  .omdenken-top-grid{
-    grid-template-columns:280px 1fr;
-    gap:30px;
-  }
-
-  .omdenken-story-grid{
-    grid-template-columns:1fr 1fr;
-    gap:42px;
-  }
-
-  .omdenken-right-copy{
-    padding-top:20px;
-  }
-
-  .omdenken-player-section{
-    max-width:none;
-  }
-}
-
-@media (max-width:900px){
-  .omdenken-hero-image{
-    height:420px;
-  }
-
-  .omdenken-hero-copy{
-    left:18px;
-    right:18px;
-    bottom:24px;
-    max-width:none;
-  }
-
-  .omdenken-top-grid,
-  .omdenken-story-grid,
-  .omdenken-player-section,
-  .omdenken-stats-row,
-  .omdenken-note-row{
-    grid-template-columns:1fr;
-  }
-
-  .omdenken-content{
-    padding:22px 20px 34px;
-  }
-
-  .omdenken-title{
-    font-size:1.8rem;
-  }
-
-  .omdenken-poster-card{
-    max-width:280px;
-  }
-
-  .omdenken-note-label{
-    text-align:left;
-  }
-
-  .omdenken-right-copy{
-    padding-top:0;
-    max-width:100%;
-  }
-
-  .omdenken-host-image-wrap img{
-    max-width:420px;
-  }
-}
-
-@media (max-width:650px){
-  .detail-page{
-    padding:0 10px 56px;
-  }
-
-  .omdenken-hero-image{
-    height:340px;
-  }
-
-  .omdenken-title{
-    font-size:1.35rem;
-  }
-
-  .omdenken-subtitle{
-    font-size:.88rem;
-  }
-
-  .omdenken-hero-text{
-    font-size:.64rem;
-  }
-
-  .omdenken-content{
-    padding:18px 14px 28px;
-  }
-
-  .omdenken-player-section{
-    padding:16px;
-  }
-
-  .omdenken-stats-row{
-    gap:12px;
-  }
-}
-
-
-/* =========================================================
-   RESPONSIVE - SHARED / DEFAULT / OTHER EVENTS
-   ========================================================= */
-
-@media (max-width:900px){
-  .section-grid-2,
-  .section-grid-2-equal,
-  .gallery-3{
-    grid-template-columns:1fr;
-  }
-
-  .detail-title-xl{
-    font-size:1.9rem;
-  }
-
-  .detail-top-inner{
-    padding:38px 22px;
-  }
-}
-
-@media (max-width:650px){
-  .detail-title-xl{
-    font-size:1.45rem;
-  }
-
-  .detail-subtitle{
-    font-size:.94rem;
-  }
-}  
-/* =========================================================
-   STORIES DETAIL PAGE
-   SHARED / DEFAULT / OTHER EVENTS
-   ========================================================= */
-
-body.stories-detail-page{
-  background:#0b0b0b;
-  color:#f0f0f0;
-  font-family:system-ui,-apple-system,sans-serif;
-}
-
-.detail-page{
-  width:100%;
-  max-width:1920px;
-  margin:0 auto;
-}
-
-.detail-not-found{
-  color:#f5b400;
-}
-
-.gold-section{
-  background:linear-gradient(180deg, #111 0%, #2a1b00 100%);
-  border:1px solid rgba(255,255,255,0.08);
-  box-shadow:0 12px 34px rgba(0,0,0,0.45);
-}
-
-.detail-top-hero{
-  position:relative;
-  min-height:420px;
-  border-radius:0 0 12px 12px;
-  overflow:hidden;
-  margin-bottom:28px;
-  background-size:cover;
-  background-position:center;
-}
-
-.detail-top-hero::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(90deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.18) 100%);
-}
-
-.detail-top-inner{
-  position:relative;
-  z-index:2;
-  width:100%;
-  max-width:1420px;
-  margin:0 auto;
-  padding:52px 34px;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-end;
-  min-height:420px;
-}
-
-.detail-title-xl{
-  font-size:2.5rem;
-  line-height:1.05;
-  font-weight:900;
-  color:#fff;
-  margin:0 0 14px;
-  max-width:760px;
-  text-transform:uppercase;
-  letter-spacing:.03em;
-}
-
-.detail-subtitle{
-  color:#f3f3f3;
-  font-size:1.02rem;
-  max-width:720px;
-  margin:0;
-  line-height:1.7;
-}
-
-.section-wrap{
-  padding:0 0 26px;
-}
-
-.section-grid-2{
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:28px;
-  align-items:start;
-  margin-top:24px;
-}
-
-.section-grid-2-equal{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:24px;
-  align-items:start;
-  margin-top:22px;
-}
-
-.section-space-top{
-  margin-top:24px;
-}
-
-.content-card{
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:12px;
-  padding:22px;
-  box-shadow:0 10px 28px rgba(0,0,0,0.35);
-}
-
-.content-card h2,
-.content-card h3{
-  margin:0 0 10px;
-  color:#ffcc00;
-  font-weight:900;
-  letter-spacing:.03em;
-}
-
-.content-card p{
-  margin:0;
-  color:#d7d7d7;
-  font-size:14px;
-  line-height:1.8;
-}
-
-.meta-panel{
-  background:rgba(0,0,0,0.42);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:12px;
-  padding:22px;
-}
-
-.meta-list{
-  display:grid;
-  gap:12px;
-  font-size:14px;
-  color:#e6e6e6;
-}
-
-.meta-item strong{
-  color:#ffcc00;
-  display:inline-block;
-  min-width:90px;
-}
-
-.image-box{
-  border-radius:12px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,0.08);
-  box-shadow:0 10px 28px rgba(0,0,0,0.35);
-  background:#111;
-}
-
-.image-box img{
-  display:block;
-  width:100%;
-  height:auto;
-  object-fit:cover;
-}
-
-.gallery-3{
-  display:grid;
-  grid-template-columns:repeat(3, 1fr);
-  gap:18px;
-  margin-top:20px;
-}
-
-.gallery-3 .gallery-item{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-.gallery-3 img{
-  width:100%;
-  height:220px;
-  object-fit:cover;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,0.08);
-  box-shadow:0 10px 24px rgba(0,0,0,0.35);
-  background:#111;
-}
-
-.gallery-caption{
-  font-size:12px;
-  color:#cfcfcf;
-  line-height:1.55;
-}
-
-.ticket-bar{
-  margin-top:24px;
-  padding-top:20px;
-  border-top:1px solid rgba(255,255,255,0.12);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  flex-wrap:wrap;
-}
-
-.ticket-bar-default{
-  margin-top:18px;
-  padding-top:0;
-  border-top:none;
-}
-
-.ticket-note{
-  color:#cfcfcf;
-  font-size:12px;
-  line-height:1.6;
-}
-
-.ticket-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.btnx{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  text-decoration:none;
-  font-weight:900;
-  font-size:12px;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  border-radius:8px;
-  padding:12px 16px;
-  transition:.2s;
-  border:1px solid rgba(255,153,0,0.65);
-  min-width:120px;
-}
-
-.btnx.primary{
-  background:#ffb400;
-  border-color:#ffb400;
-  color:#000;
-}
-
-.btnx.primary:hover{
-  background:#ffcc55;
-  border-color:#ffcc55;
-  transform:translateY(-1px);
-}
-
-.btnx.outline{
-  background:rgba(0,0,0,0.25);
-  color:#ffb400;
-}
-
-.btnx.outline:hover{
-  background:#ff9900;
-  color:#000;
-  border-color:#ff9900;
-  transform:translateY(-1px);
-}
-
-
-/* =========================================================
-   OMDENKEN CUSTOM DETAIL PAGE
-   ========================================================= */
-
-.omdenken-page{
-  background:linear-gradient(180deg, #050505 0%, #0a0a0a 36%, #6c4704 100%);
-  border:1px solid rgba(255,255,255,0.06);
-  box-shadow:0 12px 34px rgba(0,0,0,0.45);
-  overflow:hidden;
-  margin-bottom:28px;
-}
-
-.omdenken-hero{
-  background:#070707;
-}
-
-.omdenken-hero-image{
-  position:relative;
-  width:100%;
-  height:540px;
-  overflow:hidden;
-}
-
-.omdenken-hero-image img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:center center;
-  display:block;
-}
-
-.omdenken-hero-overlay{
-  position:absolute;
-  inset:0;
-  background:linear-gradient(
-    180deg,
-    rgba(0,0,0,0.08) 0%,
-    rgba(0,0,0,0.18) 48%,
-    rgba(0,0,0,0.82) 100%
-  );
-}
-
-.omdenken-hero-copy{
-  position:absolute;
-  left:28px;
-  bottom:36px;
-  z-index:2;
-  max-width:640px;
-}
-
-.omdenken-title{
-  margin:0 0 10px;
-  color:#fff;
-  font-size:2.7rem;
-  line-height:1.02;
-  font-weight:900;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-  max-width:620px;
-  text-shadow:0 3px 10px rgba(0,0,0,0.45);
-}
-
-.omdenken-subtitle{
-  margin:0 0 14px;
-  color:#f3f3f3;
-  font-size:1.05rem;
-  line-height:1.45;
-  max-width:480px;
-  font-weight:700;
-  text-shadow:0 2px 8px rgba(0,0,0,0.35);
-}
-
-.omdenken-hero-text{
-  margin:0;
-  color:#ededed;
-  font-size:.74rem;
-  line-height:1.7;
-  max-width:560px;
-}
-
-.omdenken-content{
-  padding:10px 66px 46px;
-}
-
-.omdenken-top-grid{
-  display:grid;
-  grid-template-columns:300px 420px;
-  gap:42px;
-  align-items:start;
-  margin-bottom:34px;
-}
-
-.omdenken-poster-card{
-  width:100%;
-  max-width:300px;
-  background:#111;
-  overflow:hidden;
-}
-
-.omdenken-poster-card img{
-  width:100%;
-  display:block;
-  object-fit:cover;
-}
-
-.omdenken-event-meta{
-  padding-top:0;
-  max-width:none;
-}
-
-.omdenken-meta-line{
-  color:#fff;
-  font-size:1rem;
-  line-height:2.15;
-  letter-spacing:.01em;
-}
-
-.omdenken-meta-line span{
-  display:inline-block;
-  min-width:140px;
-  color:#fff;
-  font-weight:900;
+.buurderij-page {
+    background: linear-gradient(180deg, #0a0a0a 0%, #2d1b00 55%, #7a5310 100%);
+    border: 1px solid rgba(255,255,255,0.06);
+    overflow: hidden;
+    margin-bottom: 28px;
 }
 
-.omdenken-story-grid{
-  display:grid;
-  grid-template-columns:420px 420px;
-  gap:78px;
-  align-items:start;
-  margin-bottom:42px;
-}
-
-.omdenken-story-grid-second{
-  margin-top:14px;
-  margin-bottom:42px;
-}
-
-.omdenken-text-block h3{
-  margin:0 0 16px;
-  color:#f0b316;
-  font-size:1rem;
-  line-height:1.3;
-  font-weight:900;
-}
-
-.omdenken-text-block p{
-  margin:0;
-  color:#d7d7d7;
-  font-size:.76rem;
-  line-height:1.9;
-  max-width:340px;
-}
-
-.omdenken-bullet-list{
-  margin:0;
-  padding-left:18px;
-  color:#d7d7d7;
-  font-size:.75rem;
-  line-height:2;
-  max-width:360px;
-}
-
-.omdenken-bullet-list li{
-  margin-bottom:5px;
-}
-
-.omdenken-text-block-right{
-  display:block;
-}
-
-.omdenken-right-copy{
-  margin:0;
-  color:#e5e5e5;
-  font-size:.78rem;
-  line-height:1.9;
-  max-width:340px;
-  padding-top:48px;
-}
-
-.omdenken-host-image-wrap{
-  display:block;
-  padding-top:8px;
-}
-
-.omdenken-host-image-wrap img{
-  width:100%;
-  max-width:520px;
-  display:block;
-  object-fit:cover;
-}
-
-.omdenken-player-section{
-  display:grid;
-  grid-template-columns:280px 1fr;
-  gap:28px;
-  align-items:stretch;
-  background:#0a0a0a;
-  padding:28px;
-  margin:12px auto 42px;
-  max-width:1080px;
-}
-
-.omdenken-player-poster{
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  align-items:flex-start;
-  background:#050505;
-}
-
-.omdenken-player-poster img{
-  width:100%;
-  max-width:240px;
-  aspect-ratio:1 / 1;
-  object-fit:cover;
-  display:block;
-  background:#111;
-}
-
-.omdenken-poster-caption{
-  padding-top:12px;
-  text-align:center;
-  max-width:240px;
-}
-
-.omdenken-poster-caption strong{
-  display:block;
-  color:#fff;
-  font-size:1.05rem;
-  font-weight:500;
-}
-
-.omdenken-poster-caption span{
-  display:block;
-  color:#b9b9b9;
-  font-size:.66rem;
-  margin-top:3px;
-}
-
-.omdenken-player-ui{
-  background:linear-gradient(180deg, #141414 0%, #101010 100%);
-  border:1px solid rgba(255,255,255,0.05);
-  padding:22px 22px 16px;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-}
-
-.player-top-row{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:22px;
-  margin-bottom:16px;
-}
-
-.player-mini-btn,
-.player-play-btn{
-  border:none;
-  background:transparent;
-  color:#f0f0f0;
-  cursor:pointer;
-  padding:0;
-  line-height:1;
-}
-
-.player-mini-btn{
-  font-size:14px;
-  opacity:.9;
-}
-
-.player-play-btn{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  background:#f0c419;
-  color:#111;
-  font-size:15px;
-  font-weight:900;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.player-time-row{
-  display:flex;
-  justify-content:space-between;
-  color:#c8c8c8;
-  font-size:.62rem;
-  margin-bottom:6px;
-}
-
-.player-progress-wrap{
-  width:100%;
-  margin-bottom:18px;
-}
-
-.player-progress-bar{
-  height:2px;
-  background:rgba(255,255,255,0.15);
-  overflow:hidden;
-}
-
-.player-progress-fill{
-  width:36%;
-  height:100%;
-  background:#d9d9d9;
-}
-
-.player-volume-row{
-  display:grid;
-  grid-template-columns:20px 1fr 20px;
-  gap:10px;
-  align-items:center;
-  color:#cfcfcf;
-  font-size:.8rem;
-  margin-bottom:18px;
-}
-
-.player-volume-bar{
-  height:2px;
-  background:rgba(255,255,255,0.15);
-  position:relative;
-}
-
-.player-volume-fill{
-  width:55%;
-  height:100%;
-  background:#d9d9d9;
-}
-
-.player-recent-title{
-  color:#b9b9b9;
-  font-size:.62rem;
-  margin-bottom:8px;
-}
-
-.player-tracklist{
-  display:grid;
-  gap:8px;
-}
-
-.track-row{
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:16px;
-  align-items:center;
-  color:#d7d7d7;
-  background:rgba(255,255,255,0.04);
-  padding:10px 12px;
-  border-radius:4px;
-  font-size:.74rem;
-}
-
-.track-row.active{
-  border-left:3px solid #5a67ff;
-}
-
-.track-info strong{
-  display:block;
-  color:#fff;
-  font-size:.7rem;
-  font-weight:600;
-  margin-bottom:2px;
-}
-
-.track-info small{
-  display:block;
-  color:#9f9f9f;
-  font-size:.58rem;
-}
-
-.omdenken-stats-row{
-  display:grid;
-  grid-template-columns:repeat(3, 1fr);
-  gap:20px;
-  max-width:760px;
-  margin:0 auto 28px;
-}
-
-.omdenken-stat-card{
-  background:#eea311;
-  color:#111;
-  min-height:92px;
-  padding:12px 12px;
-  text-align:center;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 10px 18px rgba(0,0,0,0.2);
-}
-
-.omdenken-stat-icon{
-  font-size:1.2rem;
-  line-height:1;
-  margin-bottom:8px;
-}
-
-.omdenken-stat-title{
-  font-size:.82rem;
-  font-weight:900;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-  margin-bottom:5px;
-}
-
-.omdenken-stat-value{
-  font-size:.74rem;
-  font-weight:700;
-}
-
-.omdenken-note-row{
-  max-width:980px;
-  margin:0 auto;
-  padding:18px 0 0;
-  border-top:1px solid rgba(255,255,255,0.16);
-  display:grid;
-  grid-template-columns:120px 1fr;
-  gap:18px;
-  align-items:start;
-}
-
-.omdenken-note-label{
-  color:#f0c419;
-  font-size:.86rem;
-  font-weight:900;
-  text-align:right;
-}
-
-.omdenken-note-text{
-  color:#efefef;
-  font-size:.72rem;
-  line-height:1.7;
-  max-width:350px;
-}
-
-.omdenken-ticket-row{
-  display:flex;
-  justify-content:center;
-  margin-top:18px;
-}
-
-.omdenken-ticket-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-width:116px;
-  height:32px;
-  background:#eea311;
-  color:#111;
-  text-decoration:none;
-  font-size:.74rem;
-  font-weight:900;
-  letter-spacing:.05em;
-  text-transform:uppercase;
-  border-radius:4px;
-  box-shadow:0 8px 16px rgba(0,0,0,0.24);
-}
-
-.omdenken-ticket-btn:hover{
-  filter:brightness(1.06);
-}
-
-
-/* =========================================================
-   RESPONSIVE - OMDENKEN
-   ========================================================= */
-
-@media (max-width:1100px){
-  .omdenken-content{
-    max-width:100%;
-    padding:10px 24px 40px;
-  }
-
-  .omdenken-top-grid{
-    grid-template-columns:280px 1fr;
-    gap:30px;
-  }
-
-  .omdenken-story-grid{
-    grid-template-columns:1fr 1fr;
-    gap:42px;
-  }
-
-  .omdenken-right-copy{
-    padding-top:18px;
-    max-width:100%;
-  }
-
-  .omdenken-player-section{
-    max-width:none;
-  }
-
-  .omdenken-host-image-wrap img{
-    max-width:380px;
-  }
-}
-
-@media (max-width:900px){
-  .omdenken-hero-image{
-    height:420px;
-  }
+.buurderij-hero { background: #111; }
 
-  .omdenken-hero-copy{
-    left:18px;
-    right:18px;
-    bottom:24px;
-    max-width:none;
-  }
-
-  .omdenken-top-grid,
-  .omdenken-story-grid,
-  .omdenken-player-section,
-  .omdenken-stats-row,
-  .omdenken-note-row{
-    grid-template-columns:1fr;
-  }
-
-  .omdenken-content{
-    max-width:100%;
-    padding:22px 20px 34px;
-  }
-
-  .omdenken-title{
-    font-size:1.8rem;
-  }
-
-  .omdenken-poster-card{
-    max-width:280px;
-  }
-
-  .omdenken-note-label{
-    text-align:left;
-  }
-
-  .omdenken-right-copy{
-    padding-top:0;
-    max-width:100%;
-  }
-
-  .omdenken-host-image-wrap img{
-    max-width:420px;
-  }
-}
-
-@media (max-width:650px){
-  .detail-page{
-    padding:0 10px 56px;
-  }
-
-  .omdenken-hero-image{
-    height:340px;
-  }
-
-  .omdenken-title{
-    font-size:1.35rem;
-  }
-
-  .omdenken-subtitle{
-    font-size:.88rem;
-  }
-
-  .omdenken-hero-text{
-    font-size:.64rem;
-  }
-
-  .omdenken-content{
-    max-width:100%;
-    padding:18px 14px 28px;
-  }
-
-  .omdenken-player-section{
-    padding:16px;
-  }
-
-  .omdenken-stats-row{
-    gap:12px;
-  }
-}
-
-
-/* =========================================================
-   RESPONSIVE - SHARED / DEFAULT / OTHER EVENTS
-   ========================================================= */
-
-@media (max-width:900px){
-  .section-grid-2,
-  .section-grid-2-equal,
-  .gallery-3{
-    grid-template-columns:1fr;
-  }
-
-  .detail-title-xl{
-    font-size:1.9rem;
-  }
-
-  .detail-top-inner{
-    padding:38px 22px;
-  }
-}
-
-@media (max-width:650px){
-  .detail-title-xl{
-    font-size:1.45rem;
-  }
-
-  .detail-subtitle{
-    font-size:.94rem;
-  }
+.buurderij-hero-image {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
 }
-/* =========================================================
-   BUURDERIJ CUSTOM DETAIL PAGE
-   ========================================================= */
 
-.buurderij-page{
-  background:linear-gradient(180deg, #0a0a0a 0%, #2d1b00 55%, #7a5310 100%);
-  border:1px solid rgba(255,255,255,0.06);
-  box-shadow:0 12px 34px rgba(0,0,0,0.45);
-  overflow:hidden;
-  margin-bottom:28px;
+.buurderij-hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
-.buurderij-hero{
-  background:#111;
+.buurderij-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.18) 45%, rgba(0,0,0,0.55) 100%);
 }
 
-.buurderij-hero-image{
-  position:relative;
-  width:100%;
-  height:260px;
-  overflow:hidden;
+.buurderij-hero-copy {
+    position: absolute;
+    right: 34px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    max-width: 360px;
 }
 
-.buurderij-hero-image img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
+.buurderij-title {
+    margin: 0;
+    color: #ffcc33;
+    font-size: 42px;
+    line-height: calc(69/42);
+    font-weight: 900;
+    letter-spacing: .02em;
 }
 
-.buurderij-hero-overlay{
-  position:absolute;
-  inset:0;
-  background:linear-gradient(90deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.18) 45%, rgba(0,0,0,0.55) 100%);
+.buurderij-content {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px 40px;
 }
-
-.buurderij-hero-copy{
-  position:absolute;
-  right:34px;
-  top:50%;
-  transform:translateY(-50%);
-  z-index:2;
-  max-width:360px;
-}
-
-.buurderij-title{
-
-  margin:0;
-  color:#ffcc33;
-  font-size:2rem;
-  line-height:1.05;
-  font-weight:900;
-  letter-spacing:.02em;
-}
-
-.buurderij-content{
-  max-width:1080px;
-  margin:0 auto;
-  padding:0 24px 40px;
-}
-
-.buurderij-intro{
-  background:#ddd0b8;
-  color:#111;
-
-  width:100vw;
-  margin-left:calc(-50vw + 50%);
 
-  padding:25px 0;
+.buurderij-intro {
+    background: #ddd0b8;
+    color: #111;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    padding: 25px 0;
 }
 
-/* inner content width */
 .buurderij-intro h2,
-.buurderij-intro p{
-  max-width:1100px;
-  margin-left:auto;
-  margin-right:auto;
+.buurderij-intro p {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 24px;
 }
 
-.buurderij-intro h2{
-  text-align:left;
-  font-size:1.6rem;
-  font-weight:900;
-  margin-bottom:16px;
+.buurderij-intro h2 {
+    text-align: left;
+    font-size: 34px;
+    line-height: calc(50/34);
+    font-weight: 900;
+    margin-bottom: 16px;
 }
 
-.buurderij-intro p{
-  font-size:.85rem;
-  line-height:1.7;
-}
-.buurderij-main-grid{
-  display:grid;
-  grid-template-columns:370px 1fr;
-  gap:24px;
-  align-items:start;
-  margin-bottom:26px;
+.buurderij-intro p {
+    font-size: 20px;
+    line-height: calc(28/20);
 }
 
-.buurderij-main-image img{
-  margin-top: 15px;
-  width:100%;
-  height:230px;
-  object-fit:cover;
-  display:block;
-  background:#111;
+.buurderij-main-grid {
+    display: grid;
+    grid-template-columns: 370px 1fr;
+    gap: 24px;
+    align-items: start;
+    margin-bottom: 26px;
 }
 
-.buurderij-main-text{
-  margin-top: 15px;
-  background:#101010;
-  padding:16px 22px;
+.buurderij-main-image img {
+    margin-top: 15px;
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+    display: block;
 }
 
-.buurderij-main-text h3{
-  margin:0 0 8px;
-  color:#ffcc33;
-  font-size:1rem;
-  line-height:1.2;
-  font-weight:900;
+.buurderij-main-text { margin-top: 15px; background: #101010; padding: 16px 22px; }
+
+.buurderij-main-text h3 {
+    margin: 0 0 8px;
+    color: #ffcc33;
+    font-size: 24px;
+    line-height: calc(38/24);
+    font-weight: 900;
 }
 
-.buurderij-main-text p{
-  margin:0 0 10px;
-  color:#ddd;
-  font-size:.74rem;
-  line-height:1.7;
+.buurderij-main-text p {
+    margin: 0 0 10px;
+    color: #ddd;
+    font-size: 16px;
+    line-height: calc(22/16);
 }
 
-.buurderij-main-text p:last-child{
-  margin-bottom:0;
+.buurderij-main-text p:last-child { margin-bottom: 0; }
+
+.buurderij-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 30px;
 }
 
-.buurderij-gallery-grid{
-  display:grid;
-  grid-template-columns:repeat(3, 1fr);
-  gap:18px;
-  margin-bottom:30px;
+.buurderij-gallery-card img { width: 100%; height: 150px; object-fit: cover; display: block; margin-bottom: 8px; }
+
+.buurderij-gallery-card h4 {
+    margin: 0 0 6px;
+    color: #ffcc33;
+    font-size: 20px;
+    line-height: calc(30/20);
+    font-weight: 800;
 }
 
-.buurderij-gallery-card{
-  background:transparent;
+.buurderij-gallery-card p {
+    margin: 0;
+    color: #d8d8d8;
+    font-size: 16px;
+    line-height: calc(22/16);
 }
 
-.buurderij-gallery-card img{
-  width:100%;
-  height:150px;
-  object-fit:cover;
-  display:block;
-  margin-bottom:8px;
+.buurderij-bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.08fr;
+    gap: 10px;
+    align-items: stretch;
+    margin-bottom: 26px;
 }
 
-.buurderij-gallery-card h4{
-  margin:0 0 6px;
-  color:#ffcc33;
-  font-size:.8rem;
-  line-height:1.2;
-  font-weight:800;
+.buurderij-contribute-card {
+    background: rgba(20,10,6,0.95);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    padding: 22px 22px 18px;
+    min-height: 640px;
 }
 
-.buurderij-gallery-card p{
-  margin:0;
-  color:#d8d8d8;
-  font-size:.68rem;
-  line-height:1.6;
+.buurderij-contribute-card h3 {
+    margin: 0 0 22px;
+    color: #ffcc33;
+    font-size: 24px;
+    line-height: calc(38/24);
+    font-weight: 900;
 }
 
-/* =========================================================
-   BUURDERIJ CONTRIBUTION + INFO PANEL
-   ========================================================= */
-
-.buurderij-bottom-grid{
-  display:grid;
-  grid-template-columns:1fr 1.08fr;
-  gap:10px;
-  align-items:stretch;
-  margin-bottom:26px;
+.buurderij-place-name {
+    color: #f4f1eb;
+    font-size: 24px;
+    line-height: calc(38/24);
+    font-weight: 800;
+    margin-bottom: 56px;
 }
 
-.buurderij-contribute-card{
-  background:rgba(20,10,6,0.95);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:6px;
-  padding:22px 22px 18px;
-  min-height:640px;
+.buurderij-age-box {
+    background: linear-gradient(90deg, rgba(58,48,43,0.95) 0%, rgba(38,28,24,0.95) 100%);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 12px 14px;
+    max-width: 340px;
+    margin-bottom: 40px;
 }
 
-.buurderij-contribute-card h3{
-  margin:0 0 22px;
-  color:#ffcc33;
-  font-size:1.05rem;
-  font-weight:900;
-  letter-spacing:.02em;
+.buurderij-age-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+
+.buurderij-age-icon {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 1px solid #f0b316; color: #f0b316;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 900;
 }
 
-.buurderij-place-name{
-  color:#f4f1eb;
-  font-size:1.15rem;
-  font-weight:800;
-  margin-bottom:56px;
+.buurderij-age-text { color: #ece8e1; font-size: 16px; line-height: calc(22/16); }
+
+.buurderij-age-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 30px; height: 18px; padding: 0 6px;
+    background: #efb12c; color: #111; font-size: 15px; font-weight: 900; border-radius: 3px;
 }
 
-.buurderij-age-box{
-  background:linear-gradient(90deg, rgba(58,48,43,0.95) 0%, rgba(38,28,24,0.95) 100%);
-  border:1px solid rgba(255,255,255,0.06);
-  border-radius:8px;
-  padding:12px 14px;
-  max-width:340px;
-  margin-bottom:40px;
+.buurderij-age-box p {
+    margin: 0 0 0 22px;
+    color: #ece8e1;
+    font-size: 16px;
+    line-height: calc(22/16);
+    max-width: 250px;
 }
 
-.buurderij-age-top{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-bottom:8px;
-}
-
-.buurderij-age-icon{
-  width:14px;
-  height:14px;
-  border-radius:50%;
-  border:1px solid #f0b316;
-  color:#f0b316;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  font-size:.55rem;
-  font-weight:900;
-}
-
-.buurderij-age-text{
-  color:#ece8e1;
-  font-size:.76rem;
-  line-height:1;
-}
-
-.buurderij-age-badge{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-width:30px;
-  height:18px;
-  padding:0 6px;
-  background:#efb12c;
-  color:#111;
-  font-size:.66rem;
-  font-weight:900;
-  border-radius:3px;
-}
-
-.buurderij-age-box p{
-  margin:0 0 0 22px;
-  color:#ece8e1;
-  font-size:.72rem;
-  line-height:1.45;
-  max-width:250px;
-}
-
-.buurderij-contribute-copy{
-  color:#f3f3f3;
-  font-size:.86rem;
-  line-height:1.45;
-  max-width:420px;
-  margin-bottom:36px;
+.buurderij-contribute-copy {
+    color: #f3f3f3;
+    font-size: 16px;
+    line-height: calc(22/16);
+    margin-bottom: 36px;
 }
 
 .buurderij-amount-label,
-.buurderij-custom-label{
-  color:#f0f0f0;
-  font-size:.78rem;
-  line-height:1.3;
-  margin-bottom:10px;
+.buurderij-custom-label {
+    color: #f0f0f0;
+    font-size: 16px;
+    line-height: calc(22/16);
+    font-weight: 700;
+    margin-bottom: 10px;
 }
 
-.buurderij-custom-label{
-  margin-top:12px;
+.buurderij-custom-label { margin-top: 12px; }
+
+.buurderij-amount-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 14px;
 }
 
-.buurderij-amount-grid{
-  display:grid;
-  grid-template-columns:repeat(5, minmax(0, 1fr));
-  gap:12px;
-  margin-bottom:14px;
+.buurderij-amount-grid button {
+    height: 34px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(58,48,43,0.65);
+    color: #fff;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 6px;
 }
 
-.buurderij-amount-grid button{
-  height:34px;
-  border:1px solid rgba(255,255,255,0.08);
-  background:rgba(58,48,43,0.65);
-  color:#fff;
-  font-size:.78rem;
-  cursor:pointer;
-  border-radius:6px;
+.buurderij-amount-grid button:hover { background: #ef9f10; color: #111; }
+
+.buurderij-custom-input-wrap { margin-bottom: 16px; }
+
+.buurderij-custom-input-wrap input {
+    width: 100%; max-width: 300px; height: 34px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(54,44,40,0.9);
+    color: #fff;
+    padding: 0 12px;
+    font-size: 15px;
+    border-radius: 6px;
 }
 
-.buurderij-amount-grid button:hover{
-  background:#ef9f10;
-  color:#111;
+.buurderij-custom-input-wrap input::placeholder { color: #b7b1aa; }
+
+.buurderij-total-row {
+    margin-top: 14px; padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: space-between;
+    color: #f3f3f3;
+    font-size: 16px;
+    line-height: calc(22/16);
 }
 
-.buurderij-custom-input-wrap{
-  margin-bottom:16px;
+.buurderij-total-row strong { font-size: 20px; line-height: calc(28/20); }
+
+.buurderij-reserve-btn {
+    display: flex; align-items: center; justify-content: center;
+    height: 34px; width: 100%; margin-top: 56px;
+    background: #ef9f10; color: #111; text-decoration: none;
+    font-size: 15px; line-height: 1; font-weight: 900; border-radius: 6px;
 }
 
-.buurderij-custom-input-wrap input{
-  width:100%;
-  max-width:300px;
-  height:34px;
-  border:1px solid rgba(255,255,255,0.08);
-  background:linear-gradient(90deg, rgba(54,44,40,0.9) 0%, rgba(36,29,26,0.9) 100%);
-  color:#fff;
-  padding:0 12px;
-  font-size:.78rem;
-  border-radius:6px;
+.buurderij-reserve-btn:hover { filter: brightness(1.05); }
+
+.buurderij-info-card--design {
+    display: flex; flex-direction: column; justify-content: space-between;
+    border: 2px solid #111;
+    background: linear-gradient(90deg, #4b2f00 0%, #6f4a08 100%);
+    min-height: 640px; overflow: hidden;
 }
 
-.buurderij-custom-input-wrap input::placeholder{
-  color:#b7b1aa;
+.buurderij-info-top { padding: 30px 34px 24px; }
+
+.buurderij-info-card--design .buurderij-info-block { padding: 0; margin-bottom: 36px; }
+.buurderij-info-card--design .buurderij-info-block:last-child { margin-bottom: 0; }
+
+.buurderij-info-card--design strong {
+    display: block;
+    color: #fff;
+    font-size: 24px;
+    line-height: calc(38/24);
+    font-weight: 900;
+    margin-bottom: 8px;
 }
 
-.buurderij-total-row{
-  margin-top:14px;
-  padding-top:10px;
-  border-top:1px solid rgba(255,255,255,0.08);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  color:#f3f3f3;
-  font-size:.8rem;
+.buurderij-info-card--design span {
+    color: #f5f0e8;
+    font-size: 20px;
+    line-height: calc(28/20);
 }
 
-.buurderij-total-row strong{
-  font-size:.86rem;
-  font-weight:700;
+.buurderij-day-tabs-large { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+
+.buurderij-day-tabs-large span {
+    min-width: 156px; height: 34px; padding: 0 18px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(67,43,10,0.9);
+    color: #fff;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 800;
+    border-radius: 6px;
 }
 
-.buurderij-reserve-btn{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:34px;
-  width:100%;
-  margin-top:56px;
-  background:#ef9f10;
-  color:#111;
-  text-decoration:none;
-  font-size:.78rem;
-  font-weight:900;
-  border-radius:6px;
-  letter-spacing:.02em;
+.buurderij-day-tabs-large span.active { background: #ef9f10; color: #fff; }
+
+.buurderij-reservation-box-large { background: #eb9206; padding: 26px 34px; }
+
+.buurderij-reservation-box-large h4 {
+    margin: 0 0 16px;
+    color: #fff;
+    font-size: 24px;
+    line-height: calc(38/24);
+    font-weight: 900;
 }
 
-.buurderij-reserve-btn:hover{
-  filter:brightness(1.05);
+.buurderij-reservation-box-large ul {
+    margin: 0;
+    padding-left: 18px;
+    color: #fff;
+    font-size: 16px;
+    line-height: calc(22/16);
 }
 
-.buurderij-info-card{
-  border:2px solid #111;
-  background:#d5b786;
-  color:#111;
-  overflow:hidden;
+.buurderij-reservation-box-large li { margin-bottom: 6px; }
+
+.buurderij-last-grid { display: grid; grid-template-columns: 320px 1fr; gap: 18px; align-items: start; }
+
+.buurderij-last-image img { width: 100%; height: 170px; object-fit: cover; display: block; }
+
+.buurderij-last-text { background: rgba(255,174,0,0.18); padding: 16px 18px; }
+
+.buurderij-last-text h3 {
+    margin: 0 0 8px;
+    color: #ffcc33;
+    font-size: 24px;
+    line-height: calc(38/24);
+    font-weight: 900;
 }
 
-.buurderij-info-card--design{
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  border:2px solid #111;
-  background:linear-gradient(90deg, #4b2f00 0%, #6f4a08 100%);
-  min-height:640px;
-  overflow:hidden;
+.buurderij-last-text p {
+    margin: 0 0 10px;
+    color: #f0f0f0;
+    font-size: 16px;
+    line-height: calc(22/16);
 }
 
-.buurderij-info-top{
-  padding:30px 34px 24px;
+.buurderij-last-text p:last-child { margin-bottom: 0; }
+
+@media (max-width: 1100px) {
+    .buurderij-content { max-width: 100%; padding: 0 18px 34px; }
+    .buurderij-main-grid { grid-template-columns: 300px 1fr; }
+    .buurderij-bottom-grid { grid-template-columns: 1fr 280px; }
+    .buurderij-last-grid { grid-template-columns: 260px 1fr; }
 }
 
-.buurderij-info-card--design .buurderij-info-block{
-  padding:0;
-  margin-bottom:36px;
+@media (max-width: 900px) {
+    .buurderij-hero-image { height: 220px; }
+    .buurderij-hero-copy { right: 20px; left: 20px; top: auto; bottom: 18px; transform: none; }
+    .buurderij-title { font-size: 28px; }
+    .buurderij-main-grid, .buurderij-gallery-grid,
+    .buurderij-bottom-grid, .buurderij-last-grid { grid-template-columns: 1fr; }
+    .buurderij-contribute-card, .buurderij-info-card--design { min-height: auto; }
+    .buurderij-reserve-btn { margin-top: 26px; }
+    .buurderij-content { padding: 0 16px 28px; }
 }
 
-.buurderij-info-card--design .buurderij-info-block:last-child{
-  margin-bottom:0;
-}
-
-.buurderij-info-card--design strong{
-  display:block;
-  color:#fff;
-  font-size:1.15rem;
-  line-height:1.2;
-  font-weight:900;
-  margin-bottom:8px;
-}
-
-.buurderij-info-card--design span{
-  color:#f5f0e8;
-  font-size:1rem;
-  line-height:1.45;
-}
-
-.buurderij-day-tabs{
-  display:flex;
-  gap:6px;
-  margin-top:4px;
-  flex-wrap:wrap;
-}
-
-.buurderij-day-tabs span{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-width:48px;
-  height:22px;
-  padding:0 8px;
-  font-size:.62rem;
-  font-weight:900;
-  background:#2a1a00;
-  color:#f8f0dd;
-}
-
-.buurderij-day-tabs span.active{
-  background:#ef9f10;
-  color:#111;
-}
-
-.buurderij-day-tabs-large{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:8px;
-}
-
-.buurderij-day-tabs-large span{
-  min-width:156px;
-  height:34px;
-  padding:0 18px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(67,43,10,0.9);
-  color:#fff;
-  font-size:.82rem;
-  font-weight:800;
-  border-radius:6px;
-}
-
-.buurderij-day-tabs-large span.active{
-  background:#ef9f10;
-  color:#fff;
-}
-
-.buurderij-reservation-box{
-  margin-top:14px;
-  background:#ef9f10;
-  padding:14px 16px 16px;
-}
-
-.buurderij-reservation-box h4{
-  margin:0 0 8px;
-  font-size:.85rem;
-  font-weight:900;
-  color:#111;
-}
-
-.buurderij-reservation-box ul{
-  margin:0;
-  padding-left:16px;
-  color:#111;
-  font-size:.7rem;
-  line-height:1.7;
-}
-
-.buurderij-reservation-box-large{
-  margin-top:0;
-  background:#eb9206;
-  padding:26px 34px 26px;
-}
-
-.buurderij-reservation-box-large h4{
-  margin:0 0 16px;
-  color:#fff;
-  font-size:1.15rem;
-  font-weight:900;
-}
-
-.buurderij-reservation-box-large ul{
-  margin:0;
-  padding-left:18px;
-  color:#fff;
-  font-size:.82rem;
-  line-height:1.7;
-}
-
-.buurderij-reservation-box-large li{
-  margin-bottom:6px;
-}
-
-.buurderij-last-grid{
-  display:grid;
-  grid-template-columns:320px 1fr;
-  gap:18px;
-  align-items:start;
-}
-
-.buurderij-last-image img{
-  width:100%;
-  height:170px;
-  object-fit:cover;
-  display:block;
-}
-
-.buurderij-last-text{
-  background:rgba(255,174,0,0.18);
-  padding:16px 18px;
-}
-
-.buurderij-last-text h3{
-  margin:0 0 8px;
-  color:#ffcc33;
-  font-size:.95rem;
-  font-weight:900;
-}
-
-.buurderij-last-text p{
-  margin:0 0 10px;
-  color:#f0f0f0;
-  font-size:.72rem;
-  line-height:1.7;
-}
-
-.buurderij-last-text p:last-child{
-  margin-bottom:0;
+@media (max-width: 650px) {
+    .buurderij-title { font-size: 22px; }
+    .buurderij-amount-grid { grid-template-columns: repeat(2, 1fr); }
+    .buurderij-day-tabs-large { flex-direction: column; }
+    .buurderij-info-top, .buurderij-reservation-box-large { padding-left: 16px; padding-right: 16px; }
 }
 
 
 /* =========================================================
-   RESPONSIVE - BUURDERIJ
+   GENERIC DETAIL PAGE
    ========================================================= */
 
-@media (max-width:1100px){
-  .buurderij-content{
-    max-width:100%;
-    padding:0 18px 34px;
-  }
+.generic-detail { max-width: 1920px; margin: 0 auto; }
 
-  .buurderij-main-grid{
-    grid-template-columns:340px 1fr;
-  }
-
-  .buurderij-bottom-grid{
-    grid-template-columns:1fr 300px;
-  }
-
-  .buurderij-last-grid{
-    grid-template-columns:280px 1fr;
-  }
+.generic-hero {
+    position: relative;
+    height: 500px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
 }
 
-@media (max-width:900px){
-  .buurderij-hero-image{
-    height:220px;
-  }
-
-  .buurderij-hero-copy{
-    right:20px;
-    left:20px;
-    top:auto;
-    bottom:18px;
-    transform:none;
-    max-width:320px;
-  }
-
-  .buurderij-title{
-    font-size:1.6rem;
-  }
-
-  .buurderij-main-grid,
-  .buurderij-gallery-grid,
-  .buurderij-bottom-grid,
-  .buurderij-last-grid{
-    grid-template-columns:1fr;
-  }
-
-  .buurderij-contribute-card,
-  .buurderij-info-card--design{
-    min-height:auto;
-  }
-
-  .buurderij-reserve-btn{
-    margin-top:26px;
-  }
-
-  .buurderij-day-tabs-large span{
-    min-width:120px;
-  }
-
-  .buurderij-content{
-    padding:0 16px 28px;
-  }
-
-  .buurderij-main-image img,
-  .buurderij-gallery-card img,
-  .buurderij-last-image img{
-    height:auto;
-  }
+.generic-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.25) 45%, rgba(0,0,0,0.85) 100%);
 }
 
-@media (max-width:650px){
-  .buurderij-title{
-    font-size:1.28rem;
-  }
+.generic-hero-inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 34px 48px;
+}
 
-  .buurderij-intro{
-    padding:18px 16px 16px;
-  }
+.generic-hero-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
 
-  .buurderij-intro h2{
-    font-size:1.05rem;
-  }
+.generic-tag {
+    display: inline-flex; align-items: center; padding: 4px 12px;
+    background: rgba(255,180,0,0.18); border: 1px solid rgba(255,180,0,0.40);
+    color: #ffb400; font-size: 15px; font-weight: 800; letter-spacing: .06em;
+    text-transform: uppercase; border-radius: 999px;
+}
 
-  .buurderij-intro p{
-    font-size:.72rem;
-  }
+.generic-hero-title {
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: 64px;
+    line-height: calc(84/64);
+    font-weight: 900;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    max-width: 820px;
+    text-shadow: 0 3px 14px rgba(0,0,0,0.55);
+}
 
-  .buurderij-main-text,
-  .buurderij-contribute-card,
-  .buurderij-last-text{
-    padding:14px;
-  }
+.generic-hero-venue {
+    margin: 0;
+    color: rgba(255,255,255,0.72);
+    font-size: 20px;
+    line-height: calc(28/20);
+}
 
-  .buurderij-info-top,
-  .buurderij-reservation-box-large{
-    padding-left:16px;
-    padding-right:16px;
-  }
+.generic-body {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 28px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 34px 70px;
+    align-items: start;
+}
 
-  .buurderij-amount-grid{
-    grid-template-columns:repeat(2, 1fr);
-  }
+.generic-col-main { display: flex; flex-direction: column; gap: 22px; }
 
-  .buurderij-day-tabs-large{
-    flex-direction:column;
-    align-items:flex-start;
-  }
+.generic-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 26px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
 
-  .buurderij-day-tabs-large span{
-    min-width:140px;
-  }
-} 
+.generic-card-title {
+    margin: 0;
+    color: #ffcc00;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.generic-intro-text {
+    margin: 0;
+    color: #d0d0d0;
+    font-size: 20px;
+    line-height: calc(28/20);
+}
+
+.generic-card p {
+    margin: 0;
+    color: #c8c8c8;
+    font-size: 16px;
+    line-height: calc(22/16);
+}
+
+.generic-article-img { border-radius: 10px; overflow: hidden; }
+.generic-article-img img { width: 100%; max-height: 340px; object-fit: cover; display: block; }
+
+.generic-highlights { display: flex; flex-direction: column; gap: 16px; }
+.generic-highlight-row { display: flex; gap: 14px; align-items: flex-start; }
+
+.generic-highlight-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #ffb400; margin-top: 6px; flex-shrink: 0;
+}
+
+.generic-highlight-row strong {
+    display: block;
+    color: #fff;
+    font-size: 16px;
+    line-height: calc(22/16);
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.generic-highlight-row p {
+    margin: 0;
+    color: #b8b8b8;
+    font-size: 15px;
+    line-height: calc(22/15);
+}
+
+.generic-gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+.generic-gallery-item img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; display: block; margin-bottom: 8px; }
+
+.generic-gallery-item h4 {
+    margin: 0 0 4px;
+    color: #ffcc00;
+    font-size: 16px;
+    line-height: calc(22/16);
+    font-weight: 800;
+}
+
+.generic-gallery-item p {
+    margin: 0;
+    color: #b0b0b0;
+    font-size: 15px;
+    line-height: calc(22/15);
+}
+
+.generic-col-side { position: sticky; top: 24px; }
+
+.generic-info-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.generic-info-heading {
+    padding: 18px 22px 14px; margin: 0; color: #ffcc00;
+    font-size: 15px; line-height: 1; font-weight: 900;
+    letter-spacing: .08em; text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.generic-info-list { display: flex; flex-direction: column; padding: 8px 0; }
+
+.generic-info-row {
+    display: flex; flex-direction: column; gap: 3px;
+    padding: 12px 22px; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.generic-info-row:last-child { border-bottom: none; }
+
+.generic-info-row dt {
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 800;
+    color: #888;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.generic-info-row dd {
+    margin: 0;
+    font-size: 20px;
+    line-height: calc(28/20);
+    color: #efefef;
+    font-weight: 600;
+}
+
+.generic-ticket-wrap {
+    padding: 20px 22px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,180,0,0.04);
+}
+
+.generic-ticket-note {
+    margin: 0 0 16px;
+    color: #888;
+    font-size: 16px;
+    line-height: calc(22/16);
+}
+
+.generic-ticket-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 44px; background: #ffb400; color: #000;
+    text-decoration: none;
+    font-size: 15px; line-height: 1; font-weight: 900;
+    border-radius: 8px; letter-spacing: .04em;
+    transition: background .15s, transform .15s;
+}
+
+.generic-ticket-btn:hover { background: #ffc933; transform: translateY(-1px); }
+
+@media (max-width: 960px) {
+    .generic-body { grid-template-columns: 1fr; padding: 24px 20px 40px; }
+    .generic-col-side { position: static; }
+    .generic-hero { height: 360px; }
+    .generic-hero-title { font-size: 40px; }
+    .generic-hero-inner { padding: 0 20px 32px; }
+}
+
+@media (max-width: 600px) {
+    .generic-hero { height: 280px; }
+    .generic-hero-title { font-size: 28px; }
+    .generic-card { padding: 18px 16px; }
+}
