@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($viewModel->hero['title'] ?? '') ?></title>
-    <!-- General site CSS -->
+
     <link rel="stylesheet" href="/css/style.css">
-    <!-- CSS for History -->
     <link rel="stylesheet" href="/css/history.css">
 </head>
 <body class="history-page">
@@ -45,13 +44,14 @@
     <div class="history-locations-section">
         <?php
         $index = 0;
-        foreach ($viewModel->locations as $location):
-            $isEven = $index % 2 === 0;
+        ?>
+        <?php foreach ($viewModel->locations as $location): ?>
+            <?php $isEven = $index % 2 === 0;
             $layoutClass = $isEven ? 'history-location-image-left' : 'history-location-image-right';
             $image = $viewModel->primaryImages[$location->id] ?? null;
             $index++;
             ?>
-            <section class="history-location-section <?= $layoutClass ?>">
+            <section class="history-location-section <?= htmlspecialchars($layoutClass) ?>">
                 <div class="container">
                     <div class="history-location-image-container">
                         <img
@@ -60,14 +60,22 @@
                         >
                     </div>
                     <div class="history-location-content">
-                        <h2 class="history-location-title"><?= htmlspecialchars($location->name) ?></h2>
+                        <h2 class="history-location-title">
+                            <?= htmlspecialchars($location->name) ?>
+                        </h2>
                         <div class="history-location-description">
-                            <p class="history-location-text"><?= htmlspecialchars($location->description1 ?? '') ?></p>
-                            <p class="history-location-text"><?= htmlspecialchars($location->description2 ?? '') ?></p>
+                            <div class="history-location-text">
+                                <?= htmlspecialchars($location->description1 ?? '') ?>
+                            </div>
+                            <div class="history-location-text">
+                                <?= htmlspecialchars($location->description2 ?? '') ?>
+                            </div>
                         </div>
                         <a href="/history/location/<?= htmlspecialchars($location->slug) ?>"
                            class="history-read-more-button">
-                            <span class="history-read-more-text">READ MORE</span>
+                            <span class="history-read-more-text">
+                                READ MORE
+                            </span>
                         </a>
                     </div>
                 </div>
@@ -78,9 +86,13 @@
     <!-- GO BACK -->
     <section class="history-back-section">
         <div class="container">
-            <p class="history-back-text">Go back to the Event Page</p>
+            <p class="history-back-text">
+                Go back to the Event Page
+            </p>
             <a href="/history" class="history-button-big">
-                <span class="history-button-text">BACK</span>
+                <span class="history-button-text">
+                    BACK
+                </span>
             </a>
         </div>
     </section>

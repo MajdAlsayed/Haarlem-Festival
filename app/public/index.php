@@ -29,6 +29,7 @@ use App\Controllers\AdminOrdersController;
 use App\Controllers\AdminHomepageController;
 use App\Controllers\AdminCmsUploadController;
 use App\Controllers\AdminDanceController;
+use App\Controllers\AdminHistoryController;
 use App\Controllers\AdminFoodController;
 use App\Controllers\CartController;
 use App\Controllers\CheckoutController;
@@ -94,6 +95,11 @@ if (preg_match('#^/history/location/([a-z0-9-]+)$#', $uri, $m)) {
     exit;
 }
 
+if (preg_match('#^/admin/cms/history/location/([a-z0-9-]+)$#', $uri, $m)) {
+    $historyLocationCms = new AdminHistoryController();
+    if ($method === 'GET') $historyLocationCms->showLocationForm($m[1]);
+    elseif ($method === 'POST') $historyLocationCms->saveLocation($m[1]);
+    else http_response_code(405);
 if (preg_match('#^/account/order/(\d+)$#', $uri, $m)) {
     if ($method === 'GET') {
         (new AccountController())->orderDetail((int) $m[1]);
@@ -338,6 +344,35 @@ switch ($uri) {
     case '/admin/cms/upload':
         if ($method === 'POST') {
             (new AdminCmsUploadController())->handle();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/cms/history':
+        $historyCms = new AdminHistoryController();
+        if ($method === 'GET') $historyCms->showIndexForm();
+        elseif ($method === 'POST') $historyCms->saveIndex();
+        else http_response_code(405);
+        break;
+
+    case '/admin/cms/history-locations':
+        $historyLocationsCms = new AdminHistoryController();
+        if ($method === 'GET') $historyLocationsCms->showLocationsForm();
+        elseif ($method === 'POST') $historyLocationsCms->saveLocations();
+        else http_response_code(405);
+        break;
+
+    case '/admin/cms/history-tours':
+        $historyToursCms = new AdminHistoryController();
+        if ($method === 'GET') $historyToursCms->showToursForm();
+        elseif ($method === 'POST') $historyToursCms->saveTours();
+        else http_response_code(405);
+        break;
+
+    case '/admin/api/history/images':
+        if ($method === 'GET') {
+            (new AdminHistoryController())->getImages();
         } else {
             http_response_code(405);
         }

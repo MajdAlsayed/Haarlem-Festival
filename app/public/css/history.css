@@ -1212,3 +1212,28 @@ nav.breadcrumbs {
     object-fit: contain;
     filter: brightness(0) invert(1);
 }
+
+.history-tours-marker-wrapper {
+    background: transparent;
+    border: none;
+}
+
+.history-tours-map-marker {
+    background: #e58708;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Montserrat, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.history-tours-leaflet-map {
+    height: 500px;
+    border-radius: 12px;
+    overflow: hidden;
+}
