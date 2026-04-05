@@ -73,7 +73,7 @@
 
 <?php include __DIR__ . '/cartDrawer.php'; ?>
 <?php
-$cartCsrf = \App\Core\Csrf::token('cart');
+$cartCsrf = \App\Core\Csrf::peek('cart') ?? \App\Core\Csrf::token('cart');
 ?>
 <script>
 window.__CSRF_CART__ = <?= json_encode($cartCsrf, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;

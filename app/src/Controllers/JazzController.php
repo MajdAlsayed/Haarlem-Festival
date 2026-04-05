@@ -22,7 +22,7 @@ final class JazzController
     public function index(): void
     {
         $events = $this->jazzRepo->getAll();
-        $jazzConfig = require __DIR__ . '/../Config/jazz.php';
+        $jazzConfig = $this->settingsRepo->getMergedConfig();
         $eventCardImages = $jazzConfig['event_card_images'] ?? [];
         $allEventsOrder = $jazzConfig['all_events_order'] ?? [];
         $vm = new JazzViewModel($events, 'Jazz Festival', $eventCardImages, $allEventsOrder);
@@ -32,7 +32,7 @@ final class JazzController
 
     public function gumboKings(): void
     {
-        $this->renderArtist('gumbo-kings', __DIR__ . '/../Views/Jazz/gumbo-king.php');
+        $this->renderArtist('gumbo-kings', __DIR__ . '/../Views/Jazz/gumbo-king.php', true);
     }
 
     public function karsu(): void
@@ -45,10 +45,10 @@ final class JazzController
         $this->renderArtist('gare-du-nord', __DIR__ . '/../Views/Jazz/gare-du-nord.php');
     }
 
-    private function renderArtist(string $slug, string $viewFile): void
+    private function renderArtist(string $slug, string $viewFile, bool $attachPreviewAudio = false): void
     {
-        $settings = $this->settingsRepo->getAll();
-        $artistPages = $settings['artist_pages'] ?? (require __DIR__ . '/../Config/jazz.php')['artist_pages'];
+        $jazzConfig = $this->settingsRepo->getMergedConfig();
+        $artistPages = $jazzConfig['artist_pages'] ?? [];
 
         $page = $artistPages[$slug] ?? null;
         $title = $page['title'] ?? ucfirst(str_replace('-', ' ', $slug));
@@ -57,11 +57,28 @@ final class JazzController
         $heroImage = '/images/jazz/' . rawurlencode($heroFile);
 
         $events = $this->jazzRepo->getByTitle($title);
+        if ($attachPreviewAudio) {
+            $events = $this->jazzRepo->attachPreviewAudio($events);
+            usort($events, function ($a, $b) {
+                $order = ['thursday' => 1, 'friday' => 2, 'saturday' => 3, 'sunday' => 4];
+                $da = strtolower((string) ($a['event_day'] ?? ''));
+                $db = strtolower((string) ($b['event_day'] ?? ''));
+                $oa = $order[$da] ?? 9;
+                $ob = $order[$db] ?? 9;
+                if ($oa !== $ob) {
+                    return $oa <=> $ob;
+                }
+
+                return strcmp((string) ($a['start_time'] ?? ''), (string) ($b['start_time'] ?? ''));
+            });
+        }
 
         // Bio is stored on events.description (first matching event row)
         $bio = ($events[0]['description'] ?? '') ?: 'Artist bio placeholder (edit in DB: events.description).';
 
-        $viewModel = new JazzArtistViewModel($slug, $title, $tagline, $heroImage, $bio, $events);
+        $discography = $this->jazzRepo->getDiscographyByArtistSlug($slug);
+
+        $viewModel = new JazzArtistViewModel($slug, $title, $tagline, $heroImage, $bio, $events, $discography);
 
         require $viewFile;
     }

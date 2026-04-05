@@ -3,7 +3,8 @@
     "type": "project",
     "require": {
         "ezyang/htmlpurifier": "^4.18",
-        "robmorgan/phinx": "^0.16.10"
+        "robmorgan/phinx": "^0.16.10",
+        "stripe/stripe-php": "^16.0"
     },
     "autoload": {
         "psr-4": {

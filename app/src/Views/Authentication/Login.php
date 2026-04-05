@@ -27,6 +27,9 @@ $app = $viewModel->appSettings;
 
             <form method="post" action="/login" autocomplete="on" novalidate>
                 <input type="hidden" name="_csrf" value="<?= htmlspecialchars($viewModel->csrf) ?>">
+                <?php if (!empty($viewModel->returnTo)): ?>
+                    <input type="hidden" name="return" value="<?= htmlspecialchars($viewModel->returnTo) ?>">
+                <?php endif; ?>
 
                 <div class="auth-field">
                     <label for="identifier">Email or username</label>

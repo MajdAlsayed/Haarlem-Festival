@@ -36,10 +36,16 @@ final class AuthController
 
     public function showLogin(): void
     {
+        $returnTo = isset($_GET['return']) ? trim((string) $_GET['return']) : '';
+        if ($returnTo === '' || !str_starts_with($returnTo, '/')) {
+            $returnTo = null;
+        }
+
         $viewModel = new LoginViewModel(
             csrf: Csrf::token('login'),
             error: Session::getFlash('login_error'),
             appSettings: $this->appSettings(),
+            returnTo: $returnTo,
         );
 
         require __DIR__ . '/../Views/Authentication/Login.php';
@@ -72,6 +78,12 @@ final class AuthController
             'role_id' => $user->roleId,
             'username' => $user->username,
         ];
+
+        $return = trim((string) ($_POST['return'] ?? ''));
+        if ($return !== '' && str_starts_with($return, '/')) {
+            header('Location: ' . $return);
+            exit;
+        }
 
         header('Location: /');
         exit;

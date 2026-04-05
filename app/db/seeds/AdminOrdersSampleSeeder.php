@@ -9,6 +9,8 @@ use Phinx\Seed\AbstractSeed;
  * Run: docker compose run --rm php vendor/bin/phinx seed:run -s AdminOrdersSampleSeeder
  *
  * Login: admin@haarlem.test / Admin123!
+ *
+ * If `orders` already has rows, demo orders are skipped; the seeder still ensures the demo admin user exists.
  */
 final class AdminOrdersSampleSeeder extends AbstractSeed
 {

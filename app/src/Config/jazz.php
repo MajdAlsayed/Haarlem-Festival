@@ -10,8 +10,30 @@ return [
      * Matches prototype order: row 1–4 card images for filtering system.
      */
     /**
+     * Thursday tab: exactly these 6 cards in this order.
+     */
+    'thursday_order' => [
+        'Gumbo Kings', 'Evolve', 'Ntjam Rosie', 'Wicked Jazz Sounds', 'Wouter Hamel', 'Jonna Frazer',
+    ],
+
+    /** Friday tab: cards in this order (Karsu may appear twice by time). */
+    'friday_order' => [
+        'Karsu', 'Uncle Sue', 'Chris Allen', 'Myles Sanko', 'Ilse Huizinga', 'Eric Vloeimans en Hotspot',
+    ],
+
+    /** Saturday tab: cards in this order. */
+    'saturday_order' => [
+        'Gare du Nord', 'Rilan & The Bombardiers', 'Soul Six', 'Han Bennink', 'The Nordanians', 'Lilith Merlot',
+    ],
+
+    /** Sunday tab: cards in this order. */
+    'sunday_order' => [
+        'Ruis Soundsystem', 'Wicked Jazz Sounds', 'Evolve', 'The Nordanians', 'Gumbo Kings', 'Gare du Nord',
+    ],
+
+    /**
      * Order of event titles for "All Events" view (row 1 left→right, row 2, …).
-     * Ensures grid matches prototype: 6+6+6+1 cards.
+     * First 6 = Thursday (same as thursday_order).
      */
     'all_events_order' => [
         'Gumbo Kings', 'Evolve', 'Ntjam Rosie', 'Wicked Jazz Sounds', 'Wouter Hamel', 'Jonna Frazer',

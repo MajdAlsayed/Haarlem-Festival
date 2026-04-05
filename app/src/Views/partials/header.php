@@ -5,9 +5,13 @@ if (!isset($navLinks)) $navLinks = (new \App\Repositories\MenuRepository())->get
 if (!isset($app)) $app = (new \App\Repositories\SettingsRepository())->getAll();
 $isLoggedIn = !empty($_SESSION['auth'] ?? []);
 $username = $isLoggedIn ? htmlspecialchars($_SESSION['auth']['username'] ?? '') : '';
+$isAdmin = \App\Core\AdminAuth::isAdmin();
+$canUseTicketScanner = $isLoggedIn && \App\Core\TicketScannerAuth::currentUserCanScan();
+$adminNavActive = $isAdmin && strpos($currentPath, '/admin') === 0 && $currentPath !== '/admin/scan';
+$scannerNavActive = $currentPath === '/admin/scan';
+$cartBadgeCount = 0;
 ?>
 
-<!-- Bootstrap first (cart offcanvas); site CSS after so Haarlem styles win over Bootstrap reboot -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string) ($app['css_version'] ?? '1')) ?>">
 
@@ -52,13 +56,46 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['auth']['username'] ?? '') 
                 aria-controls="cartOffcanvas"
             >
                 🛒
-                <span id="cartBadge" class="cart-badge">0</span>
+                <span id="cartBadge" class="cart-badge"><?= (int) $cartBadgeCount ?></span>
             </button>
 
             <?php if ($isLoggedIn): ?>
-                <div class="nav-user">
-                    <span class="nav-username">👤 <?= $username ?></span>
-                    <a href="/logout" class="btn btn-outline nav-auth-btn">Logout</a>
+                <div class="nav-user nav-user-dropdown dropdown">
+                    <button
+                        class="btn btn-outline nav-auth-btn nav-user-menu-toggle dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="true"
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                        aria-label="Account menu"
+                        id="navUserMenuBtn"
+                    >
+                        <?= $isAdmin ? '👤' : ($canUseTicketScanner ? '🎫' : '👤') ?>
+                        <span class="nav-user-menu-label"><?= $username ?></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end nav-user-menu" aria-labelledby="navUserMenuBtn">
+                        <li>
+                            <a class="dropdown-item<?= str_starts_with($currentPath, '/account') ? ' active' : '' ?>" href="/account/orders">My orders</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item<?= str_starts_with($currentPath, '/my-program') ? ' active' : '' ?>" href="/my-program">My program</a>
+                        </li>
+                        <?php if ($isAdmin): ?>
+                            <li>
+                                <a class="dropdown-item<?= $adminNavActive ? ' active' : '' ?>" href="/admin">Admin dashboard</a>
+                            </li>
+                        <?php endif; ?>
+                        <?php if ($canUseTicketScanner): ?>
+                            <li>
+                                <a class="dropdown-item<?= $scannerNavActive ? ' active' : '' ?>" href="/admin/scan">Scan tickets</a>
+                            </li>
+                        <?php endif; ?>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item nav-user-menu-logout" href="/logout">Logout</a>
+                        </li>
+                    </ul>
                 </div>
             <?php else: ?>
                 <div class="nav-user">

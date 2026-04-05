@@ -219,14 +219,6 @@ class EventSeeder extends AbstractSeed
             ],
             // Other categories (for homepage one-per-category)
             [
-                'event_type_id' => 2,
-                'venue_id' => 2,
-                'title' => 'Jazz Evening',
-                'description' => 'Smooth jazz in the heart of Haarlem.',
-                'event_day' => 'friday',
-                'start_time' => '20:00',
-            ],
-            [
                 'event_type_id' => 4,
                 'venue_id' => 3,
                 'title' => 'Food Market',

@@ -15,6 +15,9 @@ services:
     build:
       context: .
       dockerfile: PHP.Dockerfile
+    environment:
+      # Used by Stripe return URLs; set STRIPE_SECRET_KEY for real test payments (see README).
+      APP_PUBLIC_URL: http://localhost
     volumes:
       - ./app:/app
 

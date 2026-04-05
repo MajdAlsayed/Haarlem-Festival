@@ -20,7 +20,7 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
     <section class="artist-detail-hero" style="background-image: linear-gradient(to right, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 45%, transparent 70%), linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.65) 100%), url('<?= htmlspecialchars($viewModel->heroImage) ?>');">
         <div class="artist-detail-hero-content">
             <h1 class="artist-detail-hero-name"><?= htmlspecialchars($artist['name']) ?></h1>
-            <p class="artist-detail-hero-tagline"><?= htmlspecialchars($artist['bio'] ? substr($artist['bio'], 0, 80) . (strlen($artist['bio']) > 80 ? '...' : '') : '') ?></p>
+            <p class="artist-detail-hero-tagline"><?= htmlspecialchars($artist['bio'] ?? '') ?></p>
             <a href="#about" class="artist-detail-hero-btn">More info <span aria-hidden="true">&#8594;</span></a>
         </div>
     </section>

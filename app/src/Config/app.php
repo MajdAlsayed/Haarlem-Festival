@@ -11,7 +11,7 @@ return [
     'default_event_location' => 'Haarlem — Netherlands',
     'default_venue_city' => 'Haarlem',
     'default_event_time' => '22:00',
-    'css_version' => '20',
+    'css_version' => '25',
 
     'footer' => [
         'social_icons' => ['insta icon.png', 'tiktok icon.png', 'facebook icon.png', 'youtube icon.png'],
@@ -37,6 +37,9 @@ return [
 
     /** Used by SecureToken::signTicketCode for QR / scanner verification (override via env in production). */
     'ticket_signing_secret' => getenv('HAARLEM_TICKET_SECRET') ?: 'dev-only-change-in-production',
+
+    /** Absolute site URL for Stripe redirects (e.g. http://localhost or https://yourdomain.nl). */
+    'public_base_url' => rtrim((string) (getenv('APP_PUBLIC_URL') ?: 'http://localhost'), '/'),
 
     /**
      * Homepage hero / welcome / about copy. Overridden by site_settings keys `cms_home_*` (see SettingsRepository::getMergedCmsHome).

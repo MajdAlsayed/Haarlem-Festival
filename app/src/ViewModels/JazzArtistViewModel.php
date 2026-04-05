@@ -7,6 +7,7 @@ final class JazzArtistViewModel
 {
     /**
      * @param array<int, array<string,mixed>> $events
+     * @param list<array<string,mixed>> $discography track rows with image_url, audio_url, title, etc.
      */
     public function __construct(
         public string $slug,
@@ -15,6 +16,8 @@ final class JazzArtistViewModel
         public string $heroImage,
         public string $bio,
         /** @var array<int, array<string,mixed>> $events */
-        public array $events
+        public array $events,
+        /** @var list<array<string,mixed>> */
+        public array $discography = []
     ) {}
 }

@@ -21,16 +21,27 @@ use App\Controllers\JazzController;
 use App\Exceptions\AppException;
 use App\Exceptions\NotFoundException;
 use App\Controllers\StoriesController;
+use App\Controllers\AdminController;
+use App\Controllers\AdminJazzController;
+use App\Controllers\AdminTicketsController;
 use App\Controllers\AdminOrderExportController;
 use App\Controllers\AdminOrdersController;
 use App\Controllers\AdminHomepageController;
 use App\Controllers\AdminCmsUploadController;
 use App\Controllers\AdminDanceController;
 use App\Controllers\AdminHistoryController;
+use App\Controllers\AdminFoodController;
 use App\Controllers\CartController;
+use App\Controllers\CheckoutController;
+use App\Controllers\TicketScanController;
+use App\Controllers\TicketsController;
+use App\Controllers\AccountController;
+use App\Controllers\ProgramController;
 use App\Core\SecurityHeaders;
+use App\Services\PendingOrderMaintenance;
 
 Session::start();
+PendingOrderMaintenance::run();
 SecurityHeaders::send();
 
 set_exception_handler(function (Throwable $e): void {
@@ -57,6 +68,19 @@ if (preg_match('#^/food/restaurant/(\d+)$#', $uri, $m)) {
     (new FoodController())->restaurant((int) $m[1]);
     exit;
 }
+if (preg_match('#^/food/restaurant/(\d+)/booking$#', $uri, $m)) {
+    if ($method !== 'GET' && $method !== 'POST') {
+        http_response_code(405);
+        exit;
+    }
+    (new FoodController())->booking((int) $m[1]);
+    exit;
+}
+if (preg_match('#^/food/restaurant/(\d+)/booking/overview$#', $uri, $m)) {
+    if ($method !== 'GET' && $method !== 'POST') { http_response_code(405); exit; }
+    (new FoodController())->bookingOverview((int) $m[1]);
+    exit;
+}
 if (preg_match('#^/dance/event/(\d+)$#', $uri, $m)) {
     (new EventDetailController())->show((int) $m[1]);
     exit;
@@ -76,6 +100,12 @@ if (preg_match('#^/admin/cms/history/location/([a-z0-9-]+)$#', $uri, $m)) {
     if ($method === 'GET') $historyLocationCms->showLocationForm($m[1]);
     elseif ($method === 'POST') $historyLocationCms->saveLocation($m[1]);
     else http_response_code(405);
+if (preg_match('#^/account/order/(\d+)$#', $uri, $m)) {
+    if ($method === 'GET') {
+        (new AccountController())->orderDetail((int) $m[1]);
+    } else {
+        http_response_code(405);
+    }
     exit;
 }
 
@@ -133,12 +163,108 @@ switch ($uri) {
         }
         break;
 
+    case '/checkout':
+        if ($method === 'GET') {
+            (new CheckoutController())->show();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/pay':
+        if ($method === 'POST') {
+            (new CheckoutController())->pay();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/pay-stripe':
+        if ($method === 'POST') {
+            (new CheckoutController())->payStripe();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/pay-later':
+        if ($method === 'POST') {
+            (new CheckoutController())->payLater();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/pay-pending':
+        if ($method === 'POST') {
+            (new CheckoutController())->payPending();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/pay-pending-stripe':
+        if ($method === 'POST') {
+            (new CheckoutController())->payPendingStripe();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/cancel':
+        if ($method === 'GET') {
+            (new CheckoutController())->cancel();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/checkout/success':
+        if ($method === 'GET') {
+            (new CheckoutController())->success();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/scan':
+        $scan = new TicketScanController();
+        if ($method === 'POST') {
+            $scan->scan();
+        } elseif ($method === 'GET') {
+            $scan->index();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
     case '/dance':
         (new DanceController())->index();
         break;
 
     case '/food':
         (new FoodController())->index();
+        break;
+
+    case '/tickets':
+        if ($method === 'GET') (new TicketsController())->index();
+        else http_response_code(405);
+        break;
+
+    case '/account/orders':
+        if ($method === 'GET') {
+            (new AccountController())->orders();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/my-program':
+        if ($method === 'GET') {
+            (new ProgramController())->index();
+        } else {
+            http_response_code(405);
+        }
         break;
 
     case '/login':
@@ -180,6 +306,14 @@ switch ($uri) {
     case '/admin/orders':
         if ($method === 'GET') {
             (new AdminOrdersController())->index();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/orders/tickets':
+        if ($method === 'GET') {
+            (new AdminOrdersController())->tickets();
         } else {
             http_response_code(405);
         }
@@ -277,8 +411,155 @@ switch ($uri) {
         (new JazzController())->gareDuNord();
         break;
 
+    case '/admin':
+        (new AdminController())->index();
+        break;
+
+    case '/admin/pages':
+        (new AdminController())->pages();
+        break;
+
+    case '/admin/pages/edit':
+        (new AdminController())->editPage();
+        break;
+
+    case '/admin/pages/update':
+        if ($method === 'POST') (new AdminController())->updatePage();
+        else { header('Location: /admin/pages'); exit; }
+        break;
+
+    case '/admin/jazz':
+        (new AdminJazzController())->index();
+        break;
+
+    case '/admin/jazz/events':
+        (new AdminJazzController())->events();
+        break;
+
+    case '/admin/jazz/events/new':
+        (new AdminJazzController())->newEvent();
+        break;
+
+    case '/admin/jazz/events/edit':
+        (new AdminJazzController())->editEvent();
+        break;
+
+    case '/admin/jazz/events/save':
+        if ($method === 'POST') (new AdminJazzController())->saveEvent();
+        else { header('Location: /admin/jazz/events'); exit; }
+        break;
+
+    case '/admin/jazz/events/delete':
+        if ($method === 'POST') (new AdminJazzController())->deleteEvent();
+        else { header('Location: /admin/jazz/events'); exit; }
+        break;
+
+    case '/admin/jazz/settings':
+        (new AdminJazzController())->settings();
+        break;
+
+    case '/admin/jazz/discography':
+        (new AdminJazzController())->discography();
+        break;
+
+    case '/admin/jazz/discography/edit':
+        (new AdminJazzController())->editDiscTrack();
+        break;
+
+    case '/admin/jazz/discography/save':
+        if ($method === 'POST') (new AdminJazzController())->saveDiscTrack();
+        else { header('Location: /admin/jazz/discography'); exit; }
+        break;
+
+    case '/admin/jazz/discography/delete':
+        if ($method === 'POST') (new AdminJazzController())->deleteDiscTrack();
+        else { header('Location: /admin/jazz/discography'); exit; }
+        break;
+
+    case '/admin/tickets':
+        (new AdminTicketsController())->index();
+        break;
+
+    case '/admin/tickets/settings':
+        (new AdminTicketsController())->settings();
+        break;
+
+    case '/admin/tickets/edit':
+        (new AdminTicketsController())->edit();
+        break;
+
+    case '/admin/tickets/new':
+        (new AdminTicketsController())->newTicket();
+        break;
+
+    case '/admin/tickets/save':
+        if ($method === 'POST') (new AdminTicketsController())->save();
+        else { header('Location: /admin/tickets'); exit; }
+        break;
+
+    case '/admin/tickets/delete':
+        if ($method === 'POST') (new AdminTicketsController())->delete();
+        else { header('Location: /admin/tickets'); exit; }
+        break;
+    case '/admin/food':
+        (new AdminFoodController())->index();
+        break;
+ 
+    case '/admin/food/settings':
+        $food = new AdminFoodController();
+        if ($method === 'POST') {
+            $food->saveSettings();
+        } else {
+            $food->settings();
+        }
+        break;
+ 
+    case '/admin/food/restaurants':
+        if ($method === 'GET') {
+            (new AdminFoodController())->restaurants();
+        } else {
+            http_response_code(405);
+        }
+        break;
+ 
+    case '/admin/food/restaurants/new':
+        if ($method === 'GET') {
+            (new AdminFoodController())->newRestaurant();
+        } else {
+            http_response_code(405);
+        }
+        break;
+ 
+    case '/admin/food/restaurants/edit':
+        if ($method === 'GET') {
+            (new AdminFoodController())->editRestaurant();
+        } else {
+            http_response_code(405);
+        }
+        break;
+ 
+    case '/admin/food/restaurants/save':
+        if ($method === 'POST') {
+            (new AdminFoodController())->saveRestaurant();
+        } else {
+            header('Location: /admin/food/restaurants');
+            exit;
+        }
+        break;
+ 
+    case '/admin/food/restaurants/delete':
+        if ($method === 'POST') {
+            (new AdminFoodController())->deleteRestaurant();
+        } else {
+            header('Location: /admin/food/restaurants');
+            exit;
+        }
+        break;
+
     default:
         http_response_code(404);
         echo 'Page not found';
         break;
+
+
 }
