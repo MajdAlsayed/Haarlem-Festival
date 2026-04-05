@@ -99,7 +99,7 @@ class EventRepository implements EventRepositoryInterface
         );
 
         $stmt->execute([
-            'event_type_name' => trim($eventTypeName),
+            'event_type_name' => $eventTypeName,
             'event_day' => trim($eventDay),
         ]);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -154,7 +154,7 @@ class EventRepository implements EventRepositoryInterface
         $event->id = (int) $row['event_id'];
         $event->eventTypeId = (int) $row['event_type_id'];
         $event->venueId = (int) $row['venue_id'];
-        $event->title = (string)$row['title'];
+        $event->title = $row['title'];
         $event->description = $row['description'] ?? null;
         $event->eventDay = isset($row['event_day']) ? (string) $row['event_day'] : null;
         $event->startTime = isset($row['start_time']) ? (string) $row['start_time'] : null;

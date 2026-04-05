@@ -1,4 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
+    function getCsrf() {
+        return typeof window.__CSRF_CART__ === 'string' ? window.__CSRF_CART__ : '';
+    }
+
+    function setCsrf(token) {
+        if (typeof token === 'string' && token) {
+            window.__CSRF_CART__ = token;
+        }
+    }
+
     const cartBadge = document.getElementById('cartBadge');
     const cartCountLabel = document.getElementById('cartCountLabel');
     const cartTotalLabel = document.getElementById('cartTotalLabel');
@@ -107,16 +117,22 @@ document.addEventListener('DOMContentLoaded', () => {
     async function request(url, payload = null) {
         const options = {
             method: payload ? 'POST' : 'GET',
-            headers: {}
+            headers: {},
+            credentials: 'same-origin'
         };
 
         if (payload) {
             options.headers['Content-Type'] = 'application/json';
-            options.body = JSON.stringify(payload);
+            const body = { ...payload, _csrf: getCsrf() };
+            options.body = JSON.stringify(body);
         }
 
         const response = await fetch(url, options);
         const data = await response.json();
+
+        if (data && data.csrf) {
+            setCsrf(data.csrf);
+        }
 
         if (!response.ok || !data.success) {
             throw new Error(data.message || 'Cart request failed.');

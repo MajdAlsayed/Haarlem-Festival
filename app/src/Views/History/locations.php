@@ -1,18 +1,9 @@
-<?php
-$blocks = $viewModel->blocks;
-$locations = $viewModel->locations;
-
-$hero = $blocks['hero']['content'] ?? [];
-$aboutBanner = $blocks['about_banner']['content'] ?? [];
-$locationCards = $blocks['location_cards']['content'] ?? [];
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($hero['title'] ?? '') ?></title>
+    <title><?= htmlspecialchars($viewModel->hero['title'] ?? '') ?></title>
     <!-- General site CSS -->
     <link rel="stylesheet" href="/css/style.css">
     <!-- CSS for History -->
@@ -24,45 +15,37 @@ $locationCards = $blocks['location_cards']['content'] ?? [];
 
 <main>
     <!-- HERO -->
-    <section class="history-hero-section history-hero-section--locations">
-        <div class="history-hero-background">
-            <img
-                    src="<?= htmlspecialchars($viewModel->heroImage?->imageUrl ?? '') ?>"
-                    alt="<?= htmlspecialchars($viewModel->heroImage?->altText ?? '') ?>"
-            >
-        </div>
-        <div class="history-hero-content">
-            <div class="container">
-                <div class="history-hero-title-container">
-                    <h1 class="history-hero-title history-hero-title--yellow"><?= nl2br(htmlspecialchars($hero['title'] ?? '')) ?></h1>
-                </div>
-            </div>
-        </div>
-    </section>
+    <?php
+    $sectionModifier = 'history-hero-section--locations';
+    $titleModifier = 'history-hero-title--yellow';
+    $showSubtitle = false;
+    $showButton = false;
+    require __DIR__ . '/../partials/history/history-hero.php';
+    ?>
 
     <!-- BREADCRUMBS -->
-    <nav class="history-breadcrumb" aria-label="Breadcrumb">
-        <div class="container">
-            <a href="/" class="history-breadcrumb-link">HOME</a>
-            <span class="history-breadcrumb-separator">→</span>
-            <a href="/history" class="history-breadcrumb-link">HISTORY</a>
-            <span class="history-breadcrumb-separator">→</span>
-            <span class="history-breadcrumb-link active" aria-current="page">LANDMARKS</span>
-        </div>
-    </nav>
+    <?php
+    $breadcrumbs = [
+        ['label' => 'HOME', 'url' => '/'],
+        ['label' => 'HISTORY', 'url' => '/history'],
+        ['label' => 'LOCATIONS', 'url' => null],
+    ];
+    require __DIR__ . '/../partials/history/history-breadcrumb.php';
+    ?>
 
     <!-- ABOUT BANNER -->
-    <section class="history-heritage-banner">
-        <div class="container">
-            <p class="history-intro-text"><?= htmlspecialchars($aboutBanner['text'] ?? '') ?></p>
-        </div>
-    </section>
+    <?php
+    $sectionModifier = '';
+    $showTitle = false;
+    $textModifier = 'history-about-banner--bold';
+    require __DIR__ . '/../partials/history/history-about-banner.php';
+    ?>
 
     <!-- LOCATION CARDS -->
     <div class="history-locations-section">
         <?php
         $index = 0;
-        foreach ($locations as $location):
+        foreach ($viewModel->locations as $location):
             $isEven = $index % 2 === 0;
             $layoutClass = $isEven ? 'history-location-image-left' : 'history-location-image-right';
             $image = $viewModel->primaryImages[$location->id] ?? null;

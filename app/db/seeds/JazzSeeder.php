@@ -37,9 +37,8 @@ final class JazzSeeder extends AbstractSeed
             [$jazzTypeId,$patronaatId,'Wouter Hamel','Enjoy Wouter Hamel�s captivating jazz tunes!', 'thursday','19:30','20:30','Second hall',10.00],
             [$jazzTypeId,$patronaatId,'Jonna Frazer','Feel the energy with Jonna Frazer live!', 'thursday','21:00','22:00','Second hall',10.00],
 
-            // FRIDAY
-            [$jazzTypeId,$patronaatId,'Karsu','Experience Karsu�s powerful voice and melodies live.', 'friday','18:00','19:00','Main hall',200,15.00],
-            [$jazzTypeId,$patronaatId,'Karsu','Experience Karsu\'s powerful voice and captivating melodies live.', 'friday','18:30','19:30','Main hall',200,32.00],
+            // FRIDAY (one Karsu slot)
+            [$jazzTypeId,$patronaatId,'Karsu','Experience Karsu\'s powerful voice and captivating melodies live.', 'friday','18:00','19:00','Main hall',15.00],
             [$jazzTypeId,$patronaatId,'Uncle Sue','Groove with Uncle Sue and their vibrant jazz tunes.', 'friday','19:30','20:30','Main hall',15.00],
             [$jazzTypeId,$patronaatId,'Chris Allen','Let Chris Allen mesmerize you with soulful rhythms.', 'friday','21:00','22:00','Main hall',15.00],
             [$jazzTypeId,$patronaatId,'Myles Sanko','Dive into Myles Sanko�s smooth jazz vibes.', 'friday','18:00','19:00','Second hall',10.00],
@@ -53,7 +52,6 @@ final class JazzSeeder extends AbstractSeed
             [$jazzTypeId,$patronaatId,'Han Bennink','Iconic jazz rhythms in an intimate setting.', 'saturday','18:00','19:00','Third hall',10.00],
             [$jazzTypeId,$patronaatId,'The Nordanians','Innovative and eclectic jazz sound.', 'saturday','19:30','20:30','Third hall',10.00],
             [$jazzTypeId,$patronaatId,'Lilith Merlot','Close the night with Lilith Merlot�s captivating performance.', 'saturday','21:00','22:00','Third hall',10.00],
-            [$jazzTypeId,$patronaatId,'Karsu','Experience Karsu\'s powerful voice and captivating melodies live.', 'saturday','20:00','21:00','Main hall',200,32.00],
 
             // SUNDAY (open air examples)
             [$jazzTypeId,$groteMarktId,'Ruis Soundsystem','Kick off Sunday with dynamic beats (free).', 'sunday','15:00','16:00',null,0.00],
@@ -65,7 +63,7 @@ final class JazzSeeder extends AbstractSeed
         ];
 
         foreach ($events as $e) {
-            $hasSeats = count($e) >= 10;
+            // Rows may be [..., hall, price] (9 elems) or [..., hall, seats, price] (10 elems).
             $typeId   = $e[0];
             $venueId  = $e[1];
             $title    = $e[2];
@@ -74,8 +72,15 @@ final class JazzSeeder extends AbstractSeed
             $start    = $e[5];
             $end      = $e[6];
             $hall     = $e[7];
-            $price    = $hasSeats ? $e[9] : $e[8];
-            $seats    = $hasSeats ? (int)$e[8] : null;
+            if (count($e) >= 10) {
+                $seats = $e[8] !== null && $e[8] !== '' ? (int) $e[8] : null;
+                $price = $e[9];
+            } else {
+                $price = $e[8];
+                // Paid shows in a hall get a default cap (was always NULL before: count($e) >= 10 was never true).
+                $priceNum = is_numeric($price) ? (float) $price : 0.0;
+                $seats = ($priceNum > 0.0 && $hall !== null && $hall !== '') ? 150 : null;
+            }
 
             $titleEsc = addslashes($title);
             $descEsc  = addslashes($desc);

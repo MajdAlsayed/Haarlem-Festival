@@ -175,6 +175,104 @@ class CartRepository
     }
 
     /**
+     * Capacity for this catalog row: session slot, event seats, or unlimited (passes / no cap).
+     */
+    public function getTicketDetailsCapacity(int $ticketDetailsId): ?int
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            "SELECT td.ticket_type, td.session_id, td.event_id,
+                    s.tickets_available AS session_cap,
+                    e.seats AS event_seats
+             FROM ticket_details td
+             LEFT JOIN sessions s ON s.session_id = td.session_id
+             LEFT JOIN events e ON e.event_id = td.event_id
+             WHERE td.ticket_details_id = :id
+             LIMIT 1"
+        );
+        $stmt->execute(['id' => $ticketDetailsId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            return null;
+        }
+
+        $type = (string) ($row['ticket_type'] ?? '');
+        if (in_array($type, ['day_pass', 'all_access_pass'], true)) {
+            return null;
+        }
+
+        if ($row['session_id'] !== null && $row['session_id'] !== '') {
+            return (int) $row['session_cap'];
+        }
+
+        if ($row['event_id'] !== null && $row['event_id'] !== '') {
+            if ($row['event_seats'] === null || $row['event_seats'] === '') {
+                return null;
+            }
+
+            return (int) $row['event_seats'];
+        }
+
+        return null;
+    }
+
+    /** Sum of quantities in all active carts for this ticket option. */
+    public function sumActiveCartQuantityForTicketDetails(int $ticketDetailsId): int
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            "SELECT COALESCE(SUM(ci.quantity), 0)
+             FROM cart_items ci
+             INNER JOIN carts c ON c.cart_id = ci.cart_id AND c.status = 'active'
+             WHERE ci.ticket_details_id = :tdid"
+        );
+        $stmt->execute(['tdid' => $ticketDetailsId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Seats held by pay-later orders (pending with a future expiry). Ignores legacy pending rows without expires_at.
+     */
+    public function sumPendingOrderQuantityForTicketDetails(int $ticketDetailsId): int
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            "SELECT COALESCE(SUM(oi.quantity), 0)
+             FROM order_items oi
+             INNER JOIN orders o ON o.order_id = oi.order_id
+             WHERE o.status = 'pending'
+               AND o.expires_at IS NOT NULL
+               AND o.expires_at > NOW()
+               AND oi.ticket_details_id = :tdid"
+        );
+        $stmt->execute(['tdid' => $ticketDetailsId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /** @return array{cart_item_id: int, cart_id: int, ticket_details_id: int, quantity: int}|null */
+    public function findCartItemById(int $cartItemId): ?array
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            "SELECT cart_item_id, cart_id, ticket_details_id, quantity
+             FROM cart_items
+             WHERE cart_item_id = :id
+             LIMIT 1"
+        );
+        $stmt->execute(['id' => $cartItemId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? [
+            'cart_item_id' => (int) $row['cart_item_id'],
+            'cart_id' => (int) $row['cart_id'],
+            'ticket_details_id' => (int) $row['ticket_details_id'],
+            'quantity' => (int) $row['quantity'],
+        ] : null;
+    }
+
+    /**
      * @return CartItem[]
      */
     public function getCartItemsDetailed(int $cartId): array
@@ -211,6 +309,22 @@ class CartRepository
         }
 
         return $items;
+    }
+
+    public function deleteAllItemsForCart(int $cartId): void
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare('DELETE FROM cart_items WHERE cart_id = :cid');
+        $stmt->execute(['cid' => $cartId]);
+    }
+
+    public function markCartConverted(int $cartId): void
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            "UPDATE carts SET status = 'converted' WHERE cart_id = :cid"
+        );
+        $stmt->execute(['cid' => $cartId]);
     }
 
     private function mapRowToCart(array $row): Cart

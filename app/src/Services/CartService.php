@@ -8,7 +8,8 @@ use App\ViewModels\CartViewModel;
 class CartService
 {
     public function __construct(
-        private CartRepository $cartRepository
+        private CartRepository $cartRepository,
+        private TicketAvailabilityService $availability
     ) {
     }
 
@@ -35,6 +36,8 @@ class CartService
             throw new \InvalidArgumentException('Invalid ticket_details_id.');
         }
 
+        $this->availability->assertDeltaAllowed($ticketDetailsId, $quantity);
+
         $cartId = $this->resolveCurrentCartId(createIfMissing: true);
 
         $existingItem = $this->cartRepository->findCartItem($cartId, $ticketDetailsId);
@@ -50,11 +53,19 @@ class CartService
 
     public function updateItem(int $cartItemId, int $quantity): CartViewModel
     {
+        $existing = $this->cartRepository->findCartItemById($cartItemId);
+        if ($existing === null) {
+            return $this->getCurrentCart();
+        }
+
         if ($quantity <= 0) {
+            $this->availability->assertDeltaAllowed($existing['ticket_details_id'], -$existing['quantity']);
             $this->cartRepository->deleteCartItem($cartItemId);
             return $this->getCurrentCart();
         }
 
+        $delta = $quantity - $existing['quantity'];
+        $this->availability->assertDeltaAllowed($existing['ticket_details_id'], $delta);
         $this->cartRepository->updateCartItemQuantity($cartItemId, $quantity);
 
         return $this->getCurrentCart();
@@ -62,6 +73,10 @@ class CartService
 
     public function removeItem(int $cartItemId): CartViewModel
     {
+        $existing = $this->cartRepository->findCartItemById($cartItemId);
+        if ($existing !== null) {
+            $this->availability->assertDeltaAllowed($existing['ticket_details_id'], -$existing['quantity']);
+        }
         $this->cartRepository->deleteCartItem($cartItemId);
 
         return $this->getCurrentCart();
