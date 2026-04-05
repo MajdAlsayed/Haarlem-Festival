@@ -169,7 +169,7 @@ final class TicketDetailsSeeder extends AbstractSeed
         return match ($cat) {
             'dance' => 75.0,
             'jazz' => 15.0,
-            'history' => 12.0,
+            'history' => 17.50,
             'stories' => 10.0,
             default => 20.0,
         };

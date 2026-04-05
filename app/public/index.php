@@ -37,6 +37,7 @@ use App\Controllers\TicketScanController;
 use App\Controllers\TicketsController;
 use App\Controllers\AccountController;
 use App\Controllers\ProgramController;
+use App\Controllers\AdminUserController;
 use App\Core\SecurityHeaders;
 use App\Services\PendingOrderMaintenance;
 
@@ -238,6 +239,40 @@ switch ($uri) {
             $scan->index();
         } else {
             http_response_code(405);
+        }
+        break;
+
+    case '/admin/users':
+        if ($method === 'GET') {
+            (new AdminUserController())->index();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/users/edit':
+        if ($method === 'GET') {
+            (new AdminUserController())->edit();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/users/update':
+        if ($method === 'POST') {
+            (new AdminUserController())->update();
+        } else {
+            header('Location: /admin/users');
+            exit;
+        }
+        break;
+
+    case '/admin/users/delete':
+        if ($method === 'POST') {
+            (new AdminUserController())->delete();
+        } else {
+            header('Location: /admin/users');
+            exit;
         }
         break;
 

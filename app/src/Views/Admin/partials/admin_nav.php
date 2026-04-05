@@ -22,4 +22,6 @@ $base = '/admin';
     <a href="<?= htmlspecialchars($base) ?>/cms/history/location/st-bavo">Edit St. Bavo</a>
     <span aria-hidden="true"> · </span>
     <a href="<?= htmlspecialchars($base) ?>/cms/history/location/grote-markt">Edit Grote Markt</a>
+    <span aria-hidden="true"> · </span>
+    <a href="<?= htmlspecialchars($base) ?>/users">Manage Users</a>
 </nav>
