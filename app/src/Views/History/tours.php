@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($viewModel->hero['title'] ?? '') ?></title>
-    <!-- General site CSS -->
+
     <link rel="stylesheet" href="/css/style.css">
-    <!-- CSS for History -->
     <link rel="stylesheet" href="/css/history.css">
 </head>
 <body class="history-page">
@@ -36,19 +35,27 @@
     <!-- IMPORTANT INFORMATION -->
     <section class="history-tours-info">
         <div class="container">
-            <h2><?= htmlspecialchars($viewModel->infoCards['title'] ?? '') ?></h2>
+            <h2>
+                <?= htmlspecialchars($viewModel->infoCards['title'] ?? '') ?>
+            </h2>
             <div class="history-tours-info-cards">
                 <?php foreach ($viewModel->infoCards['cards'] ?? [] as $card): ?>
                     <div class="history-tours-info-card">
-                        <h3><?= htmlspecialchars($card['title']) ?></h3>
+                        <h3>
+                            <?= htmlspecialchars($card['title']) ?>
+                        </h3>
                         <?php if (!empty($card['items'])): ?>
                             <ul>
                                 <?php foreach ($card['items'] as $item): ?>
-                                    <li><?= htmlspecialchars($item) ?></li>
+                                    <li>
+                                        <?= htmlspecialchars($item) ?>
+                                    </li>
                                 <?php endforeach; ?>
                             </ul>
                         <?php else: ?>
-                            <p><?= htmlspecialchars($card['text']) ?></p>
+                            <p>
+                                <?= htmlspecialchars($card['text']) ?>
+                            </p>
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
@@ -63,22 +70,25 @@
 
                 <!-- LEFT: Schedule -->
                 <div class="history-tours-schedule">
-                    <h2>SCHEDULE YOUR TOUR</h2>
+                    <h2>
+                        SCHEDULE YOUR TOUR
+                    </h2>
 
                     <!-- Day tabs -->
                     <div class="history-tours-day-tabs">
-                        <?php $first = true;
-                        foreach ($viewModel->toursByDay as $date => $tours): ?>
+                        <?php $first = true; ?>
+                        <?php foreach ($viewModel->toursByDay as $date => $tours): ?>
                             <button class="history-tours-day-tab <?= $first ? 'active' : '' ?>"
                                     data-filter="<?= htmlspecialchars($date) ?>">
                                 <?= htmlspecialchars(date('l', strtotime($date))) ?>
                             </button>
-                            <?php $first = false; endforeach; ?>
+                            <?php $first = false; ?>
+                        <?php endforeach; ?>
                     </div>
 
                     <!-- Tours per day - all panels rendered, JS shows/hides -->
-                    <?php $first = true;
-                    foreach ($viewModel->toursByDay as $date => $tours): ?>
+                    <?php $first = true; ?>
+                    <?php foreach ($viewModel->toursByDay as $date => $tours): ?>
                         <div class="history-tours-day-panel <?= $first ? 'active' : '' ?>"
                              data-filter="<?= htmlspecialchars($date) ?>">
                             <p class="history-tours-day-title">
@@ -98,16 +108,21 @@
                                     <span class="history-tours-spots">
                                         <?= htmlspecialchars($tour['tickets_available']) ?> spots left
                                     </span>
-                                    <a href="/tickets" class="history-button-big history-button-big--yellow">ADD TO CART</a>
+                                    <a href="/tickets" class="history-button-big history-button-big--yellow">
+                                        ADD TO CART
+                                    </a>
                                 </div>
                             <?php endforeach; ?>
                         </div>
-                        <?php $first = false; endforeach; ?>
+                        <?php $first = false; ?>
+                    <?php endforeach; ?>
                 </div>
 
                 <!-- RIGHT: Tour Details -->
                 <div class="history-tours-details">
-                    <h2><?= htmlspecialchars($viewModel->tourDetails['title'] ?? '') ?></h2>
+                    <h2>
+                        <?= htmlspecialchars($viewModel->tourDetails['title'] ?? '') ?>
+                    </h2>
                     <div class="history-tours-details-list">
                         <?php foreach ($viewModel->tourDetails['items'] ?? [] as $item): ?>
                             <?php
@@ -117,18 +132,23 @@
                                 'Meeting Point' => '/images/history/icons/location-icon.svg',
                                 'Languages' => '/images/history/icons/language-icon.svg',
                                 'Includes' => '/images/history/icons/cup-icon.svg',
-                                default => '•'
+                                default => null
                             };
                             ?>
                             <div class="history-tours-detail-item">
                                 <div class="history-tours-detail-icon">
                                     <?php if ($icon): ?>
-                                        <img src="<?= htmlspecialchars($icon) ?>" alt="<?= htmlspecialchars($item['label']) ?>">
+                                        <img src="<?= htmlspecialchars($icon) ?>"
+                                             alt="<?= htmlspecialchars($item['label']) ?>">
                                     <?php endif; ?>
                                 </div>
                                 <div class="history-tours-detail-content">
-                                    <strong><?= htmlspecialchars($item['label']) ?></strong>
-                                    <p><?= htmlspecialchars($item['value']) ?></p>
+                                    <p>
+                                        <?= htmlspecialchars($item['label']) ?>
+                                    </p>
+                                    <p>
+                                        <?= htmlspecialchars($item['value']) ?>
+                                    </p>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -141,15 +161,23 @@
     <!-- WHAT'S INCLUDED -->
     <section class="history-tours-tickets">
         <div class="container">
-            <h2><?= htmlspecialchars($viewModel->ticketOptions['title'] ?? '') ?></h2>
+            <h2>
+                <?= htmlspecialchars($viewModel->ticketOptions['title'] ?? '') ?>
+            </h2>
             <div class="history-tours-tickets-cards">
                 <?php foreach ($viewModel->ticketOptions['tickets'] ?? [] as $ticket): ?>
                     <div class="history-tours-ticket-card">
-                        <h3><?= htmlspecialchars($ticket['name']) ?></h3>
-                        <p class="history-tours-ticket-per"><?= htmlspecialchars($ticket['per']) ?></p>
+                        <h3>
+                            <?= htmlspecialchars($ticket['name']) ?>
+                        </h3>
+                        <p class="history-tours-ticket-per">
+                            <?= htmlspecialchars($ticket['per']) ?>
+                        </p>
                         <ul>
                             <?php foreach ($ticket['items'] as $item): ?>
-                                <li><?= htmlspecialchars($item) ?></li>
+                                <li>
+                                    <?= htmlspecialchars($item) ?>
+                                </li>
                             <?php endforeach; ?>
                         </ul>
                     </div>

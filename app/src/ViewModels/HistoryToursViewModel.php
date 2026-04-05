@@ -9,7 +9,6 @@ class HistoryToursViewModel
 {
     public array $hero = [];
     public array $infoCards = [];
-
     public array $tourDetails = [];
     public array $ticketOptions= [];
 

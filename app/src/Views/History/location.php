@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($viewModel->hero['title'] ?? '') ?></title>
+
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/history.css">
 </head>
@@ -48,8 +49,12 @@
             <div class="container">
                 <?php foreach ($viewModel->statsBar['stats'] as $stat): ?>
                     <div class="history-stats-item">
-                        <span class="history-stats-value"><?= htmlspecialchars($stat['value']) ?></span>
-                        <span class="history-stats-label"><?= htmlspecialchars($stat['label']) ?></span>
+                        <span class="history-stats-value">
+                            <?= htmlspecialchars($stat['value']) ?>
+                        </span>
+                        <span class="history-stats-label">
+                            <?= htmlspecialchars($stat['label']) ?>
+                        </span>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -58,8 +63,10 @@
 
     <!-- CONTENT SECTIONS -->
     <?php foreach ($viewModel->contentSections as $section): ?>
-        <?php $layoutClass = 'history-' . $section['layout']; ?>
-        <section class="history-content-section <?= $layoutClass ?>">
+        <?php
+        $layoutClass = 'history-' . ($section['layout'] ?? '');
+        ?>
+        <section class="history-content-section <?= htmlspecialchars($layoutClass) ?>">
             <div class="container">
 
                 <!-- Text block -->
@@ -67,24 +74,29 @@
                     <h2 class="history-content-section-title">
                         <?= htmlspecialchars($section['title'] ?? '') ?>
                     </h2>
+
                     <?php foreach ($section['sections'] as $subsection): ?>
                         <div class="history-content-section-item">
                             <p class="history-content-section-subtitle">
                                 <?= htmlspecialchars($subsection['subtitle'] ?? '') ?>
                             </p>
+
                             <?php foreach ($subsection['paragraphs'] as $paragraph): ?>
-                                <p class="history-content-section-paragraph">
-                                    <?= htmlspecialchars($paragraph) ?>
-                                </p>
+                                <div class="history-content-section-paragraph cms-html">
+                                    <?= $paragraph ?>
+                                </div>
                             <?php endforeach; ?>
                         </div>
                     <?php endforeach; ?>
+
                 </div>
 
                 <!-- Media block -->
                 <div class="history-content-media">
                     <?php foreach ($section['image_ids'] ?? [] as $imageId): ?>
-                        <?php $image = $viewModel->contentImages[$imageId] ?? null; ?>
+                        <?php
+                        $image = $viewModel->contentImages[$imageId] ?? null;
+                        ?>
                         <?php if ($image): ?>
                             <div class="history-content-image">
                                 <img src="<?= htmlspecialchars($image->imageUrl) ?>"
@@ -95,9 +107,14 @@
 
                     <?php if (!empty($section['did_you_know'])): ?>
                         <div class="history-did-you-know">
-                            <p class="history-did-you-know-title">DID YOU KNOW?</p>
+                            <p class="history-did-you-know-title">
+                                DID YOU KNOW?
+                            </p>
+
                             <?php foreach ($section['did_you_know'] as $fact): ?>
-                                <p class="history-did-you-know-text"><?= htmlspecialchars($fact) ?></p>
+                                <div class="history-did-you-know-text cms-html">
+                                    <?= $fact ?>
+                                </div>
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
@@ -122,19 +139,21 @@
                             <?= htmlspecialchars($viewModel->experience['independent']['title'] ?? '') ?>
                         </h3>
                         <div class="history-experience-card history-experience-card--white">
-                            <p class="history-experience-card-text">
-                                <?= htmlspecialchars($viewModel->experience['independent']['text'] ?? '') ?>
-                            </p>
+                            <div class="history-experience-card-text cms-html">
+                                <?= $viewModel->experience['independent']['text'] ?? '' ?>
+                            </div>
+
                             <?php if (!empty($viewModel->experience['independent']['subtitle'])): ?>
                                 <p class="history-experience-card-subtitle">
                                     <?= htmlspecialchars($viewModel->experience['independent']['subtitle']) ?>
                                 </p>
                             <?php endif; ?>
+
                             <?php foreach ($viewModel->experience['independent']['details'] ?? [] as $detail): ?>
                                 <p class="history-experience-card-detail">
-                    <span class="history-experience-card-detail-label">
-                        <?= htmlspecialchars($detail['label']) ?>
-                    </span>
+                                    <span class="history-experience-card-detail-label">
+                                        <?= htmlspecialchars($detail['label']) ?>
+                                    </span>
                                     <?= htmlspecialchars($detail['text']) ?>
                                 </p>
                             <?php endforeach; ?>
@@ -147,14 +166,17 @@
                             <?= htmlspecialchars($viewModel->experience['guided']['title'] ?? '') ?>
                         </h3>
                         <div class="history-experience-card history-experience-card--orange">
-                            <p class="history-experience-card-text">
-                                <?= htmlspecialchars($viewModel->experience['guided']['text'] ?? '') ?>
-                            </p>
+                            <div class="history-experience-card-text cms-html">
+                                <?= $viewModel->experience['guided']['text'] ?? '' ?>
+                            </div>
                             <a href="/history" class="history-button-big">
-                                <span class="history-button-text">VIEW TOUR DETAILS</span>
+                                <span class="history-button-text">
+                                    VIEW TOUR DETAILS
+                                </span>
                             </a>
                         </div>
                     </div>
+
                 </div>
             </div>
         </section>
@@ -165,30 +187,32 @@
         <div class="container">
 
             <?php if ($viewModel->prevLocation): ?>
-                <a href="/history/location/<?= htmlspecialchars($viewModel->prevLocation->slug) ?>"
-                   class="history-button-big">
-                    <span class="history-button-text">< <?= htmlspecialchars($viewModel->prevLocation->name) ?></span>
+                <a href="/history/location/<?= htmlspecialchars($viewModel->prevLocation->slug) ?>" class="history-button-big">
+                    <span class="history-button-text">
+                        < <?= htmlspecialchars($viewModel->prevLocation->name) ?>
+                    </span>
                 </a>
             <?php else: ?>
                 <span></span>
             <?php endif; ?>
 
             <a href="/history/locations" class="history-button-big">
-                <span class="history-button-text">ALL LANDMARKS</span>
+                <span class="history-button-text">
+                    ALL LANDMARKS
+                </span>
             </a>
 
             <?php if ($viewModel->nextLocation): ?>
-                <a href="/history/location/<?= htmlspecialchars($viewModel->nextLocation->slug) ?>"
-                   class="history-button-big">
-                    <span class="history-button-text"><?= htmlspecialchars($viewModel->nextLocation->name) ?> ></span>
+                <a href="/history/location/<?= htmlspecialchars($viewModel->nextLocation->slug) ?>" class="history-button-big">
+                    <span class="history-button-text">
+                        <?= htmlspecialchars($viewModel->nextLocation->name) ?> >
+                    </span>
                 </a>
             <?php else: ?>
                 <span></span>
             <?php endif; ?>
-
         </div>
     </nav>
-
 </main>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>

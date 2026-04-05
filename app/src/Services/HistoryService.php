@@ -12,8 +12,7 @@ class HistoryService implements HistoryServiceInterface
 {
     public function __construct(
         private HistoryRepositoryInterface $historyRepository
-    )
-    {
+    ){
     }
 
     // LOCATIONS
@@ -38,6 +37,11 @@ class HistoryService implements HistoryServiceInterface
     }
 
     //IMAGES
+    public function getAllImages(): array
+    {
+        return $this->historyRepository->getAllImages();
+    }
+
     public function getPrimaryImage(int $locationId): ?HistoryImage
     {
         return $this->historyRepository->getPrimaryImage($locationId);
@@ -58,6 +62,11 @@ class HistoryService implements HistoryServiceInterface
         return $this->historyRepository->getImageById($imageId);
     }
 
+    public function insertImage(string $imageUrl, string $altText): int
+    {
+        return $this->historyRepository->insertImage($imageUrl, $altText);
+    }
+
     // BLOCKS
     public function getPageBlocks(string $slug): array
     {
@@ -67,6 +76,10 @@ class HistoryService implements HistoryServiceInterface
     public function getPageBlocksList(string $slug): array
     {
         return $this->historyRepository->getPageBlocksList($slug);
+    }
+    public function updatePageBlock(int $blockId, array $content): bool
+    {
+        return $this->historyRepository->updatePageBlock($blockId, $content);
     }
 
     // TOURS

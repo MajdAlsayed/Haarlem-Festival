@@ -121,6 +121,29 @@ final class AdminCmsUploadController
             return;
         }
 
+        if ($context === 'history_hero') {
+            $dir = dirname(__DIR__, 2) . '/public/images/history';
+            if (!is_dir($dir)) {
+                http_response_code(500);
+                echo json_encode(['ok' => false, 'error' => 'images/history missing.']);
+                return;
+            }
+            $dest = $dir . '/' . $basename;
+            if (!move_uploaded_file($tmp, $dest)) {
+                http_response_code(500);
+                echo json_encode(['ok' => false, 'error' => 'Save failed.']);
+                return;
+            }
+
+            // Insert into history_images and get new image_id
+            $service = new \App\Services\HistoryService(new \App\Repositories\HistoryRepository());
+            $imageUrl = '/images/history/' . rawurlencode($basename);
+            $imageId = $service->insertImage($imageUrl, $basename);
+
+            echo json_encode(['ok' => true, 'image_id' => $imageId, 'url' => $imageUrl]);
+            return;
+        }
+
         http_response_code(400);
         echo json_encode(['ok' => false, 'error' => 'Unknown context.']);
     }
