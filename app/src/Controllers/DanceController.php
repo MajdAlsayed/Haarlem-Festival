@@ -2,54 +2,69 @@
 
 namespace App\Controllers;
 
-use App\Contracts\ServiceInterface\EventServiceInterface;
-use App\Repositories\EventRepository;
-use App\Services\ArtistService;
-use App\Services\EventService;
+use App\Repositories\SettingsRepository;
+use App\Services\DanceService;
 use App\ViewModels\DanceViewModel;
 
+/**
+ * Dance page. Controller gets data from services, builds the view model, then loads the view.
+ */
 class DanceController
 {
-    private EventServiceInterface $eventService;
-    private ArtistService $artistService;
+    private DanceService $danceService;
+    private SettingsRepository $settingsRepository;
 
     public function __construct()
     {
-        $this->eventService = new EventService(new EventRepository());
-        $this->artistService = new ArtistService(new \App\Repositories\ArtistsRepository(), new EventRepository());
+        $this->danceService = new DanceService(
+            new \App\Repositories\EventRepository(),
+            new \App\Repositories\DanceSettingsRepository()
+        );
+        $this->settingsRepository = new SettingsRepository();
     }
 
     public function index(): void
     {
-        $events = $this->eventService->getByCategory('dance');
-        $fridayEvents = $this->eventService->getByCategoryAndDay('dance', 'friday');
-        // Figma order: Lichtfabriek, Slachthuis, Jopenkerk, XO, Puncher (venue_id 4,7,5,8,9)
-        $fridayVenueOrder = [4 => 0, 7 => 1, 5 => 2, 8 => 3, 9 => 4];
-        usort($fridayEvents, function ($a, $b) use ($fridayVenueOrder) {
-            $posA = $fridayVenueOrder[$a->venueId] ?? 99; // unknown venue last
-            $posB = $fridayVenueOrder[$b->venueId] ?? 99;
-            return $posA <=> $posB;
-        });
-        $saturdayEvents = $this->eventService->getByCategoryAndDay('dance', 'saturday');
-        // Figma order: Caprera, Jopenkerk, Slachthuis (venue_id 6,5,7); within Slachthuis by time
-        $saturdayVenueOrder = [6 => 0, 5 => 1, 7 => 2];
-        usort($saturdayEvents, function ($a, $b) use ($saturdayVenueOrder) {
-            $posA = $saturdayVenueOrder[$a->venueId] ?? 99;
-            $posB = $saturdayVenueOrder[$b->venueId] ?? 99;
-            if ($posA !== $posB) return $posA <=> $posB;
-            return strcmp($a->startTime ?? '', $b->startTime ?? ''); // same venue: by time
-        });
-        $sundayEvents = $this->eventService->getByCategoryAndDay('dance', 'sunday');
-        // Figma order: Caprera, Jopenkerk, XO, Slachthuis (venue_id 6,5,8,7)
-        $sundayVenueOrder = [6 => 0, 5 => 1, 8 => 2, 7 => 3];
-        usort($sundayEvents, function ($a, $b) use ($sundayVenueOrder) {
-            $posA = $sundayVenueOrder[$a->venueId] ?? 99;
-            $posB = $sundayVenueOrder[$b->venueId] ?? 99;
-            return $posA <=> $posB;
-        });
+        try {
+            $grouped = $this->danceService->getEventsGroupedByDay();
+            $artists = $this->danceService->getArtistsOrdered();
+            $danceSettings = $this->danceService->getDanceSettings();
+            $appSettings = $this->settingsRepository->getAll();
+        } catch (\Throwable $e) {
+            throw $e;
+        }
 
-        $artists = $this->artistService->getAllOrdered();
-        $viewModel = new DanceViewModel($events, $fridayEvents, $saturdayEvents, $sundayEvents, $artists);
+        $fridayEvents = $grouped['friday'];
+        $saturdayEvents = $grouped['saturday'];
+        $sundayEvents = $grouped['sunday'];
+        $events = $grouped['all'];
+
+        $featuredEvents = array_merge(
+            array_slice($saturdayEvents, 0, 1),
+            array_slice($sundayEvents, 1, 2)
+        );
+
+        $breadcrumbs = [
+            ['label' => 'HOME', 'url' => '/'],
+            ['label' => 'DANCE', 'url' => null],
+        ];
+
+        $pageTitle = isset($danceSettings['dance_page_title']) && is_string($danceSettings['dance_page_title']) && $danceSettings['dance_page_title'] !== ''
+            ? $danceSettings['dance_page_title']
+            : 'Dance Festival';
+
+        $viewModel = new DanceViewModel(
+            $events,
+            $fridayEvents,
+            $saturdayEvents,
+            $sundayEvents,
+            $featuredEvents,
+            $artists,
+            $appSettings,
+            $danceSettings,
+            $breadcrumbs,
+            $pageTitle
+        );
 
         require __DIR__ . '/../Views/Dance/Index.php';
     }

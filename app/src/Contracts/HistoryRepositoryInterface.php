@@ -15,6 +15,9 @@ interface HistoryRepositoryInterface
 
     public function getToursByDate(string $date): array;
 
+    public function getToursWithDetailsByDate(string $date): array;
+    public function getTourDates(): array;
+
     // LOCATIONS
     public function getAllLocations(): array;
 

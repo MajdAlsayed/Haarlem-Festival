@@ -9,6 +9,7 @@ final class LoginViewModel
         public string $csrf,
         public ?string $error = null,
         public array $appSettings = [],
+        public ?string $returnTo = null,
     ) {
     }
 }

@@ -122,4 +122,127 @@ final class JazzRepository
             return strtolower(trim((string)$e['title'])) === $title;
         }));
     }
+
+    /**
+     * Attach preview_audio (url + track_title) from event_audio table when present.
+     *
+     * @param array<int, array<string,mixed>> $events
+     * @return array<int, array<string,mixed>>
+     */
+    public function attachPreviewAudio(array $events): array
+    {
+        if ($events === []) {
+            return $events;
+        }
+        $ids = array_values(array_unique(array_map(fn ($e) => (int) ($e['event_id'] ?? 0), $events)));
+        $ids = array_values(array_filter($ids, fn ($id) => $id > 0));
+        if ($ids === []) {
+            return $events;
+        }
+
+        $db = Database::getConnection();
+        try {
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $stmt = $db->prepare(
+                "SELECT event_id, file_path, track_title FROM event_audio WHERE event_id IN ($placeholders)"
+            );
+            $stmt->execute($ids);
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Throwable) {
+            return $events;
+        }
+
+        $byEvent = [];
+        foreach ($rows as $r) {
+            $eid = (int) $r['event_id'];
+            $path = (string) ($r['file_path'] ?? '');
+            $byEvent[$eid] = [
+                'url' => $this->buildAudioPublicUrl($path),
+                'track_title' => isset($r['track_title']) && $r['track_title'] !== null ? (string) $r['track_title'] : null,
+            ];
+        }
+
+        foreach ($events as $i => $e) {
+            $eid = (int) ($e['event_id'] ?? 0);
+            $events[$i]['preview_audio'] = $byEvent[$eid] ?? null;
+        }
+
+        return $events;
+    }
+
+    private function buildAudioPublicUrl(string $relativePath): string
+    {
+        $relativePath = str_replace('\\', '/', trim($relativePath, '/'));
+        if ($relativePath === '') {
+            return '/audio/';
+        }
+        $segments = explode('/', $relativePath);
+
+        return '/audio/' . implode('/', array_map('rawurlencode', $segments));
+    }
+
+    /**
+     * Discography rows for a jazz artist page (e.g. Karsu). Empty if table missing or none.
+     *
+     * @return list<array{
+     *   track_id:int,
+     *   title:string,
+     *   release_year:?int,
+     *   duration_seconds:?int,
+     *   play_count:int,
+     *   image_url:string,
+     *   audio_url:string,
+     *   sort_order:int
+     * }>
+     */
+    public function getDiscographyByArtistSlug(string $slug): array
+    {
+        $slug = strtolower(trim($slug));
+        if ($slug === '') {
+            return [];
+        }
+
+        $db = Database::getConnection();
+        try {
+            $stmt = $db->prepare(
+                'SELECT track_id, title, release_year, duration_seconds, play_count, image_file, audio_file, sort_order
+                 FROM artist_discography
+                 WHERE artist_slug = :slug
+                 ORDER BY sort_order ASC, track_id ASC'
+            );
+            $stmt->execute(['slug' => $slug]);
+            /** @var array<int, array<string, mixed>> $rows */
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Throwable) {
+            return [];
+        }
+
+        return array_map(function (array $r): array {
+            return [
+                'track_id' => (int) $r['track_id'],
+                'title' => (string) $r['title'],
+                'release_year' => $r['release_year'] !== null ? (int) $r['release_year'] : null,
+                'duration_seconds' => $r['duration_seconds'] !== null ? (int) $r['duration_seconds'] : null,
+                'play_count' => (int) $r['play_count'],
+                'image_url' => $this->buildJazzImagePublicUrl((string) $r['image_file']),
+                'audio_url' => $this->buildAudioPublicUrl((string) $r['audio_file']),
+                'sort_order' => (int) $r['sort_order'],
+            ];
+        }, $rows);
+    }
+
+    private function buildJazzImagePublicUrl(string $fileName): string
+    {
+        $fileName = str_replace('\\', '/', trim($fileName, '/'));
+        if ($fileName === '') {
+            return '/images/jazz/';
+        }
+        if (str_contains($fileName, '/')) {
+            $segments = explode('/', $fileName);
+
+            return '/images/jazz/' . implode('/', array_map('rawurlencode', $segments));
+        }
+
+        return '/images/jazz/' . rawurlencode($fileName);
+    }
 }

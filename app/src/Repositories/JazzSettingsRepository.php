@@ -8,46 +8,95 @@ use App\Core\Database;
 final class JazzSettingsRepository
 {
     /** @var array<string, mixed>|null */
-    private static ?array $cache = null;
+    private static ?array $mergedCache = null;
 
-    /** @return array<string, mixed> */
-    public function getAll(): array
+    public static function clearCache(): void
     {
-        if (self::$cache !== null) return self::$cache;
+        self::$mergedCache = null;
+    }
+
+    /**
+     * Full jazz config: defaults from Config/jazz.php overlaid by jazz_settings rows (JSON values).
+     *
+     * @return array<string, mixed>
+     */
+    public function getMergedConfig(): array
+    {
+        if (self::$mergedCache !== null) {
+            return self::$mergedCache;
+        }
+
+        /** @var array<string, mixed> $defaults */
+        $defaults = require __DIR__ . '/../Config/jazz.php';
 
         try {
             $db = Database::getConnection();
             $stmt = $db->query('SELECT setting_key, setting_value FROM jazz_settings');
+            /** @var array<int, array{setting_key:string, setting_value:?string}> $rows */
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        } catch (\Throwable $e) {
-            self::$cache = require __DIR__ . '/../Config/jazz.php';
-            return self::$cache;
+        } catch (\Throwable) {
+            self::$mergedCache = $defaults;
+
+            return self::$mergedCache;
         }
 
-        if ($rows === []) {
-            self::$cache = require __DIR__ . '/../Config/jazz.php';
-            return self::$cache;
-        }
-
-        $out = [];
+        $fromDb = [];
         foreach ($rows as $row) {
-            $key = (string)$row['setting_key'];
+            $key = (string) $row['setting_key'];
             $val = $row['setting_value'];
-            if ($val !== null) {
-                $decoded = json_decode($val, true);
-                $out[$key] = (is_array($decoded) || is_object($decoded)) ? $decoded : $val;
+            if ($val === null || $val === '') {
+                continue;
+            }
+            $decoded = json_decode($val, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $fromDb[$key] = $decoded;
             } else {
-                $out[$key] = null;
+                $fromDb[$key] = $val;
             }
         }
 
-        // normalize to match config keys if they are stored as raw strings
-        if (!isset($out['artist_pages'])) {
-            $fallback = require __DIR__ . '/../Config/jazz.php';
-            $out['artist_pages'] = $fallback['artist_pages'];
+        $merged = $defaults;
+        foreach (array_keys($defaults) as $k) {
+            if (array_key_exists($k, $fromDb)) {
+                $merged[$k] = $fromDb[$k];
+            }
         }
 
-        self::$cache = $out;
-        return $out;
+        self::$mergedCache = $merged;
+
+        return self::$mergedCache;
+    }
+
+    /** @return array<string, mixed> */
+    public function getAll(): array
+    {
+        return $this->getMergedConfig();
+    }
+
+    /**
+     * @param array<string, mixed> $settings Whitelisted keys from jazz.php
+     */
+    public function saveMany(array $settings): void
+    {
+        /** @var array<string, mixed> $defaults */
+        $defaults = require __DIR__ . '/../Config/jazz.php';
+        $allowed = array_keys($defaults);
+
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            'INSERT INTO jazz_settings (setting_key, setting_value, updated_at)
+             VALUES (?, ?, NOW())
+             ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = NOW()'
+        );
+
+        foreach ($settings as $key => $value) {
+            if (!in_array($key, $allowed, true)) {
+                continue;
+            }
+            $json = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+            $stmt->execute([$key, $json]);
+        }
+
+        self::clearCache();
     }
 }

@@ -1,11 +1,15 @@
+<?php
+/** @var array<string, string> $cmsHome */
+$h = $cmsHome ?? [];
+?>
 <section class="hero">
     <div class="hero-overlay"></div>
     <div class="hero-content">
-        <p class="hero-eyebrow">Festival</p>
-        <h1>Haarlem Festival</h1>
-        <p class="hero-subtitle">
-            Experience music, culture &amp; history like never before.
-        </p>
-        <a class="btn btn-primary" href="#events">Explore Now</a>
+        <p class="hero-eyebrow"><?= htmlspecialchars($h['hero_eyebrow'] ?? '') ?></p>
+        <h1><?= htmlspecialchars($h['hero_heading'] ?? '') ?></h1>
+        <div class="hero-subtitle cms-html">
+            <?= \App\Core\HtmlSanitizer::purify($h['hero_subtitle'] ?? '') ?>
+        </div>
+        <a class="btn btn-primary" href="<?= htmlspecialchars($h['hero_cta_href'] ?? '#events') ?>"><?= htmlspecialchars($h['hero_cta_label'] ?? '') ?></a>
     </div>
 </section>

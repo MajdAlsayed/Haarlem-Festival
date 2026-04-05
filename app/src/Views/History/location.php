@@ -1,36 +1,9 @@
-<?php
-$hero = null;
-$aboutBanner = null;
-$statsBar = null;
-$contentSections = [];
-$experience = null;
-
-foreach ($viewModel->blocks as $block) {
-    switch ($block['block_type']) {
-        case 'hero':
-            $hero = $block['content'];
-            break;
-        case 'about_banner':
-            $aboutBanner = $block['content'];
-            break;
-        case 'stats_bar':
-            $statsBar = $block['content'];
-            break;
-        case 'content_section':
-            $contentSections[] = $block['content'];
-            break;
-        case 'experience':
-            $experience = $block['content'];
-            break;
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($hero['title'] ?? '') ?></title>
+    <title><?= htmlspecialchars($viewModel->hero['title'] ?? '') ?></title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/history.css">
 </head>
@@ -40,52 +13,40 @@ foreach ($viewModel->blocks as $block) {
 
 <main>
     <!-- HERO -->
-    <section class="history-hero-section">
-        <div class="history-hero-background">
-            <img
-                    src="<?= htmlspecialchars($viewModel->heroImage?->imageUrl ?? '') ?>"
-                    alt="<?= htmlspecialchars($viewModel->heroImage?->altText ?? '') ?>"
-            >
-        </div>
-        <div class="history-hero-content">
-            <div class="container">
-                <div class="history-hero-title-container">
-                    <h1 class="history-hero-title"><?= nl2br(htmlspecialchars($hero['title'] ?? '')) ?></h1>
-                    <p class="history-hero-subtitle"><?= htmlspecialchars($hero['subtitle'] ?? '') ?></p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <?php
+    $sectionModifier = '';
+    $titleModifier = '';
+    $showSubtitle = true;
+    $showButton = false;
+    require __DIR__ . '/../partials/history/history-hero.php';
+    ?>
 
     <!-- BREADCRUMBS -->
-    <nav class="history-breadcrumb" aria-label="Breadcrumb">
-        <div class="container">
-            <a href="/" class="history-breadcrumb-link">HOME</a>
-            <span class="history-breadcrumb-separator">→</span>
-            <a href="/history" class="history-breadcrumb-link">HISTORY</a>
-            <span class="history-breadcrumb-separator">→</span>
-            <a href="/history/locations" class="history-breadcrumb-link">LANDMARKS</a>
-            <span class="history-breadcrumb-separator">→</span>
-            <span class="history-breadcrumb-link active" aria-current="page">
-                <?= htmlspecialchars($viewModel->location->name) ?>
-            </span>
-        </div>
-    </nav>
+    <?php
+    $breadcrumbs = [
+        ['label' => 'HOME', 'url' => '/'],
+        ['label' => 'HISTORY', 'url' => '/history'],
+        ['label' => 'LOCATIONS', 'url' => '/history/locations'],
+        ['label' => strtoupper($viewModel->location->name), 'url' => null],
+    ];
+    require __DIR__ . '/../partials/history/history-breadcrumb.php';
+    ?>
 
     <!-- ABOUT BANNER -->
-    <?php if ($aboutBanner): ?>
-        <section class="history-heritage-banner">
-            <div class="container">
-                <p class="history-intro-text"><?= htmlspecialchars($aboutBanner['text'] ?? '') ?></p>
-            </div>
-        </section>
+    <?php if ($viewModel->aboutBanner): ?>
+        <?php
+        $sectionModifier = '';
+        $showTitle = false;
+        $textModifier = 'history-about-banner--bold';
+        require __DIR__ . '/../partials/history/history-about-banner.php';
+        ?>
     <?php endif; ?>
 
     <!-- STATS BAR -->
-    <?php if ($statsBar): ?>
+    <?php if ($viewModel->statsBar): ?>
         <section class="history-stats-banner">
             <div class="container">
-                <?php foreach ($statsBar['stats'] as $stat): ?>
+                <?php foreach ($viewModel->statsBar['stats'] as $stat): ?>
                     <div class="history-stats-item">
                         <span class="history-stats-value"><?= htmlspecialchars($stat['value']) ?></span>
                         <span class="history-stats-label"><?= htmlspecialchars($stat['label']) ?></span>
@@ -96,7 +57,7 @@ foreach ($viewModel->blocks as $block) {
     <?php endif; ?>
 
     <!-- CONTENT SECTIONS -->
-    <?php foreach ($contentSections as $section): ?>
+    <?php foreach ($viewModel->contentSections as $section): ?>
         <?php $layoutClass = 'history-' . $section['layout']; ?>
         <section class="history-content-section <?= $layoutClass ?>">
             <div class="container">
@@ -147,29 +108,29 @@ foreach ($viewModel->blocks as $block) {
     <?php endforeach; ?>
 
     <!-- EXPERIENCE BANNER -->
-    <?php if ($experience): ?>
+    <?php if ($viewModel->experience): ?>
         <section class="history-experience-banner">
             <div class="container">
                 <h2 class="history-experience-banner-title">
-                    <?= htmlspecialchars($experience['title'] ?? '') ?>
+                    <?= htmlspecialchars($viewModel->experience['title'] ?? '') ?>
                 </h2>
                 <div class="history-experience-cards">
 
                     <!-- Independent Visit -->
                     <div class="history-experience-card-wrapper">
                         <h3 class="history-experience-card-title history-experience-card-title--dark">
-                            <?= htmlspecialchars($experience['independent']['title'] ?? '') ?>
+                            <?= htmlspecialchars($viewModel->experience['independent']['title'] ?? '') ?>
                         </h3>
                         <div class="history-experience-card history-experience-card--white">
                             <p class="history-experience-card-text">
-                                <?= htmlspecialchars($experience['independent']['text'] ?? '') ?>
+                                <?= htmlspecialchars($viewModel->experience['independent']['text'] ?? '') ?>
                             </p>
-                            <?php if (!empty($experience['independent']['subtitle'])): ?>
+                            <?php if (!empty($viewModel->experience['independent']['subtitle'])): ?>
                                 <p class="history-experience-card-subtitle">
-                                    <?= htmlspecialchars($experience['independent']['subtitle']) ?>
+                                    <?= htmlspecialchars($viewModel->experience['independent']['subtitle']) ?>
                                 </p>
                             <?php endif; ?>
-                            <?php foreach ($experience['independent']['details'] ?? [] as $detail): ?>
+                            <?php foreach ($viewModel->experience['independent']['details'] ?? [] as $detail): ?>
                                 <p class="history-experience-card-detail">
                     <span class="history-experience-card-detail-label">
                         <?= htmlspecialchars($detail['label']) ?>
@@ -183,11 +144,11 @@ foreach ($viewModel->blocks as $block) {
                     <!-- Guided Tour -->
                     <div class="history-experience-card-wrapper">
                         <h3 class="history-experience-card-title history-experience-card-title--dark">
-                            <?= htmlspecialchars($experience['guided']['title'] ?? '') ?>
+                            <?= htmlspecialchars($viewModel->experience['guided']['title'] ?? '') ?>
                         </h3>
                         <div class="history-experience-card history-experience-card--orange">
                             <p class="history-experience-card-text">
-                                <?= htmlspecialchars($experience['guided']['text'] ?? '') ?>
+                                <?= htmlspecialchars($viewModel->experience['guided']['text'] ?? '') ?>
                             </p>
                             <a href="/history" class="history-button-big">
                                 <span class="history-button-text">VIEW TOUR DETAILS</span>
