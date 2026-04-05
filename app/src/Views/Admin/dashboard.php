@@ -38,6 +38,14 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                 <h2 class="admin-card-title">Jazz</h2>
                 <p class="admin-card-desc">Events, layout, artist pages, discography.</p>
             </a>
+
+            
+            <a href="/admin/food" class="admin-card">
+                <span class="admin-card-icon">🍽️</span>
+                <h2 class="admin-card-title">Food</h2>
+                <p class="admin-card-desc">Restaurants, settings, reservation fee &amp; filters.</p>
+            </a>
+
             <a href="/admin/tickets" class="admin-card">
                 <span class="admin-card-icon">🎫</span>
                 <h2 class="admin-card-title">Tickets</h2>

@@ -29,6 +29,7 @@ use App\Controllers\AdminOrdersController;
 use App\Controllers\AdminHomepageController;
 use App\Controllers\AdminCmsUploadController;
 use App\Controllers\AdminDanceController;
+use App\Controllers\AdminFoodController;
 use App\Controllers\CartController;
 use App\Controllers\CheckoutController;
 use App\Controllers\TicketScanController;
@@ -465,9 +466,65 @@ switch ($uri) {
         if ($method === 'POST') (new AdminTicketsController())->delete();
         else { header('Location: /admin/tickets'); exit; }
         break;
+    case '/admin/food':
+        (new AdminFoodController())->index();
+        break;
+ 
+    case '/admin/food/settings':
+        $food = new AdminFoodController();
+        if ($method === 'POST') {
+            $food->saveSettings();
+        } else {
+            $food->settings();
+        }
+        break;
+ 
+    case '/admin/food/restaurants':
+        if ($method === 'GET') {
+            (new AdminFoodController())->restaurants();
+        } else {
+            http_response_code(405);
+        }
+        break;
+ 
+    case '/admin/food/restaurants/new':
+        if ($method === 'GET') {
+            (new AdminFoodController())->newRestaurant();
+        } else {
+            http_response_code(405);
+        }
+        break;
+ 
+    case '/admin/food/restaurants/edit':
+        if ($method === 'GET') {
+            (new AdminFoodController())->editRestaurant();
+        } else {
+            http_response_code(405);
+        }
+        break;
+ 
+    case '/admin/food/restaurants/save':
+        if ($method === 'POST') {
+            (new AdminFoodController())->saveRestaurant();
+        } else {
+            header('Location: /admin/food/restaurants');
+            exit;
+        }
+        break;
+ 
+    case '/admin/food/restaurants/delete':
+        if ($method === 'POST') {
+            (new AdminFoodController())->deleteRestaurant();
+        } else {
+            header('Location: /admin/food/restaurants');
+            exit;
+        }
+        break;
 
     default:
         http_response_code(404);
         echo 'Page not found';
         break;
+
+
 }
