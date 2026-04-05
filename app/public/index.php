@@ -100,6 +100,9 @@ if (preg_match('#^/admin/cms/history/location/([a-z0-9-]+)$#', $uri, $m)) {
     if ($method === 'GET') $historyLocationCms->showLocationForm($m[1]);
     elseif ($method === 'POST') $historyLocationCms->saveLocation($m[1]);
     else http_response_code(405);
+    exit;
+}
+
 if (preg_match('#^/account/order/(\d+)$#', $uri, $m)) {
     if ($method === 'GET') {
         (new AccountController())->orderDetail((int) $m[1]);
