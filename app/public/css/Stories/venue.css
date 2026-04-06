@@ -1,8 +1,4 @@
-/* =========================================================
-   STORIES VENUE PAGE — FIXED TO MATCH PROJECT STYLE
-   ========================================================= */
 
-/* ---------- Page base ---------- */
 body.stories-dark {
     margin: 0;
     background: radial-gradient(circle at top, #25201a 0, #0c0c0c 45%, #050505 100%);
@@ -37,9 +33,6 @@ body.stories-dark {
     line-height: 1.75;
 }
 
-/* =========================================================
-   BREADCRUMB — USE THIS ONLY ONCE
-   ========================================================= */
 
 .stories-breadcrumb {
     background: transparent;
@@ -91,7 +84,7 @@ body.stories-dark {
     font-size: 13px;
 }
 
-/* ---------- Hero ---------- */
+
 .venue-hero-x {
     height: 340px;
     position: relative;

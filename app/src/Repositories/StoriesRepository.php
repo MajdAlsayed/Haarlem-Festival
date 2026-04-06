@@ -61,6 +61,7 @@ class StoriesRepository extends Repository implements IStoriesRepository
 
     public function getStories(?string $day = null): array
     {
+        // Get stories with event data using LEFT JOIN
         $sql = "
             SELECT
                 e.event_id,
@@ -78,7 +79,8 @@ class StoriesRepository extends Repository implements IStoriesRepository
                 s.story_type,
                 s.age,
                 s.language,
-                s.template
+                s.template,
+                COALESCE(s.audience, '') AS audience
             FROM events e
             LEFT JOIN stories s ON s.event_id = e.event_id
             WHERE e.event_type_id = 5
@@ -125,7 +127,8 @@ class StoriesRepository extends Repository implements IStoriesRepository
                 s.story_type,
                 s.age,
                 s.language,
-                s.template
+                s.template,
+                COALESCE(s.audience, '') AS audience
             FROM events e
             LEFT JOIN stories s ON s.event_id = e.event_id
             WHERE e.event_type_id = 5
@@ -167,6 +170,7 @@ class StoriesRepository extends Repository implements IStoriesRepository
                 s.age,
                 s.language,
                 s.template,
+                COALESCE(s.audience, '') AS audience,
                 s.venue_id,
                 s.event_id,
                 e.event_day,
@@ -197,6 +201,7 @@ class StoriesRepository extends Repository implements IStoriesRepository
             SELECT
                 story_id, name, slug, description,
                 image_path, story_type, age, language, template,
+                COALESCE(audience, '') AS audience,
                 venue_id, event_id
             FROM stories
             ORDER BY story_id ASC
@@ -211,6 +216,7 @@ class StoriesRepository extends Repository implements IStoriesRepository
             SELECT
                 story_id, name, slug, description,
                 image_path, story_type, age, language, template,
+                COALESCE(audience, '') AS audience,
                 venue_id, event_id
             FROM stories
             WHERE slug = :slug
@@ -251,61 +257,32 @@ class StoriesRepository extends Repository implements IStoriesRepository
 
     public function updateStory(int $storyId, array $data): bool
     {
-        // Only update template if the caller explicitly provides one
-        if (isset($data['template']) && $data['template'] !== '') {
-            $sql = "
-                UPDATE stories SET
-                    name        = :name,
-                    slug        = :slug,
-                    description = :description,
-                    image_path  = :image_path,
-                    story_type  = :story_type,
-                    age         = :age,
-                    language    = :language,
-                    template    = :template,
-                    event_id    = :event_id
-                WHERE story_id  = :story_id
-            ";
+        $sql = "
+            UPDATE stories SET
+                name        = :name,
+                slug        = :slug,
+                description = :description,
+                image_path  = :image_path,
+                story_type  = :story_type,
+                age         = :age,
+                language    = :language,
+                template    = :template,
+                event_id    = :event_id
+            WHERE story_id  = :story_id
+        ";
 
-            $params = [
-                'name'        => $data['name'],
-                'slug'        => $data['slug'],
-                'description' => $data['description'],
-                'image_path'  => $data['image_path'],
-                'story_type'  => $data['story_type'],
-                'age'         => $data['age'],
-                'language'    => $data['language'],
-                'template'    => $data['template'],
-                'event_id'    => (int)($data['event_id'] ?? 0),
-                'story_id'    => $storyId,
-            ];
-        } else {
-            
-            $sql = "
-                UPDATE stories SET
-                    name        = :name,
-                    slug        = :slug,
-                    description = :description,
-                    image_path  = :image_path,
-                    story_type  = :story_type,
-                    age         = :age,
-                    language    = :language,
-                    event_id    = :event_id
-                WHERE story_id  = :story_id
-            ";
-
-            $params = [
-                'name'        => $data['name'],
-                'slug'        => $data['slug'],
-                'description' => $data['description'],
-                'image_path'  => $data['image_path'],
-                'story_type'  => $data['story_type'],
-                'age'         => $data['age'],
-                'language'    => $data['language'],
-                'event_id'    => (int)($data['event_id'] ?? 0),
-                'story_id'    => $storyId,
-            ];
-        }
+        $params = [
+            'name'        => $data['name'],
+            'slug'        => $data['slug'],
+            'description' => $data['description'],
+            'image_path'  => $data['image_path'],
+            'story_type'  => $data['story_type'],
+            'age'         => $data['age'],
+            'language'    => $data['language'],
+            'template'    => isset($data['template']) && $data['template'] !== '' ? $data['template'] : 'generic',
+            'event_id'    => (int)($data['event_id'] ?? 0),
+            'story_id'    => $storyId,
+        ];
 
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($params);

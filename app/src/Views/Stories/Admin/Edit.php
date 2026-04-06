@@ -40,6 +40,7 @@ if (!function_exists('h')) {
 
         <form method="post" action="/cms/stories/update" class="admin-form admin-form--wide">
             <input type="hidden" name="story_id" value="<?= (int)($story['story_id'] ?? 0) ?>">
+            <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
 
             <section class="story-cms-card">
                 <div class="story-cms-card__header">
@@ -135,14 +136,20 @@ if (!function_exists('h')) {
                     <div class="story-cms-grid-3">
                         <div class="admin-field">
                             <label for="story_type">Story Type</label>
-                            <input
-                                class="admin-input"
-                                type="text"
+                            <select
+                                class="admin-input <?= !empty($errors['story_type']) ? 'has-error' : '' ?>"
                                 id="story_type"
                                 name="story_type"
-                                value="<?= h($story['story_type'] ?? '') ?>"
-                                placeholder="e.g. Podcast, Story, Kids"
                             >
+                                <option value="">— Select Type —</option>
+                                <option value="historical" <?= ($story['story_type'] ?? '') === 'historical' ? 'selected' : '' ?>>Historical</option>
+                                <option value="fictional" <?= ($story['story_type'] ?? '') === 'fictional' ? 'selected' : '' ?>>Fictional</option>
+                                <option value="cultural" <?= ($story['story_type'] ?? '') === 'cultural' ? 'selected' : '' ?>>Cultural</option>
+                                <option value="interactive" <?= ($story['story_type'] ?? '') === 'interactive' ? 'selected' : '' ?>>Interactive</option>
+                                <option value="podcast" <?= ($story['story_type'] ?? '') === 'podcast' ? 'selected' : '' ?>>Podcast</option>
+                                <option value="story" <?= ($story['story_type'] ?? '') === 'story' ? 'selected' : '' ?>>Story</option>
+                                <option value="kids" <?= ($story['story_type'] ?? '') === 'kids' ? 'selected' : '' ?>>Kids</option>
+                            </select>
                             <?php if (!empty($errors['story_type'])): ?>
                                 <span class="field-error"><?= h($errors['story_type']) ?></span>
                             <?php endif; ?>
@@ -177,6 +184,42 @@ if (!function_exists('h')) {
                                 <span class="field-error"><?= h($errors['language']) ?></span>
                             <?php endif; ?>
                         </div>
+
+                        <div class="admin-field">
+                            <label for="template">Template</label>
+                            <select
+                                class="admin-input <?= !empty($errors['template']) ? 'has-error' : '' ?>"
+                                id="template"
+                                name="template"
+                            >
+                                <option value="generic" <?= ($story['template'] ?? 'generic') === 'generic' ? 'selected' : '' ?>>Generic</option>
+                                <option value="omdenken" <?= ($story['template'] ?? '') === 'omdenken' ? 'selected' : '' ?>>Omdenken</option>
+                                <option value="buurderij" <?= ($story['template'] ?? '') === 'buurderij' ? 'selected' : '' ?>>Buurderij</option>
+                            </select>
+                            <span class="story-cms-hint">Controls the detail page layout.</span>
+                            <?php if (!empty($errors['template'])): ?>
+                                <span class="field-error"><?= h($errors['template']) ?></span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="admin-field" style="max-width:220px;">
+                        <label for="audience">Audience</label>
+                        <select
+                            class="admin-input <?= !empty($errors['audience']) ? 'has-error' : '' ?>"
+                            id="audience"
+                            name="audience"
+                        >
+                            <option value="">— Optional —</option>
+                            <option value="all-ages" <?= ($story['audience'] ?? '') === 'all-ages' ? 'selected' : '' ?>>All Ages</option>
+                            <option value="kids" <?= ($story['audience'] ?? '') === 'kids' ? 'selected' : '' ?>>Kids</option>
+                            <option value="teens" <?= ($story['audience'] ?? '') === 'teens' ? 'selected' : '' ?>>Teens</option>
+                            <option value="adults" <?= ($story['audience'] ?? '') === 'adults' ? 'selected' : '' ?>>Adults</option>
+                            <option value="families" <?= ($story['audience'] ?? '') === 'families' ? 'selected' : '' ?>>Families</option>
+                        </select>
+                        <?php if (!empty($errors['audience'])): ?>
+                            <span class="field-error"><?= h($errors['audience']) ?></span>
+                        <?php endif; ?>
                     </div>
 
                     <div class="admin-field" style="max-width:220px;">

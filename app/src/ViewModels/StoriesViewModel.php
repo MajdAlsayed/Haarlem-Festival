@@ -97,6 +97,11 @@ class StoriesViewModel
         return (string)($this->story['story_type'] ?? '');
     }
 
+    public function getStoryAudienceText(): string
+    {
+        return (string)($this->story['audience'] ?? '');
+    }
+
     public function getStoryDescriptionText(): string
     {
         return (string)($this->story['description'] ?? '');

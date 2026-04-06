@@ -6,6 +6,8 @@ use App\Repositories\StoriesRepository;
 use App\Services\StoriesService;
 use App\Validation\StoryValidator;
 use App\Core\AdminAuth;
+use App\Core\Csrf;
+use App\Core\Session;
 
 class AdminStoriesController
 {
@@ -19,14 +21,13 @@ class AdminStoriesController
     public function index(): void
     {
         if (!AdminAuth::requireAdmin()) {
-    return;
-}
+            return;
+        }
+
         $stories = $this->storiesService->getAllStoriesForAdmin();
 
-        foreach ($stories as &$story) 
-        {
-            $story['has_detail_page'] = $this->storiesService->hasDetailPage
-            (
+        foreach ($stories as &$story) {
+            $story['has_detail_page'] = $this->storiesService->hasDetailPage(
                 (int)($story['story_id'] ?? 0)
             );
         }
@@ -37,19 +38,23 @@ class AdminStoriesController
 
     public function edit(): void
     {
+        // Only admins can edit
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
+
         $storyId = (int)($_GET['id'] ?? 0);
         $story   = $this->storiesService->getStoryForEdit($storyId);
-        if (!AdminAuth::requireAdmin()) {
-    return;
-}
-        if (!$story)
-        {
+
+        if (!$story) {
             http_response_code(404);
             echo 'Story not found.';
             return;
         }
 
         $errors = [];
+        // CSRF token prevents form hacking
+        $csrf = Csrf::token('admin_stories_edit');
 
         require __DIR__ . '/../Views/Stories/Admin/Edit.php';
     }
@@ -59,6 +64,13 @@ class AdminStoriesController
         if (!AdminAuth::requireAdmin()) {
             return;
         }
+
+        if (!Csrf::validate('admin_stories_edit', $_POST['_csrf'] ?? null)) {
+            Session::setFlash('admin_error', 'Invalid request. Please try again.');
+            header('Location: /cms/stories');
+            exit;
+        }
+
         $validator = new StoryValidator();
         $storyId   = (int)($_POST['story_id'] ?? 0);
 
@@ -70,6 +82,8 @@ class AdminStoriesController
             'story_type'  => trim((string)($_POST['story_type']  ?? '')),
             'age'         => trim((string)($_POST['age']         ?? '')),
             'language'    => trim((string)($_POST['language']    ?? '')),
+            'template'    => trim((string)($_POST['template']    ?? 'generic')),
+            'audience'    => trim((string)($_POST['audience']    ?? '')),
             'event_id'    => (int)($_POST['event_id'] ?? 0),
         ];
 
@@ -77,12 +91,14 @@ class AdminStoriesController
 
         if (!empty($errors)) {
             $story = array_merge(['story_id' => $storyId], $data);
+            $csrf = Csrf::token('admin_stories_edit');
             require __DIR__ . '/../Views/Stories/Admin/Edit.php';
             return;
         }
 
         $this->storiesService->updateStory($storyId, $data);
 
+        Session::setFlash('admin_success', 'Story updated successfully.');
         header('Location: /cms/stories');
         exit;
     }
@@ -105,9 +121,10 @@ class AdminStoriesController
 
     public function editDetailPage(): void
     {
-            if (!AdminAuth::requireAdmin()) {
-                return;
-            }
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
+
         $slug = trim((string)($_GET['slug'] ?? ''));
         $data = $this->storiesService->getDetailPageForCms($slug);
 

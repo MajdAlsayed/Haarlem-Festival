@@ -13,12 +13,14 @@ final class StoriesSeeder extends AbstractSeed
 
     public function run(): void
     {
+        // Get all events from database
         $events = $this->fetchAll("
             SELECT event_id, venue_id, title, event_day
             FROM events
             WHERE event_type_id = 5
         ");
 
+        // Normalize text to match stories with events
         $norm = function (string $s): string {
             $s = mb_strtolower(trim($s));
             $s = preg_replace('/\s+/', ' ', $s);
@@ -29,6 +31,7 @@ final class StoriesSeeder extends AbstractSeed
             return strtolower(trim((string)$s));
         };
 
+        // Create lookup tables to find matching events
         $eventByTitle    = [];
         $eventByTitleDay = [];
         $titleCounts     = [];
@@ -43,6 +46,7 @@ final class StoriesSeeder extends AbstractSeed
             $titleCounts[$titleKey]     = ($titleCounts[$titleKey] ?? 0) + 1;
         }
 
+        // Add all the stories
         $rows = [
             [
                 'event_title' => 'Winnie de Poeh',
@@ -62,7 +66,7 @@ final class StoriesSeeder extends AbstractSeed
                 'name'        => 'Omdenken Podcast',
                 'slug'        => 'omdenken-podcast',
                 'description' => "A funny and smart talk about thinking differently.\nLive recording with audience.",
-                'image_path'  => '/images/Stories/details/omdenken-main.jpg',
+                'image_path'  => '/images/Stories/cards/card-image-4.jpg',
                 'story_type'  => 'Podcast',
                 'age'         => '16+',
                 'language'    => 'NL',

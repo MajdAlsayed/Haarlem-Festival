@@ -6,6 +6,7 @@ use App\Repositories\StoriesRepository;
 use App\Services\StoriesService;
 use App\ViewModels\StoriesViewModel;
 
+// Main controller for Stories
 class StoriesController
 {
     private const ALLOWED_DAYS = ['all', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -14,17 +15,19 @@ class StoriesController
 
     public function __construct()
     {
+        // Using a Service to keep business logic separate
         $this->storiesService = new StoriesService(new StoriesRepository());
     }
 
     public function index(): void
     {
+        // Get the day filter from user
         $day  = $this->normalizeDay($_GET['day'] ?? 'all');
+        
+        // Fetch stories and prepare for display
         $data = $this->storiesService->getStoriesHomeData($day);
         $data['pageTitle'] = 'Stories in Haarlem';
-
         $vm = new StoriesViewModel($data, $day);
-
         require __DIR__ . '/../Views/Stories/Index.php';
     }
 
@@ -93,6 +96,8 @@ class StoriesController
                 'story_type'  => $s['story_type']  ?? '',
                 'age'         => $s['age']         ?? '',
                 'language'    => $s['language']    ?? '',
+                'template'    => $s['template']    ?? 'generic',
+                'audience'    => $s['audience']    ?? '',
                 'event_day'   => $s['event_day']   ?? '',
                 'start_time'  => $s['start_time']  ?? '',
                 'venue_name'  => $s['venue_name']  ?? '',
@@ -122,18 +127,4 @@ class StoriesController
         http_response_code(404);
         echo $message;
     }
-    public function api(): void
-{
-    header('Content-Type: application/json; charset=UTF-8');
-
-    $day = $_GET['day'] ?? 'all';
-
-    $repo = new \App\Repositories\StoriesRepository();
-    $stories = $repo->getStories($day);
-
-    echo json_encode([
-        'stories' => $stories
-    ]);
-    exit;
-}
 }
