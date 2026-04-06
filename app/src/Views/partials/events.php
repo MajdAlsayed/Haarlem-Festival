@@ -24,7 +24,10 @@ $categoryDisplayLabels = [
             <?php foreach ($categories as $category):
                 $imageName = $category->cardImage ?? strtolower($category->name) . '.jpg';
                 $imagePath = '/images/' . $imageName;
-                $infoUrl = $category->infoPath ?? '#';
+                $rawInfo = (string) ($category->infoPath ?? '#');
+                $infoUrl = $rawInfo === '' || $rawInfo === '#'
+                    ? '#'
+                    : ($rawInfo[0] === '/' ? $rawInfo : '/' . ltrim($rawInfo, '/'));
                 $slug = strtolower(trim((string) ($category->name ?? '')));
                 $showTickets = ($slug !== 'yammy');
                 $ticketUrl = '/tickets';

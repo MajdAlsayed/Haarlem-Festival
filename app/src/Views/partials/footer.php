@@ -46,7 +46,7 @@
             <div class="footer-column footer-column-social">
                 <h3 class="footer-heading">FOLLOW US</h3>
                 <div class="footer-social">
-                    <?php foreach ($app['footer']['social_icons'] as $icon): ?>
+                    <?php foreach (($app['footer']['social_icons'] ?? []) as $icon): ?>
                     <a href="#" class="footer-social-link" aria-label="<?= htmlspecialchars(pathinfo($icon, PATHINFO_FILENAME)) ?>"><img src="<?= htmlspecialchars($app['icons_path']) ?><?= rawurlencode($icon) ?>" alt="" class="footer-social-icon-img"></a>
                     <?php endforeach; ?>
                 </div>
@@ -56,7 +56,7 @@
         <div class="footer-app">
             <p class="footer-app-title">GET THE APP</p>
             <div class="footer-app-buttons">
-                <?php foreach ($app['footer']['app_icons'] as $i => $icon): $label = $app['footer']['app_labels'][$i] ?? ''; ?>
+                <?php foreach (($app['footer']['app_icons'] ?? []) as $i => $icon): $label = ($app['footer']['app_labels'] ?? [])[$i] ?? ''; ?>
                 <a href="#" class="footer-app-btn"><img src="<?= htmlspecialchars($app['icons_path']) ?><?= rawurlencode($icon) ?>" alt="<?= htmlspecialchars($label) ?>" class="footer-app-badge"></a>
                 <?php endforeach; ?>
             </div>
