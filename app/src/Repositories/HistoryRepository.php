@@ -95,6 +95,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
         return $rows;
     }
+
     public function getTourDates(): array
     {
         $db = Database::getConnection();
@@ -232,6 +233,20 @@ class HistoryRepository implements HistoryRepositoryInterface
         return $image;
     }
 
+    public function getAllImages(): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT history_image_id, image_url, alt_text, image_type
+        FROM history_images
+        ORDER BY history_image_id'
+        );
+
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
     public function getPrimaryImage(int $locationId): ?HistoryImage
     {
         $db = Database::getConnection();
@@ -356,6 +371,21 @@ class HistoryRepository implements HistoryRepositoryInterface
         return $this->mapToHistoryImages($row);
     }
 
+    public function insertImage(string $imageUrl, string $altText): int
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            'INSERT INTO history_images (image_url, alt_text, image_type) 
+        VALUES (:url, :alt, :type)'
+        );
+        $stmt->execute([
+            'url' => $imageUrl,
+            'alt' => $altText,
+            'type' => 'primary'
+        ]);
+        return (int)$db->lastInsertId();
+    }
+
     // PAGE BLOCKS
     public function getPageBlocks(string $slug): array
     {
@@ -420,5 +450,20 @@ class HistoryRepository implements HistoryRepositoryInterface
             'page_id' => $pageId,
             'blocks' => $blocks,
         ];
+    }
+
+    public function updatePageBlock(int $blockId, array $content): bool
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'UPDATE page_blocks 
+            SET content_json = :content_json 
+            WHERE block_id = :block_id'
+        );
+
+        return $stmt->execute([
+            'block_id' => $blockId,
+            'content_json' => json_encode($content)]);
     }
 }

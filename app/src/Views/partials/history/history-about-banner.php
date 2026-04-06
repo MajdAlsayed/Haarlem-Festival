@@ -1,10 +1,14 @@
-<section class="history-about-banner <?= $sectionModifier ?? '' ?>">
+<section class="history-about-banner <?= htmlspecialchars($sectionModifier ?? '') ?>">
     <div class="container">
         <?php if ($showTitle ?? false): ?>
-            <h2 class="history-about-banner-title"><?= htmlspecialchars($viewModel->aboutBanner['title'] ?? '') ?></h2>
+            <h2 class="history-about-banner-title">
+                <?= htmlspecialchars($viewModel->aboutBanner['title'] ?? '') ?>
+            </h2>
         <?php endif; ?>
         <div class="history-about-banner-content">
-            <p class="history-about-banner-text <?= $textModifier ?? '' ?>"><?= htmlspecialchars($viewModel->aboutBanner['text'] ?? '') ?></p>
+            <div class="history-about-banner-text <?= htmlspecialchars($textModifier ?? '') ?> cms-html">
+                <?= $viewModel->aboutBanner['text'] ?? '' ?>
+            </div>
         </div>
     </div>
 </section>

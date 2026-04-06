@@ -29,12 +29,15 @@ use App\Controllers\AdminOrdersController;
 use App\Controllers\AdminHomepageController;
 use App\Controllers\AdminCmsUploadController;
 use App\Controllers\AdminDanceController;
+use App\Controllers\AdminHistoryController;
+use App\Controllers\AdminFoodController;
 use App\Controllers\CartController;
 use App\Controllers\CheckoutController;
 use App\Controllers\TicketScanController;
 use App\Controllers\TicketsController;
 use App\Controllers\AccountController;
 use App\Controllers\ProgramController;
+use App\Controllers\AdminUserController;
 use App\Core\SecurityHeaders;
 use App\Services\PendingOrderMaintenance;
 use App\Controllers\AdminStoriesController;
@@ -90,6 +93,14 @@ if (preg_match('#^/dance/artist/([a-z0-9-]+)$#', $uri, $m)) {
 
 if (preg_match('#^/history/location/([a-z0-9-]+)$#', $uri, $m)) {
     (new HistoryController())->show($m[1]);
+    exit;
+}
+
+if (preg_match('#^/admin/cms/history/location/([a-z0-9-]+)$#', $uri, $m)) {
+    $historyLocationCms = new AdminHistoryController();
+    if ($method === 'GET') $historyLocationCms->showLocationForm($m[1]);
+    elseif ($method === 'POST') $historyLocationCms->saveLocation($m[1]);
+    else http_response_code(405);
     exit;
 }
 
@@ -286,6 +297,40 @@ case '/cms/stories/detail-page/save':
         }
         break;
 
+    case '/admin/users':
+        if ($method === 'GET') {
+            (new AdminUserController())->index();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/users/edit':
+        if ($method === 'GET') {
+            (new AdminUserController())->edit();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/users/update':
+        if ($method === 'POST') {
+            (new AdminUserController())->update();
+        } else {
+            header('Location: /admin/users');
+            exit;
+        }
+        break;
+
+    case '/admin/users/delete':
+        if ($method === 'POST') {
+            (new AdminUserController())->delete();
+        } else {
+            header('Location: /admin/users');
+            exit;
+        }
+        break;
+
     case '/dance':
         (new DanceController())->index();
         break;
@@ -392,6 +437,35 @@ case '/cms/stories/detail-page/save':
     case '/admin/cms/upload':
         if ($method === 'POST') {
             (new AdminCmsUploadController())->handle();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/admin/cms/history':
+        $historyCms = new AdminHistoryController();
+        if ($method === 'GET') $historyCms->showIndexForm();
+        elseif ($method === 'POST') $historyCms->saveIndex();
+        else http_response_code(405);
+        break;
+
+    case '/admin/cms/history-locations':
+        $historyLocationsCms = new AdminHistoryController();
+        if ($method === 'GET') $historyLocationsCms->showLocationsForm();
+        elseif ($method === 'POST') $historyLocationsCms->saveLocations();
+        else http_response_code(405);
+        break;
+
+    case '/admin/cms/history-tours':
+        $historyToursCms = new AdminHistoryController();
+        if ($method === 'GET') $historyToursCms->showToursForm();
+        elseif ($method === 'POST') $historyToursCms->saveTours();
+        else http_response_code(405);
+        break;
+
+    case '/admin/api/history/images':
+        if ($method === 'GET') {
+            (new AdminHistoryController())->getImages();
         } else {
             http_response_code(405);
         }
@@ -520,9 +594,65 @@ case '/cms/stories/detail-page/save':
         if ($method === 'POST') (new AdminTicketsController())->delete();
         else { header('Location: /admin/tickets'); exit; }
         break;
+    case '/admin/food':
+        (new AdminFoodController())->index();
+        break;
+ 
+    case '/admin/food/settings':
+        $food = new AdminFoodController();
+        if ($method === 'POST') {
+            $food->saveSettings();
+        } else {
+            $food->settings();
+        }
+        break;
+ 
+    case '/admin/food/restaurants':
+        if ($method === 'GET') {
+            (new AdminFoodController())->restaurants();
+        } else {
+            http_response_code(405);
+        }
+        break;
+ 
+    case '/admin/food/restaurants/new':
+        if ($method === 'GET') {
+            (new AdminFoodController())->newRestaurant();
+        } else {
+            http_response_code(405);
+        }
+        break;
+ 
+    case '/admin/food/restaurants/edit':
+        if ($method === 'GET') {
+            (new AdminFoodController())->editRestaurant();
+        } else {
+            http_response_code(405);
+        }
+        break;
+ 
+    case '/admin/food/restaurants/save':
+        if ($method === 'POST') {
+            (new AdminFoodController())->saveRestaurant();
+        } else {
+            header('Location: /admin/food/restaurants');
+            exit;
+        }
+        break;
+ 
+    case '/admin/food/restaurants/delete':
+        if ($method === 'POST') {
+            (new AdminFoodController())->deleteRestaurant();
+        } else {
+            header('Location: /admin/food/restaurants');
+            exit;
+        }
+        break;
 
     default:
         http_response_code(404);
         echo 'Page not found';
         break;
+
+
 }
