@@ -190,7 +190,7 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                             <div><span class="tickets-meta-label">Time</span><span class="tickets-meta-value"><?= $h($timeStr) ?></span></div>
                         </div>
                         <div class="tickets-card-footer">
-                            <span class="tickets-price"><?= !empty($e['is_free']) ? 'FREE' : '€' . $h(number_format((float) $e['price'], 0)) ?></span>
+                            <span class="tickets-price"><?= !empty($e['is_free']) ? 'FREE' : '€' . $h(number_format((float) $e['price'], fmod((float) $e['price'], 1) > 0 ? 2 : 0)) ?></span>
                             <?php if (empty($e['is_free']) && empty(($e['stock']['sold_out'] ?? false))): ?>
                                 <form method="post" action="/cart/add" class="tickets-buy-form">
                                     <input type="hidden" name="ticket_details_id" value="<?= (int) $e['ticket_details_id'] ?>">
