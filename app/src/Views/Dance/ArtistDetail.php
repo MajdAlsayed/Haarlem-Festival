@@ -1,4 +1,5 @@
 <?php
+/** Dance artist profile for /dance/artist/{slug}. */
 /** @var \App\ViewModels\ArtistDetailViewModel $viewModel */
 $artist = $viewModel->artist;
 $appSettings = $viewModel->appSettings;
@@ -20,7 +21,9 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
     <section class="artist-detail-hero" style="background-image: linear-gradient(to right, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 45%, transparent 70%), linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.65) 100%), url('<?= htmlspecialchars($viewModel->heroImage) ?>');">
         <div class="artist-detail-hero-content">
             <h1 class="artist-detail-hero-name"><?= htmlspecialchars($artist['name']) ?></h1>
-            <p class="artist-detail-hero-tagline"><?= htmlspecialchars($artist['bio'] ?? '') ?></p>
+            <?php if (($viewModel->heroTagline ?? '') !== ''): ?>
+            <p class="artist-detail-hero-tagline"><?= htmlspecialchars((string) $viewModel->heroTagline) ?></p>
+            <?php endif; ?>
             <a href="#about" class="artist-detail-hero-btn">More info <span aria-hidden="true">&#8594;</span></a>
         </div>
     </section>
@@ -51,7 +54,7 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
         </div>
     </section>
 
-    <?php if ($viewModel->hasFullPage() && $viewModel->careerHighlights !== null): ?>
+    <?php if ($viewModel->careerHighlights !== null && count($viewModel->careerHighlights) > 0): ?>
     <section class="artist-detail-section artist-detail-section-alt container">
         <div class="artist-detail-features">
             <div class="artist-detail-desc-text">
@@ -67,6 +70,9 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
             </div>
         </div>
     </section>
+    <?php endif; ?>
+
+    <?php if (!empty($viewModel->musicTracks) || !empty($viewModel->musicExtraTracks)): ?>
     <?php require __DIR__ . '/partials/artist-music-section.php'; ?>
     <?php endif; ?>
 
@@ -91,12 +97,12 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
             </div>
         </div>
         <div class="artist-detail-schedule-cta">
-            <a href="/dance/event/<?= (int) ($viewModel->artistEvents[0]->id ?? 0) ?>" class="artist-detail-schedule-btn">Ticket <span aria-hidden="true">&#8594;</span></a>
+            <a href="/dance/event/<?= (int) ($viewModel->artistEvents[0]->id ?? 0) ?>" class="artist-detail-schedule-btn">Tickets <span aria-hidden="true">&#8594;</span></a>
         </div>
     </section>
     <?php endif; ?>
 
-    <?php if ($viewModel->hasFullPage() && count($viewModel->galleryImages) >= 4): ?>
+    <?php if (count($viewModel->galleryImages) >= 4): ?>
     <section class="artist-detail-section artist-detail-gallery-section">
         <div class="artist-detail-gallery-header">
             <h2 class="artist-detail-gallery-title">Gallery</h2>

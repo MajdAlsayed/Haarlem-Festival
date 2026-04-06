@@ -27,11 +27,12 @@
             <div class="footer-column">
                 <h3 class="footer-heading">EXPERIENCES</h3>
                 <ul>
-                    <li><a href="#">Jazz</a></li>
-                    <li><a href="#">Dance</a></li>
-                    <li><a href="#">History</a></li>
-                    <li><a href="#">Food</a></li>
-                    <li><a href="#">Stories</a></li>
+                    <li><a href="/jazz">Jazz</a></li>
+                    <li><a href="/dance">Dance</a></li>
+                    <li><a href="/dance#dance-artists">Dance artists</a></li>
+                    <li><a href="/history">History</a></li>
+                    <li><a href="/food">Food</a></li>
+                    <li><a href="/stories">Stories</a></li>
                 </ul>
             </div>
             <div class="footer-column">

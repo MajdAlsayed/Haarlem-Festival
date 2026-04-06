@@ -1,4 +1,5 @@
 <?php
+// Each ticket row may include `stock` (sold_out, nearly, low_stock, remaining) from TicketAvailabilityService for badges and hiding BUY.
 /** @var array $app */
 /** @var string $category */
 /** @var string $intro */

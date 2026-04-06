@@ -6,9 +6,7 @@ namespace App\Services;
 
 use App\Repositories\OrderRepository;
 
-/**
- * Expires unpaid reservations and sends reminder emails (best-effort; run on each request).
- */
+/** Pay-later housekeeping without a cron job; invoked from the front controller after Session::start(). */
 final class PendingOrderMaintenance
 {
     public static function run(): void
@@ -26,7 +24,7 @@ final class PendingOrderMaintenance
                 );
                 $orders->markPaymentReminderSent($row['order_id']);
             } catch (\Throwable) {
-                // Do not block requests
+                // Whole site shouldn’t 500 because mail or the log file failed.
             }
         }
     }

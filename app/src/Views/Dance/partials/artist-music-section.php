@@ -33,6 +33,9 @@ $albumSub = $viewModel->albumSub;
                         <span class="artist-music-verified" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                         </span>
+                        <?php if (!empty($viewModel->followUrl)): ?>
+                        <a href="<?= htmlspecialchars($viewModel->followUrl) ?>" class="artist-music-follow" target="_blank" rel="noopener noreferrer">Follow</a>
+                        <?php endif; ?>
                     </div>
                     <p class="artist-music-real"><?= htmlspecialchars($realName) ?></p>
                     <p class="artist-music-location"><?= htmlspecialchars($location) ?></p>

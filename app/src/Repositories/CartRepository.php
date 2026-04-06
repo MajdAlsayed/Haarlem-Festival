@@ -179,9 +179,64 @@ class CartRepository
      */
     public function getTicketDetailsCapacity(int $ticketDetailsId): ?int
     {
+        if ($ticketDetailsId <= 0) {
+            return null;
+        }
+        $row = $this->fetchTicketDetailsCapacityRow($ticketDetailsId);
+        if (!$row) {
+            return null;
+        }
+
+        return $this->capacityFromJoinedTicketRow($row);
+    }
+
+    /**
+     * Batch capacity for admin tickets list (same rules as getTicketDetailsCapacity).
+     *
+     * @param list<int> $ticketDetailsIds
+     * @return array<int, ?int> ticket_details_id => capacity or null
+     */
+    public function getTicketDetailsCapacitiesForIds(array $ticketDetailsIds): array
+    {
+        $ids = [];
+        foreach ($ticketDetailsIds as $tid) {
+            $i = (int) $tid;
+            if ($i > 0) {
+                $ids[] = $i;
+            }
+        }
+        $ids = array_values(array_unique($ids));
+        if ($ids === []) {
+            return [];
+        }
+
+        $db = Database::getConnection();
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $db->prepare(
+            "SELECT td.ticket_details_id, td.ticket_type, td.session_id, td.event_id,
+                    s.tickets_available AS session_cap,
+                    e.seats AS event_seats
+             FROM ticket_details td
+             LEFT JOIN sessions s ON s.session_id = td.session_id
+             LEFT JOIN events e ON e.event_id = td.event_id
+             WHERE td.ticket_details_id IN ($placeholders)"
+        );
+        $stmt->execute($ids);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $out = [];
+        foreach ($rows as $row) {
+            $out[(int) $row['ticket_details_id']] = $this->capacityFromJoinedTicketRow($row);
+        }
+
+        return $out;
+    }
+
+    /** @return ?array<string,mixed> */
+    private function fetchTicketDetailsCapacityRow(int $ticketDetailsId): ?array
+    {
         $db = Database::getConnection();
         $stmt = $db->prepare(
-            "SELECT td.ticket_type, td.session_id, td.event_id,
+            "SELECT td.ticket_details_id, td.ticket_type, td.session_id, td.event_id,
                     s.tickets_available AS session_cap,
                     e.seats AS event_seats
              FROM ticket_details td
@@ -192,10 +247,15 @@ class CartRepository
         );
         $stmt->execute(['id' => $ticketDetailsId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row) {
-            return null;
-        }
 
+        return $row ?: null;
+    }
+
+    /**
+     * @param array<string,mixed> $row joined ticket_details + sessions + events
+     */
+    private function capacityFromJoinedTicketRow(array $row): ?int
+    {
         $type = (string) ($row['ticket_type'] ?? '');
         if (in_array($type, ['day_pass', 'all_access_pass'], true)) {
             return null;
@@ -232,7 +292,8 @@ class CartRepository
     }
 
     /**
-     * Seats held by pay-later orders (pending with a future expiry). Ignores legacy pending rows without expires_at.
+     * Pay-later: unpaid orders still reserve capacity until paid or expired.
+     * Pending rows without expires_at (legacy seed data) are ignored so they do not block sales indefinitely.
      */
     public function sumPendingOrderQuantityForTicketDetails(int $ticketDetailsId): int
     {

@@ -103,11 +103,12 @@ final class CartController
 
             $loggedUserId = isset($_SESSION['auth']['user_id']) ? (int) $_SESSION['auth']['user_id'] : 0;
             if ($loggedUserId > 0) {
+                // Personal program: mirror cart adds into the saved picks list for logged-in users.
                 (new PersonalProgramRepository())->addItem($loggedUserId, $ticketDetailsId);
             }
 
             if ($formPost) {
-                Session::setFlash('cart_success', 'Added to your cart.');
+                Session::setFlash('cart_success', 'Ticket added to your cart.');
                 $this->redirectReturn($data);
                 return;
             }

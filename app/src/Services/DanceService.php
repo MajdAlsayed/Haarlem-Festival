@@ -3,12 +3,12 @@
 namespace App\Services;
 
 use App\Models\Event;
+use App\Repositories\ArtistsRepository;
 use App\Repositories\DanceSettingsRepository;
 use App\Repositories\EventRepository;
 
 /**
- * Dance page: get events by day (sorted by venue order from database) and artists.
- * Artists for the Dance index come from dance config only (not the shared artists table).
+ * Data for /dance: per-day venue order from dance_settings or defaults in dance.php; artist list from the same merged config.
  */
 class DanceService
 {
@@ -53,6 +53,7 @@ class DanceService
 
     private function sortEventsByVenueOrder(array $events, array $venueOrder): array
     {
+        // Venues not listed in CMS/config go to the end, then we sort by start time inside the same slot.
         $unknownPosition = count($venueOrder);
         usort($events, function (Event $a, Event $b) use ($venueOrder, $unknownPosition) {
             $posA = array_search($a->venueId, $venueOrder, true);
@@ -81,18 +82,61 @@ class DanceService
     }
 
     /**
-     * Dance index shows only artists defined in dance config (Hardwell, Tiësto).
-     * Jazz artists (e.g. Gumbo Kings, Karsu, Gare du Nord) are not shown here.
+     * Homepage artist strip: non-empty CMS `artists` JSON, else defaults from dance.php, else `artists` table rows
+     * whose slug is listed in `dance_index_artist_slugs` (Hardwell / Tiësto — not Jazz slugs).
      */
     public function getArtistsOrdered(): array
     {
         $settings = $this->danceSettingsRepository->getMergedWithConfig();
         $artists = $settings['artists'] ?? null;
-        if (is_array($artists) && $artists !== []) {
+        if (is_array($artists) && count($artists) > 0) {
             return $artists;
         }
         $config = require __DIR__ . '/../Config/dance.php';
-        return $config['artists'] ?? [];
+        $fromConfig = $config['artists'] ?? [];
+        if (is_array($fromConfig) && count($fromConfig) > 0) {
+            return $fromConfig;
+        }
+
+        return $this->getDanceArtistsFromDatabase();
+    }
+
+    /**
+     * @return list<array{name: string, slug: string, bio: string, image: string}>
+     */
+    private function getDanceArtistsFromDatabase(): array
+    {
+        $defaults = require __DIR__ . '/../Config/dance.php';
+        $slugs = $defaults['dance_index_artist_slugs'] ?? ['hardwell', 'tiesto'];
+        if (!is_array($slugs)) {
+            $slugs = ['hardwell', 'tiesto'];
+        }
+
+        $repo = new ArtistsRepository();
+        $all = $repo->getAllOrdered();
+        $bySlug = [];
+        foreach ($all as $row) {
+            $s = $row['slug'] ?? null;
+            if (is_string($s) && $s !== '') {
+                $bySlug[$s] = $row;
+            }
+        }
+
+        $out = [];
+        foreach ($slugs as $slug) {
+            if (!isset($bySlug[$slug])) {
+                continue;
+            }
+            $r = $bySlug[$slug];
+            $out[] = [
+                'name' => (string) ($r['name'] ?? ''),
+                'slug' => $slug,
+                'bio' => (string) ($r['bio'] ?? ''),
+                'image' => (string) ($r['image'] ?? ''),
+            ];
+        }
+
+        return $out;
     }
 
     public function getDanceSettings(): array

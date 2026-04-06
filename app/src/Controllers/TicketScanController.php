@@ -11,9 +11,7 @@ use App\Core\TicketScannerAuth;
 use App\Repositories\SettingsRepository;
 use App\Repositories\TicketRepository;
 
-/**
- * Ticket scanner for admin and employee roles (assessment: employee scans at door).
- */
+/** Door ticket scanner (/admin/scan): single or batch codes, QR in the view; POST then redirect with flash JSON. */
 final class TicketScanController
 {
     public function index(): void
@@ -24,6 +22,7 @@ final class TicketScanController
         $error = Session::getFlash('scan_error');
         $resultRaw = Session::getFlash('scan_result');
         $result = null;
+        // POST/redirect/GET: last scan outcome is JSON in flash so refresh does not resubmit the form.
         if (is_string($resultRaw) && $resultRaw !== '') {
             $decoded = json_decode($resultRaw, true);
             $result = is_array($decoded) ? $decoded : null;
@@ -43,6 +42,7 @@ final class TicketScanController
             exit;
         }
 
+        // Group box wins on purpose — staff can paste one code in the single field by mistake; batch mode is explicit.
         $groupRaw = trim((string) ($_POST['group_codes'] ?? ''));
         if ($groupRaw !== '') {
             $lines = preg_split('/\r\n|\r|\n/', $groupRaw) ?: [];
@@ -90,6 +90,7 @@ final class TicketScanController
      */
     private function scanOneCode(TicketRepository $repo, string $code): array
     {
+        // findByCodeWithDetails only returns tickets tied to a paid order (invalid/cancelled handled inside mark).
         $row = $repo->findByCodeWithDetails($code);
 
         if ($row === null) {

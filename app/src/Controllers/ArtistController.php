@@ -9,7 +9,7 @@ use App\ViewModels\ArtistDetailViewModel;
 use App\Exceptions\NotFoundException;
 
 /**
- * Dance artist detail page. Controller gets artist data from service, builds view model, loads view.
+ * Dance artist detail (/dance/artist/{slug}): repository data plus static copy and tracks from Config/dance.php; CMS images.
  */
 class ArtistController
 {
@@ -42,10 +42,19 @@ class ArtistController
         $artistEvents = $data['artistEvents'];
 
         $appSettings = $this->settingsRepository->getAll();
+        // Static narrative + Spotify-style blocks live in PHP config so we don’t need extra DB tables for v1.
         $danceConfig = require __DIR__ . '/../Config/dance.php';
         $cfg = isset($danceConfig['artist_music'][$slug]) && is_array($danceConfig['artist_music'][$slug])
             ? $danceConfig['artist_music'][$slug]
             : [];
+
+        $cfgGallery = isset($cfg['gallery']) && is_array($cfg['gallery'])
+            ? array_values(array_filter($cfg['gallery'], static fn ($x) => is_string($x) && $x !== ''))
+            : [];
+        if (count($galleryImages) < 4 && count($cfgGallery) >= 4) {
+            $merged = array_values(array_unique(array_merge($galleryImages, $cfgGallery)));
+            $galleryImages = count($merged) >= 4 ? array_slice($merged, 0, 4) : array_slice($cfgGallery, 0, 4);
+        }
 
         $heroFilename = $this->photosRepository->getFilename('dance_artist_hero', $slug);
         if ($heroFilename === null) {
@@ -87,6 +96,19 @@ class ArtistController
         $albumCoverFilename = $this->photosRepository->getFilename('dance_artist_music', $albumKey);
         $albumCoverImage = ($albumCoverFilename !== null) ? '/images/dance/' . $albumCoverFilename : '/images/dance/Artist/hardwell2.jpg';
 
+        $heroTagline = isset($cfg['hero_tagline']) ? trim((string) $cfg['hero_tagline']) : '';
+        if ($heroTagline === '') {
+            $bio = (string) ($artist['bio'] ?? '');
+            if ($bio !== '') {
+                $heroTagline = mb_strlen($bio) > 160 ? mb_substr($bio, 0, 157) . '…' : $bio;
+            }
+        }
+        $heroTagline = $heroTagline !== '' ? $heroTagline : null;
+
+        $followUrl = isset($cfg['follow_url']) && is_string($cfg['follow_url']) && $cfg['follow_url'] !== ''
+            ? $cfg['follow_url']
+            : null;
+
         $viewModel = new ArtistDetailViewModel(
             $artist,
             $galleryImages,
@@ -107,7 +129,9 @@ class ArtistController
             $galleryStats,
             $careerImage,
             $profileImage,
-            $albumCoverImage
+            $albumCoverImage,
+            $heroTagline,
+            $followUrl
         );
 
         require __DIR__ . '/../Views/Dance/ArtistDetail.php';

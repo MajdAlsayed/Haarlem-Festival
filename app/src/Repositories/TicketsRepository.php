@@ -54,6 +54,55 @@ final class TicketsRepository
     }
 
     /**
+     * Dance day pass for the event weekday (matches ticket_details.pass_day).
+     *
+     * @return array<string,mixed>|null
+     */
+    public function getDanceDayPassForDay(string $eventDay): ?array
+    {
+        $normalized = strtolower(trim($eventDay));
+        if (!in_array($normalized, ['thursday', 'friday', 'saturday', 'sunday'], true)) {
+            return null;
+        }
+
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            "SELECT ticket_details_id, ticket_type, category, pass_day, pass_time, schedule_display,
+                    sort_order, is_free, name, description, price
+             FROM ticket_details
+             WHERE ticket_type = 'day_pass'
+               AND LOWER(category) = 'dance'
+               AND LOWER(COALESCE(pass_day, '')) = :day
+             LIMIT 1"
+        );
+        $stmt->execute(['day' => $normalized]);
+        $r = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $r ? $this->normalizeRow($r) : null;
+    }
+
+    /**
+     * Dance all-access weekend pass (not tied to a single event).
+     *
+     * @return array<string,mixed>|null
+     */
+    public function getDanceAllAccessPass(): ?array
+    {
+        $db = Database::getConnection();
+        $stmt = $db->query(
+            "SELECT ticket_details_id, ticket_type, category, pass_day, pass_time, schedule_display,
+                    sort_order, is_free, name, description, price
+             FROM ticket_details
+             WHERE ticket_type = 'all_access_pass'
+               AND LOWER(category) = 'dance'
+             LIMIT 1"
+        );
+        $r = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $r ? $this->normalizeRow($r) : null;
+    }
+
+    /**
      * @return array<string, list<array<string,mixed>>>
      */
     public function getEventTicketsGroupedByDay(string $category): array

@@ -8,10 +8,7 @@ use App\Repositories\OrderRepository;
 use App\Repositories\SettingsRepository;
 use App\Repositories\UserRepository;
 
-/**
- * Sends order confirmation + ticket codes. Always appends to storage/mail/orders.log (Docker-friendly).
- * Also attempts PHP mail() when the server is configured for it.
- */
+/** Paid confirmation, pay-later reservation, and payment reminders; logs to file and attempts PHP mail(). */
 final class OrderConfirmationMailer
 {
     public function send(int $orderId, int $userId): void
@@ -145,6 +142,7 @@ final class OrderConfirmationMailer
         return implode("\n", $buf);
     }
 
+    /** Demo-friendly: tail app/storage/mail/orders.log; swap for real SMTP in production. */
     private function appendLog(string $toEmail, string $subject, string $body): void
     {
         $base = dirname(__DIR__, 2) . '/storage/mail';

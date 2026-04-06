@@ -8,7 +8,7 @@ use App\Core\Database;
 use PDO;
 
 /**
- * Orders for admin export (joins customer when user_id is set).
+ * Orders: admin export and listing, plus customer and pay-later persistence for checkout and account pages.
  */
 final class OrderRepository
 {
@@ -127,6 +127,7 @@ final class OrderRepository
         return (int) $db->lastInsertId();
     }
 
+    /** Pay-later: no tickets yet, just order_lines + clock for when it auto-dies. */
     public function createPendingOrder(int $userId, float $totalAmount): int
     {
         $db = Database::getConnection();
@@ -157,7 +158,7 @@ final class OrderRepository
     }
 
     /**
-     * Pending orders that should receive one reminder (created ≥12h ago, not expired, flag unset).
+     * One nag per order: still pending, still alive, sitting there half a day, and we haven’t mailed them yet.
      *
      * @return list<array{order_id:int,user_id:int,total_amount:string,expires_at:string}>
      */
@@ -225,7 +226,7 @@ final class OrderRepository
     }
 
     /**
-     * Call inside an open transaction (InnoDB) before issuing tickets for pay-later completion.
+     * Locks this row until the transaction ends — pairs with fulfill so two requests can’t both pass the checks.
      *
      * @return ?array<string, mixed>
      */
@@ -265,6 +266,7 @@ final class OrderRepository
             $stmt->execute(['id' => $orderId]);
         }
 
+        // rowCount 0 = someone else already flipped it to paid, or it was never pending.
         if ($stmt->rowCount() === 0) {
             throw new \RuntimeException('This order is not pending anymore. Refresh your orders list.');
         }

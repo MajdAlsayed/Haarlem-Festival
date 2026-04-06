@@ -9,7 +9,7 @@ use App\Core\SecureToken;
 use PDO;
 
 /**
- * Ticket rows (scanner / QR). Uses cryptographically secure ticket_code values.
+ * Ticket rows: issued at checkout and used by the door scanner (lookup and scan state).
  */
 final class TicketRepository
 {
@@ -104,6 +104,7 @@ final class TicketRepository
             return 'cancelled';
         }
 
+        // WHERE status = 'valid' makes the update atomic: two scanners at once → one row updated, other sees already_scanned.
         $upd = $db->prepare(
             "UPDATE tickets SET status = 'scanned', scanned_at = NOW() WHERE ticket_id = :id AND status = 'valid'"
         );

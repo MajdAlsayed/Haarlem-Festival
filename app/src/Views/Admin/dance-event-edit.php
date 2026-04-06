@@ -11,7 +11,7 @@ $days = ['thursday', 'friday', 'saturday', 'sunday'];
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit jazz event — Admin — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
+    <title>Edit dance event — Admin — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
     <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
     <link rel="stylesheet" href="/css/admin.css?v=<?= $h($app['css_version'] ?? '1') ?>">
 </head>
@@ -26,16 +26,16 @@ $days = ['thursday', 'friday', 'saturday', 'sunday'];
             <span class="admin-breadcrumb-sep">›</span>
             <a href="/admin">Admin</a>
             <span class="admin-breadcrumb-sep">›</span>
-            <a href="/admin/jazz">Jazz</a>
+            <a href="/admin/dance">Dance</a>
             <span class="admin-breadcrumb-sep">›</span>
-            <a href="/admin/jazz/events">Events</a>
+            <a href="/admin/dance/events">Events</a>
             <span class="admin-breadcrumb-sep">›</span>
             <span>Edit</span>
         </nav>
 
-        <h1 class="admin-title">Edit jazz event</h1>
+        <h1 class="admin-title">Edit dance event</h1>
 
-        <form method="post" action="/admin/jazz/events/save" class="admin-form admin-form--wide">
+        <form method="post" action="/admin/dance/events/save" class="admin-form admin-form--wide">
             <input type="hidden" name="_csrf" value="<?= $h($csrf) ?>">
             <input type="hidden" name="event_id" value="<?= (int) $event['event_id'] ?>">
 
@@ -99,7 +99,7 @@ $days = ['thursday', 'friday', 'saturday', 'sunday'];
 
             <fieldset class="admin-fieldset">
                 <legend>Preview audio (optional)</legend>
-                <p class="admin-hint">Path under <code>public/audio/</code>, use forward slashes (e.g. <code>Jazz audio/track.mp3</code>).</p>
+                <p class="admin-hint">Path under <code>public/audio/</code>, use forward slashes.</p>
                 <div class="admin-field">
                     <label for="preview_audio_path">File path</label>
                     <input type="text" id="preview_audio_path" name="preview_audio_path" value="<?= $h($audio['file_path'] ?? '') ?>" class="admin-input">
@@ -120,7 +120,7 @@ $days = ['thursday', 'friday', 'saturday', 'sunday'];
 
             <div class="admin-form-actions">
                 <button type="submit" class="admin-btn admin-btn-primary">Save</button>
-                <a href="/admin/jazz/events" class="admin-btn admin-btn-secondary">Back</a>
+                <a href="/admin/dance/events" class="admin-btn admin-btn-secondary">Back</a>
             </div>
         </form>
     </div>

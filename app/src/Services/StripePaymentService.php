@@ -8,9 +8,7 @@ use App\ViewModels\CartViewModel;
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
 
-/**
- * Stripe Checkout (test/live keys): card + iDEAL. Requires composer package stripe/stripe-php.
- */
+/** Stripe Checkout: cart checkout and pay-later completion (session metadata distinguishes the flow). */
 final class StripePaymentService
 {
     public static function secretKey(): ?string
@@ -61,6 +59,7 @@ final class StripePaymentService
             ];
         }
 
+        // Metadata is echoed back when the customer returns; CheckoutService matches user + cart before finalizing.
         $session = Session::create([
             'mode' => 'payment',
             'payment_method_types' => ['card', 'ideal'],
@@ -83,7 +82,8 @@ final class StripePaymentService
     }
 
     /**
-     * Stripe Checkout for an existing pay-later order (metadata carries pending_order_id).
+     * Same hosted checkout as the cart flow, but line items come from order_lines and metadata says which pending
+     * order to close when Stripe sends the user back (see CheckoutService::completeAfterStripe).
      *
      * @param list<array{name:string,quantity:int,unit_price:string}> $lines
      */
@@ -145,6 +145,8 @@ final class StripePaymentService
     }
 
     /**
+     * Pull session after redirect: normalizes metadata to string map for CheckoutService amount and user checks.
+     *
      * @return array{payment_status:string, amount_total:int, metadata:array<string,string>}
      */
     public static function retrieveSession(string $sessionId): array

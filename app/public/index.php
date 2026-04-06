@@ -42,6 +42,7 @@ use App\Core\SecurityHeaders;
 use App\Services\PendingOrderMaintenance;
 use App\Controllers\AdminStoriesController;
 Session::start();
+// Pay-later maintenance: expire stale reservations and send reminders (non-fatal errors inside the service).
 PendingOrderMaintenance::run();
 SecurityHeaders::send();
 
@@ -82,6 +83,7 @@ if (preg_match('#^/food/restaurant/(\d+)/booking/overview$#', $uri, $m)) {
     (new FoodController())->bookingOverview((int) $m[1]);
     exit;
 }
+// Dance: event and artist detail URLs (index is /dance via DanceController).
 if (preg_match('#^/dance/event/(\d+)$#', $uri, $m)) {
     (new EventDetailController())->show((int) $m[1]);
     exit;
@@ -529,6 +531,70 @@ case '/admin/stories/detail-page/save':
 
     case '/admin/jazz':
         (new AdminJazzController())->index();
+        break;
+
+    case '/admin/dance':
+        (new AdminDanceController())->index();
+        break;
+
+    case '/admin/dance/events':
+        (new AdminDanceController())->events();
+        break;
+
+    case '/admin/dance/events/new':
+        (new AdminDanceController())->newEvent();
+        break;
+
+    case '/admin/dance/events/edit':
+        (new AdminDanceController())->editEvent();
+        break;
+
+    case '/admin/dance/events/save':
+        if ($method === 'POST') {
+            (new AdminDanceController())->saveEvent();
+        } else {
+            header('Location: /admin/dance/events');
+            exit;
+        }
+        break;
+
+    case '/admin/dance/events/delete':
+        if ($method === 'POST') {
+            (new AdminDanceController())->deleteEvent();
+        } else {
+            header('Location: /admin/dance/events');
+            exit;
+        }
+        break;
+
+    case '/admin/dance/artists':
+        (new AdminDanceController())->artists();
+        break;
+
+    case '/admin/dance/artists/new':
+        (new AdminDanceController())->artistsNew();
+        break;
+
+    case '/admin/dance/artists/edit':
+        (new AdminDanceController())->artistsEdit();
+        break;
+
+    case '/admin/dance/artists/save':
+        if ($method === 'POST') {
+            (new AdminDanceController())->saveArtist();
+        } else {
+            header('Location: /admin/dance/artists');
+            exit;
+        }
+        break;
+
+    case '/admin/dance/artists/delete':
+        if ($method === 'POST') {
+            (new AdminDanceController())->deleteArtist();
+        } else {
+            header('Location: /admin/dance/artists');
+            exit;
+        }
         break;
 
     case '/admin/jazz/events':

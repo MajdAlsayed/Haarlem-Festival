@@ -16,6 +16,9 @@ use App\Services\CheckoutService;
 use App\Services\StripePaymentService;
 use App\Services\TicketAvailabilityService;
 
+/**
+ * Checkout: confirmation page, demo and Stripe payment, pay-later reserve, and completing pending orders from account.
+ */
 final class CheckoutController
 {
     public function show(): void
@@ -33,6 +36,7 @@ final class CheckoutController
         $app = (new SettingsRepository())->getAll();
         $error = Session::getFlash('checkout_error');
         $csrf = Csrf::token('checkout');
+        // €0 cart → no Stripe button (class demo still uses “Confirm without payment”).
         $stripeOn = StripePaymentService::isConfigured() && $vm->total > 0;
         $demoOn = true;
 
@@ -232,6 +236,7 @@ final class CheckoutController
     {
         $userId = $this->requireLoginOrRedirect();
 
+        // Stripe redirect: ?session_id=… → we finalize the order then redirect again with ?order_id= for a clean URL.
         $stripeSessionId = trim((string) ($_GET['session_id'] ?? ''));
         if ($stripeSessionId !== '') {
             if (!StripePaymentService::isConfigured()) {
@@ -272,6 +277,8 @@ final class CheckoutController
     }
 
     /**
+     * Shared stack for checkout: one CartRepository instance so cart lines and capacity math stay consistent.
+     *
      * @return array{cartRepo: CartRepository, ticketRepo: TicketRepository, availability: TicketAvailabilityService, cartService: CartService}
      */
     private function cartInfrastructure(): array

@@ -3,103 +3,165 @@
 declare(strict_types=1);
 
 /**
- * Dance page: image filenames (in /public/images/dance/), genres, featured first card override, artists.
+ * Default Dance content and image filenames; CMS overrides most keys in the database. artist_music enriches artist pages.
  */
 return [
     /** Shown in &lt;h1&gt; and &lt;title&gt; (editable via /admin/cms/dance). */
-    'dance_page_title' => 'Dance Festival',
-    'about_section_heading' => 'About Dance',
-    'featured_section_title' => 'Featured Events',
-    'all_events_section_title' => 'All Events',
-    'artists_section_title' => 'Artist(s)',
-    'hero_cta_label' => 'View Dance Events',
-    'hero_subtitle' => 'Experience Haarlem\'s biggest nights of house, techno, and trance.',
-    'about_paragraphs' => [
-        'Haarlem Dance brings the world\'s best house, techno and trance DJs to iconic Haarlem locations.',
-        'Across three nights, visitors experience Back2Back headline sets, immersive club sessions and unique experimental performances.',
-        'Join thousands of music lovers for the most energetic part of the Festival.',
-    ],
+    'dance_page_title' => 'Dance',
+    'about_section_heading' => '',
+    'featured_section_title' => '',
+    'all_events_section_title' => '',
+    'artists_section_title' => '',
+    'hero_cta_label' => '',
+    'hero_subtitle' => '',
+    'about_paragraphs' => [],
 
     'hero_image' => 'Dance page front picture.png',
-    'featured_images' => ['Dance-page-1.png', 'Dance-page-2.png', 'Dance-page-3.png'],
-    'friday_images' => ['dance-page-friday-1.png', 'dance-page-friday-2.png', 'dance-page-friday-3.png', 'dance-page-friday-4.png', 'dance-page-friday-5.png'],
-    'saturday_images' => ['dance-page-satuday-1.png', 'dance-page-satuday-2.png', 'dance-page-satuday-3.png', 'dance-page-satuday-4.png'],
-    'sunday_images' => ['dance-page-sunday-1.png', 'dance-page-sunday-2.png', 'dance-page-sunday-3.png', 'dance-page-sunday-4.png'],
+    'featured_images' => [],
+    'friday_images' => [],
+    'saturday_images' => [],
+    'sunday_images' => [],
 
-    'friday_genres' => ['HOUSE', 'TRANCE', 'DANCE', 'TRANCE', 'ELECTRONIC'],
-    'saturday_genres' => ['MIXED GENRES', 'HOUSE', 'TRANCE / ELECTRO', 'ELECTROHOUSE'],
-    'sunday_genres' => ['MIXED GENRES', 'TRANCE', 'DANCE', 'ELECTRONIC'],
+    'friday_genres' => [],
+    'saturday_genres' => [],
+    'sunday_genres' => [],
 
-    'featured_genre_labels' => ['HOUSE', 'TRANCE', 'DANCE'],
+    'featured_genre_labels' => [],
+    'breadcrumb_home_label' => 'HOME',
+    'breadcrumb_dance_label' => 'DANCE',
+    'day_label_friday' => 'Friday',
+    'day_label_saturday' => 'Saturday',
+    'day_label_sunday' => 'Sunday',
+    'artist_info_label' => 'INFO >',
+    'show_more_artists_label' => 'Show More Artists >',
 
     'venue_order_friday' => [4, 7, 5, 8, 9],
     'venue_order_saturday' => [6, 5, 7],
     'venue_order_sunday' => [6, 5, 8, 7],
 
+    /** Slugs shown on /dance (homepage strip). Must match rows in `artists` for detail pages. Overridable via CMS `artists` JSON. */
+    'dance_index_artist_slugs' => ['hardwell', 'tiesto'],
+
+    /**
+     * Default homepage artist cards when CMS `artists` is empty or []. Keep in sync with ArtistsSeeder / `artists` table.
+     *
+     * @var list<array{name: string, slug: string, bio: string, image: string}>
+     */
     'artists' => [
         [
-            'slug' => 'hardwell',
-            'image' => 'Image (Robbert Hardwell).png',
             'name' => 'Robbert Hardwell',
+            'slug' => 'hardwell',
             'bio' => 'A high-energy dance night featuring Hardwell\'s signature big-room sound, explosive drops, and immersive festival-style atmosphere.',
+            'image' => 'Artist/hardwell1.png',
         ],
         [
-            'slug' => 'tiesto',
-            'image' => 'Image (Tiësto).png',
             'name' => 'Tiësto',
+            'slug' => 'tiesto',
             'bio' => 'A signature Tiësto club night featuring his blend of trance, techno, and electronic energy inside Haarlem\'s Slachthuis.',
+            'image' => 'Image (Tiësto).png',
         ],
     ],
-
+    /**
+     * Rich artist detail content for /dance/artist/{slug}. Add MP3s under public/audio/ (see public/audio/README.txt).
+     *
+     * @var array<string, array<string, mixed>>
+     */
     'artist_music' => [
         'hardwell' => [
+            'hero_tagline' => 'High-energy dance',
+            'follow_url' => 'https://open.spotify.com/artist/6Brvow44BowRkBHKq5FJmn',
+            'about' => [
+                'Robbert van de Corput — known worldwide as Hardwell — helped define modern big-room and festival dance music. His sets blend anthem melodies, driving kicks, and festival-scale energy that has filled arenas and main stages for over a decade.',
+                'Beyond the booth, he founded Revealed Recordings, championing new talent and a steady stream of club and festival weapons. Expect immersive drops, laser-sharp production, and a crowd-first atmosphere at Haarlem Dance.',
+            ],
+            'highlights' => [
+                'Two-time DJ Mag #1 DJ (2013–2014)',
+                'Founder of Revealed Recordings and Revealed events worldwide',
+                'Headlined Tomorrowland, Ultra Music Festival, and EDC Las Vegas',
+                'Iconic singles and remixes shaping the big-room era',
+                'Collaborations with Tiësto, Armin van Buuren, and Afrojack',
+            ],
             'display_name' => 'HARDWELL',
-            'real_name' => 'Robbert Hardwell',
+            'real_name' => 'Robbert van de Corput',
             'location' => 'Breda, Netherlands',
-            'album_title' => 'Hardwell & Friends Vol. 04',
-            'album_sub' => 'VOL. 04',
+            'album_title' => 'Hardwell & Friends Vol. 3',
+            'album_sub' => 'EP • 2025',
             'tracks' => [
-                ['title' => 'The Partycrasher', 'duration' => '2:54', 'audio' => '/audio/Hardwell & Chuckie - The Partycrasher (Hardwell & Friends Vol. 04).mp3'],
-                ['title' => 'Lights Out', 'duration' => '4:54', 'audio' => '/audio/Hardwell & Olly James - Lights Out (Hardwell & Friends Vol. 04).mp3'],
-                ['title' => 'Rise Again', 'duration' => '2:78', 'audio' => '/audio/Hardwell & Ryos - Rise Again (Hardwell & Friends Vol. 04).mp3'],
+                ['title' => 'The Partycrasher', 'duration' => '3:24', 'audio' => '/audio/partycrasher.mp3'],
+                ['title' => 'Lights Out', 'duration' => '3:08', 'audio' => '/audio/lights-out.mp3'],
+                ['title' => 'Rise Again', 'duration' => '3:41', 'audio' => '/audio/rise-again.mp3'],
+                ['title' => 'Not Alone', 'duration' => '3:55', 'audio' => '/audio/not-alone.mp3'],
+                ['title' => 'Rave Till My Grave', 'duration' => '3:12', 'audio' => '/audio/rave-till-my-grave.mp3'],
             ],
             'extra_tracks' => [
-                ['artist' => 'Hardwell, Dyro', 'title' => 'Not Alone', 'tag' => 'Dance', 'cover' => '/images/dance/Artist/hardwell3.jpg', 'audio' => '/audio/Hardwell & Dyro - Not Alone (Official Music Video).mp3'],
-                ['artist' => 'Hardwell, Maddix', 'title' => 'Rave Till My Grave (feat. Villain)', 'tag' => 'Dance', 'cover' => '/images/dance/Artist/hardwell4.jpg', 'audio' => '/audio/Hardwell & Maddix feat. Villain - Rave Till My Grave.mp3'],
+                [
+                    'artist' => 'HARDWELL',
+                    'title' => 'Spaceman',
+                    'cover' => 'Artist/hardwell3.jpg',
+                    'audio' => '/audio/lights-out.mp3',
+                    'tag' => 'Dance',
+                ],
             ],
-            'about' => [
-                'Hardwell is one of the Netherlands\' biggest electronic music names, known for his energetic mainstage sound and powerful club performances.',
-                'His sets combine festival-level intensity with sharp, modern dance drops making him a guaranteed crowd favorite at Haarlem Dance 2026.',
+            'gallery_stats' => [
+                ['num' => '250+', 'label' => 'SHOWS'],
+                ['num' => '500+', 'label' => 'TRACKS'],
+                ['num' => '100+', 'label' => 'ALBUMS'],
+                ['num' => '80+', 'label' => 'AWARDS'],
             ],
-            'highlights' => [
-                'Headliner at major festivals including Tomorrowland and Ultra',
-                'Voted #1 DJ in the World twice by DJ Mag',
-                'Founder of Revealed Recordings',
+            /** Fallback when `artist_photos` has fewer than four rows (same paths as ArtistPhotosSeeder). */
+            'gallery' => [
+                'Artist/hardwell1.png',
+                'Artist/hardwell7.png',
+                'Artist/hardwell8.png',
+                'Artist/hardwell9.png',
             ],
-            'gallery_stats' => [['num' => '250+', 'label' => 'PHOTOS'], ['num' => '500+', 'label' => 'LIVE SHOWS'], ['num' => '100+', 'label' => 'FESTIVALS'], ['num' => '80+', 'label' => 'COUNTRIES']],
         ],
         'tiesto' => [
-            'display_name' => 'TIËSTO',
-            'real_name' => 'Tiësto',
-            'location' => 'The World is My Home',
-            'album_title' => 'Tiësto',
-            'album_sub' => 'Featured',
-            'tracks' => [
-                ['title' => 'RVN (Raven)', 'duration' => '3:24', 'audio' => '/audio/Tiësto - RVN (Raven).mp3'],
-                ['title' => 'Drifting (Arodes Remix)', 'duration' => '4:12', 'audio' => '/audio/Tiësto - Drifting (Official Music Video).mp3'],
-                ['title' => 'Everlight', 'duration' => '5:24', 'audio' => '/audio/Tiësto Mathame - Everlight (Official Audio).mp3'],
-            ],
-            'extra_tracks' => [],
+            'hero_tagline' => 'Trance and electro',
+            'follow_url' => 'https://open.spotify.com/artist/2CIMQHJaSUzqSkFPaQNAEQ',
             'about' => [
-                'Tiësto is one of the most influential electronic artists in the world. Known for his signature blend of trance, electro, and festival-ready sounds.',
-                'His emotional melodies, powerful drops, and decades of experience make him a global dance icon.',
+                'Tiësto is a cornerstone of electronic music — from trance anthems to chart-topping collaborations. His sets move between melodic tension and peak-time energy, built for big rooms and late nights.',
+                'At Haarlem Dance, expect precision mixing, recognizable hooks, and a journey through club and festival favourites — all inside the industrial atmosphere of Slachthuis.',
             ],
             'highlights' => [
-                'Grammy Award-winning DJ & producer',
-                'Performed at the Olympics Opening Ceremony (Athens 2004)',
-                'Known for legendary albums like Just Be and Elements of Life',
+                'Grammy-winning producer and global touring artist',
+                'Pioneered the stadium-trance sound; evolved into house and pop crossover hits',
+                'Residencies and headline slots at major festivals worldwide',
+                'Collaborations with artists across pop and electronic music',
+                'Decades of releases spanning trance, progressive, and modern club music',
             ],
-            'gallery_stats' => [['num' => '300+', 'label' => 'PHOTOS'], ['num' => '700+', 'label' => 'LIVE SHOWS'], ['num' => '150+', 'label' => 'FESTIVALS'], ['num' => '60+', 'label' => 'COUNTRIES']],
+            'display_name' => 'TIËSTO',
+            'real_name' => 'Tijs Michiel Verwest',
+            'location' => 'Netherlands',
+            'album_title' => 'Drive',
+            'album_sub' => 'Album • 2023',
+            'tracks' => [
+                ['title' => 'The Business', 'duration' => '2:44', 'audio' => '/audio/partycrasher.mp3'],
+                ['title' => 'Jackie Chan', 'duration' => '2:35', 'audio' => '/audio/lights-out.mp3'],
+                ['title' => 'On My Way', 'duration' => '3:12', 'audio' => '/audio/rise-again.mp3'],
+                ['title' => 'Red Lights', 'duration' => '3:20', 'audio' => '/audio/not-alone.mp3'],
+            ],
+            'extra_tracks' => [
+                [
+                    'artist' => 'TIËSTO',
+                    'title' => 'Adagio for Strings',
+                    'cover' => 'Artist/tiesto3.png',
+                    'audio' => '/audio/rave-till-my-grave.mp3',
+                    'tag' => 'Trance',
+                ],
+            ],
+            'gallery_stats' => [
+                ['num' => '300+', 'label' => 'SHOWS'],
+                ['num' => '600+', 'label' => 'TRACKS'],
+                ['num' => '120+', 'label' => 'ALBUMS'],
+                ['num' => '90+', 'label' => 'AWARDS'],
+            ],
+            'gallery' => [
+                'Artist/tiesto4.png',
+                'Artist/tiesto5.png',
+                'Artist/tiesto6.png',
+                'Artist/tiesto7.png',
+            ],
         ],
     ],
 ];

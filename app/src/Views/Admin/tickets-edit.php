@@ -1,6 +1,7 @@
 <?php
 /** @var array $app */
 /** @var ?array<string,mixed> $row */
+/** @var ?array{capacity: ?int, stock: ?array<string,mixed>, event_id: int, session_id: mixed, event_type_name: ?string} $capacityMeta */
 /** @var string $csrf */
 /** @var list<array<string,mixed>> $allEvents */
 /** @var list<array<string,mixed>> $eventsMissing */
@@ -37,6 +38,43 @@ $cat = (string) ($r['category'] ?? 'jazz');
 
         <h1 class="admin-title"><?= $isNew ? 'New ticket or pass' : 'Edit ticket' ?></h1>
         <p class="admin-hint" style="margin-bottom:1rem;">Day pass and all-access pass rows are shown on the live Tickets page only for <strong>Jazz</strong> and <strong>Dance</strong>. For History and Stories events, create an <strong>Event ticket</strong> only.</p>
+        <p class="admin-hint" style="margin-bottom:1rem;">
+            <strong>Capacity / stock</strong> for event tickets comes from the linked <strong>event</strong> (<code>events.seats</code>) or <strong>session</strong> (<code>sessions.tickets_available</code>).
+            Restaurant seating is managed under <a href="/admin/food">Food → Restaurants</a>.
+            For Jazz events: <a href="/admin/jazz/events">Jazz → Events → Edit</a>. For Dance: <a href="/admin/dance/events">Dance → Events → Edit</a> → <em>Capacity (seats)</em>.
+        </p>
+
+        <?php if ($capacityMeta !== null && !$isNew): ?>
+            <fieldset class="admin-fieldset" style="margin-bottom:1rem;">
+                <legend>Capacity &amp; availability</legend>
+                <?php
+                $cm = $capacityMeta;
+                $pst = $cm['stock'] ?? null;
+                $rem = is_array($pst) ? $pst['remaining'] : null;
+                $cap = $cm['capacity'] ?? null;
+                $eid = (int) ($cm['event_id'] ?? 0);
+                $sessId = $cm['session_id'] ?? null;
+                $etn = $cm['event_type_name'] ?? null;
+                ?>
+                <p class="admin-hint" style="margin-top:0;">
+                    <strong>Live availability for this row</strong>
+                    <?php if ($sessId !== null && $sessId !== ''): ?>
+                        — capacity from session #<?= $h((string) $sessId) ?>.
+                    <?php elseif ($cap !== null): ?>
+                        — capacity <strong><?= $h((string) (int) $cap) ?></strong>,
+                        remaining <strong><?= $rem !== null ? $h((string) (int) $rem) : '—' ?></strong>
+                        <?php if (is_array($pst) && !empty($pst['sold_out'])): ?>(sold out)<?php endif; ?>.
+                    <?php else: ?>
+                        — no fixed capacity until <code>events.seats</code> or session cap is set.
+                    <?php endif; ?>
+                </p>
+                <?php if ($eid > 0 && $etn === 'jazz'): ?>
+                    <p style="margin:0;"><a class="admin-btn admin-btn-sm" href="/admin/jazz/events/edit?id=<?= $eid ?>">Open Jazz event → change capacity</a></p>
+                <?php elseif ($eid > 0 && $etn === 'dance'): ?>
+                    <p style="margin:0;"><a class="admin-btn admin-btn-sm" href="/admin/dance/events/edit?id=<?= $eid ?>">Open Dance event → change capacity</a></p>
+                <?php endif; ?>
+            </fieldset>
+        <?php endif; ?>
 
         <?php if ($eventsMissing !== [] && $isNew): ?>
             <p class="admin-hint">Events without a ticket row yet: <?= count($eventsMissing) ?>. Pick <strong>Event ticket</strong> and select one.</p>
