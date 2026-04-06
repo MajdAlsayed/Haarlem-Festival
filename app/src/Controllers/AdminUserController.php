@@ -86,6 +86,7 @@ final class AdminUserController
         $email = trim((string)($_POST['email'] ?? ''));
         $isActive = !empty($_POST['is_active']);
 
+        // Redirect back if required fields are missing
         if ($id <= 0 || $firstName === '' || $email === '') {
             Session::setFlash('admin_error', 'Required fields missing.');
             header('Location: /admin/users/edit?id=' . $id);

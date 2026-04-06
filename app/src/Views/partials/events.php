@@ -37,7 +37,7 @@ $categoryDisplayLabels = [
                                 <p class="event-description"><?= htmlspecialchars($category->description) ?></p>
                                 <div class="event-actions">
                                     <a href="<?= htmlspecialchars($infoUrl) ?>" class="event-link">INFO &gt;</a>
-                                    <a href="#" class="event-link">TICKETS &gt;</a>
+                                    <a href="/tickets" class="event-link">TICKETS &gt;</a>
                                 </div>
                             </div>
                         </div>

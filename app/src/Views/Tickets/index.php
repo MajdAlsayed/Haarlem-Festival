@@ -163,7 +163,12 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                 <?php foreach ($items as $e):
                     $start = $e['start_time'] ?? '';
                     $end = $e['end_time'] ?? '';
-                    $timeStr = $start !== '' && $end !== '' ? $start . ' – ' . $end : ($start !== '' ? $start : '—');
+                    //Formated time
+                    $startFormatted = $start !== '' ? date('H:i', strtotime($start)) : '';
+                    $endFormatted = $end !== '' ? date('H:i', strtotime($end)) : '';
+                    $timeStr = $startFormatted !== '' && $endFormatted !== ''
+                        ? $startFormatted . ' – ' . $endFormatted
+                        : ($startFormatted !== '' ? $startFormatted : '—');
                     $venueLine = $e['subtitle'] ?? '';
                     ?>
                     <article class="tickets-card">

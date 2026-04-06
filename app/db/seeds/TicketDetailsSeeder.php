@@ -28,7 +28,7 @@ final class TicketDetailsSeeder extends AbstractSeed
              FROM events e
              JOIN event_types et ON et.event_type_id = e.event_type_id
              JOIN venues v ON v.venue_id = e.venue_id
-             WHERE LOWER(et.name) IN ('jazz','dance','history','stories')"
+             WHERE LOWER(et.name) IN ('jazz','dance','stories')"
         );
 
         foreach ($rows as $ev) {
@@ -169,7 +169,6 @@ final class TicketDetailsSeeder extends AbstractSeed
         return match ($cat) {
             'dance' => 75.0,
             'jazz' => 15.0,
-            'history' => 17.50,
             'stories' => 10.0,
             default => 20.0,
         };

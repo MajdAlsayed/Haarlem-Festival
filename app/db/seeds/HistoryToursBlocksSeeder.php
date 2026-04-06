@@ -94,6 +94,7 @@ class HistoryToursBlocksSeeder extends AbstractSeed
                     'tickets' => [
                         [
                             'name' => 'Regular Ticket',
+                            'price' => '€17,5',
                             'per' => 'person',
                             'items' => [
                                 '2.5 hours guided tour',
@@ -104,6 +105,7 @@ class HistoryToursBlocksSeeder extends AbstractSeed
                         ],
                         [
                             'name' => 'Family Ticket',
+                            'price' => '€60',
                             'per' => 'up to 4 people',
                             'items' => [
                                 'All regular ticket benefits',

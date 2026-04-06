@@ -169,7 +169,7 @@
                             <div class="history-experience-card-text cms-html">
                                 <?= $viewModel->experience['guided']['text'] ?? '' ?>
                             </div>
-                            <a href="/history" class="history-button-big">
+                            <a href="/history/tours" class="history-button-big">
                                 <span class="history-button-text">
                                     VIEW TOUR DETAILS
                                 </span>

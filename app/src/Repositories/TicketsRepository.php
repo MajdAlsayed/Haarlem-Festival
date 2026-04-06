@@ -66,10 +66,19 @@ final class TicketsRepository
         $db = Database::getConnection();
         $stmt = $db->prepare(
             "SELECT td.ticket_details_id, td.name, td.description, td.price, td.is_free,
-                    e.event_id, e.event_day, e.start_time, e.end_time, e.hall,
-                    v.name AS venue_name
+                    e.event_id, e.event_day,
+                    CASE
+                        WHEN LOWER(et.name) = 'history' THEN s.start_time
+                        ELSE e.start_time
+                   END AS start_time,
+                   CASE
+                       WHEN LOWER(et.name) = 'history' THEN s.end_time
+                       ELSE e.end_time
+                   END AS end_time,
+                    e.hall,v.name AS venue_name
              FROM ticket_details td
              INNER JOIN events e ON e.event_id = td.event_id
+             LEFT JOIN sessions s ON s.session_id = td.session_id
              INNER JOIN event_types et ON et.event_type_id = e.event_type_id
              INNER JOIN venues v ON v.venue_id = e.venue_id
              WHERE td.ticket_type = 'event_ticket'

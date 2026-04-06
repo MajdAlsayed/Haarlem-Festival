@@ -364,6 +364,19 @@ nav.breadcrumbs {
 
 .history-button-big--yellow {
     background: #f8dc3d;
+    color: #000;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 10px 18px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.history-button-big--yellow:hover {
+    background: #ffe65a;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(248, 220, 61, 0.3);
 }
 
 /* Button End */
@@ -973,27 +986,39 @@ nav.breadcrumbs {
 /* Day tabs */
 .history-tours-day-tabs {
     display: flex;
-    gap: 20px;
+    gap: 12px;
     flex-wrap: wrap;
+    margin-bottom: 8px;
 }
 
 .history-tours-day-tab {
-    padding: 8px 24px;
+    padding: 10px 24px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
     border-radius: 8px;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.02);
     color: white;
     font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    font-size: 16px;
-    letter-spacing: 1.4px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
-.history-tours-day-tab:hover,
+.history-tours-day-tab:hover{
+    border-color: #e58708;
+    transform: translateY(-1px);
+}
 .history-tours-day-tab.active {
     background: #e58708;
     border-color: #e58708;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(229, 135, 8, 0.25);
 }
 
 /* Day panel */
@@ -1026,10 +1051,21 @@ nav.breadcrumbs {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 20px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
+    padding: 16px 20px;
+    background: linear-gradient(
+            90deg,
+            rgba(255,255,255,0.08),
+            rgba(255,255,255,0.03)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.history-tours-item:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.35);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
 
 .history-tours-time-lang {
@@ -1041,12 +1077,13 @@ nav.breadcrumbs {
 .history-tours-time {
     font-family: 'Montserrat', sans-serif;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 14px;
     color: white;
-    min-width: 48px;
+    min-width: 64px;
+    text-align: center;
     background: #e58708;
     border-radius: 6px;
-    padding: 4px 12px;
+    padding: 6px 12px;
 }
 
 .history-tours-lang {
@@ -1118,65 +1155,103 @@ nav.breadcrumbs {
 
 /* What's Included */
 .history-tours-tickets {
-    padding: 40px 0;
+    padding: 48px 0 56px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .history-tours-tickets h2 {
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: 2rem;
+    font-size: 32px;
+    line-height: 48px;
     letter-spacing: 4px;
     color: #f8dc3d;
     text-transform: uppercase;
-    margin-bottom: 40px;
+    margin: 0 0 32px 0;
     text-align: center;
 }
 
 .history-tours-tickets-cards {
     display: flex;
-    gap: 40px;
+    gap: 32px;
     justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
 }
 
 .history-tours-ticket-card {
-    background: rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 12px;
-    padding: 40px;
+    padding: 32px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
     flex: 1;
-    max-width: 480px;
+    max-width: 420px;
+    min-height: 260px;
 }
 
 .history-tours-ticket-card h3 {
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
-    font-size: 1.2rem;
+    font-size: 18px;
+    line-height: 1.3;
     letter-spacing: 2px;
     color: white;
     text-transform: uppercase;
+    margin: 0;
+}
+
+.history-tours-ticket-price {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.2;
+    letter-spacing: 1px;
+    color: #f8dc3d;
+    margin: 0;
 }
 
 .history-tours-ticket-per {
-    font-size: 0.85rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 1.5px;
     color: rgba(255, 255, 255, 0.6);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    margin: 0 0 8px 0;
 }
 
 .history-tours-ticket-card ul {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding-left: 16px;
+    gap: 10px;
+    padding-left: 18px;
+    margin: 4px 0 0 0;
 }
 
 .history-tours-ticket-card li {
-    font-size: 0.9rem;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 1.6;
     color: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 768px) {
+    .history-tours-tickets-cards {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .history-tours-ticket-card {
+        max-width: 100%;
+        min-height: auto;
+    }
+
+    .history-tours-ticket-price {
+        font-size: 24px;
+    }
 }
 
 /* Route Map */

@@ -105,12 +105,13 @@
                                             <?= htmlspecialchars($tour['language_name']) ?>
                                         </span>
                                     </div>
-                                    <span class="history-tours-spots">
-                                        <?= htmlspecialchars($tour['tickets_available']) ?> spots left
-                                    </span>
-                                    <a href="/tickets" class="history-button-big history-button-big--yellow">
+                                    <button
+                                        type="button"
+                                        class="history-button-big history-button-big--yellow"
+                                        data-ticket-details-id="<?= (int) $tour['ticket_details_id'] ?>"
+                                    >
                                         ADD TO CART
-                                    </a>
+                                    </button>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -170,6 +171,11 @@
                         <h3>
                             <?= htmlspecialchars($ticket['name']) ?>
                         </h3>
+                        <?php if (!empty($ticket['price'])): ?>
+                            <p class="history-tours-ticket-price">
+                                <?= htmlspecialchars($ticket['price']) ?>
+                            </p>
+                        <?php endif; ?>
                         <p class="history-tours-ticket-per">
                             <?= htmlspecialchars($ticket['per']) ?>
                         </p>
@@ -186,7 +192,7 @@
         </div>
     </section>
 
-    <!-- ROUTE MAP -->
+    <!-- ROUTE MAP: Leaflet map with all tour locations from the database -->
     <?php
     $mapLocations = $viewModel->locations;
     require __DIR__ . '/../partials/history/history-map.php';
@@ -196,6 +202,7 @@
 <?php require __DIR__ . '/../partials/footer.php'; ?>
 
 <script>
+    // Day tab filtering
     (function () {
         var tabs = document.querySelectorAll('.history-tours-day-tab');
         var panels = document.querySelectorAll('.history-tours-day-panel');
