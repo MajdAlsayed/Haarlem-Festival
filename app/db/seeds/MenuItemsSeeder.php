@@ -16,8 +16,7 @@ class MenuItemsSeeder extends AbstractSeed
             ['path' => '/food', 'label' => 'FOOD', 'sort_order' => 4],
             ['path' => '/history', 'label' => 'HISTORY', 'sort_order' => 5],
             ['path' => '/stories', 'label' => 'STORIES', 'sort_order' => 6],
-            ['path' => '/program', 'label' => 'PROGRAM', 'sort_order' => 7],
-            ['path' => '/tickets', 'label' => 'TICKETS', 'sort_order' => 8],
+            ['path' => '/tickets', 'label' => 'TICKETS', 'sort_order' => 7],
         ];
         $this->table('menu_items')->insert($data)->saveData();
     }

@@ -32,15 +32,40 @@ final class TicketDetailsRepository
     {
         $db = Database::getConnection();
         $stmt = $db->query(
-            'SELECT td.ticket_details_id, td.event_id, td.ticket_type, td.category, td.pass_day, td.pass_time,
+            'SELECT td.ticket_details_id, td.event_id, td.session_id, td.ticket_type, td.category, td.pass_day, td.pass_time,
                     td.schedule_display, td.sort_order, td.is_free, td.name, td.description, td.price,
-                    e.title AS event_title
+                    e.title AS event_title,
+                    LOWER(et.name) AS event_type_name
              FROM ticket_details td
              LEFT JOIN events e ON e.event_id = td.event_id
+             LEFT JOIN event_types et ON et.event_type_id = e.event_type_id
              ORDER BY td.ticket_type ASC, td.category ASC, td.sort_order ASC, td.ticket_details_id ASC'
         );
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Event tickets for a public event detail page (Buy tickets).
+     *
+     * @return list<array<string,mixed>>
+     */
+    public function listByEventIdForPublic(int $eventId): array
+    {
+        if ($eventId <= 0) {
+            return [];
+        }
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            "SELECT ticket_details_id, name, description, price, is_free, sort_order
+             FROM ticket_details
+             WHERE event_id = :eid AND ticket_type = 'event_ticket'
+             ORDER BY sort_order ASC, ticket_details_id ASC"
+        );
+        $stmt->execute(['eid' => $eventId]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return is_array($rows) ? $rows : [];
     }
 
     public function insert(array $row): int

@@ -11,6 +11,7 @@ use App\Repositories\TicketRepository;
 use App\Repositories\TicketsRepository;
 use App\Services\TicketAvailabilityService;
 
+/** Category tabs for /tickets; merges real-time stock hints into each ticket row for badges and disabling buy. */
 final class TicketsController
 {
     public function index(): void
@@ -34,6 +35,7 @@ final class TicketsController
                 $ids[] = (int) ($e['ticket_details_id'] ?? 0);
             }
         }
+        // One batch query worth of ids → sold_out / nearly / low_stock for the whole page (includes cart + pay-later holds).
         $cartRepo = new CartRepository();
         $stock = (new TicketAvailabilityService($cartRepo, new TicketRepository()))->stockUiByTicketDetailsIds($ids);
         $passes = $this->attachStock($passes, $stock);
@@ -57,6 +59,7 @@ final class TicketsController
     {
         foreach ($items as &$row) {
             $tid = (int) ($row['ticket_details_id'] ?? 0);
+            // Passes without a cap get a neutral stock row so the template always reads $row['stock'].
             $row['stock'] = $stock[$tid] ?? [
                 'sold_out' => false,
                 'nearly' => false,

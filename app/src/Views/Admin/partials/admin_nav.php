@@ -1,5 +1,8 @@
 <?php
-/** @var array $app */
+/**
+ * Shared horizontal links on legacy CMS-style admin screens (orders, homepage, dance hub, scanner) for quick cross-navigation.
+ * @var array $app
+ */
 $base = '/admin';
 ?>
 <nav class="admin-cms-nav" aria-label="Admin CMS">
@@ -11,7 +14,11 @@ $base = '/admin';
     <span aria-hidden="true"> · </span>
     <a href="<?= htmlspecialchars($base) ?>/cms/homepage">Edit homepage</a>
     <span aria-hidden="true"> · </span>
-    <a href="<?= htmlspecialchars($base) ?>/cms/dance">Edit Dance page</a>
+    <a href="<?= htmlspecialchars($base) ?>/dance">Dance CMS</a>
+    <span aria-hidden="true"> · </span>
+    <a href="<?= htmlspecialchars($base) ?>/dance/events">Dance events</a>
+    <span aria-hidden="true"> · </span>
+    <a href="<?= htmlspecialchars($base) ?>/dance/artists">Dance artists</a>
     <span aria-hidden="true"> · </span>
     <a href="<?= htmlspecialchars($base) ?>/cms/history">Edit History page</a>
     <span aria-hidden="true"> · </span>

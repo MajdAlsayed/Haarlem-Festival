@@ -5,6 +5,7 @@ namespace App\ViewModels;
 use App\Models\EventType;
 use App\Models\Page;
 
+/** Data passed to Views/Home/Index: published home Page row, category cards, merged homepage CMS strings. */
 class HomeViewModel
 {
     /**

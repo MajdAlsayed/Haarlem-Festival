@@ -9,7 +9,7 @@ $days = ['thursday', 'friday', 'saturday', 'sunday'];
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>New jazz event — Admin — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
+    <title>New dance event — Admin — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
     <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
     <link rel="stylesheet" href="/css/admin.css?v=<?= $h($app['css_version'] ?? '1') ?>">
 </head>
@@ -24,17 +24,17 @@ $days = ['thursday', 'friday', 'saturday', 'sunday'];
             <span class="admin-breadcrumb-sep">›</span>
             <a href="/admin">Admin</a>
             <span class="admin-breadcrumb-sep">›</span>
-            <a href="/admin/jazz">Jazz</a>
+            <a href="/admin/dance">Dance</a>
             <span class="admin-breadcrumb-sep">›</span>
-            <a href="/admin/jazz/events">Events</a>
+            <a href="/admin/dance/events">Events</a>
             <span class="admin-breadcrumb-sep">›</span>
             <span>New</span>
         </nav>
 
-        <h1 class="admin-title">New jazz event</h1>
+        <h1 class="admin-title">New dance event</h1>
         <p class="admin-hint">After creating, use Edit to add preview audio if needed.</p>
 
-        <form method="post" action="/admin/jazz/events/save" class="admin-form admin-form--wide">
+        <form method="post" action="/admin/dance/events/save" class="admin-form admin-form--wide">
             <input type="hidden" name="_csrf" value="<?= $h($csrf) ?>">
             <input type="hidden" name="event_id" value="0">
 
@@ -86,7 +86,7 @@ $days = ['thursday', 'friday', 'saturday', 'sunday'];
                 <div class="admin-field">
                     <label for="seats">Capacity (seats)</label>
                     <input type="number" id="seats" name="seats" class="admin-input" min="0" placeholder="e.g. 120">
-                    <small class="admin-hint">Stored on <code>events.seats</code>; drives ticket availability for this concert.</small>
+                    <small class="admin-hint">Stored on <code>events.seats</code>; used for ticket availability.</small>
                 </div>
                 <div class="admin-field">
                     <label for="price">Price (optional)</label>
@@ -96,7 +96,7 @@ $days = ['thursday', 'friday', 'saturday', 'sunday'];
 
             <div class="admin-form-actions">
                 <button type="submit" class="admin-btn admin-btn-primary">Create</button>
-                <a href="/admin/jazz/events" class="admin-btn admin-btn-secondary">Cancel</a>
+                <a href="/admin/dance/events" class="admin-btn admin-btn-secondary">Cancel</a>
             </div>
         </form>
     </div>

@@ -1,4 +1,5 @@
 <?php
+/** Public homepage template: $viewModel from HomeController; $cmsHome is merged settings (edited in /admin/cms/homepage). */
 $page = $viewModel->page;
 $categories = $viewModel->categories;
 $cmsHome = $viewModel->cmsHome;
@@ -11,7 +12,7 @@ $navLinks = (new \App\Repositories\MenuRepository())->getNavLinks();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= htmlspecialchars($page->title ?? 'Haarlem Festival') ?></title>
+    <title><?= htmlspecialchars((string) ($page->title ?? '')) ?></title>
     <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string) ($app['css_version'] ?? '1')) ?>">
 </head>
 <body>

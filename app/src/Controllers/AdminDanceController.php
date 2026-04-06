@@ -7,19 +7,388 @@ namespace App\Controllers;
 use App\Core\AdminAuth;
 use App\Core\Csrf;
 use App\Core\HtmlSanitizer;
+use App\Core\Session;
+use App\Repositories\DanceCmsRepository;
 use App\Repositories\DanceSettingsRepository;
+use App\Repositories\JazzCmsRepository;
 use App\Repositories\SettingsRepository;
 use App\ViewModels\AdminDanceEditViewModel;
 
+/** Admin CMS for Dance: page copy (dance_settings), events (dance event type), artists strip (JSON in dance_settings). */
 final class AdminDanceController
 {
+    private const ADMIN_ROLE_ID = 1;
+
     private DanceSettingsRepository $danceSettingsRepository;
     private SettingsRepository $settingsRepository;
+    private DanceCmsRepository $danceCms;
 
     public function __construct()
     {
         $this->danceSettingsRepository = new DanceSettingsRepository();
         $this->settingsRepository = new SettingsRepository();
+        $this->danceCms = new DanceCmsRepository();
+    }
+
+    private function requireAdmin(): void
+    {
+        $auth = $_SESSION['auth'] ?? null;
+        if (!$auth || empty($auth['user_id'])) {
+            Session::setFlash('login_error', 'Please log in to access the admin area.');
+            header('Location: /login');
+            exit;
+        }
+        if ((int) ($auth['role_id'] ?? 0) !== self::ADMIN_ROLE_ID) {
+            Session::setFlash('login_error', 'You do not have permission to access the admin area.');
+            header('Location: /');
+            exit;
+        }
+    }
+
+    // —— Dance events (same shape as Jazz admin) ——————————————————————————————
+
+    public function events(): void
+    {
+        $this->requireAdmin();
+        $app = $this->settingsRepository->getAll();
+        $events = $this->danceCms->listDanceEventsForAdmin();
+        require __DIR__ . '/../Views/Admin/dance-events-list.php';
+    }
+
+    public function newEvent(): void
+    {
+        $this->requireAdmin();
+        $venues = $this->danceCms->listVenues();
+        $app = $this->settingsRepository->getAll();
+        $csrf = Csrf::token('admin_dance_event');
+        require __DIR__ . '/../Views/Admin/dance-event-new.php';
+    }
+
+    public function editEvent(): void
+    {
+        $this->requireAdmin();
+        $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+        if ($id <= 0) {
+            header('Location: /admin/dance/events');
+            exit;
+        }
+        $event = $this->danceCms->getDanceEventById($id);
+        if (!$event) {
+            Session::setFlash('admin_error', 'Dance event not found.');
+            header('Location: /admin/dance/events');
+            exit;
+        }
+        $venues = $this->danceCms->listVenues();
+        $audio = (new JazzCmsRepository())->getEventAudio($id);
+        $app = $this->settingsRepository->getAll();
+        $csrf = Csrf::token('admin_dance_event');
+        require __DIR__ . '/../Views/Admin/dance-event-edit.php';
+    }
+
+    public function saveEvent(): void
+    {
+        $this->requireAdmin();
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /admin/dance/events');
+            exit;
+        }
+        if (!Csrf::validate('admin_dance_event', $_POST['_csrf'] ?? null)) {
+            Session::setFlash('admin_error', 'Invalid request. Please try again.');
+            header('Location: /admin/dance/events');
+            exit;
+        }
+
+        $eventId = isset($_POST['event_id']) ? (int) $_POST['event_id'] : 0;
+        $venueId = (int) ($_POST['venue_id'] ?? 0);
+        $title = trim((string) ($_POST['title'] ?? ''));
+        $description = trim((string) ($_POST['description'] ?? ''));
+        $eventDay = trim((string) ($_POST['event_day'] ?? 'friday'));
+        $startTime = trim((string) ($_POST['start_time'] ?? ''));
+        $endTime = trim((string) ($_POST['end_time'] ?? ''));
+        $hall = trim((string) ($_POST['hall'] ?? ''));
+        $seatsRaw = trim((string) ($_POST['seats'] ?? ''));
+        $seats = $seatsRaw === '' ? null : (int) $seatsRaw;
+        $priceRaw = trim((string) ($_POST['price'] ?? ''));
+        $price = $priceRaw === '' ? null : $priceRaw;
+
+        $audioPath = trim((string) ($_POST['preview_audio_path'] ?? ''));
+        $audioTitle = trim((string) ($_POST['preview_audio_title'] ?? ''));
+        $clearAudio = !empty($_POST['clear_preview_audio']);
+
+        if ($title === '' || $venueId <= 0 || $startTime === '') {
+            Session::setFlash('admin_error', 'Title, venue, and start time are required.');
+            header('Location: ' . ($eventId > 0 ? '/admin/dance/events/edit?id=' . $eventId : '/admin/dance/events/new'));
+            exit;
+        }
+
+        $jazzAudio = new JazzCmsRepository();
+        try {
+            if ($eventId > 0) {
+                $this->danceCms->updateDanceEvent(
+                    $eventId,
+                    $venueId,
+                    $title,
+                    $description,
+                    $eventDay,
+                    $startTime,
+                    $endTime !== '' ? $endTime : null,
+                    $hall !== '' ? $hall : null,
+                    $seats,
+                    $price
+                );
+                $newId = $eventId;
+            } else {
+                $newId = $this->danceCms->createDanceEvent(
+                    $venueId,
+                    $title,
+                    $description,
+                    $eventDay,
+                    $startTime,
+                    $endTime !== '' ? $endTime : null,
+                    $hall !== '' ? $hall : null,
+                    $seats,
+                    $price
+                );
+            }
+
+            if ($clearAudio) {
+                $jazzAudio->deleteEventAudio($newId);
+            } elseif ($audioPath !== '') {
+                $jazzAudio->upsertEventAudio($newId, $audioPath, $audioTitle !== '' ? $audioTitle : null);
+            }
+        } catch (\Throwable $e) {
+            Session::setFlash('admin_error', 'Could not save event: ' . $e->getMessage());
+            header('Location: ' . ($eventId > 0 ? '/admin/dance/events/edit?id=' . $eventId : '/admin/dance/events/new'));
+            exit;
+        }
+
+        Session::setFlash('admin_success', 'Dance event saved.');
+        header('Location: /admin/dance/events/edit?id=' . $newId);
+        exit;
+    }
+
+    public function deleteEvent(): void
+    {
+        $this->requireAdmin();
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /admin/dance/events');
+            exit;
+        }
+        $form = (string) ($_POST['_csrf_form'] ?? '');
+        if ($form === '' || !Csrf::validate($form, $_POST['_csrf'] ?? null)) {
+            Session::setFlash('admin_error', 'Invalid request.');
+            header('Location: /admin/dance/events');
+            exit;
+        }
+        $id = (int) ($_POST['event_id'] ?? 0);
+        if ($id <= 0) {
+            header('Location: /admin/dance/events');
+            exit;
+        }
+        try {
+            $this->danceCms->deleteDanceEvent($id);
+            Session::setFlash('admin_success', 'Event deleted.');
+        } catch (\Throwable $e) {
+            Session::setFlash('admin_error', $e->getMessage());
+        }
+        header('Location: /admin/dance/events');
+        exit;
+    }
+
+    // —— Artists (homepage strip — JSON in dance_settings['artists']) ——————————
+
+    public function artists(): void
+    {
+        $this->requireAdmin();
+        $app = $this->settingsRepository->getAll();
+        $merged = $this->danceSettingsRepository->getMergedWithConfig();
+        $artists = $merged['artists'] ?? [];
+        if (!is_array($artists)) {
+            $artists = [];
+        }
+        require __DIR__ . '/../Views/Admin/dance-artists-list.php';
+    }
+
+    public function artistsNew(): void
+    {
+        $this->requireAdmin();
+        $app = $this->settingsRepository->getAll();
+        $csrf = Csrf::token('admin_dance_artist');
+        $isNew = true;
+        $row = ['name' => '', 'slug' => '', 'bio' => '', 'image' => ''];
+        require __DIR__ . '/../Views/Admin/dance-artist-edit.php';
+    }
+
+    public function artistsEdit(): void
+    {
+        $this->requireAdmin();
+        $slug = trim((string) ($_GET['slug'] ?? ''));
+        if ($slug === '' || !self::isValidArtistSlug($slug)) {
+            Session::setFlash('admin_error', 'Invalid artist.');
+            header('Location: /admin/dance/artists');
+            exit;
+        }
+        $merged = $this->danceSettingsRepository->getMergedWithConfig();
+        $artists = $merged['artists'] ?? [];
+        if (!is_array($artists)) {
+            $artists = [];
+        }
+        $row = null;
+        foreach ($artists as $a) {
+            if (is_array($a) && isset($a['slug']) && (string) $a['slug'] === $slug) {
+                $row = [
+                    'name' => (string) ($a['name'] ?? ''),
+                    'slug' => (string) ($a['slug'] ?? ''),
+                    'bio' => (string) ($a['bio'] ?? ''),
+                    'image' => (string) ($a['image'] ?? ''),
+                ];
+                break;
+            }
+        }
+        if ($row === null) {
+            Session::setFlash('admin_error', 'Artist not found.');
+            header('Location: /admin/dance/artists');
+            exit;
+        }
+        $app = $this->settingsRepository->getAll();
+        $csrf = Csrf::token('admin_dance_artist');
+        $isNew = false;
+        require __DIR__ . '/../Views/Admin/dance-artist-edit.php';
+    }
+
+    public function saveArtist(): void
+    {
+        $this->requireAdmin();
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /admin/dance/artists');
+            exit;
+        }
+        if (!Csrf::validate('admin_dance_artist', $_POST['_csrf'] ?? null)) {
+            Session::setFlash('admin_error', 'Invalid request.');
+            header('Location: /admin/dance/artists');
+            exit;
+        }
+
+        $originalSlug = trim((string) ($_POST['original_slug'] ?? ''));
+        $name = trim((string) ($_POST['name'] ?? ''));
+        $slug = trim((string) ($_POST['slug'] ?? ''));
+        $bio = trim((string) ($_POST['bio'] ?? ''));
+        $image = trim((string) ($_POST['image'] ?? ''));
+
+        $artistFormBack = $originalSlug !== ''
+            ? '/admin/dance/artists/edit?slug=' . rawurlencode($originalSlug)
+            : '/admin/dance/artists/new';
+
+        if ($name === '' || $slug === '' || !self::isValidArtistSlug($slug)) {
+            Session::setFlash('admin_error', 'Name and a valid slug (lowercase letters, numbers, hyphens) are required.');
+            header('Location: ' . $artistFormBack);
+            exit;
+        }
+        if ($image !== '' && self::looksUnsafeFilename($image)) {
+            Session::setFlash('admin_error', 'Image: filename only, no path characters.');
+            header('Location: ' . $artistFormBack);
+            exit;
+        }
+
+        $merged = $this->danceSettingsRepository->getMergedWithConfig();
+        $artists = $merged['artists'] ?? [];
+        if (!is_array($artists)) {
+            $artists = [];
+        }
+
+        $list = [];
+        foreach ($artists as $a) {
+            if (!is_array($a) || empty($a['slug'])) {
+                continue;
+            }
+            $s = (string) $a['slug'];
+            if ($originalSlug !== '' && $s === $originalSlug) {
+                continue;
+            }
+            if ($s === $slug) {
+                Session::setFlash('admin_error', 'That slug is already used.');
+                header('Location: ' . $artistFormBack);
+                exit;
+            }
+            $list[] = [
+                'name' => (string) ($a['name'] ?? ''),
+                'slug' => $s,
+                'bio' => (string) ($a['bio'] ?? ''),
+                'image' => (string) ($a['image'] ?? ''),
+            ];
+        }
+
+        $list[] = [
+            'name' => $name,
+            'slug' => $slug,
+            'bio' => $bio,
+            'image' => $image,
+        ];
+
+        $this->danceSettingsRepository->upsertSetting('artists', json_encode(array_values($list)));
+        Session::setFlash('admin_success', 'Artist saved.');
+        header('Location: /admin/dance/artists');
+        exit;
+    }
+
+    public function deleteArtist(): void
+    {
+        $this->requireAdmin();
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /admin/dance/artists');
+            exit;
+        }
+        $form = (string) ($_POST['_csrf_form'] ?? '');
+        if ($form === '' || !Csrf::validate($form, $_POST['_csrf'] ?? null)) {
+            Session::setFlash('admin_error', 'Invalid request.');
+            header('Location: /admin/dance/artists');
+            exit;
+        }
+        $delSlug = trim((string) ($_POST['slug'] ?? ''));
+        if ($delSlug === '' || !self::isValidArtistSlug($delSlug)) {
+            header('Location: /admin/dance/artists');
+            exit;
+        }
+        $merged = $this->danceSettingsRepository->getMergedWithConfig();
+        $artists = $merged['artists'] ?? [];
+        if (!is_array($artists)) {
+            $artists = [];
+        }
+        $list = [];
+        foreach ($artists as $a) {
+            if (!is_array($a) || empty($a['slug'])) {
+                continue;
+            }
+            if ((string) $a['slug'] === $delSlug) {
+                continue;
+            }
+            $list[] = [
+                'name' => (string) ($a['name'] ?? ''),
+                'slug' => (string) ($a['slug'] ?? ''),
+                'bio' => (string) ($a['bio'] ?? ''),
+                'image' => (string) ($a['image'] ?? ''),
+            ];
+        }
+        $this->danceSettingsRepository->upsertSetting('artists', json_encode(array_values($list)));
+        Session::setFlash('admin_success', 'Artist removed from the Dance page.');
+        header('Location: /admin/dance/artists');
+        exit;
+    }
+
+    private static function isValidArtistSlug(string $slug): bool
+    {
+        return (bool) preg_match('/^[a-z0-9-]+$/', $slug);
+    }
+
+    /** CMS hub at /admin/dance (dashboard cards → edit form, public site). */
+    public function index(): void
+    {
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
+
+        $app = $this->settingsRepository->getAll();
+        require __DIR__ . '/../Views/Admin/dance-index.php';
     }
 
     public function showForm(?string $error = null, ?string $success = null): void
@@ -98,6 +467,7 @@ final class AdminDanceController
         $artistsSectionTitle = trim((string) ($_POST['artists_section_title'] ?? ''));
         $heroCtaLabel = trim((string) ($_POST['hero_cta_label'] ?? ''));
         $heroImage = trim((string) ($_POST['hero_image'] ?? ''));
+        // Rich text fields go through HtmlPurifier so admins can’t paste script tags.
         $heroSubtitle = HtmlSanitizer::purify((string) ($_POST['hero_subtitle'] ?? ''));
         $p1 = HtmlSanitizer::purify((string) ($_POST['about_p1'] ?? ''));
         $p2 = HtmlSanitizer::purify((string) ($_POST['about_p2'] ?? ''));

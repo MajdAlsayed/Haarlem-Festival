@@ -7,9 +7,7 @@ namespace App\Controllers;
 use App\Repositories\PersonalProgramRepository;
 use App\Repositories\SettingsRepository;
 
-/**
- * Saved ticket picks (personal program) when the customer adds items to the cart while logged in.
- */
+/** Personal program (/my-program): ticket picks saved when a logged-in user adds items to the cart. */
 final class ProgramController
 {
     public function index(): void

@@ -6,9 +6,7 @@ use App\Core\Database;
 use PDO;
 
 /**
- * Reads dance_settings from the database (hero_image, featured_images, genres, etc.).
- * JSON values are decoded. If the database fails or has no rows, we use the config file.
- * getMergedWithConfig() overlays DB on dance.php so partial CMS updates never drop defaults.
+ * Dance CMS key/value store: database overrides dance.php; falls back to the config file if the table is empty or unavailable.
  */
 class DanceSettingsRepository
 {

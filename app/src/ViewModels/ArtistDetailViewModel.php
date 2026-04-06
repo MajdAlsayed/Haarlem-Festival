@@ -4,9 +4,7 @@ namespace App\ViewModels;
 
 use App\Models\Event;
 
-/**
- * Data for the Dance artist detail view. The controller fills this; the view only uses these properties.
- */
+/** View model for a Dance artist profile (music block, gallery, schedule asset, related events). */
 class ArtistDetailViewModel
 {
     public array $artist;
@@ -29,6 +27,8 @@ class ArtistDetailViewModel
     public string $careerImage;
     public string $profileImage;
     public string $albumCoverImage;
+    public ?string $heroTagline;
+    public ?string $followUrl;
 
     public function __construct(
         array $artist,
@@ -50,7 +50,9 @@ class ArtistDetailViewModel
         array $galleryStats,
         string $careerImage,
         string $profileImage,
-        string $albumCoverImage
+        string $albumCoverImage,
+        ?string $heroTagline = null,
+        ?string $followUrl = null
     ) {
         $this->artist = $artist;
         $this->galleryImages = $galleryImages;
@@ -72,8 +74,11 @@ class ArtistDetailViewModel
         $this->careerImage = $careerImage;
         $this->profileImage = $profileImage;
         $this->albumCoverImage = $albumCoverImage;
+        $this->heroTagline = $heroTagline;
+        $this->followUrl = $followUrl;
     }
 
+    /** @deprecated Prefer checking sections individually (career highlights, tracks, gallery). */
     public function hasFullPage(): bool
     {
         return $this->aboutParagraphs !== null && $this->careerHighlights !== null;

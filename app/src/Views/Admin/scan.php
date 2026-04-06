@@ -129,8 +129,9 @@ if ($result !== null && !empty($result['ticket_code'])) {
             </div>
         <?php endif; ?>
 
+        <div class="admin-scan-layout">
         <div class="admin-scan-qr-block">
-            <p class="admin-scan-label" style="margin-bottom:0.5rem;">Camera (QR)</p>
+            <p class="admin-scan-label admin-scan-label--tight">Camera (QR)</p>
             <div class="admin-scan-qr-wrap" id="qr-reader-wrap">
                 <div id="qr-reader-idle" class="admin-scan-qr-idle" aria-hidden="false">
                     <p class="admin-scan-qr-idle-title">No live preview yet</p>
@@ -139,7 +140,7 @@ if ($result !== null && !empty($result['ticket_code'])) {
                 </div>
                 <div id="qr-reader" class="admin-scan-qr-reader" aria-label="QR scanner live view"></div>
             </div>
-            <p id="qr-camera-error" class="admin-scan-error" style="display:none;margin-top:0.5rem;" role="alert"></p>
+            <p id="qr-camera-error" class="admin-scan-error" style="display:none" role="alert"></p>
             <div class="admin-scan-qr-actions">
                 <button type="button" class="admin-scan-submit admin-scan-submit--secondary" id="qr-start">Start camera</button>
                 <button type="button" class="admin-scan-submit admin-scan-submit--secondary" id="qr-stop" hidden>Stop camera</button>
@@ -149,11 +150,12 @@ if ($result !== null && !empty($result['ticket_code'])) {
 
         <div class="admin-scan-test-qr-block">
             <p class="admin-scan-label">Test QR (for this device’s camera)</p>
-            <p class="admin-scan-hint" style="margin-top:0;">Scan this image with the camera above, or use a second phone. The QR encodes the same text as a ticket code.</p>
+            <p class="admin-scan-hint admin-scan-hint--flush">Scan this image with the camera above, or use a second phone. The QR encodes the same text as a ticket code.</p>
             <div id="scan-test-qr-host" class="admin-scan-test-qr-host" data-initial-code="<?= $h($demoQrCode) ?>"></div>
             <div class="admin-scan-test-qr-actions">
                 <button type="button" class="admin-scan-submit admin-scan-submit--secondary" id="scan-test-qr-refresh">Make QR from “Ticket code” field</button>
             </div>
+        </div>
         </div>
 
         <form method="post" action="/admin/scan" class="admin-scan-form" autocomplete="off">

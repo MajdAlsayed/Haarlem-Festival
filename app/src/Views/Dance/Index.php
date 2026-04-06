@@ -1,4 +1,5 @@
 <?php
+/** Public Dance index; card images come from merged CMS settings and dance.php defaults. */
 /** @var \App\ViewModels\DanceViewModel $viewModel */
 $fridayEvents = $viewModel->fridayEvents;
 $saturdayEvents = $viewModel->saturdayEvents;
@@ -9,7 +10,7 @@ $appSettings = $viewModel->appSettings;
 $danceSettings = $viewModel->danceSettings;
 $breadcrumbs = $viewModel->breadcrumbs;
 
-$danceHeroImage = isset($danceSettings['hero_image']) ? '/images/dance/' . rawurlencode((string) $danceSettings['hero_image']) : '/images/dance/Dance page front picture.png';
+$danceHeroImage = isset($danceSettings['hero_image']) ? '/images/dance/' . rawurlencode((string) $danceSettings['hero_image']) : '';
 $featuredImages = isset($danceSettings['featured_images']) && is_array($danceSettings['featured_images']) ? $danceSettings['featured_images'] : [];
 $fridayImages = isset($danceSettings['friday_images']) && is_array($danceSettings['friday_images']) ? $danceSettings['friday_images'] : [];
 $saturdayImages = isset($danceSettings['saturday_images']) && is_array($danceSettings['saturday_images']) ? $danceSettings['saturday_images'] : [];
@@ -17,17 +18,10 @@ $sundayImages = isset($danceSettings['sunday_images']) && is_array($danceSetting
 $fridayGenres = isset($danceSettings['friday_genres']) && is_array($danceSettings['friday_genres']) ? $danceSettings['friday_genres'] : [];
 $saturdayGenres = isset($danceSettings['saturday_genres']) && is_array($danceSettings['saturday_genres']) ? $danceSettings['saturday_genres'] : [];
 $sundayGenres = isset($danceSettings['sunday_genres']) && is_array($danceSettings['sunday_genres']) ? $danceSettings['sunday_genres'] : [];
-$genreLabels = isset($danceSettings['featured_genre_labels']) && is_array($danceSettings['featured_genre_labels']) ? $danceSettings['featured_genre_labels'] : ['DANCE', 'DANCE', 'DANCE'];
-$defaultEventTime = isset($appSettings['default_event_time']) ? (string) $appSettings['default_event_time'] : '22:00';
-$heroSubtitle = isset($danceSettings['hero_subtitle']) && is_string($danceSettings['hero_subtitle']) ? $danceSettings['hero_subtitle'] : 'Experience Haarlem\'s biggest nights of house, techno, and trance.';
+$genreLabels = isset($danceSettings['featured_genre_labels']) && is_array($danceSettings['featured_genre_labels']) ? $danceSettings['featured_genre_labels'] : [];
+$defaultEventTime = isset($appSettings['default_event_time']) ? (string) $appSettings['default_event_time'] : '';
+$heroSubtitle = isset($danceSettings['hero_subtitle']) && is_string($danceSettings['hero_subtitle']) ? $danceSettings['hero_subtitle'] : '';
 $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceSettings['about_paragraphs']) ? $danceSettings['about_paragraphs'] : [];
-if ($aboutParagraphs === []) {
-    $aboutParagraphs = [
-        'Haarlem Dance brings the world\'s best house, techno and trance DJs to iconic Haarlem locations.',
-        'Across three nights, visitors experience Back2Back headline sets, immersive club sessions and unique experimental performances.',
-        'Join thousands of music lovers for the most energetic part of the Festival.',
-    ];
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,7 +41,7 @@ if ($aboutParagraphs === []) {
         <div class="dance-hero-content">
             <h1><?= htmlspecialchars($viewModel->pageTitle) ?></h1>
             <div class="dance-hero-subtitle cms-html"><?= \App\Core\HtmlSanitizer::purify($heroSubtitle) ?></div>
-            <a href="#featured-events" class="btn btn-primary btn-white"><?= htmlspecialchars(isset($danceSettings['hero_cta_label']) && is_string($danceSettings['hero_cta_label']) ? $danceSettings['hero_cta_label'] : 'View Dance Events') ?></a>
+            <a href="#featured-events" class="btn btn-primary btn-white"><?= htmlspecialchars((string) ($danceSettings['hero_cta_label'] ?? '')) ?></a>
         </div>
     </section>
 
@@ -62,7 +56,7 @@ if ($aboutParagraphs === []) {
                 <?php endif; ?>
             <?php endforeach; ?>
         </nav>
-        <h2 class="dance-about-heading"><?= htmlspecialchars(isset($danceSettings['about_section_heading']) && is_string($danceSettings['about_section_heading']) ? $danceSettings['about_section_heading'] : 'About Dance') ?></h2>
+        <h2 class="dance-about-heading"><?= htmlspecialchars((string) ($danceSettings['about_section_heading'] ?? '')) ?></h2>
         <div class="dance-about-content">
             <?php foreach ($aboutParagraphs as $para): ?>
                 <?php if (is_string($para) && !\App\Core\HtmlSanitizer::isEmptyHtml($para)): ?>
@@ -73,13 +67,13 @@ if ($aboutParagraphs === []) {
     </section>
 
     <section id="featured-events" class="dance-featured container">
-        <h2 class="dance-section-title"><?= htmlspecialchars(isset($danceSettings['featured_section_title']) && is_string($danceSettings['featured_section_title']) ? $danceSettings['featured_section_title'] : 'Featured Events') ?></h2>
+        <h2 class="dance-section-title"><?= htmlspecialchars((string) ($danceSettings['featured_section_title'] ?? '')) ?></h2>
         <div class="dance-cards dance-cards-featured">
             <?php foreach ($featuredEvents as $i => $event): ?>
                 <?php
                 $imageName = isset($featuredImages[$i]) ? $featuredImages[$i] : (isset($featuredImages[0]) ? $featuredImages[0] : '');
                 $imagePath = $imageName !== '' ? '/images/dance/' . rawurlencode($imageName) : '';
-                $genre = isset($genreLabels[$i]) ? $genreLabels[$i] : 'DANCE';
+                $genre = isset($genreLabels[$i]) ? $genreLabels[$i] : '';
                 $dayLabel = ucfirst($event->eventDay ?? 'friday');
                 $timeLine = $dayLabel . ' • ' . ($event->startTime ?? '20:00');
                 $title = $event->title;
@@ -106,15 +100,19 @@ if ($aboutParagraphs === []) {
     </section>
 
     <section class="dance-all container">
-        <h2 class="dance-section-title"><?= htmlspecialchars(isset($danceSettings['all_events_section_title']) && is_string($danceSettings['all_events_section_title']) ? $danceSettings['all_events_section_title'] : 'All Events') ?></h2>
+        <h2 class="dance-section-title"><?= htmlspecialchars((string) ($danceSettings['all_events_section_title'] ?? '')) ?></h2>
         <div class="dance-date-filters" role="tablist">
-            <button type="button" class="dance-filter-btn active" data-filter="friday" aria-pressed="true">Friday</button>
-            <button type="button" class="dance-filter-btn" data-filter="saturday" aria-pressed="false">Saturday</button>
-            <button type="button" class="dance-filter-btn" data-filter="sunday" aria-pressed="false">Sunday</button>
+            <button type="button" class="dance-filter-btn active" data-filter="friday" aria-pressed="true"><?= htmlspecialchars((string) ($danceSettings['day_label_friday'] ?? '')) ?></button>
+            <button type="button" class="dance-filter-btn" data-filter="saturday" aria-pressed="false"><?= htmlspecialchars((string) ($danceSettings['day_label_saturday'] ?? '')) ?></button>
+            <button type="button" class="dance-filter-btn" data-filter="sunday" aria-pressed="false"><?= htmlspecialchars((string) ($danceSettings['day_label_sunday'] ?? '')) ?></button>
         </div>
 
         <?php
-        $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday'];
+        $dayLabels = [
+            'friday' => (string) ($danceSettings['day_label_friday'] ?? ''),
+            'saturday' => (string) ($danceSettings['day_label_saturday'] ?? ''),
+            'sunday' => (string) ($danceSettings['day_label_sunday'] ?? '')
+        ];
         $panels = [
             'friday' => ['events' => $fridayEvents, 'images' => $fridayImages, 'genres' => $fridayGenres],
             'saturday' => ['events' => $saturdayEvents, 'images' => $saturdayImages, 'genres' => $saturdayGenres],
@@ -132,7 +130,7 @@ if ($aboutParagraphs === []) {
                 <?php foreach ($dayEvents as $i => $event):
                     $imageName = !empty($dayImages) ? $dayImages[$i % count($dayImages)] : '';
                     $imagePath = $imageName !== '' ? '/images/dance/' . rawurlencode($imageName) : '';
-                    $genre = !empty($dayGenres) ? $dayGenres[$i % count($dayGenres)] : 'DANCE';
+                    $genre = !empty($dayGenres) ? $dayGenres[$i % count($dayGenres)] : '';
                     $dateTime = $dayLabel . ' • ' . ($event->startTime ?? $defaultEventTime);
                 ?>
                     <a href="/dance/event/<?= (int) $event->id ?>" class="dance-card dance-card-vertical" style="text-decoration: none; color: inherit;">
@@ -156,8 +154,8 @@ if ($aboutParagraphs === []) {
         <?php endforeach; ?>
     </section>
 
-    <section class="dance-artists container">
-        <h2 class="dance-section-title"><?= htmlspecialchars(isset($danceSettings['artists_section_title']) && is_string($danceSettings['artists_section_title']) ? $danceSettings['artists_section_title'] : 'Artist(s)') ?></h2>
+    <section id="dance-artists" class="dance-artists container">
+        <h2 class="dance-section-title"><?= htmlspecialchars((string) ($danceSettings['artists_section_title'] ?? '')) ?></h2>
         <div class="dance-artists-grid">
             <?php foreach ($artists as $artist): ?>
                 <?php
@@ -178,12 +176,12 @@ if ($aboutParagraphs === []) {
                 <div class="dance-artist-card-body">
                     <h3 class="dance-artist-name"><?= htmlspecialchars($artistName) ?></h3>
                     <p class="dance-artist-bio"><?= htmlspecialchars($artistBio) ?></p>
-                    <a href="<?= $artistUrl ?>" class="dance-artist-info-link">INFO &gt;</a>
+                    <a href="<?= $artistUrl ?>" class="dance-artist-info-link"><?= htmlspecialchars((string) ($danceSettings['artist_info_label'] ?? '')) ?></a>
                 </div>
             </article>
             <?php endforeach; ?>
         </div>
-        <button type="button" class="btn btn-outline dance-show-more">Show More Artists &gt;</button>
+        <button type="button" class="btn btn-outline dance-show-more"><?= htmlspecialchars((string) ($danceSettings['show_more_artists_label'] ?? '')) ?></button>
     </section>
 </main>
 

@@ -7,9 +7,12 @@ namespace App\Controllers;
 use App\Core\Csrf;
 use App\Core\Database;
 use App\Core\Session;
+use App\Repositories\CartRepository;
 use App\Repositories\SettingsRepository;
 use App\Repositories\TicketDetailsRepository;
+use App\Repositories\TicketRepository;
 use App\Repositories\TicketsRepository;
+use App\Services\TicketAvailabilityService;
 
 final class AdminTicketsController
 {
@@ -49,6 +52,11 @@ final class AdminTicketsController
         $this->requireAdmin();
         $app = $this->app();
         $rows = $this->tickets->listAllForAdmin();
+        $ids = array_values(array_unique(array_filter(array_map('intval', array_column($rows, 'ticket_details_id')))));
+        $cartRepo = new CartRepository();
+        $ticketRepo = new TicketRepository();
+        $capacities = $cartRepo->getTicketDetailsCapacitiesForIds($ids);
+        $stock = (new TicketAvailabilityService($cartRepo, $ticketRepo))->stockUiByTicketDetailsIds($ids);
         require __DIR__ . '/../Views/Admin/tickets-list.php';
     }
 
@@ -105,6 +113,7 @@ final class AdminTicketsController
         $csrf = Csrf::token('admin_tickets_item');
         $allEvents = $this->tickets->listEventsForTicketForm();
         $eventsMissing = $this->tickets->listEventsWithoutTicket();
+        $capacityMeta = $this->buildTicketCapacityMeta($row);
         require __DIR__ . '/../Views/Admin/tickets-edit.php';
     }
 
@@ -116,7 +125,50 @@ final class AdminTicketsController
         $row = null;
         $allEvents = $this->tickets->listEventsForTicketForm();
         $eventsMissing = $this->tickets->listEventsWithoutTicket();
+        $capacityMeta = null;
         require __DIR__ . '/../Views/Admin/tickets-edit.php';
+    }
+
+    /**
+     * Read-only capacity + stock for event/session tickets (passes have no cap here).
+     *
+     * @param array<string,mixed> $row
+     * @return ?array{capacity: ?int, stock: ?array<string,mixed>, event_id: int, session_id: mixed, event_type_name: ?string}
+     */
+    private function buildTicketCapacityMeta(array $row): ?array
+    {
+        if (($row['ticket_type'] ?? '') !== 'event_ticket') {
+            return null;
+        }
+        $tid = (int) ($row['ticket_details_id'] ?? 0);
+        if ($tid <= 0) {
+            return null;
+        }
+        $cartRepo = new CartRepository();
+        $ticketRepo = new TicketRepository();
+        $cap = $cartRepo->getTicketDetailsCapacity($tid);
+        $stockMap = (new TicketAvailabilityService($cartRepo, $ticketRepo))->stockUiByTicketDetailsIds([$tid]);
+        $eventId = (int) ($row['event_id'] ?? 0);
+        $eventTypeName = null;
+        if ($eventId > 0) {
+            $db = Database::getConnection();
+            $st = $db->prepare(
+                'SELECT LOWER(et.name) AS n FROM events e
+                 INNER JOIN event_types et ON et.event_type_id = e.event_type_id
+                 WHERE e.event_id = :id LIMIT 1'
+            );
+            $st->execute(['id' => $eventId]);
+            $n = $st->fetchColumn();
+            $eventTypeName = is_string($n) ? strtolower($n) : null;
+        }
+
+        return [
+            'capacity' => $cap,
+            'stock' => $stockMap[$tid] ?? null,
+            'event_id' => $eventId,
+            'session_id' => $row['session_id'] ?? null,
+            'event_type_name' => $eventTypeName,
+        ];
     }
 
     public function save(): void

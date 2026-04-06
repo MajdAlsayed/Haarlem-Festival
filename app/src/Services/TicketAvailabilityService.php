@@ -7,10 +7,7 @@ namespace App\Services;
 use App\Repositories\CartRepository;
 use App\Repositories\TicketRepository;
 
-/**
- * Enforces capacity from events.seats or sessions.tickets_available.
- * Passes (day_pass / all_access_pass) are not capped.
- */
+/** Capacity: sold seats plus active carts plus unpaid pay-later reservations before allowing add or checkout. */
 final class TicketAvailabilityService
 {
     public function __construct(
@@ -39,6 +36,8 @@ final class TicketAvailabilityService
         $pending = $this->cartRepository->sumPendingOrderQuantityForTicketDetails($ticketDetailsId);
         $used = $sold + $reserved + $pending;
 
+        // Requirement was “max 90% for single tickets”. We only apply it when someone adds one seat at a time
+        // (delta 1). Buying 2+ in one click skips this extra rule and only hits the hard capacity check below.
         if ($delta === 1 && $capacity > 10) {
             $maxSingleShare = (int) max(0, floor(0.9 * $capacity));
             if ($used + $delta > $maxSingleShare) {
@@ -60,7 +59,8 @@ final class TicketAvailabilityService
     }
 
     /**
-     * Re-check before payment (inside a transaction). Uses sold + all active cart holds.
+     * Re-check immediately before payment (call inside the same DB transaction as the order).
+     * Counts sold + every active cart + pay-later pendings so two people cannot oversell the last seats.
      */
     public function assertCartCanCheckout(\App\ViewModels\CartViewModel $cart): void
     {

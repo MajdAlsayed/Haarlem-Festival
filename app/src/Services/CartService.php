@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\CartRepository;
 use App\ViewModels\CartViewModel;
 
+/** Cart lifecycle: resolves guest session cart vs logged-in user cart, runs capacity checks on each change. */
 class CartService
 {
     public function __construct(
@@ -92,6 +93,7 @@ class CartService
                 return $userCart->cartId;
             }
 
+            // Logged in after browsing as guest: merge session cart into the user row so items are not lost.
             $sessionCartId = isset($_SESSION['cart_id']) ? (int)$_SESSION['cart_id'] : null;
             if ($sessionCartId) {
                 $sessionCart = $this->cartRepository->findActiveCartById($sessionCartId);
@@ -109,6 +111,7 @@ class CartService
             return $this->cartRepository->createCart($userId);
         }
 
+        // Guest: cart id lives in session until login attaches it to a user.
         $sessionCartId = isset($_SESSION['cart_id']) ? (int)$_SESSION['cart_id'] : null;
         if ($sessionCartId) {
             $sessionCart = $this->cartRepository->findActiveCartById($sessionCartId);

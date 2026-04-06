@@ -6,9 +6,7 @@ namespace App\Core;
 
 use App\Repositories\UserRepository;
 
-/**
- * Ticket door scanner: allowed for admin and employee roles (not customers).
- */
+/** Restricts /admin/scan to admin and employee roles; caches role IDs to limit database reads. */
 final class TicketScannerAuth
 {
     /** @var array{admin: ?int, employee: ?int}|null */
@@ -17,6 +15,7 @@ final class TicketScannerAuth
     /** @return array{admin: ?int, employee: ?int} */
     private static function roleIds(UserRepository $repo): array
     {
+        // Role ids don’t change at runtime; hitting the DB on every menu render would be overkill.
         if (self::$roleIds === null) {
             self::$roleIds = [
                 'admin' => $repo->getRoleIdByName('admin'),
