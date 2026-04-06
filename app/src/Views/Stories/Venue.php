@@ -107,15 +107,17 @@ $kweekHighlights = [
 <?php else: ?>
 
     <!-- ── Breadcrumb ── -->
-    <nav class="stories-breadcrumb" aria-label="Breadcrumb">
-        <div class="stories-breadcrumb-inner">
-            <a href="/" class="stories-breadcrumb-link">HOME</a>
-            <span class="stories-breadcrumb-separator">→</span>
-            <a href="/stories" class="stories-breadcrumb-link">STORIES</a>
-            <span class="stories-breadcrumb-separator">→</span>
-            <span class="stories-breadcrumb-link active" aria-current="page"><?= h($venueName) ?></span>
-        </div>
-    </nav>
+   <nav class="stories-breadcrumb" aria-label="Breadcrumb">
+    <div class="stories-breadcrumb-inner">
+        <a href="/" class="stories-breadcrumb-link">Home</a>
+        <span class="stories-breadcrumb-separator">/</span>
+
+        <a href="/stories" class="stories-breadcrumb-link">Stories</a>
+        <span class="stories-breadcrumb-separator">/</span>
+
+        <span class="stories-breadcrumb-link active"><?= htmlspecialchars($venue['name'] ?? 'Venue') ?></span>
+    </div>
+</nav>
 
     <!-- ================================================================
          DE SCHUUR

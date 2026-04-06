@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Repositories\StoriesRepository;
 use App\Services\StoriesService;
 use App\Validation\StoryValidator;
+use App\Core\AdminAuth;
 
 class AdminStoriesController
 {
@@ -17,6 +18,9 @@ class AdminStoriesController
 
     public function index(): void
     {
+        if (!AdminAuth::requireAdmin()) {
+    return;
+}
         $stories = $this->storiesService->getAllStoriesForAdmin();
 
         foreach ($stories as &$story) 
@@ -35,7 +39,9 @@ class AdminStoriesController
     {
         $storyId = (int)($_GET['id'] ?? 0);
         $story   = $this->storiesService->getStoryForEdit($storyId);
-
+        if (!AdminAuth::requireAdmin()) {
+    return;
+}
         if (!$story)
         {
             http_response_code(404);
@@ -50,6 +56,9 @@ class AdminStoriesController
 
     public function update(): void
     {
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
         $validator = new StoryValidator();
         $storyId   = (int)($_POST['story_id'] ?? 0);
 
@@ -81,6 +90,9 @@ class AdminStoriesController
 
     public function delete(): void
     {
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
         $storyId = (int)($_POST['story_id'] ?? 0);
 
         if ($storyId > 0) {
@@ -93,6 +105,9 @@ class AdminStoriesController
 
     public function editDetailPage(): void
     {
+            if (!AdminAuth::requireAdmin()) {
+                return;
+            }
         $slug = trim((string)($_GET['slug'] ?? ''));
         $data = $this->storiesService->getDetailPageForCms($slug);
 
@@ -116,6 +131,9 @@ class AdminStoriesController
 
     public function saveDetailPage(): void
     {
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
         $storyId = (int)($_POST['story_id'] ?? 0);
 
         $data = [

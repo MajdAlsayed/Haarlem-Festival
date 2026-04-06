@@ -48,6 +48,11 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                 <h2 class="admin-card-title">Scan tickets</h2>
                 <p class="admin-card-desc">Check admission codes at the door (admin).</p>
             </a>
+            <a href="/cms/stories" class="admin-card">
+            <div class="admin-card-icon">📚</div>
+            <h3>Stories CMS</h3>
+             <p>Manage story cards and story detail pages.</p>
+           </a>
         </section>
     </div>
 </main>

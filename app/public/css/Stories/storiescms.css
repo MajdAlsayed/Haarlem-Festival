@@ -1,0 +1,562 @@
+/* =========================================================
+   STORIES CMS
+   Consistent with Haarlem Festival dark / gold design
+   Load AFTER /css/admin.css
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: #0c0c0c;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.admin-main {
+    padding: 2rem 1.25rem 3rem;
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #25201a 0, #0c0c0c 45%, #050505 100%);
+}
+
+.admin-container {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.admin-container--wide {
+    max-width: 1320px;
+}
+
+/* =========================================================
+   TYPOGRAPHY + BREADCRUMBS
+   ========================================================= */
+
+.admin-breadcrumb {
+    font-size: 0.9rem;
+    color: #999999;
+    margin-bottom: 1rem;
+}
+
+.admin-breadcrumb a {
+    color: #f5b400;
+    text-decoration: none;
+}
+
+.admin-breadcrumb a:hover {
+    opacity: 0.85;
+}
+
+.admin-breadcrumb-sep {
+    margin: 0 0.35rem;
+    color: rgba(245, 180, 0, 0.55);
+}
+
+.admin-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 0.4rem 0;
+    line-height: 1.2;
+}
+
+.admin-lead {
+    font-size: 1rem;
+    color: #c0c0c0;
+    margin: 0;
+}
+
+/* =========================================================
+   SHARED BUTTON LOOK
+   ========================================================= */
+
+.admin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 0.9rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 700;
+    transition: 0.2s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+    line-height: 1.2;
+}
+
+.admin-btn-sm {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.75rem;
+}
+
+.admin-btn-primary {
+    background: #f5b400;
+    color: #000000;
+    border-color: #f5b400;
+}
+
+.admin-btn-primary:hover {
+    background: #e0a600;
+    border-color: #e0a600;
+}
+
+.admin-btn-secondary {
+    background: transparent;
+    color: #f5b400;
+    border: 1px solid rgba(245, 180, 0, 0.75);
+}
+
+.admin-btn-secondary:hover {
+    background: rgba(245, 180, 0, 0.12);
+}
+
+.admin-btn-danger {
+    background: rgba(220, 53, 69, 0.14);
+    color: #ffb3b8;
+    border: 1px solid rgba(220, 53, 69, 0.45);
+}
+
+.admin-btn-danger:hover {
+    background: rgba(220, 53, 69, 0.24);
+}
+
+/* =========================================================
+   FORM BASE
+   ========================================================= */
+
+.admin-form {
+    max-width: 700px;
+}
+
+.admin-form--wide {
+    max-width: 100%;
+}
+
+.admin-field {
+    margin-bottom: 1rem;
+}
+
+.admin-field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: #f1f1f1;
+}
+
+.admin-input {
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.98rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-input:focus {
+    outline: none;
+    border-color: #f5b400;
+    box-shadow: 0 0 0 3px rgba(245, 180, 0, 0.12);
+}
+
+.admin-textarea {
+    min-height: 120px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.admin-form-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.field-error {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.82rem;
+    color: #ff9aa5;
+}
+
+/* =========================================================
+   STORIES CMS HEADER
+   ========================================================= */
+
+.story-cms-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.story-cms-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    background: rgba(245, 180, 0, 0.12);
+    color: #f5b400;
+    border: 1px solid rgba(245, 180, 0, 0.28);
+}
+
+.story-cms-count-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: rgba(245, 180, 0, 0.12);
+    color: #f5b400;
+    border: 1px solid rgba(245, 180, 0, 0.25);
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-top: 0.75rem;
+}
+
+/* =========================================================
+   STORIES CMS CARD / PANEL
+   ========================================================= */
+
+.story-cms-card {
+    background: #161412;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+    margin-bottom: 1.5rem;
+}
+
+.story-cms-card__header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.story-cms-card__title {
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #f5b400;
+    margin: 0;
+}
+
+.story-cms-card__body {
+    padding: 1.25rem;
+}
+
+/* =========================================================
+   TABLE / INDEX PAGE
+   ========================================================= */
+
+.admin-table-wrap {
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #f2f2f2;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 1rem 0.9rem;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-table th {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #a9a9a9;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.admin-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.admin-muted {
+    color: #8b8b8b;
+}
+
+.story-cms-thumb {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    object-fit: cover;
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.story-cms-thumb-placeholder {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed rgba(255, 255, 255, 0.14);
+    font-size: 1.25rem;
+}
+
+.story-cms-name {
+    font-weight: 700;
+    line-height: 1.35;
+    color: #ffffff;
+}
+
+.story-cms-slug {
+    margin-top: 0.2rem;
+    font-size: 0.8rem;
+    color: #9a9a9a;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.story-cms-badge-soft {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.24rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.story-cms-badge-type {
+    color: #9bb8ff;
+    border-color: rgba(120, 150, 255, 0.25);
+    background: rgba(120, 150, 255, 0.12);
+}
+
+.story-cms-badge-age {
+    color: #f5b400;
+    border-color: rgba(245, 180, 0, 0.25);
+    background: rgba(245, 180, 0, 0.12);
+}
+
+.story-cms-badge-ok {
+    color: #7dce8a;
+    border-color: rgba(40, 167, 69, 0.35);
+    background: rgba(40, 167, 69, 0.12);
+}
+
+.story-cms-badge-muted {
+    color: #aaa;
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.story-cms-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.story-cms-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.story-cms-empty-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.story-cms-empty h3 {
+    margin: 0 0 0.35rem 0;
+    font-size: 1rem;
+    color: #ffffff;
+}
+
+.story-cms-empty p {
+    color: #9a9a9a;
+    margin: 0;
+}
+
+/* =========================================================
+   FORM LAYOUT
+   ========================================================= */
+
+.story-cms-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.story-cms-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.story-cms-col-full {
+    grid-column: 1 / -1;
+}
+
+.story-cms-hint {
+    display: block;
+    font-size: 0.82rem;
+    color: #999999;
+    margin-top: 0.3rem;
+    line-height: 1.45;
+}
+
+.story-cms-form-note {
+    font-size: 0.82rem;
+    color: #999999;
+}
+
+/* =========================================================
+   IMAGE PREVIEW
+   ========================================================= */
+
+.story-cms-preview {
+    border: 1.5px dashed rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.22);
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+}
+
+.story-cms-preview img {
+    width: 100%;
+    max-height: 260px;
+    object-fit: cover;
+    display: block;
+}
+
+.story-cms-preview--small {
+    max-width: 220px;
+    min-height: auto;
+}
+
+.story-cms-preview--small img {
+    height: 130px;
+}
+
+.story-cms-preview-empty {
+    text-align: center;
+    color: #888888;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    padding: 1.25rem;
+}
+
+.story-cms-preview-empty span {
+    display: block;
+    font-size: 1.8rem;
+    margin-bottom: 0.35rem;
+}
+
+.story-cms-live-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.45rem;
+    padding: 0.12rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #7dce8a;
+    border: 1px solid rgba(40, 167, 69, 0.45);
+    background: rgba(40, 167, 69, 0.12);
+    vertical-align: middle;
+}
+
+/* =========================================================
+   REPEATABLE BLOCKS
+   ========================================================= */
+
+.story-cms-repeat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.story-cms-repeat-item {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.story-cms-repeat-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.story-cms-repeat-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #aaaaaa;
+}
+
+.story-cms-remove {
+    margin-left: auto;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+    .story-cms-grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .col-type,
+    .col-age {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .story-cms-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .story-cms-col-full {
+        grid-column: auto;
+    }
+
+    .story-cms-actions,
+    .admin-form-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-title {
+        font-size: 1.8rem;
+    }
+}

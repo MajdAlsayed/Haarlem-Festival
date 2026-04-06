@@ -75,13 +75,7 @@ class StoriesController
         require __DIR__ . '/../Views/Stories/Detail.php';
     }
 
-    /**
-     * GET /api/stories
-     *
-     * JSON endpoint — Lecture 6 requirement.
-     * Returns all stories as JSON so the frontend can load them via fetch().
-     * Supports optional ?day= filter matching the public index page.
-     */
+
     public function apiStories(): void
     {
         $day  = $this->normalizeDay($_GET['day'] ?? 'all');
@@ -128,4 +122,18 @@ class StoriesController
         http_response_code(404);
         echo $message;
     }
+    public function api(): void
+{
+    header('Content-Type: application/json; charset=UTF-8');
+
+    $day = $_GET['day'] ?? 'all';
+
+    $repo = new \App\Repositories\StoriesRepository();
+    $stories = $repo->getStories($day);
+
+    echo json_encode([
+        'stories' => $stories
+    ]);
+    exit;
+}
 }

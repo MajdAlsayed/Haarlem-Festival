@@ -37,7 +37,7 @@ use App\Controllers\AccountController;
 use App\Controllers\ProgramController;
 use App\Core\SecurityHeaders;
 use App\Services\PendingOrderMaintenance;
-
+use App\Controllers\AdminStoriesController;
 Session::start();
 PendingOrderMaintenance::run();
 SecurityHeaders::send();
@@ -123,6 +123,14 @@ switch ($uri) {
         if ($method === 'GET') (new StoriesController())->detail();
         else http_response_code(405);
         break;
+       
+case '/api/stories':
+    if ($method === 'GET') {
+        (new StoriesController())->apiStories();
+    } else {
+        http_response_code(405);
+    }
+    break;
 
     case '/cart':
         if ($method === 'GET') {
@@ -155,6 +163,53 @@ switch ($uri) {
             http_response_code(405);
         }
         break;
+        case '/cms/stories':
+    if ($method === 'GET') {
+        (new AdminStoriesController())->index();
+    } else {
+        http_response_code(405);
+    }
+    break;
+
+case '/cms/stories/edit':
+    if ($method === 'GET') {
+        (new AdminStoriesController())->edit();
+    } else {
+        http_response_code(405);
+    }
+    break;
+
+case '/cms/stories/update':
+    if ($method === 'POST') {
+        (new AdminStoriesController())->update();
+    } else {
+        http_response_code(405);
+    }
+    break;
+
+case '/cms/stories/delete':
+    if ($method === 'GET' || $method === 'POST') {
+        (new AdminStoriesController())->delete();
+    } else {
+        http_response_code(405);
+    }
+    break;
+
+case '/cms/stories/detail-page':
+    if ($method === 'GET') {
+        (new AdminStoriesController())->editDetailPage();
+    } else {
+        http_response_code(405);
+    }
+    break;
+
+case '/cms/stories/detail-page/save':
+    if ($method === 'POST') {
+        (new AdminStoriesController())->saveDetailPage();
+    } else {
+        http_response_code(405);
+    }
+    break;
 
     case '/checkout':
         if ($method === 'GET') {
