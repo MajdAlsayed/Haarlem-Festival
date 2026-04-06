@@ -1,0 +1,1 @@
+ALTER TABLE stories ADD COLUMN audience VARCHAR(50) DEFAULT '' NOT NULL AFTER template;
