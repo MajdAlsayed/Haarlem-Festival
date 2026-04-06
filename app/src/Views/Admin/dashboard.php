@@ -77,6 +77,12 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                     </p>
                 </a>
 
+                <a href="/admin/stories" class="admin-card">
+                    <span class="admin-card-icon">📚</span>
+                    <h2 class="admin-card-title">Stories</h2>
+                    <p class="admin-card-desc">Manage story cards and story detail pages.</p>
+                </a>
+
                 <a href="/admin/tickets" class="admin-card">
                     <span class="admin-card-icon">🎫</span>
                     <h2 class="admin-card-title">Tickets</h2>

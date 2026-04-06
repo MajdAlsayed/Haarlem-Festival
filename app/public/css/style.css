@@ -1592,66 +1592,6 @@ main {
     line-height: 1.5;
 }
 
-/* STORIES PAGE */
-.stories-filter { margin-top: 30px; }
-.stories-filter-top { display:flex; align-items:center; gap:20px; }
-.stories-filter-label { font-size:12px; opacity:.7; }
-
-.stories-tabs { display:flex; gap:10px; flex-wrap:wrap; }
-.stories-tab{
-  display:inline-flex; align-items:center; justify-content:center;
-  padding:10px 18px;
-  border-radius:10px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
-  color:#eee; text-decoration:none; font-weight:700; font-size:12px;
-}
-.stories-tab.active{ background:#f5b400; color:#000; border-color:#f5b400; }
-
-.stories-schedule{
-  margin-top: 26px;
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px;
-}
-.stories-schedule-title{ font-weight:800; margin-bottom:10px; }
-.stories-schedule-grid{ display:flex; gap:14px; flex-wrap:wrap; }
-.stories-schedule-box{
-  background:#f5e35a;
-  color:#000;
-  border-radius:10px;
-  padding:10px 12px;
-  min-width: 170px;
-  font-weight:800;
-}
-.stories-schedule-box .t{ font-size:12px; }
-.stories-schedule-box .n{ font-size:12px; margin-top:2px; }
-.stories-schedule-box .a{ font-size:12px; margin-top:4px; }
-
-.stories-cards{ margin: 30px 0 80px; }
-.stories-cards-grid{
-  display:grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 22px;
-}
-.stories-card{
-  background: rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:14px;
-  overflow:hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,.45);
-}
-.stories-card-img{
-  height: 220px;
-  background-size: cover;
-  background-position:center;
-}
-.stories-card-body{ padding:16px; }
-.stories-card-title{ margin:0 0 8px; font-size:18px; font-weight:900; }
-.stories-card-meta{ font-size:12px; opacity:.85; display:grid; gap:4px; margin-bottom:10px; }
-.stories-card-desc{ font-size:13px; opacity:.8; line-height:1.6; min-height: 50px; }
-.stories-card-actions{ display:flex; gap:10px; margin-top:12px; }
-.stories-card-actions .btn{ flex:1; text-align:center; }
 
 /* Map toolbar pills */
 .map-toolbar {
