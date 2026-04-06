@@ -23,7 +23,8 @@ final class CreateStoryDetailPagesTable extends AbstractMigration
                 'signed' => false,
             ])
             ->addColumn('story_id', 'integer', [
-                'signed' => false,
+                // Must match stories.story_id (signed INT from create_stories_table).
+                'signed' => true,
                 'null' => false,
             ])
             ->addColumn('hero_image', 'string', [
