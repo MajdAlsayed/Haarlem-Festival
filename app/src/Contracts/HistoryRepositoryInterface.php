@@ -15,6 +15,10 @@ interface HistoryRepositoryInterface
 
     public function getToursByDate(string $date): array;
 
+    public function getToursWithDetailsByDate(string $date): array;
+
+    public function getTourDates(): array;
+
     // LOCATIONS
     public function getAllLocations(): array;
 
@@ -25,6 +29,8 @@ interface HistoryRepositoryInterface
     public function getLocationBySortOrder(int $sortOrder): ?HistoryLocation;
 
     // IMAGES
+    public function getAllImages(): array;
+
     public function getPrimaryImage(int $locationId): ?HistoryImage;
 
     public function getLocationImages(int $locationId): array;
@@ -37,6 +43,8 @@ interface HistoryRepositoryInterface
 
     public function getImageById(int $imageId): ?HistoryImage;
 
+    public function insertImage(string $imageUrl, string $altText): int;
+
     // BLOCKS
 
     /** @return array{page_id: int|null, blocks: array} */
@@ -44,4 +52,6 @@ interface HistoryRepositoryInterface
 
     /** @return array{page_id: int|null, blocks: list<array>} */
     public function getPageBlocksList(string $slug): array;
+
+    public function updatePageBlock(int $blockId, array $content): bool;
 }

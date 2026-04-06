@@ -2,15 +2,17 @@
 
 namespace App\Controllers;
 
+use App\Contracts\ServiceInterface\HistoryServiceInterface;
 use App\Repositories\HistoryRepository;
 use App\Services\HistoryService;
 use App\ViewModels\HistoryViewModel;
 use App\ViewModels\HistoryLocationViewModel;
+use App\ViewModels\HistoryToursViewModel;
 use App\Exceptions\NotFoundException;
 
 class HistoryController
 {
-    private HistoryService $historyService;
+    private HistoryServiceInterface $historyService;
 
     public function __construct()
     {
@@ -136,5 +138,42 @@ class HistoryController
         );
 
         require __DIR__ . '/../Views/History/Location.php';
+    }
+
+    public function tours(): void
+    {
+
+        // Get page blocks
+        $result = $this->historyService->getPageBlocks('history-tours');
+        $blocks = $result['blocks'];
+
+        // Get hero image (if no - return null)
+        $heroImageId = $blocks['hero']['content']['image_id'] ?? null;
+        $heroImage = $heroImageId ? $this->historyService->getImageById($heroImageId) : null;
+
+        // Get all available dates
+        $dates = $this->historyService->getTourDates();
+        $toursByDay = [];
+        foreach ($dates as $date) {
+            $toursByDay[$date] = $this->historyService->getToursWithDetailsByDate($date);
+        }
+
+        // Get all locations (for map)
+        $locations = $this->historyService->getAllLocations();
+
+        $viewModel = new HistoryToursViewModel(
+            blocks: $blocks,
+            heroImage: $heroImage,
+            toursByDay: $toursByDay,
+            locations: $locations,
+        );
+
+        require __DIR__ . '/../Views/History/Tours.php';
+    }
+    public function toursSchedule(): void
+    {
+        $date = $_GET['day'] ?? '';
+        $tours = $this->historyService->getToursWithDetailsByDate($date);
+        require __DIR__ . '/../Views/History/ToursSchedule.php';
     }
 }

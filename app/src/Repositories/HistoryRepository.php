@@ -77,6 +77,45 @@ class HistoryRepository implements HistoryRepositoryInterface
         return array_map([$this, 'mapToHistoryTours'], $rows);
     }
 
+    public function getToursWithDetailsByDate(string $date): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT ht.history_tour_id, ht.session_id, ht.language_id, ht.tickets_available, s.start_time, l.name AS language_name
+            FROM history_tours ht
+            INNER JOIN sessions s ON ht.session_id = s.session_id 
+            INNER JOIN languages l ON ht.language_id = l.language_id
+            WHERE DATE(s.start_time) = :date
+            ORDER BY s.start_time ASC'
+        );
+
+        $stmt->execute(['date' => $date]);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        return $rows;
+    }
+
+    public function getTourDates(): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare('SELECT DISTINCT DATE(s.start_time) AS tour_date
+            FROM history_tours ht
+            INNER JOIN sessions s ON ht.session_id = s.session_id 
+            INNER JOIN events e ON s.event_id = e.event_id
+            INNER JOIN event_types et ON e.event_type_id = et.event_type_id                    
+            WHERE et.name = :name
+            ORDER BY s.start_time ASC'
+        );
+
+        $stmt->execute(['name' => 'history']);
+        $rows = $stmt->fetchAll(\PDO::FETCH_OBJ);
+
+        return array_column($rows, 'tour_date');
+    }
+
+
     // LOCATIONS
     private function mapToHistoryLocations(object $row): HistoryLocation
     {
@@ -90,6 +129,8 @@ class HistoryRepository implements HistoryRepositoryInterface
         $historyLocation->pageId = (int)$row->page_id;
         $historyLocation->shortDescription = $row->short_description;
         $historyLocation->pageSlug = $row->page_slug ?? null;
+        $historyLocation->lat = $row->lat !== null ? (float)$row->lat : null;
+        $historyLocation->lng = $row->lng !== null ? (float)$row->lng : null;
 
         return $historyLocation;
     }
@@ -99,7 +140,8 @@ class HistoryRepository implements HistoryRepositoryInterface
         $db = Database::getConnection();
 
         $stmt = $db->prepare(
-            'SELECT history_location_id, name, slug, description_1, description_2, short_description, page_id, sort_order
+            'SELECT history_location_id, name, slug, description_1, description_2, short_description, 
+            page_id, sort_order, lat, lng
             FROM history_locations 
             ORDER BY sort_order'
         );
@@ -115,7 +157,8 @@ class HistoryRepository implements HistoryRepositoryInterface
         $db = Database::getConnection();
 
         $stmt = $db->prepare(
-            'SELECT history_location_id, name, slug, description_1, description_2, short_description, page_id, sort_order
+            'SELECT history_location_id, name, slug, description_1, description_2, short_description, 
+            page_id, sort_order, lat, lng
             FROM history_locations
             WHERE history_location_id = :id
             LIMIT 1'
@@ -136,7 +179,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
         $stmt = $db->prepare(
             'SELECT hl.history_location_id, hl.name, hl.slug, hl.description_1, hl.description_2, 
-            hl.short_description, hl.page_id, hl.sort_order, p.slug as page_slug
+            hl.short_description, hl.page_id, hl.sort_order, hl.lat, hl.lng, p.slug as page_slug
             FROM history_locations hl
             LEFT JOIN pages p ON hl.page_id = p.page_id
             WHERE hl.slug = :slug
@@ -158,7 +201,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
         $stmt = $db->prepare(
             'SELECT history_location_id, name, slug, description_1, description_2, 
-        short_description, page_id, sort_order
+        short_description, page_id, sort_order, lat, lng
         FROM history_locations
         WHERE sort_order = :sort_order
         LIMIT 1'
@@ -188,6 +231,20 @@ class HistoryRepository implements HistoryRepositoryInterface
         $image->sortOrder = $row->sort_order;
 
         return $image;
+    }
+
+    public function getAllImages(): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT history_image_id, image_url, alt_text, image_type
+        FROM history_images
+        ORDER BY history_image_id'
+        );
+
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function getPrimaryImage(int $locationId): ?HistoryImage
@@ -314,6 +371,21 @@ class HistoryRepository implements HistoryRepositoryInterface
         return $this->mapToHistoryImages($row);
     }
 
+    public function insertImage(string $imageUrl, string $altText): int
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            'INSERT INTO history_images (image_url, alt_text, image_type) 
+        VALUES (:url, :alt, :type)'
+        );
+        $stmt->execute([
+            'url' => $imageUrl,
+            'alt' => $altText,
+            'type' => 'primary'
+        ]);
+        return (int)$db->lastInsertId();
+    }
+
     // PAGE BLOCKS
     public function getPageBlocks(string $slug): array
     {
@@ -378,5 +450,20 @@ class HistoryRepository implements HistoryRepositoryInterface
             'page_id' => $pageId,
             'blocks' => $blocks,
         ];
+    }
+
+    public function updatePageBlock(int $blockId, array $content): bool
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'UPDATE page_blocks 
+            SET content_json = :content_json 
+            WHERE block_id = :block_id'
+        );
+
+        return $stmt->execute([
+            'block_id' => $blockId,
+            'content_json' => json_encode($content)]);
     }
 }

@@ -8,11 +8,18 @@ class HistorySessionsSeeder extends AbstractSeed
 {
     public function run(): void
     {
+        // Clear existing data to avoid duplicates
+        $this->execute('SET FOREIGN_KEY_CHECKS = 0');
+        $this->execute('DELETE FROM history_tours');
+        $this->execute('DELETE FROM sessions WHERE event_id IN (
+    SELECT event_id FROM events WHERE event_type_id = 3
+)');
+        $this->execute('SET FOREIGN_KEY_CHECKS = 1');
         $days = [
             'thursday' => '2026-07-23',
-            'friday'   => '2026-07-24',
+            'friday' => '2026-07-24',
             'saturday' => '2026-07-25',
-            'sunday'   => '2026-07-26',
+            'sunday' => '2026-07-26',
         ];
 
         // 3 time slots per day

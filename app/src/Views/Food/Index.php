@@ -1,13 +1,13 @@
 ﻿<?php
-$app = $viewModel->appSettings;
+
 $foodConfig = $viewModel->foodSettings;
 $restaurants = $viewModel->restaurants;
 
-$pageTitle = 'Food';
-$heroImage = '/images/food/' . rawurlencode($foodConfig['hero_image'] ?? 'food-hero.jpg');
+$pageTitle    = 'Food';
+$heroImage    = '/images/food/' . rawurlencode($foodConfig['hero_image'] ?? 'food-hero.jpg');
 $introHeading = $foodConfig['intro_heading'] ?? 'Taste the Festival Spirit in Haarlem';
-$introText = $foodConfig['intro_text'] ?? '';
-$filters = $foodConfig['filter_labels'] ?? ['All'];
+$introText    = $foodConfig['intro_text'] ?? '';
+$filters      = $foodConfig['filter_labels'] ?? ['All'];
 $localsReviews = $foodConfig['locals_reviews'] ?? [];
 
 $normalize = static function (string $value): string {
@@ -25,8 +25,7 @@ $renderStars = static function (int $stars): string {
 <head>
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle) ?></title>
-<link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars($app['css_version']) ?>">
-</head>
+    <link rel="stylesheet" href="/css/style.css"></head>
 
 <body class="food-page">
 
@@ -43,11 +42,11 @@ $renderStars = static function (int $stars): string {
 
     <!-- Intro -->
     <section class="food-intro container">
-    <nav class="breadcrumbs food-breadcrumbs">
-    <a href="/">HOME</a>
-    <span class="breadcrumb-sep">›</span>
-    <span class="breadcrumb-current">FOOD</span>
-    </nav>
+        <nav class="breadcrumbs food-breadcrumbs">
+            <a href="/">HOME</a>
+            <span class="breadcrumb-sep">›</span>
+            <span class="breadcrumb-current">FOOD</span>
+        </nav>
 
         <h2 class="food-intro-heading"><?= htmlspecialchars($introHeading) ?></h2>
         <p class="food-intro-text"><?= nl2br(htmlspecialchars($introText)) ?></p>
@@ -72,44 +71,44 @@ $renderStars = static function (int $stars): string {
         </div>
 
         <div class="food-cards-grid" id="foodCards">
-    <?php foreach ($restaurants as $restaurant): ?>
-    <?php
-    $tags = array_filter(array_map('trim', explode(',', $restaurant->type)));
-    $imagePath = $restaurant->image ? '/images/food/' . rawurlencode($restaurant->image) : '';
-    $dataTags = htmlspecialchars(json_encode(array_map($normalize, $tags), JSON_UNESCAPED_UNICODE));
-    ?>
-    <a class="food-card-link"
-       href="/food/restaurant/<?= (int) $restaurant->restaurantId ?>"
-       aria-label="Open <?= htmlspecialchars($restaurant->name) ?> details">
-        <article class="food-card"
-                 data-tags="<?= $dataTags ?>"
-                 data-name="<?= htmlspecialchars($restaurant->name) ?>">
+            <?php foreach ($restaurants as $restaurant): ?>
+            <?php
+            $tags      = array_filter(array_map('trim', explode(',', $restaurant->type)));
+            $imagePath = $restaurant->image ? '/images/food/' . rawurlencode($restaurant->image) : '';
+            $dataTags  = htmlspecialchars(json_encode(array_map($normalize, $tags), JSON_UNESCAPED_UNICODE));
+            ?>
+            <a class="food-card-link"
+               href="/food/restaurant/<?= (int) $restaurant->restaurantId ?>"
+               aria-label="Open <?= htmlspecialchars($restaurant->name) ?> details">
+                <article class="food-card"
+                         data-tags="<?= $dataTags ?>"
+                         data-name="<?= htmlspecialchars($restaurant->name) ?>">
 
-            <div class="food-card-image-wrap">
-                <?php if ($imagePath): ?>
-                    <img src="<?= htmlspecialchars($imagePath) ?>"
-                         alt="<?= htmlspecialchars($restaurant->name) ?>"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <?php endif; ?>
-                <div class="food-card-placeholder" style="<?= $imagePath ? 'display:none;' : 'display:flex;' ?>">🍽️</div>
-            </div>
+                    <div class="food-card-image-wrap">
+                        <?php if ($imagePath): ?>
+                            <img src="<?= htmlspecialchars($imagePath) ?>"
+                                 alt="<?= htmlspecialchars($restaurant->name) ?>"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <?php endif; ?>
+                        <div class="food-card-placeholder" style="<?= $imagePath ? 'display:none;' : 'display:flex;' ?>">🍽️</div>
+                    </div>
 
-            <div class="food-card-body">
-                <h3 class="food-card-title"><?= htmlspecialchars($restaurant->name) ?></h3>
-                <p class="food-card-tags"><?= htmlspecialchars(implode(', ', $tags)) ?></p>
-                <p class="food-card-stars"><?= htmlspecialchars($renderStars($restaurant->stars)) ?></p>
-                <p class="food-card-prices">
-                    €<?= number_format($restaurant->priceAdult, 2) ?>
-                    •
-                    Kids&lt;<?= (int) $restaurant->kidAgeMax ?> €<?= number_format($restaurant->priceKid, 2) ?>
-                </p>
-                <p class="food-card-seats">Seats <?= (int) $restaurant->seats ?></p>
-                <p class="food-card-address"><?= htmlspecialchars($restaurant->address) ?></p>
-            </div>
-        </article>
-    </a>
-<?php endforeach; ?>
-</div>
+                    <div class="food-card-body">
+                        <h3 class="food-card-title"><?= htmlspecialchars($restaurant->name) ?></h3>
+                        <p class="food-card-tags"><?= htmlspecialchars(implode(', ', $tags)) ?></p>
+                        <p class="food-card-stars"><?= htmlspecialchars($renderStars($restaurant->stars)) ?></p>
+                        <p class="food-card-prices">
+                            €<?= number_format($restaurant->priceAdult, 2) ?>
+                            •
+                            Kids&lt;<?= (int) $restaurant->kidAgeMax ?> €<?= number_format($restaurant->priceKid, 2) ?>
+                        </p>
+                        <p class="food-card-seats">Seats <?= (int) $restaurant->seats ?></p>
+                        <p class="food-card-address"><?= htmlspecialchars($restaurant->address) ?></p>
+                    </div>
+                </article>
+            </a>
+            <?php endforeach; ?>
+        </div>
     </section>
 
     <!-- Locals reviews -->
@@ -119,12 +118,11 @@ $renderStars = static function (int $stars): string {
 
             <div class="food-reviews-grid">
                 <?php foreach ($localsReviews as $rev):
-                    $reviewer = (string)($rev['reviewer'] ?? 'Local');
+                    $reviewer   = (string)($rev['reviewer'] ?? 'Local');
                     $restaurant = (string)($rev['restaurant'] ?? '');
-                    $rating = (float)($rev['rating'] ?? 0);
-                    $text = (string)($rev['text'] ?? '');
-                    // optional avatar field if you add it later in config
-                    $avatar = $rev['avatar'] ?? null;
+                    $rating     = (float)($rev['rating'] ?? 0);
+                    $text       = (string)($rev['text'] ?? '');
+                    $avatar     = $rev['avatar'] ?? null;
                 ?>
                     <article class="food-review-card">
                         <div class="food-review-head">
@@ -153,63 +151,59 @@ $renderStars = static function (int $stars): string {
 </main>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
+
 <script>
 (function () {
-  const buttons = document.querySelectorAll('.food-filter-btn');
-  const grid = document.getElementById('foodCards');
+    const buttons = document.querySelectorAll('.food-filter-btn');
+    const grid    = document.getElementById('foodCards');
+    const items   = Array.from(grid.querySelectorAll('.food-card-link'));
 
-  // IMPORTANT: grid items are the LINKS, not the articles
-  const items = Array.from(grid.querySelectorAll('.food-card-link'));
-
-  function normalize(s) {
-    return (s || '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
-  }
-
-  function hasTag(cardEl, tag) {
-    try {
-      const tags = JSON.parse(cardEl.getAttribute('data-tags') || '[]');
-      const needle = normalize(tag);
-      if (needle === 'all') return true;
-
-      return tags.some(t => {
-        t = normalize(t);
-        return t === needle || t.includes(needle) || needle.includes(t);
-      });
-    } catch (e) {
-      return true;
+    function normalize(s) {
+        return (s || '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
     }
-  }
 
-  function applyFilter(filterLabel) {
-    items.forEach(linkEl => {
-      const cardEl = linkEl.querySelector('.food-card');
-      const match = cardEl ? hasTag(cardEl, filterLabel) : true;
-
-      // Hide/show the GRID ITEM so the grid reflows
-      linkEl.style.display = match ? '' : 'none';
-    });
-
-    buttons.forEach(b => {
-      b.classList.remove('active');
-      b.setAttribute('aria-pressed', 'false');
-    });
-
-    const active = Array.from(buttons).find(b =>
-      normalize(b.getAttribute('data-filter')) === normalize(filterLabel)
-    );
-    if (active) {
-      active.classList.add('active');
-      active.setAttribute('aria-pressed', 'true');
+    function hasTag(cardEl, tag) {
+        try {
+            const tags   = JSON.parse(cardEl.getAttribute('data-tags') || '[]');
+            const needle = normalize(tag);
+            if (needle === 'all') return true;
+            return tags.some(t => {
+                t = normalize(t);
+                return t === needle || t.includes(needle) || needle.includes(t);
+            });
+        } catch (e) {
+            return true;
+        }
     }
-  }
 
-  buttons.forEach(btn => {
-    btn.addEventListener('click', function () {
-      applyFilter(this.getAttribute('data-filter'));
+    function applyFilter(filterLabel) {
+        items.forEach(linkEl => {
+            const cardEl = linkEl.querySelector('.food-card');
+            const match  = cardEl ? hasTag(cardEl, filterLabel) : true;
+            linkEl.style.display = match ? '' : 'none';
+        });
+
+        buttons.forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-pressed', 'false');
+        });
+
+        const active = Array.from(buttons).find(b =>
+            normalize(b.getAttribute('data-filter')) === normalize(filterLabel)
+        );
+        if (active) {
+            active.classList.add('active');
+            active.setAttribute('aria-pressed', 'true');
+        }
+    }
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            applyFilter(this.getAttribute('data-filter'));
+        });
     });
-  });
 
-  if (buttons.length) applyFilter(buttons[0].getAttribute('data-filter'));
+    if (buttons.length) applyFilter(buttons[0].getAttribute('data-filter'));
 })();
 </script>
 </body>

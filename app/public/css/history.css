@@ -5,13 +5,16 @@
     min-height: 520px;
     overflow: hidden;
 }
+
 .history-hero-section h1,
 .history-hero-section p {
     margin: 0;
 }
+
 .history-hero-bottom .history-button-big {
     width: fit-content;
 }
+
 .history-hero-background {
     position: absolute;
     inset: 0;
@@ -90,66 +93,43 @@
 .history-hero-section--st-bavo .history-hero-background img {
     object-position: center 60%;
 }
+
 /* Hero Section End */
 
 /* Breadcrumb Start*/
-.history-breadcrumb {
-    width: 100%;
-    gap: 30px;
-    align-items: center;
-}
-
-.history-breadcrumb-link {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 22px;
-    color: white;
-    text-transform: uppercase;
-    text-decoration: none;
-}
-
-.history-breadcrumb-link.active {
-    color: #e58708;
-}
-
-.history-breadcrumb-separator {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 500;
-    font-size: 16px;
-    color: white;
-    text-transform: uppercase;
+nav.breadcrumbs {
+    display: block;
 }
 /* Breadcrumb End */
 
-/* Heritage Banner Start*/
-.history-heritage-banner {
+/* About Banner Start*/
+.history-about-banner {
     width: 100%;
-    padding: 50px 0;
+    padding: 40px 0;
     background: #deccab;
     color: #292929;
     display: flex;
     flex-direction: column;
 }
 
-.history-heritage-title {
+.history-about-banner-title {
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
     font-size: 36px;
-    line-height: 48px;
+    line-height: 40px;
     letter-spacing: 2px;
     color: #292929;
     margin: 0;
 }
 
-.history-heritage-content {
+.history-about-banner-content {
     display: flex;
-    gap: 110px;
+    gap: 60px;
     align-items: flex-start;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
-.history-heritage-text {
+.history-about-banner-text {
     font-family: 'Inter', sans-serif;
     font-weight: 400;
     font-size: 16px;
@@ -157,7 +137,21 @@
     color: #292929;
     margin: 0;
 }
-/* Heritage Banner End */
+
+.history-about-banner-text--columns {
+    column-count: 2;
+    column-gap: 120px;
+}
+
+.history-about-banner--bold {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.75;
+    letter-spacing: 1px;
+    margin: 0;
+}
+/* About Banner End */
 
 /* 9 Sites Section Start */
 .history-sites-section {
@@ -193,11 +187,13 @@
     color: white;
     margin: 0 0 40px 0;
 }
+
 .history-sites-section .container {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
+
 /* 9 Sites Section End */
 
 /* History Card Start*/
@@ -226,10 +222,12 @@
     transform: translateY(-10px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
+
 .history-card-title,
 .history-card-text {
     margin: 0;
 }
+
 .history-card-image {
     position: relative;
     width: 100%;
@@ -297,6 +295,7 @@
     color: white;
     margin: 0;
 }
+
 /* History Card End */
 
 /* Read More Button Start */
@@ -325,11 +324,12 @@
     color: #e58708;
     text-transform: uppercase;
 }
+
 /* Read More Button End */
 
 /* Button Start */
 .history-button-big {
-    padding: 12px 26px;
+    padding: 8px 16px;
     width: fit-content;
     display: flex;
     justify-content: center;
@@ -361,6 +361,11 @@
     color: #292929;
     text-transform: uppercase;
 }
+
+.history-button-big--yellow {
+    background: #f8dc3d;
+}
+
 /* Button End */
 
 /* Experience Section Start */
@@ -401,21 +406,21 @@
     flex-direction: column;
     align-items: center;
 }
+
 /* Experience Section End */
 
 /* Responsive Start */
 @media (max-width: 1440px) {
-    .history-heritage-banner,
-    .history-breadcrumb {
+    .history-about-banner-banner{
         padding-left: 0;
         padding-right: 0;
     }
 
-    .history-heritage-content {
+    .history-about-banner-content {
         gap: 60px;
     }
 
-    .history-heritage-text {
+    .history-about-banner-text {
         width: calc(50% - 30px);
     }
 
@@ -435,12 +440,12 @@
         line-height: 48px;
     }
 
-    .history-heritage-content {
+    .history-about-banner-content {
         flex-direction: column;
         gap: 30px;
     }
 
-    .history-heritage-text {
+    .history-about-banner-text {
         width: 100%;
     }
 
@@ -474,20 +479,10 @@
         grid-template-columns: 1fr;
     }
 }
+
 /* Responsive End */
 
 /* LOCATIONS PAGE*/
-
-/* Intro text for locations page */
-.history-intro-text {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    line-height: 1.75;
-    letter-spacing: 1px;
-    margin: 0;
-}
-
 /* Location Cards Section Start*/
 .history-locations-section {
     width: 100%;
@@ -500,17 +495,18 @@
     padding: 80px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.29);
 }
+
 .history-location-section .container {
     display: flex;
     gap: 60px;
     align-items: stretch;
 }
 
-.history-location-image-left .container{
+.history-location-image-left .container {
     flex-direction: row;
 }
 
-.history-location-image-right .container{
+.history-location-image-right .container {
     flex-direction: row-reverse;
 }
 
@@ -588,28 +584,29 @@
     color: white;
     margin: 0;
 }
+
 /* Back Section End */
 
 /* Stats Bar Start */
-.history-stats-banner{
+.history-stats-banner {
     width: 100%;
     padding: 40px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.29);
 }
 
-.history-stats-banner .container{
+.history-stats-banner .container {
     display: flex;
     justify-content: space-between
 }
 
-.history-stats-item{
+.history-stats-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 5px;
 }
 
-.history-stats-value{
+.history-stats-value {
     color: #F8DC3D;
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
@@ -617,7 +614,8 @@
     line-height: 64px;
     letter-spacing: 2px;
 }
-.history-stats-label{
+
+.history-stats-label {
     color: white;
     text-align: center;
     font-family: 'Inter', sans-serif;
@@ -626,6 +624,7 @@
     line-height: 1.6;
     max-width: 120px;
 }
+
 /* Stats Bar End */
 
 /* Content Section */
@@ -809,6 +808,7 @@
     text-transform: uppercase;
     margin: 0;
 }
+
 .history-experience-card-wrapper {
     flex: 1;
     display: flex;
@@ -819,6 +819,7 @@
 .history-experience-card-title--dark {
     color: #292929;
 }
+
 .history-experience-card--white .history-experience-card-title {
     color: #292929;
 }
@@ -878,4 +879,361 @@
     justify-content: center;
     gap: 25px;
 }
+
 /* Location Buttons End */
+
+
+/* =====================
+   TOURS PAGE
+   ===================== */
+
+/* Important Information */
+.history-tours-info {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 40px;
+}
+
+.history-tours-info h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: #f8dc3d;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+}
+
+.history-tours-info-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.history-tours-info-card {
+    background: rgba(255, 255, 255, 0.07);
+    border-left: 4px solid #e58708;
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-tours-info-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: #f8dc3d;
+    text-transform: uppercase;
+    margin-bottom: 0;
+}
+
+.history-tours-info-card p,
+.history-tours-info-card li {
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.history-tours-info-card ul {
+    padding-left: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Schedule + Tour Details */
+.history-tours-schedule-section {
+    padding: 40px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.history-tours-schedule-wrapper {
+    display: flex;
+    gap: 160px;
+    align-items: flex-start;
+}
+
+.history-tours-schedule {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+}
+
+.history-tours-schedule h2,
+.history-tours-details h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: #f8dc3d;
+    text-transform: uppercase;
+}
+
+/* Day tabs */
+.history-tours-day-tabs {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.history-tours-day-tab {
+    padding: 8px 24px;
+    border-radius: 8px;
+    background: transparent;
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.history-tours-day-tab:hover,
+.history-tours-day-tab.active {
+    background: #e58708;
+    border-color: #e58708;
+}
+
+/* Day panel */
+.history-tours-day-panel {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 16px 32px;
+}
+
+.history-tours-day-panel.active {
+    display: flex;
+}
+
+.history-tours-day-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: white;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+/* Tour item row */
+.history-tours-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.history-tours-time-lang {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+}
+
+.history-tours-time {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: white;
+    min-width: 48px;
+    background: #e58708;
+    border-radius: 6px;
+    padding: 4px 12px;
+}
+
+.history-tours-lang {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: white;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.history-tours-spots {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Tour Details */
+.history-tours-details {
+    width: 360px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.history-tours-details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.history-tours-detail-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.history-tours-detail-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.history-tours-detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.history-tours-detail-content strong {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    color: #f8dc3d;
+    text-transform: uppercase;
+}
+
+.history-tours-detail-content p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* What's Included */
+.history-tours-tickets {
+    padding: 40px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.history-tours-tickets h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    letter-spacing: 4px;
+    color: #f8dc3d;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.history-tours-tickets-cards {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+}
+
+.history-tours-ticket-card {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    max-width: 480px;
+}
+
+.history-tours-ticket-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    color: white;
+    text-transform: uppercase;
+}
+
+.history-tours-ticket-per {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.history-tours-ticket-card ul {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-left: 16px;
+}
+
+.history-tours-ticket-card li {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Route Map */
+.history-tours-map {
+    padding: 80px 0;
+}
+
+.history-tours-map h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    letter-spacing: 4px;
+    color: #f8dc3d;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+}
+
+.history-tours-detail-icon {
+    width: 48px;
+    height: 48px;
+    background: #e58708;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 10px;
+}
+
+.history-tours-detail-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+.history-tours-marker-wrapper {
+    background: transparent;
+    border: none;
+}
+
+.history-tours-map-marker {
+    background: #e58708;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Montserrat, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.history-tours-leaflet-map {
+    height: 500px;
+    border-radius: 12px;
+    overflow: hidden;
+}

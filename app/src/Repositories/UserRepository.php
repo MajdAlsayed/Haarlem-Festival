@@ -4,12 +4,23 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Contracts\UserRepositoryInterface;
 use App\Core\Database;
 use App\Models\User;
 use PDO;
 
-final class UserRepository
+final class UserRepository implements UserRepositoryInterface
 {
+    public function findById(int $userId): ?User
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare('SELECT * FROM users WHERE user_id = :id LIMIT 1');
+        $stmt->execute(['id' => $userId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? $this->mapRowToUser($row) : null;
+    }
+
     public function findByEmail(string $email): ?User
     {
         $db = Database::getConnection();
@@ -98,6 +109,74 @@ final class UserRepository
             'password_hash' => $passwordHash,
             'user_id' => $userId,
         ]);
+    }
+
+    public function getAllUsers(string $search = '', string $sortBy = 'created_at', string $sortDir = 'DESC'): array
+    {
+        $db = Database::getConnection();
+
+        $allowed = ['user_id', 'first_name', 'last_name', 'email', 'created_at'];
+        if (!in_array($sortBy, $allowed)) $sortBy = 'created_at';
+        $sortDir = strtoupper($sortDir) === 'ASC' ? 'ASC' : 'DESC';
+
+        $sql = "SELECT u.*, r.name AS role_name 
+            FROM users u 
+            JOIN roles r ON u.role_id = r.role_id";
+
+        $params = [];
+        if ($search !== '') {
+            $sql .= " WHERE u.first_name LIKE :search 
+                  OR u.last_name LIKE :search 
+                  OR u.email LIKE :search";
+            $params['search'] = '%' . $search . '%';
+        }
+
+        $sql .= " ORDER BY {$sortBy} {$sortDir}";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function updateUser(int $id, int $roleId, string $firstName, string $lastName, string $email, bool $isActive): void
+    {
+        $db = Database::getConnection();
+
+        $sql = 'UPDATE users 
+            SET role_id=:role_id, first_name=:first_name, last_name=:last_name, email=:email, is_active=:is_active 
+            WHERE user_id=:id';
+        $stmt = $db->prepare($sql);
+
+        $stmt->execute([
+            'role_id' => $roleId,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $email,
+            'is_active' => $isActive ? 1 : 0,
+            'id' => $id,
+        ]);
+    }
+
+    public function deleteUser(int $id): void
+    {
+        $db = Database::getConnection();
+
+        $sql = 'DELETE FROM users WHERE user_id = :id';
+        $stmt = $db->prepare($sql);
+
+        $stmt->execute(['id' => $id]);
+    }
+
+    public function getAllRoles(): array
+    {
+        $db = Database::getConnection();
+
+        $sql = 'SELECT * FROM roles';
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     private function mapRowToUser(array $row): User

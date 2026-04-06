@@ -137,7 +137,9 @@ final class RestaurantsSeeder extends AbstractSeed
             ],
         ];
 
-        $this->table('restaurants')->truncate();
-        $this->table('restaurants')->insert($rows)->saveData();
+$this->execute('DELETE FROM reservations');
+$this->execute('DELETE FROM restaurants');
+
+$this->table('restaurants')->insert($rows)->saveData();
     }
 }

@@ -24,6 +24,7 @@ class HistoryImagesSeeder extends AbstractSeed
         $stBavoPage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history-st-bavo'");
         $grotePage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history-grote-markt'");
         $historyEvent = $this->fetchRow("SELECT event_id FROM events WHERE event_type_id = 3 ORDER BY event_id ASC LIMIT 1");
+        $toursPage = $this->fetchRow("SELECT page_id FROM pages WHERE slug = 'history-tours'");
 
         $data = [];
 
@@ -56,8 +57,8 @@ class HistoryImagesSeeder extends AbstractSeed
         // Tours page
         $data[] = [
             'history_location_id' => null,
-            'page_id' => null,
-            'event_id' => $historyEvent ? $historyEvent['event_id'] : null,
+            'page_id' => $toursPage ? $toursPage['page_id'] : null,
+            'event_id' => null,
             'image_url' => '/images/history/tours-hero.jpg',
             'alt_text' => 'Guided walking tour through Haarlem',
             'image_type' => 'hero',

@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Contracts\HistoryRepositoryInterface;
+use App\Contracts\ServiceInterface\HistoryServiceInterface;
 use App\Models\HistoryLocation;
 use App\Models\HistoryImage;
+use App\Models\HistoryTour;
 
-class HistoryService
+class HistoryService implements HistoryServiceInterface
 {
     public function __construct(
         private HistoryRepositoryInterface $historyRepository
@@ -35,6 +37,11 @@ class HistoryService
     }
 
     //IMAGES
+    public function getAllImages(): array
+    {
+        return $this->historyRepository->getAllImages();
+    }
+
     public function getPrimaryImage(int $locationId): ?HistoryImage
     {
         return $this->historyRepository->getPrimaryImage($locationId);
@@ -55,6 +62,11 @@ class HistoryService
         return $this->historyRepository->getImageById($imageId);
     }
 
+    public function insertImage(string $imageUrl, string $altText): int
+    {
+        return $this->historyRepository->insertImage($imageUrl, $altText);
+    }
+
     // BLOCKS
     public function getPageBlocks(string $slug): array
     {
@@ -65,4 +77,22 @@ class HistoryService
     {
         return $this->historyRepository->getPageBlocksList($slug);
     }
+    public function updatePageBlock(int $blockId, array $content): bool
+    {
+        return $this->historyRepository->updatePageBlock($blockId, $content);
+    }
+
+    // TOURS
+    public function getToursWithDetailsByDate(string $date): array
+    {
+        return $this->historyRepository->getToursWithDetailsByDate($date);
+
+    }
+
+    public function getTourDates(): array
+    {
+        return $this->historyRepository->getTourDates();
+    }
+
+
 }

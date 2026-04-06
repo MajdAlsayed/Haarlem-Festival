@@ -158,9 +158,12 @@ class EventRepository implements EventRepositoryInterface
         $event->description = $row['description'] ?? null;
         $event->eventDay = isset($row['event_day']) ? (string) $row['event_day'] : null;
         $event->startTime = isset($row['start_time']) ? (string) $row['start_time'] : null;
-        $event->eventTypeName = $row['event_type_name'];
-        $event->venueName = $row['venue_name'];
-        $event->venueCity = !empty($row['venue_city']) ? $row['venue_city'] : (new SettingsRepository())->getAll()['default_venue_city']; // fallback from settings
+        $event->eventTypeName = (string) $row['event_type_name'];
+        $event->venueName = (string) $row['venue_name'];
+        $settings = (new SettingsRepository())->getAll();
+        $event->venueCity = !empty($row['venue_city'])
+            ? (string) $row['venue_city']
+            : (string) ($settings['default_venue_city'] ?? 'Haarlem');
         $event->venueAddress = isset($row['venue_address']) ? (string) $row['venue_address'] : null;
         $event->cardImage = isset($row['card_image']) ? (string) $row['card_image'] : null;
         $event->infoPath = isset($row['info_path']) ? (string) $row['info_path'] : null;
