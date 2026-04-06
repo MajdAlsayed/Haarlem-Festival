@@ -174,7 +174,8 @@ case '/api/stories':
             http_response_code(405);
         }
         break;
-        case '/cms/stories':
+        case '/admin/stories':
+    case '/cms/stories':
     if ($method === 'GET') {
         (new AdminStoriesController())->index();
     } else {
@@ -182,7 +183,8 @@ case '/api/stories':
     }
     break;
 
-case '/cms/stories/edit':
+case '/admin/stories/edit':
+    case '/cms/stories/edit':
     if ($method === 'GET') {
         (new AdminStoriesController())->edit();
     } else {
@@ -190,7 +192,8 @@ case '/cms/stories/edit':
     }
     break;
 
-case '/cms/stories/update':
+case '/admin/stories/update':
+    case '/cms/stories/update':
     if ($method === 'POST') {
         (new AdminStoriesController())->update();
     } else {
@@ -198,7 +201,8 @@ case '/cms/stories/update':
     }
     break;
 
-case '/cms/stories/delete':
+case '/admin/stories/delete':
+    case '/cms/stories/delete':
     if ($method === 'GET' || $method === 'POST') {
         (new AdminStoriesController())->delete();
     } else {
@@ -206,7 +210,8 @@ case '/cms/stories/delete':
     }
     break;
 
-case '/cms/stories/detail-page':
+case '/admin/stories/detail-page':
+    case '/cms/stories/detail-page':
     if ($method === 'GET') {
         (new AdminStoriesController())->editDetailPage();
     } else {
@@ -214,7 +219,8 @@ case '/cms/stories/detail-page':
     }
     break;
 
-case '/cms/stories/detail-page/save':
+case '/admin/stories/detail-page/save':
+    case '/cms/stories/detail-page/save':
     if ($method === 'POST') {
         (new AdminStoriesController())->saveDetailPage();
     } else {

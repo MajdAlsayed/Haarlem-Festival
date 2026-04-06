@@ -67,7 +67,7 @@ class AdminStoriesController
 
         if (!Csrf::validate('admin_stories_edit', $_POST['_csrf'] ?? null)) {
             Session::setFlash('admin_error', 'Invalid request. Please try again.');
-            header('Location: /cms/stories');
+            header('Location: /admin/stories');
             exit;
         }
 
@@ -99,7 +99,7 @@ class AdminStoriesController
         $this->storiesService->updateStory($storyId, $data);
 
         Session::setFlash('admin_success', 'Story updated successfully.');
-        header('Location: /cms/stories');
+        header('Location: /admin/stories');
         exit;
     }
 
@@ -115,7 +115,7 @@ class AdminStoriesController
             $this->storiesService->deleteStory($storyId);
         }
 
-        header('Location: /cms/stories');
+        header('Location: /admin/stories');
         exit;
     }
 
@@ -169,7 +169,7 @@ class AdminStoriesController
 
         $this->storiesService->saveDetailPage($storyId, $data);
 
-        header('Location: /cms/stories');
+        header('Location: /admin/stories');
         exit;
     }
 }
