@@ -74,6 +74,13 @@ return [
         'expect_intro' => 'Plan your days with clear routes, tickets, and venues — whether you want one highlight or the full weekend.',
         'expect_subheading' => 'Highlights by experience',
         'expect_cta' => 'Use the category cards above to jump to jazz, dance, history, food, or stories.',
-        'expect_cards_json' => '[{"icon":"🎵","title":"Music & nights","items":["Jazz stages and halls","Dance at Slachthuis","Stories performances"]},{"icon":"🍽️","title":"Food & Yammy","items":["Restaurant trail","Tastings","City bites"]},{"icon":"🏛️","title":"Culture","items":["Guided history tours","Landmarks","Family-friendly routes"]}]',
+        'expect_cards_json' => json_encode([
+            ['icon' => '🎵', 'title' => 'Music & nights', 'items' => ['Jazz stages and halls', 'Dance at Slachthuis', 'Stories performances']],
+            ['icon' => '🍽️', 'title' => 'Food & Yammy', 'items' => ['Restaurant trail', 'Tastings', 'City bites']],
+            ['icon' => '🏛️', 'title' => 'Culture', 'items' => ['Guided history tours', 'Landmarks', 'Family-friendly routes']],
+            ['icon' => '🎺', 'title' => 'Jazz', 'items' => ['Patronaat, Schuur & more', 'Filter by day on /jazz', 'Artist pages & audio previews']],
+            ['icon' => '🎛️', 'title' => 'Dance', 'items' => ['Slachthuis headline nights', 'Day passes & weekend pass', 'Hardwell, Tiësto & lineup']],
+            ['icon' => '📖', 'title' => 'Stories', 'items' => ['Venue-based routes', 'Detail pages per story', 'Bundle with festival tickets']],
+        ], JSON_UNESCAPED_UNICODE),
     ],
 ];
