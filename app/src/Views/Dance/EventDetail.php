@@ -8,8 +8,10 @@ $event = $viewModel->event;
 $appSettings = $viewModel->appSettings;
 $dateTimeLine = $viewModel->formattedDate ? ($viewModel->formattedDate . ' • ' . $viewModel->startTime) : $viewModel->startTime;
 $h = static fn (string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
+// Return users to this event after adding a ticket from POST /cart/add.
 $cartReturn = '/dance/event/' . (int) $event->id . '#tickets';
 $cartFormCsrf = Csrf::peek('cart') ?? Csrf::token('cart');
+// Keep ticket price formatting centralized (including free tickets).
 $formatTicketEur = static function (mixed $price, bool $isFree): string {
     if ($isFree) {
         return 'Free';
@@ -19,6 +21,7 @@ $formatTicketEur = static function (mixed $price, bool $isFree): string {
     return '€ ' . number_format($n, 2, ',', '.');
 };
 
+// Ticket descriptions are stored as newline-separated bullets; render as list.
 $renderFeatureList = static function (string $desc) use ($h): void {
     $lines = preg_split('/\r\n|\r|\n/', trim($desc));
     $lines = array_values(array_filter(array_map('trim', $lines), static fn ($l) => $l !== ''));
@@ -32,6 +35,7 @@ $renderFeatureList = static function (string $desc) use ($h): void {
     echo '</ul>';
 };
 
+// Festival pass uses a denser two-column feature layout.
 $renderFeatureListTwoCol = static function (string $desc) use ($h): void {
     $lines = preg_split('/\r\n|\r|\n/', trim($desc));
     $lines = array_values(array_filter(array_map('trim', $lines), static fn ($l) => $l !== ''));
@@ -62,6 +66,7 @@ $hasDayPass = $viewModel->danceDayPass !== null;
 $hasFestivalPass = $viewModel->danceAllAccessPass !== null;
 $hasAnyTicketOption = $hasEventTickets || $hasDayPass || $hasFestivalPass;
 $ticketsFigmaTitle = 'Ticket for ' . $event->title . ' in ' . ($event->venueName ?? '');
+// Grid span flags keep top row balanced when one ticket tier is missing.
 $figmaSpanStandardTop = $hasEventTickets && !$hasDayPass;
 $figmaSpanDayTop = !$hasEventTickets && $hasDayPass;
 ?>
@@ -219,8 +224,10 @@ if (!empty($viewModel->cartFlashSuccess)) {
                             $tName = (string) ($t['name'] ?? 'Ticket');
                             $tDesc = isset($t['description']) && $t['description'] !== null && $t['description'] !== '' ? (string) $t['description'] : '';
                             $isFree = !empty($t['is_free']);
+                            // VIP naming controls both visual accent and badge rendering.
                             $vipClass = (stripos($tName, 'VIP') !== false) ? ' vip' : '';
                             $pst = $t['stock'] ?? null;
+                            // If only one non-VIP ticket exists, present as "Standard Ticket".
                             $cardTitle = ($eventCount === 1 && stripos($tName, 'VIP') === false) ? 'Standard Ticket' : $tName;
                             ?>
                         <article class="event-detail-ticket-card event-detail-ticket-card--figma event-detail-ticket-card--flex<?= $vipClass ?>">
@@ -244,6 +251,7 @@ if (!empty($viewModel->cartFlashSuccess)) {
                                 <p class="event-detail-ticket-features event-detail-ticket-features--figma">Access to this event</p>
                             <?php endif; ?>
                             <?php if ($tdId > 0 && (!is_array($pst) || empty($pst['sold_out']))): ?>
+                            <!-- Submit to cart with fixed quantity=1; cart page handles edits. -->
                             <form method="post" action="/cart/add" class="event-detail-cart-form">
                                 <input type="hidden" name="_csrf" value="<?= $h($cartFormCsrf) ?>">
                                 <input type="hidden" name="ticket_details_id" value="<?= $tdId ?>">
@@ -284,6 +292,7 @@ if (!empty($viewModel->cartFlashSuccess)) {
                                 <?php $renderFeatureList($pDesc); ?>
                             <?php endif; ?>
                             <?php if (($p['pass_day'] ?? '') !== '' || ($p['pass_time'] ?? '') !== ''): ?>
+                            <!-- Optional schedule metadata for day pass, shown only when configured. -->
                             <p class="event-detail-pass-meta event-detail-pass-meta--figma">
                                 <?php if (($p['pass_day'] ?? '') !== ''): ?>
                                     <span><?= $h(ucfirst((string) $p['pass_day'])) ?> pass</span>
@@ -334,6 +343,7 @@ if (!empty($viewModel->cartFlashSuccess)) {
                                 <?php $renderFeatureListTwoCol($pDesc); ?>
                             <?php endif; ?>
                             <?php if (($p['schedule_display'] ?? '') !== ''): ?>
+                                <!-- CMS-provided schedule string for all-access pass. -->
                                 <p class="event-detail-pass-meta event-detail-pass-meta--figma"><?= $h((string) $p['schedule_display']) ?></p>
                             <?php endif; ?>
                             <?php if ($tdId > 0 && (!is_array($pst) || empty($pst['sold_out'])) && !$isFree): ?>

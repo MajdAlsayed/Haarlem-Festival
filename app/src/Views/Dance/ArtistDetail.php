@@ -3,6 +3,7 @@
 /** @var \App\ViewModels\ArtistDetailViewModel $viewModel */
 $artist = $viewModel->artist;
 $appSettings = $viewModel->appSettings;
+// Map DB day keys to UI labels for schedule rendering.
 $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday'];
 ?>
 <!DOCTYPE html>
@@ -43,6 +44,7 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
         <h2 class="artist-detail-section-title">About <?= htmlspecialchars($artist['name']) ?></h2>
         <div class="artist-detail-about">
             <div class="artist-detail-about-text">
+                <!-- Prefer curated paragraph splits from the view model; fallback to legacy bio text. -->
                 <?php if ($viewModel->aboutParagraphs !== null): ?>
                     <?php foreach ($viewModel->aboutParagraphs as $p): ?>
                     <p><?= htmlspecialchars($p) ?></p>
@@ -73,6 +75,7 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
     <?php endif; ?>
 
     <?php if (!empty($viewModel->musicTracks) || !empty($viewModel->musicExtraTracks)): ?>
+    <!-- Music section is a reusable partial shared by multiple artists. -->
     <?php require __DIR__ . '/partials/artist-music-section.php'; ?>
     <?php endif; ?>
 
@@ -86,6 +89,7 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
                     <div class="artist-detail-schedule-dot"></div>
                     <div class="artist-detail-schedule-content">
                         <p class="artist-detail-schedule-time"><span class="artist-detail-schedule-day"><?= htmlspecialchars($dayLabels[$ev->eventDay ?? 'friday'] ?? ucfirst($ev->eventDay ?? '')) ?></span><img src="/images/icons/dateIcon.png" alt="" class="artist-detail-schedule-icon" aria-hidden="true"><span class="artist-detail-schedule-hour"><?= htmlspecialchars($ev->startTime ?? '20:00') ?></span></p>
+                        <!-- If title contains "Artist - Set Type", extract and render only the set type suffix. -->
                         <p class="artist-detail-schedule-venue"><img src="/images/icons/locationIcon.png" alt="" class="artist-detail-schedule-icon" aria-hidden="true"><?= htmlspecialchars($ev->venueName . ', ' . ($ev->venueCity ?? 'Haarlem')) ?><?php if (preg_match('/^.+?[–—-]\s*(.+)$/u', $ev->title ?? '', $m) && trim($m[1])): ?> — <span class="artist-detail-schedule-type"><?= htmlspecialchars(trim($m[1])) ?></span><?php endif; ?></p>
                         <p class="artist-detail-schedule-desc"><?= htmlspecialchars($ev->description ?? '') ?></p>
                     </div>
@@ -103,6 +107,7 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
     <?php endif; ?>
 
     <?php if (count($viewModel->galleryImages) >= 4): ?>
+    <!-- Gallery layout expects at least 4 items; indices 2/3 have safe fallback to index 0. -->
     <section class="artist-detail-section artist-detail-gallery-section">
         <div class="artist-detail-gallery-header">
             <h2 class="artist-detail-gallery-title">Gallery</h2>

@@ -10,6 +10,7 @@ $appSettings = $viewModel->appSettings;
 $danceSettings = $viewModel->danceSettings;
 $breadcrumbs = $viewModel->breadcrumbs;
 
+// CMS settings are optional; each section falls back to safe defaults.
 $danceHeroImage = isset($danceSettings['hero_image']) ? '/images/dance/' . rawurlencode((string) $danceSettings['hero_image']) : '';
 $featuredImages = isset($danceSettings['featured_images']) && is_array($danceSettings['featured_images']) ? $danceSettings['featured_images'] : [];
 $fridayImages = isset($danceSettings['friday_images']) && is_array($danceSettings['friday_images']) ? $danceSettings['friday_images'] : [];
@@ -118,6 +119,7 @@ $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceS
             'saturday' => ['events' => $saturdayEvents, 'images' => $saturdayImages, 'genres' => $saturdayGenres],
             'sunday' => ['events' => $sundayEvents, 'images' => $sundayImages, 'genres' => $sundayGenres],
         ];
+        // Build one panel per day; the JS tab switcher toggles `active` class.
         foreach ($panels as $day => $data):
             $dayEvents = $data['events'];
             $dayImages = $data['images'];
@@ -128,6 +130,8 @@ $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceS
         <div class="<?= $panelClass ?>" data-filter="<?= htmlspecialchars($day) ?>" role="tabpanel">
             <div class="dance-cards dance-cards-grid">
                 <?php foreach ($dayEvents as $i => $event):
+                    // Rotate through configured day images/genres if there are
+                    // more events than entries in the CMS arrays.
                     $imageName = !empty($dayImages) ? $dayImages[$i % count($dayImages)] : '';
                     $imagePath = $imageName !== '' ? '/images/dance/' . rawurlencode($imageName) : '';
                     $genre = !empty($dayGenres) ? $dayGenres[$i % count($dayGenres)] : '';
@@ -197,6 +201,7 @@ $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceS
             filters.forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
             this.classList.add('active');
             this.setAttribute('aria-pressed', 'true');
+            // Show only the selected day panel while keeping markup static.
             panels.forEach(function(p) {
                 if (p.getAttribute('data-filter') === filter) {
                     p.classList.add('active');
