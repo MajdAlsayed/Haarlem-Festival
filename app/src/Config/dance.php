@@ -32,6 +32,61 @@ return [
     'featured_genre_labels' => ['HOUSE', 'TRANCE', 'DANCE'],
     'breadcrumb_home_label' => 'HOME',
     'breadcrumb_dance_label' => 'DANCE',
+
+    // /dance/event/{id} — merged with dance_settings; migration seeds DB rows.
+    'event_detail_photos_context' => 'dance_event_detail',
+    'event_detail_hero_fallback' => 'DetailsPage/hero.png',
+    'event_detail_gallery_fallbacks' => ['DetailsPage/2.png', 'DetailsPage/3.png', 'DetailsPage/4.png'],
+    'event_detail_list_path' => '/dance',
+    'default_event_day' => 'friday',
+    'event_detail_venue_country' => 'Netherlands',
+    'default_map_coordinates' => [52.3813, 4.6368],
+    'venue_coordinates' => [
+        'Caprera Openluchttheater' => [52.4112, 4.6062],
+        'Jopenkerk' => [52.3813, 4.6368],
+        'Lichtfabriek' => [52.3890, 4.6330],
+        'Patronaat' => [52.3820, 4.6380],
+        'XO the Club' => [52.3815, 4.6370],
+        'Slachthuis' => [52.3825, 4.6350],
+    ],
+    'day_labels' => [
+        'thursday' => 'Thursday',
+        'friday' => 'Friday',
+        'saturday' => 'Saturday',
+        'sunday' => 'Sunday',
+    ],
+
+    // /dance/artist/{slug} — photos contexts + fallbacks (dance_settings); copy still in artist_music below.
+    'dance_images_base_path' => '/images/dance/',
+    'artist_detail_photos_context_hero' => 'dance_artist_hero',
+    'artist_detail_photos_context_schedule' => 'dance_artist_schedule',
+    'artist_detail_photos_context_music' => 'dance_artist_music',
+    'artist_detail_hero_fallback' => 'Artist/hardwell hero.png',
+    'artist_detail_schedule_fallbacks' => [
+        'hardwell' => 'Artist/hardwell6.png',
+        'tiesto' => 'Artist/tiesto3.png',
+        'default' => 'Artist/hardwell6.png',
+    ],
+    'artist_detail_music_profile_slots' => [
+        'tiesto' => 'profile_tiesto',
+        'default' => 'profile',
+    ],
+    'artist_detail_music_album_slots' => [
+        'tiesto' => 'album_cover_tiesto',
+        'default' => 'album_cover',
+    ],
+    'artist_detail_music_profile_fallback' => 'Artist/hardwell1.png',
+    'artist_detail_music_album_fallback' => 'Artist/hardwell2.jpg',
+    'artist_detail_default_location' => 'Netherlands',
+    'artist_detail_default_album_title' => 'Featured',
+    'artist_detail_default_album_sub' => 'Album',
+    'artist_detail_gallery_target_count' => 4,
+    'artist_detail_hero_tagline_max_chars' => 160,
+    'artist_detail_gallery_stats_fallback' => [
+        ['num' => '—', 'label' => 'PHOTOS'],
+        ['num' => '—', 'label' => 'SHOWS'],
+    ],
+
     'day_label_friday' => 'Friday',
     'day_label_saturday' => 'Saturday',
     'day_label_sunday' => 'Sunday',

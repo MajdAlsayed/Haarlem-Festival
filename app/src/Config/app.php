@@ -19,22 +19,6 @@ return [
         'app_labels' => ['App Store', 'Google Play'],
     ],
 
-    'venue_coordinates' => [
-        'Caprera Openluchttheater' => [52.4112, 4.6062],
-        'Jopenkerk' => [52.3813, 4.6368],
-        'Lichtfabriek' => [52.3890, 4.6330],
-        'Patronaat' => [52.3820, 4.6380],
-        'XO the Club' => [52.3815, 4.6370],
-        'Slachthuis' => [52.3825, 4.6350],
-    ],
-
-    'day_labels' => [
-        'thursday' => 'Thursday',
-        'friday' => 'Friday',
-        'saturday' => 'Saturday',
-        'sunday' => 'Sunday',
-    ],
-
     /** Used by SecureToken::signTicketCode for QR / scanner verification (override via env in production). */
     'ticket_signing_secret' => getenv('HAARLEM_TICKET_SECRET') ?: 'dev-only-change-in-production',
 

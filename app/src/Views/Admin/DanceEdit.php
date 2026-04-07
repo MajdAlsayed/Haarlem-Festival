@@ -139,6 +139,154 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                 </div>
             </fieldset>
 
+            <fieldset class="admin-fieldset">
+                <legend>Event detail page (<code>/dance/event/…</code>)</legend>
+                <p class="admin-hint">Stored in <code>dance_settings</code>. Map pin uses venue name → coordinates JSON; unknown venues use default lat/lon.</p>
+                <div class="admin-field">
+                    <label for="breadcrumb_home_label">Breadcrumb: home label</label>
+                    <input type="text" id="breadcrumb_home_label" name="breadcrumb_home_label" required maxlength="40"
+                           value="<?= $h($viewModel->breadcrumbHomeLabel) ?>" class="admin-input">
+                </div>
+                <div class="admin-field">
+                    <label for="breadcrumb_dance_label">Breadcrumb: dance label</label>
+                    <input type="text" id="breadcrumb_dance_label" name="breadcrumb_dance_label" required maxlength="40"
+                           value="<?= $h($viewModel->breadcrumbDanceLabel) ?>" class="admin-input">
+                </div>
+                <div class="admin-field">
+                    <label for="event_detail_list_path">Breadcrumb: link back to programme</label>
+                    <input type="text" id="event_detail_list_path" name="event_detail_list_path" required maxlength="120"
+                           value="<?= $h($viewModel->eventDetailListPath) ?>" class="admin-input" placeholder="/dance">
+                </div>
+                <div class="admin-field">
+                    <label for="event_detail_photos_context">Photos CMS context key</label>
+                    <input type="text" id="event_detail_photos_context" name="event_detail_photos_context" required maxlength="80" pattern="[A-Za-z0-9_]+"
+                           value="<?= $h($viewModel->eventDetailPhotosContext) ?>" class="admin-input">
+                    <small class="admin-hint">Must match <code>photos.context</code> for dance event detail slots.</small>
+                </div>
+                <div class="admin-field">
+                    <label for="event_detail_hero_fallback">Hero image fallback (relative to <code>/images/dance/</code>)</label>
+                    <input type="text" id="event_detail_hero_fallback" name="event_detail_hero_fallback" required maxlength="255"
+                           value="<?= $h($viewModel->eventDetailHeroFallback) ?>" class="admin-input">
+                </div>
+                <div class="admin-field">
+                    <label for="event_detail_gallery_lines">Gallery fallbacks (exactly three lines, filenames/paths)</label>
+                    <textarea id="event_detail_gallery_lines" name="event_detail_gallery_lines" class="admin-input admin-textarea" maxlength="2000" style="font-family:monospace;font-size:0.9rem;min-height:5rem;"><?= $h($viewModel->eventDetailGalleryLines) ?></textarea>
+                </div>
+                <div class="admin-field">
+                    <label for="default_event_day">Default event day if missing in DB</label>
+                    <input type="text" id="default_event_day" name="default_event_day" required maxlength="20" pattern="[a-z]+"
+                           value="<?= $h($viewModel->defaultEventDay) ?>" class="admin-input" placeholder="friday">
+                </div>
+                <div class="admin-field">
+                    <label for="event_detail_venue_country">Location line: country</label>
+                    <input type="text" id="event_detail_venue_country" name="event_detail_venue_country" required maxlength="80"
+                           value="<?= $h($viewModel->eventDetailVenueCountry) ?>" class="admin-input">
+                </div>
+                <div class="admin-field" style="display:flex;gap:1rem;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:10rem;">
+                        <label for="default_map_lat">Default map latitude</label>
+                        <input type="text" id="default_map_lat" name="default_map_lat" required maxlength="20"
+                               value="<?= $h($viewModel->defaultMapLat) ?>" class="admin-input">
+                    </div>
+                    <div style="flex:1;min-width:10rem;">
+                        <label for="default_map_lon">Default map longitude</label>
+                        <input type="text" id="default_map_lon" name="default_map_lon" required maxlength="20"
+                               value="<?= $h($viewModel->defaultMapLon) ?>" class="admin-input">
+                    </div>
+                </div>
+                <div class="admin-field">
+                    <label for="venue_coordinates_json">Venue → map pin (JSON object)</label>
+                    <textarea id="venue_coordinates_json" name="venue_coordinates_json" class="admin-input admin-textarea" maxlength="16000" style="font-family:monospace;font-size:0.85rem;min-height:14rem;"><?= $h($viewModel->venueCoordinatesJson) ?></textarea>
+                </div>
+            </fieldset>
+
+            <fieldset class="admin-fieldset">
+                <legend>Artist detail (<code>/dance/artist/…</code>)</legend>
+                <p class="admin-hint">Breadcrumbs reuse the event-detail “home / dance / list path” fields above. Narrative + tracks still come from <code>dance.php</code> → <code>artist_music</code> per slug.</p>
+                <div class="admin-field">
+                    <label for="dance_images_base_path">Public URL prefix for dance images</label>
+                    <input type="text" id="dance_images_base_path" name="dance_images_base_path" required maxlength="120"
+                           value="<?= $h($viewModel->artistDetailDanceImagesBasePath) ?>" class="admin-input" placeholder="/images/dance/">
+                </div>
+                <div class="admin-field">
+                    <label for="artist_detail_photos_context_hero">Photos context: artist hero (slot key = artist slug)</label>
+                    <input type="text" id="artist_detail_photos_context_hero" name="artist_detail_photos_context_hero" required maxlength="80" pattern="[A-Za-z0-9_]+"
+                           value="<?= $h($viewModel->artistDetailPhotosContextHero) ?>" class="admin-input">
+                </div>
+                <div class="admin-field">
+                    <label for="artist_detail_photos_context_schedule">Photos context: schedule strip</label>
+                    <input type="text" id="artist_detail_photos_context_schedule" name="artist_detail_photos_context_schedule" required maxlength="80" pattern="[A-Za-z0-9_]+"
+                           value="<?= $h($viewModel->artistDetailPhotosContextSchedule) ?>" class="admin-input">
+                </div>
+                <div class="admin-field">
+                    <label for="artist_detail_photos_context_music">Photos context: music block</label>
+                    <input type="text" id="artist_detail_photos_context_music" name="artist_detail_photos_context_music" required maxlength="80" pattern="[A-Za-z0-9_]+"
+                           value="<?= $h($viewModel->artistDetailPhotosContextMusic) ?>" class="admin-input">
+                </div>
+                <div class="admin-field">
+                    <label for="artist_detail_hero_fallback">Hero fallback if CMS + DB image empty</label>
+                    <input type="text" id="artist_detail_hero_fallback" name="artist_detail_hero_fallback" required maxlength="255"
+                           value="<?= $h($viewModel->artistDetailHeroFallback) ?>" class="admin-input">
+                </div>
+                <div class="admin-field">
+                    <label for="artist_detail_schedule_fallbacks_json">Schedule image fallbacks (slug → path; include <code>"default"</code>)</label>
+                    <textarea id="artist_detail_schedule_fallbacks_json" name="artist_detail_schedule_fallbacks_json" class="admin-input admin-textarea" maxlength="8000" style="font-family:monospace;font-size:0.85rem;min-height:8rem;"><?= $h($viewModel->artistDetailScheduleFallbacksJson) ?></textarea>
+                </div>
+                <div class="admin-field">
+                    <label for="artist_detail_music_profile_slots_json">Music block: profile row slot keys (slug → key; include <code>"default"</code>)</label>
+                    <textarea id="artist_detail_music_profile_slots_json" name="artist_detail_music_profile_slots_json" class="admin-input admin-textarea" maxlength="4000" style="font-family:monospace;font-size:0.85rem;min-height:5rem;"><?= $h($viewModel->artistDetailMusicProfileSlotsJson) ?></textarea>
+                </div>
+                <div class="admin-field">
+                    <label for="artist_detail_music_album_slots_json">Music block: album cover slot keys</label>
+                    <textarea id="artist_detail_music_album_slots_json" name="artist_detail_music_album_slots_json" class="admin-input admin-textarea" maxlength="4000" style="font-family:monospace;font-size:0.85rem;min-height:5rem;"><?= $h($viewModel->artistDetailMusicAlbumSlotsJson) ?></textarea>
+                </div>
+                <div class="admin-field" style="display:flex;gap:1rem;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:12rem;">
+                        <label for="artist_detail_music_profile_fallback">Profile image file fallback</label>
+                        <input type="text" id="artist_detail_music_profile_fallback" name="artist_detail_music_profile_fallback" required maxlength="255"
+                               value="<?= $h($viewModel->artistDetailMusicProfileFallback) ?>" class="admin-input">
+                    </div>
+                    <div style="flex:1;min-width:12rem;">
+                        <label for="artist_detail_music_album_fallback">Album cover file fallback</label>
+                        <input type="text" id="artist_detail_music_album_fallback" name="artist_detail_music_album_fallback" required maxlength="255"
+                               value="<?= $h($viewModel->artistDetailMusicAlbumFallback) ?>" class="admin-input">
+                    </div>
+                </div>
+                <div class="admin-field" style="display:flex;gap:1rem;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:10rem;">
+                        <label for="artist_detail_default_location">Default “location” if not in artist_music</label>
+                        <input type="text" id="artist_detail_default_location" name="artist_detail_default_location" required maxlength="80"
+                               value="<?= $h($viewModel->artistDetailDefaultLocation) ?>" class="admin-input">
+                    </div>
+                    <div style="flex:1;min-width:10rem;">
+                        <label for="artist_detail_default_album_title">Default album title</label>
+                        <input type="text" id="artist_detail_default_album_title" name="artist_detail_default_album_title" required maxlength="120"
+                               value="<?= $h($viewModel->artistDetailDefaultAlbumTitle) ?>" class="admin-input">
+                    </div>
+                    <div style="flex:1;min-width:10rem;">
+                        <label for="artist_detail_default_album_sub">Default album subtitle</label>
+                        <input type="text" id="artist_detail_default_album_sub" name="artist_detail_default_album_sub" required maxlength="120"
+                               value="<?= $h($viewModel->artistDetailDefaultAlbumSub) ?>" class="admin-input">
+                    </div>
+                </div>
+                <div class="admin-field" style="display:flex;gap:1rem;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:8rem;">
+                        <label for="artist_detail_gallery_target_count">Gallery min count (top with config)</label>
+                        <input type="text" id="artist_detail_gallery_target_count" name="artist_detail_gallery_target_count" required maxlength="3" pattern="[0-9]+"
+                               value="<?= $h($viewModel->artistDetailGalleryTargetCount) ?>" class="admin-input">
+                    </div>
+                    <div style="flex:1;min-width:8rem;">
+                        <label for="artist_detail_hero_tagline_max_chars">Hero tagline max (bio teaser)</label>
+                        <input type="text" id="artist_detail_hero_tagline_max_chars" name="artist_detail_hero_tagline_max_chars" required maxlength="3" pattern="[0-9]+"
+                               value="<?= $h($viewModel->artistDetailHeroTaglineMaxChars) ?>" class="admin-input">
+                    </div>
+                </div>
+                <div class="admin-field">
+                    <label for="artist_detail_gallery_stats_json">Stats row fallback (JSON array of <code>{"num","label"}</code>)</label>
+                    <textarea id="artist_detail_gallery_stats_json" name="artist_detail_gallery_stats_json" class="admin-input admin-textarea" maxlength="4000" style="font-family:monospace;font-size:0.85rem;min-height:6rem;"><?= $h($viewModel->artistDetailGalleryStatsJson) ?></textarea>
+                </div>
+            </fieldset>
+
             <div class="admin-form-actions">
                 <button type="submit" class="admin-btn admin-btn-primary">Save Dance page</button>
                 <a href="/admin/dance" class="admin-btn admin-btn-secondary">Dance CMS hub</a>
