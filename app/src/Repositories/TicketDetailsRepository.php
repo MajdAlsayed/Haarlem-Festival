@@ -113,6 +113,39 @@ final class TicketDetailsRepository
         return (int) $db->lastInsertId();
     }
 
+    /**
+     * Food reservation helper: creates a ticket_details row linked to reservation_id
+     * so booking fees can be processed through the shared cart/checkout flow.
+     */
+    public function createForReservation(
+        int $reservationId,
+        string $name,
+        string $description,
+        float $price
+    ): int {
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            'INSERT INTO ticket_details (
+                reservation_id, event_id, session_id, ticket_type, category, pass_day, pass_time,
+                schedule_display, sort_order, is_free, name, description, price
+            ) VALUES (
+                :rid, NULL, NULL, :tt, :cat, NULL, NULL, NULL, :so, :free, :name, :desc, :price
+            )'
+        );
+        $stmt->execute([
+            'rid' => $reservationId,
+            'tt' => 'event_ticket',
+            'cat' => 'food',
+            'so' => 0,
+            'free' => $price <= 0 ? 1 : 0,
+            'name' => $name,
+            'desc' => $description !== '' ? $description : null,
+            'price' => number_format($price, 2, '.', ''),
+        ]);
+
+        return (int) $db->lastInsertId();
+    }
+
     /** Overwrites an existing catalog row (admin save). */
     public function update(int $id, array $row): void
     {
