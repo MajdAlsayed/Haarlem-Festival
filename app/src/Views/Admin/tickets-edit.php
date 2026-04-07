@@ -1,4 +1,8 @@
 <?php
+/**
+ * Create or edit one catalog line: name, price, type, link to an event if needed, and we show capacity hints when we know them.
+ * AdminTicketsController::newTicket() / ::edit().
+ */
 /** @var array $app */
 /** @var ?array<string,mixed> $row */
 /** @var ?array{capacity: ?int, stock: ?array<string,mixed>, event_id: int, session_id: mixed, event_type_name: ?string} $capacityMeta */

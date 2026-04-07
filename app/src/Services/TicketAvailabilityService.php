@@ -7,9 +7,16 @@ namespace App\Services;
 use App\Repositories\CartRepository;
 use App\Repositories\TicketRepository;
 
-/** Capacity: sold seats plus active carts plus unpaid pay-later reservations before allowing add or checkout. */
+/**
+ * Answers “how full is this ticket option?” in a way that’s fair when many people shop at once.
+ *
+ * We count: tickets already sold, everything sitting in open carts, and unpaid “pay later” orders that still hold seats.
+ * That same math powers three places: blocking add-to-cart if we’d go over capacity, double-checking at checkout,
+ * and the friendly badges on the tickets page (sold out / almost gone / only X left).
+ */
 final class TicketAvailabilityService
 {
+    /** Needs cart aggregates + sold ticket counts — both repos are read-only here. */
     public function __construct(
         private CartRepository $cartRepository,
         private TicketRepository $ticketRepository

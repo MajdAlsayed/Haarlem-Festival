@@ -1,4 +1,7 @@
 <?php
+/**
+ * Form for adding another jazz show (venue, day, times, price, …). AdminJazzController::newEvent().
+ */
 /** @var array $app */
 /** @var list<array{venue_id:int,name:string,city:string}> $venues */
 /** @var string $csrf */
@@ -32,9 +35,9 @@ $days = ['thursday', 'friday', 'saturday', 'sunday'];
         </nav>
 
         <h1 class="admin-title">New jazz event</h1>
-        <p class="admin-hint">After creating, use Edit to add preview audio if needed.</p>
+        <p class="admin-hint">You can attach preview audio now (upload or path) or add it later on Edit.</p>
 
-        <form method="post" action="/admin/jazz/events/save" class="admin-form admin-form--wide">
+        <form method="post" action="/admin/jazz/events/save" enctype="multipart/form-data" class="admin-form admin-form--wide">
             <input type="hidden" name="_csrf" value="<?= $h($csrf) ?>">
             <input type="hidden" name="event_id" value="0">
 
@@ -93,6 +96,23 @@ $days = ['thursday', 'friday', 'saturday', 'sunday'];
                     <input type="text" id="price" name="price" class="admin-input" placeholder="15.00">
                 </div>
             </div>
+
+            <fieldset class="admin-fieldset">
+                <legend>Preview audio (optional)</legend>
+                <p class="admin-hint">MP3/WAV/FLAC/OGG/M4A upload (max ~50 MB), or path under <code>public/audio/</code>. Upload wins if both are set.</p>
+                <div class="admin-field">
+                    <label for="preview_audio_upload">Upload audio</label>
+                    <input type="file" id="preview_audio_upload" name="preview_audio_upload" class="admin-input" accept="audio/mpeg,audio/wav,audio/flac,audio/ogg,.mp3,.wav,.flac,.ogg,.m4a">
+                </div>
+                <div class="admin-field">
+                    <label for="preview_audio_path">Or file path</label>
+                    <input type="text" id="preview_audio_path" name="preview_audio_path" class="admin-input" placeholder="Jazz audio/track.mp3">
+                </div>
+                <div class="admin-field">
+                    <label for="preview_audio_title">Track title (optional)</label>
+                    <input type="text" id="preview_audio_title" name="preview_audio_title" class="admin-input">
+                </div>
+            </fieldset>
 
             <div class="admin-form-actions">
                 <button type="submit" class="admin-btn admin-btn-primary">Create</button>

@@ -1,4 +1,7 @@
 <?php
+/**
+ * Table of every jazz slot on the programme — quick links to edit or delete. AdminJazzController::events().
+ */
 /** @var array $app */
 /** @var list<array<string,mixed>> $events */
 $success = \App\Core\Session::getFlash('admin_success');
@@ -30,6 +33,7 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
         </nav>
 
         <h1 class="admin-title">Jazz events</h1>
+        <p class="admin-hint admin-hint--block">These rows power the <strong>schedule</strong> on each artist detail page: the event <strong>title</strong> must match the artist title in <a href="/admin/jazz/settings">Jazz → Layout &amp; artist pages</a> (e.g. “Gare du Nord”). Edit day, time, venue, hall, price, and description here.</p>
 
         <?php if ($success): ?>
             <div class="admin-alert admin-alert-success"><?= $h($success) ?></div>

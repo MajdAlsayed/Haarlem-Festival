@@ -9,7 +9,10 @@ use App\Core\SecureToken;
 use PDO;
 
 /**
- * Ticket rows: issued at checkout and used by the door scanner (lookup and scan state).
+ * Real tickets people get after paying — each row is a scannable code tied to an order line.
+ *
+ * The door app uses this. The shop uses it too, indirectly: we count how many are already sold per catalog item
+ * so TicketAvailabilityService can say “sold out” or “only a few left” on /tickets and in the cart.
  */
 final class TicketRepository
 {
@@ -29,6 +32,7 @@ final class TicketRepository
         return (int) $db->lastInsertId();
     }
 
+    /** Minimal lookup by barcode/QR string — door check without joins. */
     public function findByCode(string $ticketCode): ?array
     {
         $db = Database::getConnection();
@@ -113,6 +117,7 @@ final class TicketRepository
         return $upd->rowCount() > 0 ? 'success' : 'already_scanned';
     }
 
+    /** Tries a few random codes until one is unused — extremely unlikely to loop out on a sane DB. */
     private function uniqueTicketCode(PDO $db): string
     {
         for ($i = 0; $i < 10; $i++) {

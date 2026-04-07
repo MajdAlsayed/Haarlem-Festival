@@ -641,6 +641,32 @@ case '/admin/stories/detail-page/save':
         else { header('Location: /admin/jazz/discography'); exit; }
         break;
 
+    case '/admin/jazz/band-members':
+        (new AdminJazzController())->bandMembers();
+        break;
+
+    case '/admin/jazz/band-members/edit':
+        (new AdminJazzController())->editBandMember();
+        break;
+
+    case '/admin/jazz/band-members/save':
+        if ($method === 'POST') {
+            (new AdminJazzController())->saveBandMember();
+        } else {
+            header('Location: /admin/jazz/band-members');
+            exit;
+        }
+        break;
+
+    case '/admin/jazz/band-members/delete':
+        if ($method === 'POST') {
+            (new AdminJazzController())->deleteBandMember();
+        } else {
+            header('Location: /admin/jazz/band-members');
+            exit;
+        }
+        break;
+
     case '/admin/tickets':
         (new AdminTicketsController())->index();
         break;
@@ -665,6 +691,15 @@ case '/admin/stories/detail-page/save':
     case '/admin/tickets/delete':
         if ($method === 'POST') (new AdminTicketsController())->delete();
         else { header('Location: /admin/tickets'); exit; }
+        break;
+
+    case '/admin/tickets/delete-bulk':
+        if ($method === 'POST') {
+            (new AdminTicketsController())->deleteBulk();
+        } else {
+            header('Location: /admin/tickets');
+            exit;
+        }
         break;
     case '/admin/food':
         (new AdminFoodController())->index();

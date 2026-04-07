@@ -1,11 +1,11 @@
 <?php
 /**
- * Manage album/track rows for each jazz artist slug (what the public discography blocks show). AdminJazzController::discography().
+ * List who’s in the band for each jazz artist page (photo + role + order). AdminJazzController::bandMembers().
  */
 /** @var array $app */
 /** @var list<string> $slugs */
 /** @var string $slug */
-/** @var list<array<string,mixed>> $tracks */
+/** @var list<array<string,mixed>> $members */
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 $success = \App\Core\Session::getFlash('admin_success');
 $error = \App\Core\Session::getFlash('admin_error');
@@ -14,7 +14,7 @@ $error = \App\Core\Session::getFlash('admin_error');
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Discography — Admin — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
+    <title>Band members — Admin — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
     <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
     <link rel="stylesheet" href="/css/admin.css?v=<?= $h($app['css_version'] ?? '1') ?>">
 </head>
@@ -31,10 +31,11 @@ $error = \App\Core\Session::getFlash('admin_error');
             <span class="admin-breadcrumb-sep">›</span>
             <a href="/admin/jazz">Jazz</a>
             <span class="admin-breadcrumb-sep">›</span>
-            <span>Discography</span>
+            <span>Band members</span>
         </nav>
 
-        <h1 class="admin-title">Discography</h1>
+        <h1 class="admin-title">Band members</h1>
+        <p class="admin-lead">Photos and roles for artist pages (e.g. Gumbo Kings, Gare du Nord). Order matches sort order, then row layout (first three, then the rest).</p>
 
         <?php if ($success): ?>
             <div class="admin-alert admin-alert-success"><?= $h($success) ?></div>
@@ -43,7 +44,7 @@ $error = \App\Core\Session::getFlash('admin_error');
             <div class="admin-alert admin-alert-error"><?= $h($error) ?></div>
         <?php endif; ?>
 
-        <form method="get" action="/admin/jazz/discography" class="admin-field" style="max-width: 24rem;">
+        <form method="get" action="/admin/jazz/band-members" class="admin-field" style="max-width: 24rem;">
             <label for="slug">Artist slug</label>
             <select name="slug" id="slug" class="admin-input" onchange="this.form.submit()">
                 <?php foreach ($slugs as $s): ?>
@@ -53,7 +54,7 @@ $error = \App\Core\Session::getFlash('admin_error');
         </form>
 
         <p>
-            <a href="/admin/jazz/discography/edit?slug=<?= $h(rawurlencode($slug)) ?>" class="admin-btn admin-btn-primary">Add track</a>
+            <a href="/admin/jazz/band-members/edit?slug=<?= $h(rawurlencode($slug)) ?>" class="admin-btn admin-btn-primary">Add member</a>
             <a href="/admin/jazz" class="admin-btn admin-btn-secondary">Back</a>
         </p>
 
@@ -62,27 +63,29 @@ $error = \App\Core\Session::getFlash('admin_error');
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Title</th>
-                        <th>Image / audio</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Image</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($tracks as $t): ?>
+                    <?php foreach ($members as $m): ?>
                     <tr>
-                        <td><?= (int) ($t['sort_order'] ?? 0) ?></td>
-                        <td><?= $h((string) ($t['title'] ?? '')) ?></td>
-                        <td><code class="admin-slug"><?= $h((string) ($t['image_file'] ?? '')) ?></code><br><code class="admin-slug"><?= $h((string) ($t['audio_file'] ?? '')) ?></code></td>
+                        <td><?= (int) ($m['sort_order'] ?? 0) ?></td>
+                        <td><?= $h((string) ($m['name'] ?? '')) ?></td>
+                        <td><?= $h((string) ($m['role'] ?? '')) ?></td>
+                        <td><code class="admin-slug"><?= $h((string) ($m['image_file'] ?? '')) ?></code></td>
                         <td>
-                            <a href="/admin/jazz/discography/edit?id=<?= (int) $t['track_id'] ?>" class="admin-btn admin-btn-sm">Edit</a>
+                            <a href="/admin/jazz/band-members/edit?id=<?= (int) $m['member_id'] ?>" class="admin-btn admin-btn-sm">Edit</a>
                             <?php
-                            $df = 'admin_jazz_disc_del_' . (int) $t['track_id'];
+                            $df = 'admin_jazz_band_del_' . (int) $m['member_id'];
                             $dt = \App\Core\Csrf::token($df);
                             ?>
-                            <form method="post" action="/admin/jazz/discography/delete" style="display:inline;" onsubmit="return confirm('Delete this track?');">
+                            <form method="post" action="/admin/jazz/band-members/delete" style="display:inline;" onsubmit="return confirm('Remove this band member?');">
                                 <input type="hidden" name="_csrf_form" value="<?= $h($df) ?>">
                                 <input type="hidden" name="_csrf" value="<?= $h($dt) ?>">
-                                <input type="hidden" name="track_id" value="<?= (int) $t['track_id'] ?>">
+                                <input type="hidden" name="member_id" value="<?= (int) $m['member_id'] ?>">
                                 <input type="hidden" name="return_slug" value="<?= $h($slug) ?>">
                                 <button type="submit" class="admin-btn admin-btn-sm admin-btn-danger">Delete</button>
                             </form>
@@ -92,8 +95,8 @@ $error = \App\Core\Session::getFlash('admin_error');
                 </tbody>
             </table>
         </div>
-        <?php if ($tracks === []): ?>
-            <p class="admin-muted">No tracks for this slug.</p>
+        <?php if ($members === []): ?>
+            <p class="admin-muted">No members for this slug. Add some, or run migrations to load defaults.</p>
         <?php endif; ?>
     </div>
 </main>

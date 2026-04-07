@@ -14,18 +14,22 @@ use App\Services\CartService;
 use App\Services\TicketAvailabilityService;
 
 /**
- * Cart: JSON for cart drawer (fetch); HTML for /cart page; form POSTs from tickets redirect after add.
- * Mutating POSTs need CSRF (key cart); JSON sends _csrf in body; forms use hidden _csrf.
+ * Shopping cart: the header drawer and `/cart` both hit this controller.
+ *
+ * Browser fetches JSON to refresh counts without reloading; traditional forms from `/tickets` or jazz pages POST here
+ * and then redirect back with a flash. Anything that changes the cart must send a valid CSRF token (`cart`).
  */
 final class CartController
 {
     private CartService $cartService;
 
+    /** Builds CartService with the real repos and the same availability rules as checkout. */
     public function __construct()
     {
         $this->cartService = $this->makeCartService();
     }
 
+    /** Small factory so we don’t duplicate `new TicketAvailabilityService(...)` all over the class. */
     private function makeCartService(): CartService
     {
         $cartRepo = new CartRepository();
@@ -36,6 +40,9 @@ final class CartController
         );
     }
 
+    /**
+     * GET `/cart` or `/cart/json`: returns either the full HTML cart page or JSON + fresh CSRF for the drawer script.
+     */
     public function get(): void
     {
         if ($this->wantsJsonResponse()) {
@@ -69,6 +76,9 @@ final class CartController
         require __DIR__ . '/../Views/Cart/index.php';
     }
 
+    /**
+     * Add a line (JSON or form). On success, logged-in users also get the ticket mirrored into their saved personal program.
+     */
     public function add(): void
     {
         $data = $this->getInputData();
@@ -132,6 +142,7 @@ final class CartController
         }
     }
 
+    /** Change quantity for one cart line (0 removes — handled inside CartService). */
     public function update(): void
     {
         $data = $this->getInputData();
@@ -172,6 +183,7 @@ final class CartController
         ]);
     }
 
+    /** Drop one line entirely; capacity is “given back” before the row is deleted. */
     public function remove(): void
     {
         $data = $this->getInputData();
@@ -211,7 +223,11 @@ final class CartController
         ]);
     }
 
-    /** @param array<string, mixed> $data */
+    /**
+     * Shared CSRF check for JSON vs form: on failure, either flash+redirect or JSON 403 with a new token.
+     *
+     * @param array<string, mixed> $data
+     */
     private function requireCsrf(array $data, bool $formPost): bool
     {
         $token = isset($data['_csrf']) && is_string($data['_csrf']) ? $data['_csrf'] : null;
@@ -234,7 +250,11 @@ final class CartController
         return false;
     }
 
-    /** @param array<string, mixed> $data */
+    /**
+     * After a form POST, send the user back to `return` (must be a same-site path starting with `/`).
+     *
+     * @param array<string, mixed> $data
+     */
     private function redirectReturn(array $data): void
     {
         $return = trim((string) ($data['return'] ?? '/tickets'));
@@ -245,6 +265,7 @@ final class CartController
         exit;
     }
 
+    /** True when the client sent a classic HTML form (not JSON). */
     private function isFormPost(): bool
     {
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
@@ -252,6 +273,7 @@ final class CartController
             || str_contains($contentType, 'multipart/form-data');
     }
 
+    /** Reads JSON body or `$_POST` depending on Content-Type so one action supports fetch and forms. */
     private function getInputData(): array
     {
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
@@ -265,6 +287,9 @@ final class CartController
         return $_POST;
     }
 
+    /**
+     * Heuristic: full page navigation usually wants HTML; fetch/XHR wants JSON. Used by `get()` for the hybrid endpoint.
+     */
     private function wantsJsonResponse(): bool
     {
         $dest = $_SERVER['HTTP_SEC_FETCH_DEST'] ?? '';
@@ -282,6 +307,7 @@ final class CartController
         return true;
     }
 
+    /** Sends JSON and stops — shared by every cart API branch. */
     private function json(array $data, int $statusCode = 200): void
     {
         http_response_code($statusCode);

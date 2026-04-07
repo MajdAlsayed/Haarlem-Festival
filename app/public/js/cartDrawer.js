@@ -1,4 +1,9 @@
+/**
+ * Header cart drawer: talks to /cart/json (and friends) to refresh the badge, list lines, and totals without a full reload.
+ * CSRF for cart actions lives on window.__CSRF_CART__ — the server can rotate it after each POST.
+ */
 document.addEventListener('DOMContentLoaded', () => {
+    // --- CSRF: server may send a fresh token on each JSON response; keep it for the next POST ---
     function getCsrf() {
         return typeof window.__CSRF_CART__ === 'string' ? window.__CSRF_CART__ : '';
     }
@@ -21,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         offcanvasInstance = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
     }
 
+    // Format euro amounts for the tiny labels in the drawer
     function money(value) {
         return Number(value || 0).toFixed(2);
     }
@@ -34,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/'/g, '&#039;');
     }
 
+    // Fills badge, subtotal, and the list of cards from `/cart` JSON (`cart` payload)
     function renderCart(cart) {
         const itemCount = Number(cart?.item_count || 0);
         const total = Number(cart?.total || 0);
@@ -114,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
+    // GET or JSON POST to /cart/*; always forwards CSRF and updates the token from the response body
     async function request(url, payload = null) {
         const options = {
             method: payload ? 'POST' : 'GET',
@@ -141,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return data;
     }
 
+    // Initial load + any time we need to sync after an error elsewhere
     async function refreshCart() {
         try {
             const data = await request('/cart');
@@ -150,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Used by `[data-ticket-details-id]` buttons on listing pages
     async function addToCart(ticketDetailsId, quantity = 1) {
         try {
             const data = await request('/cart/add', {
@@ -168,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // +/- quantity controls inside the drawer
     async function updateCartItem(cartItemId, quantity) {
         try {
             const data = await request('/cart/update', {
@@ -182,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Trash line — frees capacity server-side
     async function removeCartItem(cartItemId) {
         try {
             const data = await request('/cart/remove', {
@@ -195,6 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Event delegation: add buttons anywhere, remove/qty only inside the drawer markup
     document.addEventListener('click', async (event) => {
         const addBtn = event.target.closest('[data-ticket-details-id]');
         if (addBtn) {

@@ -11,9 +11,19 @@ use App\Repositories\TicketRepository;
 use App\Repositories\TicketsRepository;
 use App\Services\TicketAvailabilityService;
 
-/** Category tabs for /tickets; merges real-time stock hints into each ticket row for badges and disabling buy. */
+/**
+ * The public “Tickets” page people use to browse passes and single events.
+ *
+ * The ?cat= query switches the tab (jazz, dance, history, stories). We load rows from TicketsRepository, then
+ * ask TicketAvailabilityService how tight capacity is — that’s what drives “Sold out”, “Only X left”, and dimming BUY.
+ * After someone adds to cart, CartController may leave a one-time success/error message in the session; we show it at the top of the view.
+ */
 final class TicketsController
 {
+    /**
+     * Renders the tickets page: intro line, special-offer passes, then Thursday–Sunday grids for that category.
+     * Every card gets a `stock` array so the template doesn’t have to think about math.
+     */
     public function index(): void
     {
         $repo = new TicketsRepository();
@@ -35,7 +45,7 @@ final class TicketsController
                 $ids[] = (int) ($e['ticket_details_id'] ?? 0);
             }
         }
-        // One batch query worth of ids → sold_out / nearly / low_stock for the whole page (includes cart + pay-later holds).
+        // Figure out stock for every ticket on this page in one go (faster than asking per card).
         $cartRepo = new CartRepository();
         $stock = (new TicketAvailabilityService($cartRepo, new TicketRepository()))->stockUiByTicketDetailsIds($ids);
         $passes = $this->attachStock($passes, $stock);
@@ -51,6 +61,8 @@ final class TicketsController
     }
 
     /**
+     * Copies the precomputed stock info onto each row so the Blade/HTML side can always do $row['stock']['sold_out'] etc.
+     *
      * @param list<array<string,mixed>> $items
      * @param array<int, array{sold_out: bool, nearly: bool, low_stock: bool, remaining: ?int}> $stock
      * @return list<array<string,mixed>>
@@ -59,7 +71,7 @@ final class TicketsController
     {
         foreach ($items as &$row) {
             $tid = (int) ($row['ticket_details_id'] ?? 0);
-            // Passes without a cap get a neutral stock row so the template always reads $row['stock'].
+            // Day passes don’t have a seat cap — we still attach a “boring” stock row so the view doesn’t need if/else.
             $row['stock'] = $stock[$tid] ?? [
                 'sold_out' => false,
                 'nearly' => false,

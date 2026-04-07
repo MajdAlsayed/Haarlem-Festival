@@ -5,7 +5,10 @@ namespace App\Services;
 use App\Repositories\CartRepository;
 use App\ViewModels\CartViewModel;
 
-/** Cart lifecycle: resolves guest session cart vs logged-in user cart, runs capacity checks on each change. */
+/**
+ * The brain between HTTP and the database: figures out which cart id applies to this request,
+ * then adds/updates/removes lines while TicketAvailabilityService enforces seat limits.
+ */
 class CartService
 {
     public function __construct(
@@ -14,6 +17,7 @@ class CartService
     ) {
     }
 
+    /** Current basket for the session/user, or an empty view-model if nothing is open yet. */
     public function getCurrentCart(): CartViewModel
     {
         $cartId = $this->resolveCurrentCartId(createIfMissing: false);
@@ -27,6 +31,7 @@ class CartService
         return new CartViewModel($cartId, $items);
     }
 
+    /** Adds or merges a line after checking the catalog id exists and there is enough capacity left. */
     public function addItem(int $ticketDetailsId, int $quantity = 1): CartViewModel
     {
         if ($quantity < 1) {
@@ -52,6 +57,7 @@ class CartService
         return $this->getCurrentCart();
     }
 
+    /** Sets a new quantity, or deletes the line when quantity is 0 (after releasing capacity). */
     public function updateItem(int $cartItemId, int $quantity): CartViewModel
     {
         $existing = $this->cartRepository->findCartItemById($cartItemId);
@@ -72,6 +78,7 @@ class CartService
         return $this->getCurrentCart();
     }
 
+    /** Hard delete one line — treats it like lowering qty to zero for availability. */
     public function removeItem(int $cartItemId): CartViewModel
     {
         $existing = $this->cartRepository->findCartItemById($cartItemId);
@@ -83,6 +90,10 @@ class CartService
         return $this->getCurrentCart();
     }
 
+    /**
+     * Picks the cart id: logged-in users reuse their row; guests use `$_SESSION['cart_id']`;
+     * logging in may merge a guest cart into the account.
+     */
     private function resolveCurrentCartId(bool $createIfMissing): ?int
     {
         $userId = isset($_SESSION['auth']['user_id']) ? (int)$_SESSION['auth']['user_id'] : null;

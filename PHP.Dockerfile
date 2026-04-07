@@ -9,6 +9,9 @@ RUN apt-get update \
     && rm composer-setup.php \
     && rm -rf /var/lib/apt/lists/*
 
+# Allow jazz/dance admin audio uploads (must match nginx client_max_body_size).
+RUN printf '%s\n' 'upload_max_filesize = 128M' 'post_max_size = 128M' > /usr/local/etc/php/conf.d/zz-uploads.ini
+
 WORKDIR /app
 
 # Allow running Composer as root within the container

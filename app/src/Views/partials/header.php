@@ -12,8 +12,15 @@ $scannerNavActive = $currentPath === '/admin/scan';
 $cartBadgeCount = 0;
 ?>
 
+<?php
+// Avoid loading Bootstrap/style.css twice: some layouts link both in <head> (Bootstrap first, then style.css)
+// with a page-specific cache buster. If we injected Bootstrap here after that style.css, Bootstrap would win
+// and break the main nav (e.g. .btn-outline on the account button).
+if (empty($skipHeaderStyleSheet)):
+    ?>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string) ($app['css_version'] ?? '1')) ?>">
+<?php endif; ?>
 
 <header>
     <div class="nav-container">

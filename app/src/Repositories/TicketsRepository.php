@@ -7,10 +7,17 @@ namespace App\Repositories;
 use App\Core\Database;
 use PDO;
 
+/**
+ * Feeds the public tickets page with the right rows for the active tab.
+ *
+ * “Special offer” pulls day passes and all-access passes. Under each weekday we list normal event tickets whose
+ * event type matches jazz, dance, history, or stories depending on ?cat=. History rows can join session times.
+ */
 final class TicketsRepository
 {
     public const CATEGORIES = ['jazz', 'dance', 'history', 'stories'];
 
+    /** Hero paragraph on /tickets — from `site_settings` or a built-in default if the row is missing. */
     public function getIntroText(): string
     {
         try {
@@ -29,6 +36,8 @@ final class TicketsRepository
     }
 
     /**
+     * Day + all-access bundles that belong to this tab (category filter matches jazz/dance/… or “all”).
+     *
      * @return list<array<string,mixed>>
      */
     public function getPassesForCategory(string $category): array
@@ -103,6 +112,8 @@ final class TicketsRepository
     }
 
     /**
+     * Per-event tickets for the active tab, bucketed Thursday→Sunday for the template loops.
+     *
      * @return array<string, list<array<string,mixed>>>
      */
     public function getEventTicketsGroupedByDay(string $category): array
@@ -171,7 +182,11 @@ final class TicketsRepository
         return $grouped;
     }
 
-    /** @param array<string,mixed> $r */
+    /**
+     * Makes pass rows consistent for the view (booleans, trimmed strings).
+     *
+     * @param array<string,mixed> $r
+     */
     private function normalizeRow(array $r): array
     {
         return [

@@ -5,9 +5,22 @@ namespace App\Controllers;
 
 use App\Repositories\JazzRepository;
 use App\Repositories\JazzSettingsRepository;
+use App\Services\JazzArtistHtmlSanitizer;
+use App\Services\JazzCareerHighlightsPlainParser;
 use App\ViewModels\JazzArtistViewModel;
 use App\ViewModels\JazzViewModel;
 
+/**
+ * Everything visitors see under “Jazz” on the site.
+ *
+ * The main listing is /jazz. Artist pages are things like /jazz/karsu — each one uses the same helper at the bottom
+ * (renderArtist) so we don’t copy-paste how we load config, events, discography, and band photos.
+ *
+ * Where the data comes from:
+ * - JazzRepository — events from the database, plus discography and band members for a given artist slug.
+ * - JazzSettingsRepository — your jazz “CMS”: it starts from Config/jazz.php and layers admin changes from the DB.
+ * - For career highlights we either turn plain text into HTML or sanitize HTML the admin stored.
+ */
 final class JazzController
 {
     private JazzRepository $jazzRepo;
@@ -19,6 +32,10 @@ final class JazzController
         $this->settingsRepo = new JazzSettingsRepository();
     }
 
+    /**
+     * Jazz homepage. Shows every jazz event as cards, lets people filter by day, and “save to program”
+     * (that last part is handled in the browser — see the script at the bottom of jazz-home.php).
+     */
     public function index(): void
     {
         $events = $this->jazzRepo->getAll();
@@ -30,31 +47,53 @@ final class JazzController
         require __DIR__ . '/../Views/Jazz/jazz-home.php';
     }
 
+    /** Gumbo Kings artist page: discography, schedule, and “Add to program” which adds a real ticket to the cart. */
     public function gumboKings(): void
     {
         $this->renderArtist('gumbo-kings', __DIR__ . '/../Views/Jazz/gumbo-king.php', true);
     }
 
+    /** Karsu’s page: big video-style block, discography carousel, and schedule rows that post to the cart. */
     public function karsu(): void
     {
         $this->renderArtist('karsu', __DIR__ . '/../Views/Jazz/karsu.php');
     }
 
+    /** Gare du Nord — same idea as Gumbo (we can attach preview clips from the database when the flag is true). */
     public function gareDuNord(): void
     {
-        $this->renderArtist('gare-du-nord', __DIR__ . '/../Views/Jazz/gare-du-nord.php');
+        $this->renderArtist('gare-du-nord', __DIR__ . '/../Views/Jazz/gare-du-nord.php', true);
     }
 
+    /**
+     * One place that wires up every jazz artist page so the three routes stay consistent.
+     *
+     * Steps in plain English: look up that artist in the merged config (title, tagline, hero, intro text, highlights),
+     * find all events whose title matches that artist, optionally glue on preview audio and sort by weekday,
+     * pull discography and band members for this slug, then hand everything to the view as a JazzArtistViewModel.
+     */
     private function renderArtist(string $slug, string $viewFile, bool $attachPreviewAudio = false): void
     {
         $jazzConfig = $this->settingsRepo->getMergedConfig();
         $artistPages = $jazzConfig['artist_pages'] ?? [];
 
         $page = $artistPages[$slug] ?? null;
-        $title = $page['title'] ?? ucfirst(str_replace('-', ' ', $slug));
-        $tagline = $page['tagline'] ?? '';
-        $heroFile = $page['hero_image'] ?? 'hero-jazz.jpg';
+        $pageArr = is_array($page) ? $page : [];
+        $title = $pageArr['title'] ?? ucfirst(str_replace('-', ' ', $slug));
+        $tagline = $pageArr['tagline'] ?? '';
+        $heroFile = $pageArr['hero_image'] ?? 'hero-jazz.jpg';
         $heroImage = '/images/jazz/' . rawurlencode($heroFile);
+        $pageIntroText = trim((string) ($pageArr['intro_text'] ?? ''));
+        $careerPlain = trim((string) ($pageArr['career_highlights_plain'] ?? ''));
+        $careerHtmlStored = trim((string) ($pageArr['career_highlights_html'] ?? ''));
+        if ($careerPlain !== '') {
+            $generated = JazzCareerHighlightsPlainParser::toHtml($careerPlain, $slug);
+            $careerHighlightsHtml = JazzArtistHtmlSanitizer::purifyHighlights($generated);
+        } elseif ($careerHtmlStored !== '') {
+            $careerHighlightsHtml = JazzArtistHtmlSanitizer::purifyHighlights($careerHtmlStored);
+        } else {
+            $careerHighlightsHtml = '';
+        }
 
         $events = $this->jazzRepo->getByTitle($title);
         if ($attachPreviewAudio) {
@@ -73,12 +112,24 @@ final class JazzController
             });
         }
 
-        // Bio is stored on events.description (first matching event row)
+        // We don’t have a separate “bio” field for artists — we reuse the first matching event’s description.
         $bio = ($events[0]['description'] ?? '') ?: 'Artist bio placeholder (edit in DB: events.description).';
 
         $discography = $this->jazzRepo->getDiscographyByArtistSlug($slug);
+        $bandMembers = $this->jazzRepo->getBandMembersByArtistSlug($slug);
 
-        $viewModel = new JazzArtistViewModel($slug, $title, $tagline, $heroImage, $bio, $events, $discography);
+        $viewModel = new JazzArtistViewModel(
+            $slug,
+            $title,
+            $tagline,
+            $heroImage,
+            $bio,
+            $events,
+            $discography,
+            $bandMembers,
+            $pageIntroText,
+            $careerHighlightsHtml
+        );
 
         require $viewFile;
     }

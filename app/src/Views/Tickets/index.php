@@ -1,5 +1,11 @@
 <?php
-// Each ticket row may include `stock` (sold_out, nearly, low_stock, remaining) from TicketAvailabilityService for badges and hiding BUY.
+/**
+ * Shop tickets by category (/tickets?cat=jazz|dance|history|stories).
+ *
+ * TicketsController::index() sends intro copy, bundle passes ($passes), and $byDay for the weekday grids. Each row
+ * may carry a `stock` array — that’s what drives “sold out”, “almost gone”, and whether the BUY button is enabled.
+ * Add-to-cart forms POST to /cart/add; green/red flashes come from CartController via the session.
+ */
 /** @var array $app */
 /** @var string $category */
 /** @var string $intro */
@@ -21,7 +27,7 @@ $bodyClass = 'tickets-page tickets-page--' . preg_replace('/[^a-z]/', '', $categ
 $dayPasses = array_values(array_filter($passes, static fn ($p) => ($p['ticket_type'] ?? '') === 'day_pass'));
 $allAccessPasses = array_values(array_filter($passes, static fn ($p) => ($p['ticket_type'] ?? '') === 'all_access_pass'));
 
-/** Day / all-access bundles only for Jazz & Dance (not History or Stories). */
+/** History & Stories tabs skip the “day pass / all access” strip — those bundles are only for Jazz & Dance. */
 $showSpecialOffers = !in_array($category, ['history', 'stories'], true);
 
 $dayOrder = ['thursday', 'friday', 'saturday', 'sunday'];
