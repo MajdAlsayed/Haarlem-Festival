@@ -19,16 +19,17 @@ return [
     ],
 
     'hero_image' => 'Dance page front picture.png',
-    'featured_images' => [],
-    'friday_images' => [],
-    'saturday_images' => [],
-    'sunday_images' => [],
+    /** Fallbacks when `dance_settings` is empty (same as DanceSettingsSeeder). */
+    'featured_images' => ['Dance-page-1.png', 'Dance-page-2.png', 'Dance-page-3.png'],
+    'friday_images' => ['dance-page-friday-1.png', 'dance-page-friday-2.png', 'dance-page-friday-3.png', 'dance-page-friday-4.png', 'dance-page-friday-5.png'],
+    'saturday_images' => ['dance-page-satuday-1.png', 'dance-page-satuday-2.png', 'dance-page-satuday-3.png', 'dance-page-satuday-4.png'],
+    'sunday_images' => ['dance-page-sunday-1.png', 'dance-page-sunday-2.png', 'dance-page-sunday-3.png', 'dance-page-sunday-4.png'],
 
-    'friday_genres' => [],
-    'saturday_genres' => [],
-    'sunday_genres' => [],
+    'friday_genres' => ['HOUSE', 'TRANCE', 'DANCE', 'TRANCE', 'ELECTRONIC'],
+    'saturday_genres' => ['MIXED GENRES', 'HOUSE', 'TRANCE / ELECTRO', 'ELECTROHOUSE'],
+    'sunday_genres' => ['MIXED GENRES', 'TRANCE', 'DANCE', 'ELECTRONIC'],
 
-    'featured_genre_labels' => [],
+    'featured_genre_labels' => ['HOUSE', 'TRANCE', 'DANCE'],
     'breadcrumb_home_label' => 'HOME',
     'breadcrumb_dance_label' => 'DANCE',
     'day_label_friday' => 'Friday',
