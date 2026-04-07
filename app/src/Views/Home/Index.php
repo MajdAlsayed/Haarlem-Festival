@@ -15,7 +15,7 @@ $navLinks = (new \App\Repositories\MenuRepository())->getNavLinks();
     <title><?= htmlspecialchars((string) ($page->title ?? '')) ?></title>
     <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string) ($app['css_version'] ?? '1')) ?>">
 </head>
-<body class="home-page">
+<body>
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 

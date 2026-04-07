@@ -11,7 +11,7 @@ return [
     'default_event_location' => 'Haarlem — Netherlands',
     'default_venue_city' => 'Haarlem',
     'default_event_time' => '22:00',
-    'css_version' => '26',
+    'css_version' => '27',
 
     'footer' => [
         'social_icons' => ['insta icon.png', 'tiktok icon.png', 'facebook icon.png', 'youtube icon.png'],
