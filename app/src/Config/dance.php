@@ -8,13 +8,15 @@ declare(strict_types=1);
 return [
     /** Shown in &lt;h1&gt; and &lt;title&gt; (editable via /admin/cms/dance). */
     'dance_page_title' => 'Dance',
-    'about_section_heading' => '',
-    'featured_section_title' => '',
-    'all_events_section_title' => '',
-    'artists_section_title' => '',
-    'hero_cta_label' => '',
-    'hero_subtitle' => '',
-    'about_paragraphs' => [],
+    'about_section_heading' => 'Haarlem Dance',
+    'featured_section_title' => 'Featured events',
+    'all_events_section_title' => 'All events',
+    'artists_section_title' => 'Artists',
+    'hero_cta_label' => 'See featured events',
+    'hero_subtitle' => '<p>Electronic music across three nights — venues, passes, and headline sets.</p>',
+    'about_paragraphs' => [
+        '<p>Haarlem Dance brings DJs and live electronic acts to iconic venues. Browse by day, grab tickets or passes, and explore artist profiles.</p>',
+    ],
 
     'hero_image' => 'Dance page front picture.png',
     'featured_images' => [],
