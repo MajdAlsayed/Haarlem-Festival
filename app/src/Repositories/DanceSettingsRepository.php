@@ -10,6 +10,7 @@ use PDO;
  */
 class DanceSettingsRepository
 {
+    /** Raw DB-only settings (or dance.php fallback if DB is unavailable/empty). */
     public function getAll(): array
     {
         try {
@@ -59,6 +60,7 @@ class DanceSettingsRepository
         return $base;
     }
 
+    /** Insert or update one dance_settings key from admin CMS forms. */
     public function upsertSetting(string $key, string $value): bool
     {
         $db = Database::getConnection();
@@ -70,6 +72,7 @@ class DanceSettingsRepository
         return $stmt->execute(['k' => $key, 'v' => $value]);
     }
 
+    /** Decode JSON arrays/objects; keep scalar strings as-is. */
     private function decodeSettingValue(?string $val): mixed
     {
         if ($val === null) {

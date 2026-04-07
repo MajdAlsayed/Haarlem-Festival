@@ -12,9 +12,12 @@ use App\Repositories\EventRepository;
  */
 class DanceService
 {
+    private const CATEGORY_DANCE = 'dance';
+
     private EventRepository $eventRepository;
     private DanceSettingsRepository $danceSettingsRepository;
 
+    /** Keep service testable by injecting repositories. */
     public function __construct(
         EventRepository $eventRepository,
         DanceSettingsRepository $danceSettingsRepository
@@ -33,15 +36,15 @@ class DanceService
         $venueOrderSaturday = $this->getVenueOrder($settings, 'venue_order_saturday');
         $venueOrderSunday = $this->getVenueOrder($settings, 'venue_order_sunday');
 
-        $fridayEvents = $this->eventRepository->getByCategoryAndDay('dance', 'friday');
-        $saturdayEvents = $this->eventRepository->getByCategoryAndDay('dance', 'saturday');
-        $sundayEvents = $this->eventRepository->getByCategoryAndDay('dance', 'sunday');
+        $fridayEvents = $this->eventRepository->getByCategoryAndDay(self::CATEGORY_DANCE, 'friday');
+        $saturdayEvents = $this->eventRepository->getByCategoryAndDay(self::CATEGORY_DANCE, 'saturday');
+        $sundayEvents = $this->eventRepository->getByCategoryAndDay(self::CATEGORY_DANCE, 'sunday');
 
         $fridayEvents = $this->sortEventsByVenueOrder($fridayEvents, $venueOrderFriday);
         $saturdayEvents = $this->sortEventsByVenueOrder($saturdayEvents, $venueOrderSaturday);
         $sundayEvents = $this->sortEventsByVenueOrder($sundayEvents, $venueOrderSunday);
 
-        $all = $this->eventRepository->getByCategory('dance');
+        $all = $this->eventRepository->getByCategory(self::CATEGORY_DANCE);
 
         return [
             'friday' => $fridayEvents,
@@ -51,6 +54,7 @@ class DanceService
         ];
     }
 
+    /** Stable sort by configured venue order, then start time inside the same venue bucket. */
     private function sortEventsByVenueOrder(array $events, array $venueOrder): array
     {
         // Venues not listed in CMS/config go to the end, then we sort by start time inside the same slot.
@@ -72,6 +76,7 @@ class DanceService
         return $events;
     }
 
+    /** Read integer venue order list from settings; fallback to empty list. */
     private function getVenueOrder(array $settings, string $key): array
     {
         $raw = $settings[$key] ?? null;
@@ -107,9 +112,9 @@ class DanceService
     private function getDanceArtistsFromDatabase(): array
     {
         $defaults = require __DIR__ . '/../Config/dance.php';
-        $slugs = $defaults['dance_index_artist_slugs'] ?? ['hardwell', 'tiesto'];
+        $slugs = $defaults['dance_index_artist_slugs'] ?? [];
         if (!is_array($slugs)) {
-            $slugs = ['hardwell', 'tiesto'];
+            $slugs = [];
         }
 
         $repo = new ArtistsRepository();
@@ -139,6 +144,7 @@ class DanceService
         return $out;
     }
 
+    /** Public accessor so controllers don't read repository/config directly. */
     public function getDanceSettings(): array
     {
         return $this->danceSettingsRepository->getMergedWithConfig();

@@ -17,6 +17,7 @@ class ArtistController
     private SettingsRepository $settingsRepository;
     private DanceSettingsRepository $danceSettings;
 
+    /** Wire artist detail dependencies (artist data, photos, settings). */
     public function __construct()
     {
         $this->artistService = new ArtistService(
@@ -28,6 +29,7 @@ class ArtistController
         $this->danceSettings = new DanceSettingsRepository();
     }
 
+    /** Build /dance/artist/{slug} view data from DB + dance settings + artist_music config. */
     public function show(string $slug): void
     {
         try {
@@ -188,9 +190,7 @@ class ArtistController
         return str_ends_with($base, '/') ? $base : $base . '/';
     }
 
-    /**
-     * @param array<string, mixed> $slots slug → PhotosRepository slot name; must include "default"
-     */
+    /** Resolve photo slot key by slug with a required "default" fallback slot. */
     private function photoSlotKey(array $slots, string $slug, string $ifMissing): string
     {
         $v = $slots[$slug] ?? $slots['default'] ?? $ifMissing;

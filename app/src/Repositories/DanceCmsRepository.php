@@ -10,11 +10,13 @@ use PDO;
 /** Dance event CRUD for admin (event_types.name = dance). Mirrors JazzCmsRepository. */
 final class DanceCmsRepository
 {
+    /** Single PDO accessor keeps SQL calls consistent. */
     private function db(): PDO
     {
         return Database::getConnection();
     }
 
+    /** Resolve event_types id for "dance" once per operation. */
     public function getDanceEventTypeId(): int
     {
         $stmt = $this->db()->query("SELECT event_type_id FROM event_types WHERE LOWER(name) = 'dance' LIMIT 1");
@@ -43,6 +45,7 @@ final class DanceCmsRepository
     /**
      * @return list<array<string,mixed>>
      */
+    /** Admin grid source: all dance events with venue details and predictable day/time ordering. */
     public function listDanceEventsForAdmin(): array
     {
         $danceId = $this->getDanceEventTypeId();
@@ -68,6 +71,7 @@ final class DanceCmsRepository
     }
 
     /** @return ?array<string,mixed> */
+    /** Fetch one dance event for edit pages; null when id/type doesn't match dance. */
     public function getDanceEventById(int $eventId): ?array
     {
         if ($eventId <= 0) {
@@ -93,6 +97,7 @@ final class DanceCmsRepository
     }
 
     /** @return array<string,mixed> */
+    /** Normalize DB row types (ints, nullable strings) for controller/view usage. */
     private function normalizeEventRow(array $r): array
     {
         return [
@@ -112,6 +117,7 @@ final class DanceCmsRepository
         ];
     }
 
+    /** Update existing dance event row from admin form payload. */
     public function updateDanceEvent(
         int $eventId,
         int $venueId,
@@ -144,6 +150,7 @@ final class DanceCmsRepository
         ]);
     }
 
+    /** Insert a new dance event and return its event_id. */
     public function createDanceEvent(
         int $venueId,
         string $title,
@@ -176,6 +183,7 @@ final class DanceCmsRepository
         return (int) $this->db()->lastInsertId();
     }
 
+    /** Delete event only when it belongs to dance type. */
     public function deleteDanceEvent(int $eventId): void
     {
         $this->assertDanceEvent($eventId);
@@ -183,6 +191,7 @@ final class DanceCmsRepository
         $stmt->execute(['id' => $eventId]);
     }
 
+    /** Safety check so admin cannot mutate non-dance events from this repo. */
     private function assertDanceEvent(int $eventId): void
     {
         if ($this->getDanceEventById($eventId) === null) {

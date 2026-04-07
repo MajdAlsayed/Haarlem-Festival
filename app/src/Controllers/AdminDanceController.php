@@ -23,6 +23,7 @@ final class AdminDanceController
     private SettingsRepository $settingsRepository;
     private DanceCmsRepository $danceCms;
 
+    /** Create admin dance repositories/settings handlers. */
     public function __construct()
     {
         $this->danceSettingsRepository = new DanceSettingsRepository();
@@ -30,6 +31,7 @@ final class AdminDanceController
         $this->danceCms = new DanceCmsRepository();
     }
 
+    /** Legacy guard for routes that still call local admin checks. */
     private function requireAdmin(): void
     {
         $auth = $_SESSION['auth'] ?? null;
@@ -47,6 +49,7 @@ final class AdminDanceController
 
     // —— Dance events (same shape as Jazz admin) ——————————————————————————————
 
+    /** List dance events in admin. */
     public function events(): void
     {
         $this->requireAdmin();
@@ -55,6 +58,7 @@ final class AdminDanceController
         require __DIR__ . '/../Views/Admin/dance-events-list.php';
     }
 
+    /** Show create form for a new dance event. */
     public function newEvent(): void
     {
         $this->requireAdmin();
@@ -64,6 +68,7 @@ final class AdminDanceController
         require __DIR__ . '/../Views/Admin/dance-event-new.php';
     }
 
+    /** Show edit form for an existing dance event. */
     public function editEvent(): void
     {
         $this->requireAdmin();
@@ -85,6 +90,7 @@ final class AdminDanceController
         require __DIR__ . '/../Views/Admin/dance-event-edit.php';
     }
 
+    /** Validate and persist dance event create/update. */
     public function saveEvent(): void
     {
         $this->requireAdmin();
@@ -167,6 +173,7 @@ final class AdminDanceController
         exit;
     }
 
+    /** Delete a dance event row from admin. */
     public function deleteEvent(): void
     {
         $this->requireAdmin();
@@ -197,6 +204,7 @@ final class AdminDanceController
 
     // —— Artists (homepage strip — JSON in dance_settings['artists']) ——————————
 
+    /** List homepage dance artists from dance_settings JSON. */
     public function artists(): void
     {
         $this->requireAdmin();
@@ -209,6 +217,7 @@ final class AdminDanceController
         require __DIR__ . '/../Views/Admin/dance-artists-list.php';
     }
 
+    /** Show form for adding a homepage artist card. */
     public function artistsNew(): void
     {
         $this->requireAdmin();
@@ -219,6 +228,7 @@ final class AdminDanceController
         require __DIR__ . '/../Views/Admin/dance-artist-edit.php';
     }
 
+    /** Show form for editing a homepage artist card. */
     public function artistsEdit(): void
     {
         $this->requireAdmin();
@@ -256,6 +266,7 @@ final class AdminDanceController
         require __DIR__ . '/../Views/Admin/dance-artist-edit.php';
     }
 
+    /** Validate and save homepage artist cards JSON. */
     public function saveArtist(): void
     {
         $this->requireAdmin();
@@ -331,6 +342,7 @@ final class AdminDanceController
         exit;
     }
 
+    /** Remove one homepage artist card by slug. */
     public function deleteArtist(): void
     {
         $this->requireAdmin();
@@ -375,12 +387,14 @@ final class AdminDanceController
         exit;
     }
 
+    /** Strict slug rule for URL-safe artist links. */
     private static function isValidArtistSlug(string $slug): bool
     {
         return (bool) preg_match('/^[a-z0-9-]+$/', $slug);
     }
 
     /** CMS hub at /admin/dance (dashboard cards → edit form, public site). */
+    /** Redirect /admin/dance to the CMS edit form. */
     public function index(): void
     {
         if (!AdminAuth::requireAdmin()) {
@@ -391,6 +405,7 @@ final class AdminDanceController
         require __DIR__ . '/../Views/Admin/dance-index.php';
     }
 
+    /** Render /admin/cms/dance with merged defaults + DB values. */
     public function showForm(?string $error = null, ?string $success = null): void
     {
         if (!AdminAuth::requireAdmin()) {
@@ -505,6 +520,7 @@ final class AdminDanceController
         require __DIR__ . '/../Views/Admin/DanceEdit.php';
     }
 
+    /** Validate and save dance CMS settings (page, event detail, artist detail). */
     public function save(): void
     {
         if (!AdminAuth::requireAdmin()) {
@@ -851,6 +867,7 @@ final class AdminDanceController
     /**
      * @return string[]
      */
+    /** Split textarea lines into a clean string array (trim + drop empty). */
     private static function linesToStringArray(string $raw): array
     {
         $lines = preg_split('/\r\n|\r|\n/', $raw) ?: [];
@@ -868,6 +885,7 @@ final class AdminDanceController
     /**
      * @param mixed $arr
      */
+    /** Join string arrays back to textarea format for admin forms. */
     private static function arrayToLines($arr): string
     {
         if (!is_array($arr)) {
@@ -883,6 +901,7 @@ final class AdminDanceController
         return implode("\n", $s);
     }
 
+    /** Reject filename-only fields that try path traversal or folders. */
     private static function looksUnsafeFilename(string $name): bool
     {
         return str_contains($name, '..') || str_contains($name, '/') || str_contains($name, '\\');

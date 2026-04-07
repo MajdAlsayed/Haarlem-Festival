@@ -14,6 +14,7 @@ class DanceController
     private DanceService $danceService;
     private SettingsRepository $settingsRepository;
 
+    /** Wire dance page dependencies (events + dance settings + global app settings). */
     public function __construct()
     {
         $this->danceService = new DanceService(
@@ -23,6 +24,7 @@ class DanceController
         $this->settingsRepository = new SettingsRepository();
     }
 
+    /** Build homepage-ready dance data and render /dance. */
     public function index(): void
     {
         try {
