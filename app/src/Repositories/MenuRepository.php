@@ -13,13 +13,26 @@ class MenuRepository
      */
     public function getNavLinks(): array
     {
-        $db = Database::getConnection();
-        // No public /program page; personal list is /my-program (account). Hide legacy DB rows.
-        $stmt = $db->query(
-            "SELECT path, label FROM menu_items WHERE path <> '/program' ORDER BY sort_order"
-        );
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->query(
+                "SELECT path, label FROM menu_items WHERE path <> '/program' ORDER BY sort_order"
+            );
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Throwable) {
+            $rows = [];
+        }
 
-        return array_map(fn ($r) => ['path' => $r['path'], 'label' => $r['label']], $rows);
+        $links = array_map(
+            static fn ($r) => ['path' => (string) $r['path'], 'label' => (string) $r['label']],
+            $rows
+        );
+
+        if ($links !== []) {
+            return $links;
+        }
+
+        /** @var list<array{path: string, label: string}> */
+        return require __DIR__ . '/../Config/nav.php';
     }
 }
