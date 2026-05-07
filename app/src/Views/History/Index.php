@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($viewModel->hero['title'] ?? '') ?></title>
 
+    <link rel="stylesheet" href="/css/general.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/history.css">
 </head>
@@ -82,7 +83,7 @@
             </div>
 
             <!-- EXPLORE BUTTON -->
-            <a href="<?= htmlspecialchars($viewModel->locationCards['button_url'] ?? '/history/locations') ?>" class="history-button-big">
+            <a href="<?= htmlspecialchars($viewModel->locationCards['button_url'] ?? '/history/locations') ?>" class="btn btn--primary">
                 <span class="history-button-text">
                     <?= htmlspecialchars($viewModel->locationCards['button_text'] ?? '') ?>
                 </span>

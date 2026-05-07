@@ -23,16 +23,17 @@ $genreLabels = isset($danceSettings['featured_genre_labels']) && is_array($dance
 $defaultEventTime = isset($appSettings['default_event_time']) ? (string) $appSettings['default_event_time'] : '';
 $heroSubtitle = isset($danceSettings['hero_subtitle']) && is_string($danceSettings['hero_subtitle']) ? $danceSettings['hero_subtitle'] : '';
 $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceSettings['about_paragraphs']) ? $danceSettings['about_paragraphs'] : [];
+
+// Settings for the page title, styles, body class
+$pageTitle = $viewModel->pageTitle;
+$pageStyles = ['/css/pages/dance.css'];
+$bodyClass = 'dance-page';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($viewModel->pageTitle) ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars($appSettings['css_version'] ?? '1') ?>">
-</head>
-<body class="dance-page">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+<body class="<?= htmlspecialchars($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
@@ -42,22 +43,15 @@ $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceS
         <div class="dance-hero-content">
             <h1><?= htmlspecialchars($viewModel->pageTitle) ?></h1>
             <div class="dance-hero-subtitle cms-html"><?= \App\Core\HtmlSanitizer::purify($heroSubtitle) ?></div>
-            <a href="#featured-events" class="btn btn-primary btn-white"><?= htmlspecialchars((string) ($danceSettings['hero_cta_label'] ?? '')) ?></a>
+            <a href="#featured-events" class="btn btn--light"><?= htmlspecialchars((string) ($danceSettings['hero_cta_label'] ?? '')) ?></a>
         </div>
     </section>
 
-    <section class="dance-about container">
-        <nav class="breadcrumbs dance-breadcrumbs" aria-label="Breadcrumb">
-            <?php foreach ($breadcrumbs as $i => $crumb): ?>
-                <?php if ($i > 0): ?><span class="breadcrumb-sep">›</span><?php endif; ?>
-                <?php if (!empty($crumb['url'])): ?>
-                    <a href="<?= htmlspecialchars($crumb['url']) ?>"><?= htmlspecialchars($crumb['label']) ?></a>
-                <?php else: ?>
-                    <span class="breadcrumb-current"><?= htmlspecialchars($crumb['label']) ?></span>
-                <?php endif; ?>
-            <?php endforeach; ?>
-        </nav>
-        <h2 class="dance-about-heading"><?= htmlspecialchars((string) ($danceSettings['about_section_heading'] ?? '')) ?></h2>
+    <!-- Breadcrumbs nav -->
+    <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
+
+    <section class="section section--compact dance-about container">
+        <h2 class="section-title section-title--accent dance-about-heading"><?= htmlspecialchars((string) ($danceSettings['about_section_heading'] ?? '')) ?></h2>
         <div class="dance-about-content">
             <?php foreach ($aboutParagraphs as $para): ?>
                 <?php if (is_string($para) && !\App\Core\HtmlSanitizer::isEmptyHtml($para)): ?>
@@ -68,7 +62,7 @@ $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceS
     </section>
 
     <section id="featured-events" class="dance-featured container">
-        <h2 class="dance-section-title"><?= htmlspecialchars((string) ($danceSettings['featured_section_title'] ?? '')) ?></h2>
+        <h2 class="section-title section-title--underlined dance-section-title"><?= htmlspecialchars((string) ($danceSettings['featured_section_title'] ?? '')) ?></h2>
         <div class="dance-cards dance-cards-featured">
             <?php foreach ($featuredEvents as $i => $event): ?>
                 <?php
@@ -93,7 +87,7 @@ $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceS
                         <p class="dance-card-meta"><span class="dance-meta-icon">&#128205;</span> <?= htmlspecialchars($venue) ?></p>
                         <h3 class="dance-card-title"><?= htmlspecialchars($title) ?></h3>
                         <p class="dance-card-desc"><?= htmlspecialchars($desc) ?></p>
-                        <span class="dance-genre-btn"><?= htmlspecialchars($genre) ?></span>
+                        <span class="dance-genre-badge"><?= htmlspecialchars($genre) ?></span>
                     </div>
                 </a>
             <?php endforeach; ?>
@@ -101,11 +95,11 @@ $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceS
     </section>
 
     <section class="dance-all container">
-        <h2 class="dance-section-title"><?= htmlspecialchars((string) ($danceSettings['all_events_section_title'] ?? '')) ?></h2>
-        <div class="dance-date-filters" role="tablist">
-            <button type="button" class="dance-filter-btn active" data-filter="friday" aria-pressed="true"><?= htmlspecialchars((string) ($danceSettings['day_label_friday'] ?? '')) ?></button>
-            <button type="button" class="dance-filter-btn" data-filter="saturday" aria-pressed="false"><?= htmlspecialchars((string) ($danceSettings['day_label_saturday'] ?? '')) ?></button>
-            <button type="button" class="dance-filter-btn" data-filter="sunday" aria-pressed="false"><?= htmlspecialchars((string) ($danceSettings['day_label_sunday'] ?? '')) ?></button>
+        <h2 class="section-title section-title--underlined dance-section-title"><?= htmlspecialchars((string) ($danceSettings['all_events_section_title'] ?? '')) ?></h2>
+        <div class="filter-tabs dance-date-filters" role="tablist">
+            <button type="button" class="filter-tab active" data-filter="friday" aria-pressed="true"><?= htmlspecialchars((string) ($danceSettings['day_label_friday'] ?? '')) ?></button>
+            <button type="button" class="filter-tab" data-filter="saturday" aria-pressed="false"><?= htmlspecialchars((string) ($danceSettings['day_label_saturday'] ?? '')) ?></button>
+            <button type="button" class="filter-tab" data-filter="sunday" aria-pressed="false"><?= htmlspecialchars((string) ($danceSettings['day_label_sunday'] ?? '')) ?></button>
         </div>
 
         <?php
@@ -149,7 +143,7 @@ $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceS
                             <h3 class="dance-card-title"><?= htmlspecialchars($event->title) ?></h3>
                             <p class="dance-card-datetime"><?= htmlspecialchars($dateTime) ?></p>
                             <p class="dance-card-desc"><?= htmlspecialchars($event->description ?? '') ?></p>
-                            <span class="dance-genre-pill"><?= htmlspecialchars($genre) ?></span>
+                            <span class="dance-genre-badge--pill"><?= htmlspecialchars($genre) ?></span>
                         </div>
                     </a>
                 <?php endforeach; ?>
@@ -159,7 +153,7 @@ $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceS
     </section>
 
     <section id="dance-artists" class="dance-artists container">
-        <h2 class="dance-section-title"><?= htmlspecialchars((string) ($danceSettings['artists_section_title'] ?? '')) ?></h2>
+        <h2 class="section-title section-title--underlined dance-section-title"><?= htmlspecialchars((string) ($danceSettings['artists_section_title'] ?? '')) ?></h2>
         <div class="dance-artists-grid">
             <?php foreach ($artists as $artist): ?>
                 <?php
@@ -180,7 +174,7 @@ $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceS
                 <div class="dance-artist-card-body">
                     <h3 class="dance-artist-name"><?= htmlspecialchars($artistName) ?></h3>
                     <p class="dance-artist-bio"><?= htmlspecialchars($artistBio) ?></p>
-                    <a href="<?= $artistUrl ?>" class="dance-artist-info-link"><?= htmlspecialchars((string) ($danceSettings['artist_info_label'] ?? '')) ?></a>
+                    <a href="<?= $artistUrl ?>" class="btn btn--outline btn--sm dance-artist-info-link"><?= htmlspecialchars((string) ($danceSettings['artist_info_label'] ?? '')) ?></a>
                 </div>
             </article>
             <?php endforeach; ?>
@@ -193,7 +187,7 @@ $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceS
 
 <script>
 (function() {
-    var filters = document.querySelectorAll('.dance-filter-btn');
+    var filters = document.querySelectorAll('.filter-tab');
     var panels = document.querySelectorAll('.dance-events-panel');
     filters.forEach(function(btn) {
         btn.addEventListener('click', function() {

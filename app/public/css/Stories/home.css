@@ -568,57 +568,6 @@ body.stories-dark {
     background: linear-gradient(135deg, #ffc107 0%, #f5b400 100%);
 }
 
-/* Breadcrumb */
-.stories-breadcrumb {
-    padding: 28px 0 10px;
-    background: transparent;
-}
-
-.stories-breadcrumb-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 40px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.stories-breadcrumb-link {
-    color: #f5b400;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    transition: opacity 0.2s ease;
-}
-
-.stories-breadcrumb-link:hover {
-    opacity: 0.8;
-}
-
-.stories-breadcrumb-link.active {
-    color: #f5b400;
-    position: relative;
-    padding-bottom: 4px;
-}
-
-.stories-breadcrumb-link.active::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 2px;
-    background: #f5b400;
-}
-
-.stories-breadcrumb-separator {
-    color: rgba(245, 180, 0, 0.7);
-    font-size: 13px;
-}
-
 /* Responsive */
 @media (max-width: 1100px) {
     .stories-cards-grid {
@@ -681,7 +630,6 @@ body.stories-dark {
     .schedule-section,
     .stories-cards,
     .stories-map-section,
-    .stories-breadcrumb-inner,
     .venues-container {
         padding-left: 24px;
         padding-right: 24px;
