@@ -90,8 +90,8 @@ return [
     'day_label_friday' => 'Friday',
     'day_label_saturday' => 'Saturday',
     'day_label_sunday' => 'Sunday',
-    'artist_info_label' => 'INFO >',
-    'show_more_artists_label' => 'Show More Artists >',
+    'artist_info_label' => 'INFO →',
+    'show_more_artists_label' => 'Show More Artists →',
 
     'venue_order_friday' => [4, 7, 5, 8, 9],
     'venue_order_saturday' => [6, 5, 7],
