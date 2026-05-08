@@ -1,15 +1,14 @@
+<?php
+// Settings for the page title, styles, body class
+$pageTitle = $viewModel->hero['title'] ?? 'History — Haarlem Festival';
+$pageStyles = ['/css/pages/history.css'];
+$bodyClass = 'history-page';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($viewModel->hero['title'] ?? '') ?></title>
-
-    <link rel="stylesheet" href="/css/general.css">
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/history.css">
-</head>
-<body class="history-page">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+<body class="<?= htmlspecialchars($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
@@ -26,10 +25,10 @@
     <!-- BREADCRUMB -->
     <?php
     $breadcrumbs = [
-        ['label' => 'HOME', 'url' => '/'],
-        ['label' => 'HISTORY', 'url' => null],
+            ['label' => 'Home', 'url' => '/'],
+            ['label' => 'History', 'url' => null],
     ];
-    require __DIR__ . '/../partials/history/history-breadcrumb.php';
+    require __DIR__ . '/../partials/breadcrumbs.php';
     ?>
 
     <!-- ABOUT BANNER -->
@@ -44,10 +43,10 @@
     <section class="history-sites-section">
         <div class="container">
             <div class="history-sites-header">
-                <h2 class="history-sites-title">
+                <h2 class="section-title section-title--underlined history-sites-title">
                     <?= nl2br(htmlspecialchars($viewModel->sitesHeader['title'] ?? '')) ?>
                 </h2>
-                <div class="history-sites-description cms-html">
+                <div class="section-lead history-sites-description cms-html">
                     <?= $viewModel->sitesHeader['description'] ?? '' ?>
                 </div>
             </div>
@@ -58,7 +57,7 @@
                     <?php
                     $image = $viewModel->primaryImages[$location->id] ?? null;
                     ?>
-                    <div class="history-card">
+                    <div class="festival-card festival-card--history history-card">
                         <div class="history-card-image">
                             <img src="<?= htmlspecialchars($image?->imageUrl ?? '') ?>"
                                  alt="<?= htmlspecialchars($location->name) ?>">
@@ -72,10 +71,8 @@
                                     <?= htmlspecialchars($location->shortDescription) ?>
                                 </p>
                             </div>
-                            <a href="/history/location/<?= htmlspecialchars($location->slug) ?>" class="history-read-more-button">
-                                <span class="history-read-more-text">
-                                    READ MORE >
-                                </span>
+                            <a href="/history/location/<?= htmlspecialchars($location->slug) ?>" class="btn btn--outline btn--sm history-read-more-button">
+                                READ MORE →
                             </a>
                         </div>
                     </div>
@@ -83,10 +80,8 @@
             </div>
 
             <!-- EXPLORE BUTTON -->
-            <a href="<?= htmlspecialchars($viewModel->locationCards['button_url'] ?? '/history/locations') ?>" class="btn btn--primary">
-                <span class="history-button-text">
-                    <?= htmlspecialchars($viewModel->locationCards['button_text'] ?? '') ?>
-                </span>
+            <a href="<?= htmlspecialchars($viewModel->locationCards['button_url'] ?? '/history/locations') ?>" class="btn btn--primary btn--sm history-section-button">
+                <?= htmlspecialchars($viewModel->locationCards['button_text'] ?? '') ?>
             </a>
         </div>
     </section>
@@ -94,16 +89,14 @@
     <!-- EXPERIENCE SECTION -->
     <section class="history-experience-section">
         <div class="container">
-            <h2 class="history-experience-title">
+            <h2 class="section-title section-title--underlined history-experience-title">
                 <?= htmlspecialchars($viewModel->experience['title'] ?? '') ?>
             </h2>
-            <div class="history-experience-description cms-html">
+            <div class="section-lead section-lead--center history-experience-description cms-html">
                 <?= $viewModel->experience['description'] ?? '' ?>
             </div>
-            <a href="<?= htmlspecialchars($viewModel->experience['button_url'] ?? '') ?>" class="history-button-big">
-                <span class="history-button-text">
-                    <?= htmlspecialchars($viewModel->experience['button_text'] ?? '') ?>
-                </span>
+            <a href="<?= htmlspecialchars($viewModel->experience['button_url'] ?? '') ?>" class="btn btn--primary btn--sm history-section-button">
+                <?= htmlspecialchars($viewModel->experience['button_text'] ?? '') ?>
             </a>
         </div>
     </section>

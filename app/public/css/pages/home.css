@@ -1,0 +1,4 @@
+.festival-card--home {
+    --festival-card-bg: rgba(255, 255, 255, 0.04);
+    --festival-card-border: rgba(255, 255, 255, 0.08);
+}

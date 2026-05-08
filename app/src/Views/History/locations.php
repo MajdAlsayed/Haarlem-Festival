@@ -1,13 +1,13 @@
+// Settings for the page title, styles, body class
+<?php
+$pageTitle = $viewModel->hero['title'] ?? 'History — Haarlem Festival';
+$pageStyles = ['/css/pages/history.css'];
+$bodyClass = 'history-page';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($viewModel->hero['title'] ?? '') ?></title>
-
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/history.css">
-</head>
+<?php require __DIR__ . '/../partials/head.php'; ?>
 <body class="history-page">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
@@ -25,11 +25,10 @@
     <!-- BREADCRUMBS -->
     <?php
     $breadcrumbs = [
-        ['label' => 'HOME', 'url' => '/'],
-        ['label' => 'HISTORY', 'url' => '/history'],
-        ['label' => 'LOCATIONS', 'url' => null],
+            ['label' => 'Home', 'url' => '/'],
+            ['label' => 'History', 'url' => null],
     ];
-    require __DIR__ . '/../partials/history/history-breadcrumb.php';
+    require __DIR__ . '/../partials/breadcrumbs.php';
     ?>
 
     <!-- ABOUT BANNER -->

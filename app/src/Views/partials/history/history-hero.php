@@ -22,11 +22,8 @@
                         <p class="history-hero-description cms-html">
                             <?=$viewModel->hero['description'] ?? '' ?>
                         </p>
-                        <a href="<?= htmlspecialchars($viewModel->hero['button_url'] ?? '') ?>"
-                           class="history-button-big">
-                            <span class="history-button-text">
-                                <?= htmlspecialchars($viewModel->hero['button_text'] ?? '') ?>
-                            </span>
+                        <a href="<?= htmlspecialchars($viewModel->hero['button_url'] ?? '') ?>" class="btn btn--light history-button-big">
+                            <?= htmlspecialchars($viewModel->hero['button_text'] ?? '') ?>
                         </a>
                     </div>
                 <?php endif; ?>
