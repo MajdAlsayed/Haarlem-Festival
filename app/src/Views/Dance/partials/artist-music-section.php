@@ -36,11 +36,11 @@ $albumSub = $viewModel->albumSub;
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                         </span>
                         <?php if (!empty($viewModel->followUrl)): ?>
-                        <a href="<?= htmlspecialchars($viewModel->followUrl) ?>" class="artist-music-follow" target="_blank" rel="noopener noreferrer">Follow</a>
+                        <a href="<?= htmlspecialchars($viewModel->followUrl) ?>" class="btn btn--outline btn--sm artist-music-follow" target="_blank" rel="noopener noreferrer">Follow</a>
                         <?php endif; ?>
                     </div>
-                    <p class="artist-music-real"><?= htmlspecialchars($realName) ?></p>
-                    <p class="artist-music-location"><?= htmlspecialchars($location) ?></p>
+                    <p class="copy-text artist-music-real"><?= htmlspecialchars($realName) ?></p>
+                    <p class="copy-text copy-text--sm artist-music-location"><?= htmlspecialchars($location) ?></p>
                 </div>
             </div>
             <div class="artist-music-featured">
@@ -53,7 +53,7 @@ $albumSub = $viewModel->albumSub;
                     <p class="artist-music-featured-sub"><?= htmlspecialchars($albumSub) ?></p>
                     </div>
                 </div>
-                <button type="button" class="artist-music-featured-btn">OUT NOW</button>
+                <button type="button" class="btn btn--light btn--block artist-music-featured-btn">OUT NOW</button>
                 <p class="artist-music-featured-src">REVEALEDRECORDINGS.COM</p>
             </div>
         </div>

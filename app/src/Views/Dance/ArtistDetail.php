@@ -22,28 +22,35 @@ $bodyClass = 'dance-page artist-detail-page';
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main>
-    <section class="artist-detail-hero"
-             style="background-image: linear-gradient(to right, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 45%, transparent 70%), linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.65) 100%), url('<?= htmlspecialchars($viewModel->heroImage) ?>');">
-        <div class="artist-detail-hero-content">
-            <h1 class="artist-detail-hero-name"><?= htmlspecialchars($artist['name']) ?></h1>
+    <section class="page-hero artist-detail-hero">
+    <div class="page-hero__background artist-detail-hero-background">
+        <img
+                src="<?= htmlspecialchars($viewModel->heroImage) ?>"
+                alt="<?= htmlspecialchars($artist['name']) ?>"
+        >
+    </div>
+    <div class="container page-hero__inner">
+        <div class="page-hero__content artist-detail-hero-content">
+            <h1 class="page-hero__title artist-detail-hero-name"><?= htmlspecialchars($artist['name']) ?></h1>
             <?php if (($viewModel->heroTagline ?? '') !== ''): ?>
-                <p class="artist-detail-hero-tagline"><?= htmlspecialchars((string)$viewModel->heroTagline) ?></p>
+                <p class="page-hero__subtitle artist-detail-hero-tagline"><?= htmlspecialchars((string)$viewModel->heroTagline) ?></p>
             <?php endif; ?>
-            <a href="#about" class="btn btn--light">More info <span aria-hidden="true">&#8594;</span></a>
+            <a href="#about" class="btn btn--light btn--fit">More info <span aria-hidden="true">&#8594;</span></a>
         </div>
+    </div>
     </section>
 
     <!-- Breadcrumbs nav -->
     <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
     <section id="about" class="artist-detail-section container">
-        <h2 class="artist-detail-section-title">About <?= htmlspecialchars($artist['name']) ?></h2>
+        <h2 class="section-title section-title--underlined section-title--accent artist-detail-section-title">About <?= htmlspecialchars($artist['name']) ?></h2>
         <div class="artist-detail-about">
             <div class="artist-detail-about-text">
                 <!-- Prefer curated paragraph splits from the view model; fallback to legacy bio text. -->
                 <?php if ($viewModel->aboutParagraphs !== null): ?>
                     <?php foreach ($viewModel->aboutParagraphs as $p): ?>
-                        <p><?= htmlspecialchars($p) ?></p>
+                        <p class="copy-text artist-detail-about-paragraph"><?= htmlspecialchars($p) ?></p>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <p><?= nl2br(htmlspecialchars($artist['bio'] ?? '')) ?></p>
@@ -56,8 +63,8 @@ $bodyClass = 'dance-page artist-detail-page';
         <section class="artist-detail-section artist-detail-section-alt container">
             <div class="artist-detail-features">
                 <div class="artist-detail-desc-text">
-                    <h2 class="artist-detail-section-title">Career Highlights</h2>
-                    <ul class="artist-detail-highlights">
+                    <h2 class="section-title section-title--underlined artist-detail-section-title">Career Highlights</h2>
+                    <ul class="copy-text artist-detail-highlights">
                         <?php foreach ($viewModel->careerHighlights as $h): ?>
                             <li><?= htmlspecialchars($h) ?></li>
                         <?php endforeach; ?>
@@ -78,8 +85,9 @@ $bodyClass = 'dance-page artist-detail-page';
 
     <?php if (!empty($viewModel->artistEvents)): ?>
         <section class="artist-detail-section artist-detail-schedule-section">
-            <h2 class="artist-detail-schedule-title"><span
-                        class="artist-detail-schedule-title-main">Festival Schedule</span><span
+            <div class="artist-detail-schedule-inner">
+            <h2 class="section-title section-title--underlined artist-detail-schedule-title"><span
+                        class="section-title--accent artist-detail-schedule-title-main">Festival Schedule</span><span
                         class="artist-detail-schedule-title-sub"> — Haarlem Dance 2026</span></h2>
             <div class="artist-detail-schedule-wrap">
                 <div class="artist-detail-schedule-timeline">
@@ -87,19 +95,19 @@ $bodyClass = 'dance-page artist-detail-page';
                         <article class="artist-detail-schedule-item">
                             <div class="artist-detail-schedule-dot"></div>
                             <div class="artist-detail-schedule-content">
-                                <p class="artist-detail-schedule-time"><span
+                                <p class="copy-text artist-detail-schedule-time"><span
                                             class="artist-detail-schedule-day"><?= htmlspecialchars($dayLabels[$ev->eventDay ?? 'friday'] ?? ucfirst($ev->eventDay ?? '')) ?></span><img
                                             src="/images/icons/dateIcon.png" alt="" class="artist-detail-schedule-icon"
                                             aria-hidden="true"><span
                                             class="artist-detail-schedule-hour"><?= htmlspecialchars($ev->startTime ?? '20:00') ?></span>
                                 </p>
                                 <!-- If title contains "Artist - Set Type", extract and render only the set type suffix. -->
-                                <p class="artist-detail-schedule-venue"><img src="/images/icons/locationIcon.png" alt=""
+                                <p class="copy-text artist-detail-schedule-venue"><img src="/images/icons/locationIcon.png" alt=""
                                                                              class="artist-detail-schedule-icon"
                                                                              aria-hidden="true"><?= htmlspecialchars($ev->venueName . ', ' . ($ev->venueCity ?? 'Haarlem')) ?><?php if (preg_match('/^.+?[–—-]\s*(.+)$/u', $ev->title ?? '', $m) && trim($m[1])): ?> —
                                         <span class="artist-detail-schedule-type"><?= htmlspecialchars(trim($m[1])) ?></span><?php endif; ?>
                                 </p>
-                                <p class="artist-detail-schedule-desc"><?= htmlspecialchars($ev->description ?? '') ?></p>
+                                <p class="copy-text copy-text--sm artist-detail-schedule-desc"><?= htmlspecialchars($ev->description ?? '') ?></p>
                             </div>
                         </article>
                     <?php endforeach; ?>
@@ -108,6 +116,7 @@ $bodyClass = 'dance-page artist-detail-page';
                     <img src="<?= htmlspecialchars($viewModel->scheduleImage) ?>"
                          alt="<?= htmlspecialchars($artist['name']) ?> performing" onerror="this.style.display='none'">
                 </div>
+            </div>
             </div>
             <div class="artist-detail-schedule-cta">
                 <a href="/dance/event/<?= (int)($viewModel->artistEvents[0]->id ?? 0) ?>"
@@ -119,10 +128,10 @@ $bodyClass = 'dance-page artist-detail-page';
     <?php if (count($viewModel->galleryImages) >= 4): ?>
         <!-- Gallery layout expects at least 4 items; indices 2/3 have safe fallback to index 0. -->
         <section class="artist-detail-section artist-detail-gallery-section">
+            <div class="artist-detail-gallery-inner">
             <div class="artist-detail-gallery-header">
-                <h2 class="artist-detail-gallery-title">Gallery</h2>
-                <span class="artist-detail-gallery-title-line" aria-hidden="true"></span>
-                <p class="artist-detail-gallery-sub">Behind the scenes &amp; live moments</p>
+                <h2 class="section-title section-title--underlined artist-detail-gallery-title">Gallery</h2>
+                <p class="section-subtitle artist-detail-gallery-sub">Behind the scenes &amp; live moments</p>
             </div>
             <div class="artist-detail-gallery">
                 <div class="artist-detail-gallery-item artist-detail-gallery-item-left">
@@ -144,13 +153,14 @@ $bodyClass = 'dance-page artist-detail-page';
             </div>
             <div class="artist-detail-stats">
                 <?php foreach ($viewModel->galleryStats as $stat): ?>
-                    <div class="artist-detail-stat"><span
+                    <div class="festival-card artist-detail-stat"><span
                                 class="artist-detail-stat-num"><?= htmlspecialchars($stat['num']) ?></span><span
                                 class="artist-detail-stat-label"><?= htmlspecialchars($stat['label']) ?></span></div>
                 <?php endforeach; ?>
             </div>
             <div class="artist-detail-back-wrap">
                 <a href="/dance" class="btn btn--outline"> ← BACK <span aria-hidden="true"></span></a>
+            </div>
             </div>
         </section>
     <?php endif; ?>

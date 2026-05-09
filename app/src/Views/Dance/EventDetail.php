@@ -188,7 +188,7 @@ if (!empty($viewModel->cartFlashSuccess)) {
                 <div class="event-detail-desc-text">
                     <p class="event-detail-group-label">About</p>
                     <h2 class="section-title section-title--accent event-detail-group-title" id="about-desc-heading">Description</h2>
-                    <div class="event-detail-desc-paragraphs"><?= nl2br(htmlspecialchars($event->description ?? '')) ?></div>
+                    <div class="copy-text event-detail-desc-paragraphs"><?= nl2br(htmlspecialchars($event->description ?? '')) ?></div>
                     <h3 class="event-detail-features-heading">This event features</h3>
                     <ul>
                         <li><img src="/images/icons/musicIcon.png" alt="" class="feat-icon" aria-hidden="true">
@@ -247,7 +247,7 @@ if (!empty($viewModel->cartFlashSuccess)) {
             <h2 class="event-detail-tickets-figma-title" id="tickets-heading"><?= $h($ticketsFigmaTitle) ?></h2>
             <div class="event-detail-tickets event-detail-tickets-layout">
                 <?php if (!$hasAnyTicketOption): ?>
-                    <p class="event-detail-tickets-empty">Tickets for this event are not available online yet. Browse
+                    <p class="copy-text event-detail-tickets-empty">Tickets for this event are not available online yet. Browse
                         all dance tickets or check back soon.</p>
                     <div class="event-detail-tickets-cta event-detail-tickets-cta--figma">
                         <a href="/tickets?cat=dance" class="btn btn--outline">Browse dance tickets</a>
@@ -440,7 +440,7 @@ if (!empty($viewModel->cartFlashSuccess)) {
                 <p class="event-detail-group-label">Location</p>
                 <h2 class="section-title section-title--accent event-detail-group-title event-detail-location__title"
                     id="location-heading"><?= htmlspecialchars($viewModel->locationDisplay) ?></h2>
-                <p class="event-detail-location-hint">Easy to reach by public transport or by car</p>
+                <p class="copy-text copy-text--sm event-detail-location-hint">Easy to reach by public transport or by car</p>
                 <div class="event-detail-map">
                     <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=<?= $viewModel->mapLon - 0.02 ?>%2C<?= $viewModel->mapLat - 0.015 ?>%2C<?= $viewModel->mapLon + 0.02 ?>%2C<?= $viewModel->mapLat + 0.015 ?>&layer=mapnik&marker=<?= $viewModel->mapLat ?>%2C<?= $viewModel->mapLon ?>"
                             width="100%" height="100%" loading="lazy"

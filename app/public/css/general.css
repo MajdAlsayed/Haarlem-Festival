@@ -684,8 +684,18 @@ html {
 /* === Cards General End === */
 
 /* === Page Themes Start === */
-body.home-page,
+body.home-page {
+    --color-accent: #e7a90e;
+    --color-accent-rgb: 231, 169, 14;
+}
+
 body.dance-page {
+    --color-accent: #ff9800;
+    --color-accent-rgb: 255, 152, 0;
+}
+
+body.food-page,
+body.food-detail-page {
     --color-accent: #e7a90e;
     --color-accent-rgb: 231, 169, 14;
 }
@@ -701,11 +711,6 @@ body.history-page {
     --color-accent-rgb: 236, 72, 153;
 }
 
-body.food-page,
-body.food-detail-page {
-    --color-accent: #ff9800;
-    --color-accent-rgb: 255, 152, 0;
-}
 
 body.stories-page {
     --color-accent: #38bdf8;

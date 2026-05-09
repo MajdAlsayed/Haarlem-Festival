@@ -87,10 +87,10 @@ $heroButtonClass = 'btn btn--light';
                     </div>
                     <?php endif; ?>
                     <div class="dance-card-body">
-                        <p class="dance-card-meta"><span class="dance-meta-icon">&#128197;</span> <?= htmlspecialchars($timeLine) ?></p>
-                        <p class="dance-card-meta"><span class="dance-meta-icon">&#128205;</span> <?= htmlspecialchars($venue) ?></p>
+                        <p class="copy-text copy-text--sm dance-card-meta"><span class="dance-meta-icon">&#128197;</span> <?= htmlspecialchars($timeLine) ?></p>
+                        <p class="copy-text copy-text--sm dance-card-meta"><span class="dance-meta-icon">&#128205;</span> <?= htmlspecialchars($venue) ?></p>
                         <h3 class="dance-card-title"><?= htmlspecialchars($title) ?></h3>
-                        <p class="dance-card-desc"><?= htmlspecialchars($desc) ?></p>
+                        <p class="copy-text copy-text--sm dance-card-desc"><?= htmlspecialchars($desc) ?></p>
                         <span class="dance-genre-badge"><?= htmlspecialchars($genre) ?></span>
                     </div>
                 </a>
@@ -143,11 +143,11 @@ $heroButtonClass = 'btn btn--light';
                         </div>
                         <?php endif; ?>
                         <div class="dance-card-body dance-card-body-stack">
-                            <p class="dance-card-venue"><?= htmlspecialchars($event->venueName) ?>, <?= htmlspecialchars($event->venueCity) ?></p>
+                            <p class="copy-text copy-text--sm dance-card-venue"><?= htmlspecialchars($event->venueName) ?>, <?= htmlspecialchars($event->venueCity) ?></p>
                             <h3 class="dance-card-title"><?= htmlspecialchars($event->title) ?></h3>
-                            <p class="dance-card-datetime"><?= htmlspecialchars($dateTime) ?></p>
-                            <p class="dance-card-desc"><?= htmlspecialchars($event->description ?? '') ?></p>
-                            <span class="dance-genre-badge--pill"><?= htmlspecialchars($genre) ?></span>
+                            <p class="copy-text copy-text--sm dance-card-datetime"><?= htmlspecialchars($dateTime) ?></p>
+                            <p class="copy-text copy-text--sm dance-card-desc"><?= htmlspecialchars($event->description ?? '') ?></p>
+                            <span class="dance-genre-badge"><?= htmlspecialchars($genre) ?></span>
                         </div>
                     </a>
                 <?php endforeach; ?>
@@ -168,7 +168,7 @@ $heroButtonClass = 'btn btn--light';
                 $artistSlug = isset($artist['slug']) ? (string) $artist['slug'] : '';
                 $artistUrl = $artistSlug !== '' ? '/dance/artist/' . htmlspecialchars($artistSlug) : '#';
                 ?>
-            <article class="festival-card festival-card--dance-artist dance-artist-card dance-artist-card-with-image">
+            <article class="festival-card festival-card--dance-artist dance-artist-card">
                 <?php if ($artistImagePath !== ''): ?>
                 <div class="dance-artist-card-image-wrap">
                     <img src="<?= htmlspecialchars($artistImagePath) ?>" alt="<?= htmlspecialchars($artistName) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -176,14 +176,14 @@ $heroButtonClass = 'btn btn--light';
                 </div>
                 <?php endif; ?>
                 <div class="dance-artist-card-body">
-                    <h3 class="dance-artist-name"><?= htmlspecialchars($artistName) ?></h3>
-                    <p class="dance-artist-bio"><?= htmlspecialchars($artistBio) ?></p>
+                    <h3 class="section-subtitle dance-artist-name"><?= htmlspecialchars($artistName) ?></h3>
+                    <p class="copy-text copy-text--sm dance-artist-bio"><?= htmlspecialchars($artistBio) ?></p>
                     <a href="<?= $artistUrl ?>" class="btn btn--outline btn--sm dance-artist-info-link"><?= htmlspecialchars((string) ($danceSettings['artist_info_label'] ?? '')) ?></a>
                 </div>
             </article>
             <?php endforeach; ?>
         </div>
-        <button type="button" class="btn btn-outline btn--sm dance-show-more"><?= htmlspecialchars((string) ($danceSettings['show_more_artists_label'] ?? '')) ?></button>
+        <button type="button" class="btn btn--outline dance-show-more"><?= htmlspecialchars((string) ($danceSettings['show_more_artists_label'] ?? '')) ?></button>
     </section>
 </main>
 
