@@ -6,7 +6,7 @@
             </h2>
         <?php endif; ?>
         <div class="history-about-banner-content">
-            <div class="section-lead section-lead--dark history-about-banner-text <?= htmlspecialchars($textModifier ?? '') ?> cms-html">
+            <div class="copy-text copy-text--dark history-about-banner-text <?= htmlspecialchars($textModifier ?? '') ?> cms-html">
                 <?= $viewModel->aboutBanner['text'] ?? '' ?>
             </div>
         </div>

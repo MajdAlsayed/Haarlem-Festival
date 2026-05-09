@@ -3,6 +3,21 @@
 $pageTitle = $viewModel->hero['title'] ?? 'History — Haarlem Festival';
 $pageStyles = ['/css/pages/history.css'];
 $bodyClass = 'history-page';
+
+// Hero settings
+$heroModifier = 'festival-hero--history';
+$heroImage = $viewModel->heroImage?->imageUrl ?? '';
+$heroImageAlt = $viewModel->heroImage?->altText ?? 'History';
+$heroTitle = $viewModel->hero['title'] ?? 'History';
+$heroSubtitle = $viewModel->hero['subtitle'] ?? '';
+$heroButtonText = $viewModel->hero['button_text'] ?? '';
+$heroButtonUrl = $viewModel->hero['button_url'] ?? '';
+$heroButtonClass = 'btn btn--light';
+
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'History', 'url' => null],
+];
 ?>
 
 <!DOCTYPE html>
@@ -14,22 +29,10 @@ $bodyClass = 'history-page';
 
 <main>
     <!-- HERO -->
-    <?php
-    $sectionModifier = '';
-    $titleModifier = '';
-    $showSubtitle = true;
-    $showButton = true;
-    require __DIR__ . '/../partials/history/history-hero.php';
-    ?>
+    <?php require __DIR__ . '/../partials/festival-hero.php'; ?>
 
     <!-- BREADCRUMB -->
-    <?php
-    $breadcrumbs = [
-            ['label' => 'Home', 'url' => '/'],
-            ['label' => 'History', 'url' => null],
-    ];
-    require __DIR__ . '/../partials/breadcrumbs.php';
-    ?>
+    <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
     <!-- ABOUT BANNER -->
     <?php
@@ -67,7 +70,7 @@ $bodyClass = 'history-page';
                                 <h3 class="history-card-title">
                                     <?= htmlspecialchars($location->name) ?>
                                 </h3>
-                                <p class="history-card-text">
+                                <p class="copy-text copy-text--sm history-card-text">
                                     <?= htmlspecialchars($location->shortDescription) ?>
                                 </p>
                             </div>
