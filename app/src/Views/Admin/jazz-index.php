@@ -1,4 +1,8 @@
 <?php
+/**
+ * Jazz backstage landing page (/admin/jazz) — pick what you want to tweak: shows on the schedule, site copy, albums, or line-ups.
+ * Wired up by AdminJazzController::index().
+ */
 /** @var array $app */
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 ?>
@@ -25,7 +29,7 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
         </nav>
 
         <h1 class="admin-title">Jazz CMS</h1>
-        <p class="admin-lead">Manage jazz events, homepage layout, artist pages, and discography.</p>
+        <p class="admin-lead">Manage jazz events, homepage layout, artist pages, band members, and discography.</p>
 
         <section class="admin-cards">
             <a href="/admin/jazz/events" class="admin-card">
@@ -37,6 +41,11 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                 <span class="admin-card-icon">🎛️</span>
                 <h2 class="admin-card-title">Layout &amp; images</h2>
                 <p class="admin-card-desc">Hero, card images, day order, artist page copy.</p>
+            </a>
+            <a href="/admin/jazz/band-members" class="admin-card">
+                <span class="admin-card-icon">👥</span>
+                <h2 class="admin-card-title">Band members</h2>
+                <p class="admin-card-desc">Line-up, photos, and order per artist page.</p>
             </a>
             <a href="/admin/jazz/discography" class="admin-card">
                 <span class="admin-card-icon">💿</span>

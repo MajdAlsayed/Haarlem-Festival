@@ -5,7 +5,6 @@ $h = $cmsHome ?? [];
 <section class="hero">
     <div class="hero-overlay"></div>
     <div class="hero-content">
-        <p class="hero-eyebrow"><?= htmlspecialchars($h['hero_eyebrow'] ?? '') ?></p>
         <h1><?= htmlspecialchars($h['hero_heading'] ?? '') ?></h1>
         <div class="hero-subtitle cms-html">
             <?= \App\Core\HtmlSanitizer::purify($h['hero_subtitle'] ?? '') ?>

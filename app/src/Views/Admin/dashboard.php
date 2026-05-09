@@ -1,6 +1,9 @@
 <?php
-/** @var array $app */
-/** @var list<array{page_id:int,slug:string,title:string,is_published:bool}> $pages */
+/**
+ * Main admin dashboard (/admin): card grid into Pages, Jazz, Dance, Tickets, orders, scanner — each card is a separate CMS or tool area.
+ * @var array $app
+ * @var list<array{page_id:int,slug:string,title:string,is_published:bool}> $pages
+ */
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 ?>
 <!DOCTYPE html>
@@ -63,10 +66,10 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                     <p class="admin-card-desc">Restaurants, settings, reservation fee &amp; filters.</p>
                 </a>
 
-                <a href="/admin/cms/dance" class="admin-card">
+                <a href="/admin/dance" class="admin-card">
                     <span class="admin-card-icon">💃</span>
                     <h2 class="admin-card-title">Dance</h2>
-                    <p class="admin-card-desc">Manage dance page content, sections and layout.</p>
+                    <p class="admin-card-desc">Page copy, events, artist strip, images — Dance CMS hub.</p>
                 </a>
 
                 <a href="/admin/cms/history" class="admin-card">
@@ -88,6 +91,13 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                     <h2 class="admin-card-title">Tickets</h2>
                     <p class="admin-card-desc">Passes, event prices, tickets page intro.</p>
                 </a>
+
+                <a href="/admin/orders" class="admin-card">
+                    <span class="admin-card-icon">📋</span>
+                    <h2 class="admin-card-title">Order details</h2>
+                    <p class="admin-card-desc">View all orders, customer data, and per-order ticket codes.</p>
+                </a>
+
                 <a href="/admin/scan" class="admin-card">
                     <span class="admin-card-icon">📱</span>
                     <h2 class="admin-card-title">Scan tickets</h2>

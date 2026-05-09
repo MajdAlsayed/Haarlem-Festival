@@ -6,12 +6,11 @@ use App\Core\Database;
 use PDO;
 
 /**
- * Reads dance_settings from the database (hero_image, featured_images, genres, etc.).
- * JSON values are decoded. If the database fails or has no rows, we use the config file.
- * getMergedWithConfig() overlays DB on dance.php so partial CMS updates never drop defaults.
+ * Dance CMS key/value store: database overrides dance.php; falls back to the config file if the table is empty or unavailable.
  */
 class DanceSettingsRepository
 {
+    /** Raw DB-only settings (or dance.php fallback if DB is unavailable/empty). */
     public function getAll(): array
     {
         try {
@@ -61,6 +60,7 @@ class DanceSettingsRepository
         return $base;
     }
 
+    /** Insert or update one dance_settings key from admin CMS forms. */
     public function upsertSetting(string $key, string $value): bool
     {
         $db = Database::getConnection();
@@ -72,6 +72,7 @@ class DanceSettingsRepository
         return $stmt->execute(['k' => $key, 'v' => $value]);
     }
 
+    /** Decode JSON arrays/objects; keep scalar strings as-is. */
     private function decodeSettingValue(?string $val): mixed
     {
         if ($val === null) {

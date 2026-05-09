@@ -8,11 +8,15 @@ use App\Repositories\CartRepository;
 use App\Repositories\TicketRepository;
 
 /**
- * Enforces capacity from events.seats or sessions.tickets_available.
- * Passes (day_pass / all_access_pass) are not capped.
+ * Answers “how full is this ticket option?” in a way that’s fair when many people shop at once.
+ *
+ * We count: tickets already sold, everything sitting in open carts, and unpaid “pay later” orders that still hold seats.
+ * That same math powers three places: blocking add-to-cart if we’d go over capacity, double-checking at checkout,
+ * and the friendly badges on the tickets page (sold out / almost gone / only X left).
  */
 final class TicketAvailabilityService
 {
+    /** Needs cart aggregates + sold ticket counts — both repos are read-only here. */
     public function __construct(
         private CartRepository $cartRepository,
         private TicketRepository $ticketRepository
@@ -39,6 +43,8 @@ final class TicketAvailabilityService
         $pending = $this->cartRepository->sumPendingOrderQuantityForTicketDetails($ticketDetailsId);
         $used = $sold + $reserved + $pending;
 
+        // Requirement was “max 90% for single tickets”. We only apply it when someone adds one seat at a time
+        // (delta 1). Buying 2+ in one click skips this extra rule and only hits the hard capacity check below.
         if ($delta === 1 && $capacity > 10) {
             $maxSingleShare = (int) max(0, floor(0.9 * $capacity));
             if ($used + $delta > $maxSingleShare) {
@@ -60,7 +66,8 @@ final class TicketAvailabilityService
     }
 
     /**
-     * Re-check before payment (inside a transaction). Uses sold + all active cart holds.
+     * Re-check immediately before payment (call inside the same DB transaction as the order).
+     * Counts sold + every active cart + pay-later pendings so two people cannot oversell the last seats.
      */
     public function assertCartCanCheckout(\App\ViewModels\CartViewModel $cart): void
     {

@@ -17,7 +17,7 @@ class SiteSettingsSeeder extends AbstractSeed
             ['setting_key' => 'default_event_location', 'setting_value' => 'Haarlem — Netherlands'],
             ['setting_key' => 'default_venue_city', 'setting_value' => 'Haarlem'],
             ['setting_key' => 'default_event_time', 'setting_value' => '22:00'],
-            ['setting_key' => 'css_version', 'setting_value' => '18'],
+            ['setting_key' => 'css_version', 'setting_value' => '28'],
             ['setting_key' => 'tickets_intro', 'setting_value' => 'Explore all events from History tours to Jazz concerts, Dance nights, and Stories performances.'],
             ['setting_key' => 'footer_social_icons', 'setting_value' => json_encode(['insta icon.png', 'tiktok icon.png', 'facebook icon.png', 'youtube icon.png'])],
             ['setting_key' => 'footer_app_icons', 'setting_value' => json_encode(['apple.png', 'google play.png'])],

@@ -1,12 +1,21 @@
 <?php
+/**
+ * Karsu artist page (/jazz/karsu) — richer layout: hero, “video” style ticket card, discography carousel, then the timetable.
+ *
+ * JazzController::karsu() wires the same view model pattern as the other jazz acts; this template just has more JS
+ * for the carousel and builds the video card’s subtitle from the first scheduled row when we have one.
+ */
 /** @var \App\ViewModels\JazzArtistViewModel $viewModel */
 
 $app = (new \App\Repositories\SettingsRepository())->getAll();
 $h = fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+$skipHeaderStyleSheet = true;
+$jazzCartReturnUrl = '/jazz/' . rawurlencode($viewModel->slug);
 
 $events = $viewModel->events;
 $discography = $viewModel->discography;
 
+// Safe JSON for the front-end carousel (no raw HTML from the DB)
 $discographyForJs = [];
 foreach ($discography as $t) {
     $discographyForJs[] = [
@@ -23,7 +32,7 @@ $discographyJson = json_encode(
     JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
 );
 
-// Video card line: match prototype when we have a schedule row
+// Fake “video metadata” line under the hero card — if we have a real show, mirror its day/time/venue; else TBD
 $firstEvent = $events[0] ?? null;
 if ($firstEvent !== null) {
     $vd = strtolower((string) ($firstEvent['event_day'] ?? 'friday'));
@@ -49,19 +58,31 @@ $cardPreviewUrl = is_array($cardPreviewTrack) && ($cardPreviewTrack['audio_url']
 $cardPreviewTitle = is_array($cardPreviewTrack) && ($cardPreviewTrack['title'] ?? '') !== ''
     ? (string) $cardPreviewTrack['title']
     : 'Preview';
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title><?= $h($viewModel->artistTitle) ?> — Jazz</title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version']) ?>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version']) ?>&karsu=12">
 </head>
 <body class="jazz-page jazz-artist-page jazz-karsu-page">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main>
+    <?php
+    $cartFlash = \App\Core\Session::getFlash('cart_success');
+    $cartFlashError = \App\Core\Session::getFlash('cart_error');
+    ?>
+    <?php if (!empty($cartFlash)): ?>
+        <div class="container jazz-cart-flash jazz-cart-flash--success" role="status"><?= $h($cartFlash) ?></div>
+    <?php endif; ?>
+    <?php if (!empty($cartFlashError)): ?>
+        <div class="container jazz-cart-flash jazz-cart-flash--error" role="alert"><?= $h($cartFlashError) ?></div>
+    <?php endif; ?>
     <section class="jazz-artist-hero" style="background-image: linear-gradient(120deg, rgba(0,0,0,0.55), rgba(0,0,0,0.80)), url('<?= $h($viewModel->heroImage) ?>');">
         <div class="container jazz-artist-hero-content">
             <h1><?= $h($viewModel->artistTitle) ?></h1>
@@ -72,14 +93,13 @@ $cardPreviewTitle = is_array($cardPreviewTrack) && ($cardPreviewTrack['title'] ?
     <section class="container jazz-artist-body jazz-karsu-centered">
         <nav class="breadcrumbs jazz-breadcrumbs">
             <a href="/">Festival</a>
-            <span class="breadcrumb-sep">›</span>
+            <span class="breadcrumb-sep">&gt;</span>
             <a href="/jazz">Jazz</a>
-            <span class="breadcrumb-sep">›</span>
+            <span class="breadcrumb-sep">&gt;</span>
             <span class="breadcrumb-current"><?= $h($viewModel->artistTitle) ?></span>
         </nav>
 
-        <div class="jazz-karsu-experience-region">
-        <!-- Karsu Dönmez – short bio (exact text from prototype) -->
+        <!-- Karsu Dönmez – short bio (on page background; prototype) -->
         <article class="jazz-karsu-intro">
             <h2 class="jazz-section-title">Karsu Dönmez</h2>
             <p class="jazz-artist-bio">
@@ -90,31 +110,44 @@ $cardPreviewTitle = is_array($cardPreviewTrack) && ($cardPreviewTrack['title'] ?
             </p>
         </article>
 
-        <!-- Plan your Karsu experience (layout ref: single video card + event schedule panel) -->
+        <div class="jazz-karsu-experience-region">
+        <!-- Plan your Karsu experience (prototype: horizontal card + centered schedule) -->
         <section class="jazz-plan-section jazz-karsu-plan-section">
             <h3 class="jazz-section-subtitle">Plan your <?= $h($viewModel->artistTitle) ?> experience</h3>
 
             <div class="jazz-karsu-video-card-wrap">
                 <div class="jazz-karsu-video-block jazz-karsu-video-card">
-                    <div class="jazz-karsu-video-thumb jazz-karsu-video-thumb--live">
-                        <span class="jazz-karsu-video-play" aria-hidden="true">▶</span>
+                    <div class="jazz-karsu-video-card-row">
+                        <div class="jazz-karsu-video-card-media">
+                            <div class="jazz-karsu-video-thumb jazz-karsu-video-thumb--live">
+                                <span class="jazz-karsu-video-play" aria-hidden="true">▶</span>
+                            </div>
+                        </div>
+                        <div class="jazz-karsu-video-card-main">
+                            <div class="jazz-karsu-video-body">
+                                <div class="jazz-karsu-video-headline">
+                                    <p class="jazz-karsu-video-title">Karsu</p>
+                                    <p class="jazz-karsu-video-meta"><?= $h($karsuVideoMeta) ?></p>
+                                </div>
+                                <p class="jazz-karsu-video-desc">Experience Karsu's powerful voice and captivating melodies live. - Ticket price: €<?= $h(number_format($karsuVideoPrice, 2)) ?></p>
+                            </div>
+                            <?php
+                            $ticketDetailsId = $firstEvent !== null ? (int) ($firstEvent['ticket_details_id'] ?? 0) : 0;
+                            $returnUrl = $jazzCartReturnUrl;
+                            $buttonClass = 'jazz-btn jazz-btn-primary jazz-karsu-video-btn';
+                            $buttonLabel = 'Add to program';
+                            require __DIR__ . '/partials/jazz-add-to-cart-form.php';
+                            ?>
+                        </div>
                     </div>
                     <?php if ($cardPreviewUrl !== ''): ?>
-                        <div class="jazz-karsu-card-audio">
+                        <div class="jazz-karsu-card-audio jazz-karsu-card-audio--below-row">
                             <span class="jazz-karsu-card-audio-label"><?= $h($cardPreviewTitle) ?></span>
                             <audio class="jazz-karsu-card-audio-el" controls preload="metadata" src="<?= $h($cardPreviewUrl) ?>">
                                 <a href="<?= $h($cardPreviewUrl) ?>">Download audio</a>
                             </audio>
                         </div>
                     <?php endif; ?>
-                    <div class="jazz-karsu-video-body">
-                        <div class="jazz-karsu-video-headline">
-                            <p class="jazz-karsu-video-title">Karsu</p>
-                            <p class="jazz-karsu-video-meta"><?= $h($karsuVideoMeta) ?></p>
-                        </div>
-                        <p class="jazz-karsu-video-desc">Experience Karsu's powerful voice and captivating melodies live. - Ticket price: €<?= $h(number_format($karsuVideoPrice, 2)) ?></p>
-                        <button type="button" class="jazz-btn jazz-btn-primary jazz-karsu-video-btn">Save to your program</button>
-                    </div>
                 </div>
             </div>
 
@@ -131,7 +164,7 @@ $cardPreviewTitle = is_array($cardPreviewTrack) && ($cardPreviewTrack['title'] ?
                         <p class="jazz-karsu-schedule-intro">Plan your experience at the festival. Choose from various performances across different venues and times.</p>
                     </div>
                 </div>
-                <div class="jazz-schedule jazz-karsu-schedule-table">
+                <div class="jazz-schedule jazz-schedule--artist-detail jazz-karsu-schedule-table">
                     <table class="jazz-table jazz-karsu-table-buy jazz-karsu-table-schedule">
                         <thead>
                             <tr>
@@ -171,7 +204,13 @@ $cardPreviewTitle = is_array($cardPreviewTrack) && ($cardPreviewTrack['title'] ?
                                         <td><?= $p > 0 ? $h(number_format($p, 2)) . ' €' : 'Free' ?></td>
                                         <td>
                                             <?php if ($p > 0): ?>
-                                                <a class="jazz-karsu-btn-ticket" href="/tickets?event=<?= (int)$e['event_id'] ?>">Buy</a>
+                                                <?php
+                                                $ticketDetailsId = (int) ($e['ticket_details_id'] ?? 0);
+                                                $returnUrl = $jazzCartReturnUrl;
+                                                $buttonClass = 'jazz-karsu-btn-ticket';
+                                                $buttonLabel = 'Add to program';
+                                                require __DIR__ . '/partials/jazz-add-to-cart-form.php';
+                                                ?>
                                             <?php else: ?>
                                                 <span class="jazz-muted">—</span>
                                             <?php endif; ?>
@@ -182,7 +221,7 @@ $cardPreviewTitle = is_array($cardPreviewTrack) && ($cardPreviewTrack['title'] ?
                         </tbody>
                     </table>
                 </div>
-                <p class="jazz-karsu-schedule-note">Click on the ticket button to reserve your spot at the event</p>
+                <p class="jazz-karsu-schedule-note">Add to program puts the ticket in your cart; you stay on this page and see a short confirmation above.</p>
             </div>
         </section>
         </div>

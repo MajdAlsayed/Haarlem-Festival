@@ -1,4 +1,11 @@
 <?php
+/**
+ * Shop tickets by category (/tickets?cat=jazz|dance|history|stories).
+ *
+ * TicketsController::index() sends intro copy, bundle passes ($passes), and $byDay for the weekday grids. Each row
+ * may carry a `stock` array — that’s what drives “sold out”, “almost gone”, and whether the BUY button is enabled.
+ * Add-to-cart forms POST to /cart/add; green/red flashes come from CartController via the session.
+ */
 /** @var array $app */
 /** @var string $category */
 /** @var string $intro */
@@ -20,7 +27,7 @@ $bodyClass = 'tickets-page tickets-page--' . preg_replace('/[^a-z]/', '', $categ
 $dayPasses = array_values(array_filter($passes, static fn ($p) => ($p['ticket_type'] ?? '') === 'day_pass'));
 $allAccessPasses = array_values(array_filter($passes, static fn ($p) => ($p['ticket_type'] ?? '') === 'all_access_pass'));
 
-/** Day / all-access bundles only for Jazz & Dance (not History or Stories). */
+/** History & Stories tabs skip the “day pass / all access” strip — those bundles are only for Jazz & Dance. */
 $showSpecialOffers = !in_array($category, ['history', 'stories'], true);
 
 $dayOrder = ['thursday', 'friday', 'saturday', 'sunday'];
@@ -163,7 +170,12 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                 <?php foreach ($items as $e):
                     $start = $e['start_time'] ?? '';
                     $end = $e['end_time'] ?? '';
-                    $timeStr = $start !== '' && $end !== '' ? $start . ' – ' . $end : ($start !== '' ? $start : '—');
+                    //Formated time
+                    $startFormatted = $start !== '' ? date('H:i', strtotime($start)) : '';
+                    $endFormatted = $end !== '' ? date('H:i', strtotime($end)) : '';
+                    $timeStr = $startFormatted !== '' && $endFormatted !== ''
+                        ? $startFormatted . ' – ' . $endFormatted
+                        : ($startFormatted !== '' ? $startFormatted : '—');
                     $venueLine = $e['subtitle'] ?? '';
                     ?>
                     <article class="tickets-card">
@@ -185,7 +197,7 @@ $returnUrl = '/tickets?cat=' . rawurlencode($category);
                             <div><span class="tickets-meta-label">Time</span><span class="tickets-meta-value"><?= $h($timeStr) ?></span></div>
                         </div>
                         <div class="tickets-card-footer">
-                            <span class="tickets-price"><?= !empty($e['is_free']) ? 'FREE' : '€' . $h(number_format((float) $e['price'], 0)) ?></span>
+                            <span class="tickets-price"><?= !empty($e['is_free']) ? 'FREE' : '€' . $h(number_format((float) $e['price'], fmod((float) $e['price'], 1) > 0 ? 2 : 0)) ?></span>
                             <?php if (empty($e['is_free']) && empty(($e['stock']['sold_out'] ?? false))): ?>
                                 <form method="post" action="/cart/add" class="tickets-buy-form">
                                     <input type="hidden" name="ticket_details_id" value="<?= (int) $e['ticket_details_id'] ?>">

@@ -24,13 +24,13 @@ docker compose run --rm php composer install
 docker compose run --rm php vendor/bin/phinx migrate
 ```
 
-### 4. Seed the database (pages, events, jazz, admin user)
+### 4. Seed the database (pages, events, CMS defaults, admin user)
 
 ```bash
 docker compose run --rm php vendor/bin/phinx seed:run
 ```
 
-This run includes **`AdminUserSeeder`** (admin login below), **`JazzSeeder`**, **`JazzSettingsSeeder`**, discography/audio seeders, and the rest. Use it after migrations so you can sign in and open **`/admin/jazz`** without extra steps. For the **employee** scanner account, run **`EmployeeUserSeeder`** separately (see §5b) after migrations.
+This run includes **`AdminUserSeeder`** (admin login below), content seeders (Dance/Jazz/Stories/History/Food/tickets), and supporting media/config seeders. Use it after migrations so you can sign in and open the CMS screens without extra steps. For the **employee** scanner account, run **`EmployeeUserSeeder`** separately (see §5b) after migrations.
 
 For a first-time setup, run all seeders (no `-s`) so dependencies run in the right order. To run a specific seeder:
 
@@ -47,14 +47,14 @@ docker compose run --rm php vendor/bin/phinx seed:run -s AdminOrdersSampleSeeder
 
 **`AdminOrdersSampleSeeder`** ensures **`admin@haarlem.test`** and inserts **demo orders** (paid/pending) for **`/admin/orders/export`** when the `orders` table is empty. If orders already exist, it skips inserting demo orders but still ensures the demo admin user.
 
-### 5. Admin login (pages CMS + Jazz CMS + tickets CMS)
+### 5. Admin login (pages + category CMS + tickets CMS)
 
 Sign in at **`/login`** with:
 
 - **Email:** `admin@haarlem.test`
 - **Password:** `Admin123!`
 
-Then open **`/admin`** for pages, **`/admin/jazz`** for the jazz CMS, or **`/admin/tickets`** for ticket copy (same account).
+Then open **`/admin`** for dashboard links, **`/admin/cms/homepage`** for homepage, **`/admin/cms/dance`** and **`/admin/jazz`** for category CMS, or **`/admin/tickets`** for ticket copy (same account).
 
 If the admin user is missing (e.g. you never ran full seeds), run:
 
@@ -79,9 +79,9 @@ Sign in at **`/login`** with:
 
 Then open **`/admin/scan`** (or use the **🎫** link in the header). This account **cannot** use the full CMS (`/admin`, orders export, etc.) — only scan tickets.
 
-### 6. Jazz CMS (`/admin/jazz`)
+### 6. Category CMS example: Jazz (`/admin/jazz`)
 
-After logging in as admin, open **`/admin/jazz`** (or use the **Jazz** card on the dashboard). From there you can:
+After logging in as admin, open **`/admin/jazz`** (or use the dashboard card). From there you can:
 
 - **Events** — create, edit, or delete jazz rows in `events` (venue, day, times, hall, seats, price, long description). Optional **preview audio** path for the Gumbo Kings–style player (`event_audio`).
 - **Layout & images** — homepage hero filename, artist page titles/taglines/heroes, **event card images** (`Title|filename` per line), and **day / “All events” ordering** (one title per line; must match event titles in the database).
@@ -89,7 +89,7 @@ After logging in as admin, open **`/admin/jazz`** (or use the **Jazz** card on t
 
 Public jazz pages read settings from **`jazz_settings`** merged with defaults in `app/src/Config/jazz.php`. If a key is not in the database, the file default is used.
 
-**Pages:** Each person can add their own page seeder (example `DancePageSeeder`). Use `INSERT IGNORE` so seed order does not matter. In app code and when inserting into `page_blocks`, always get `page_id` by slug — never hardcode IDs.
+**Pages/CMS note:** Each category follows the same pattern: defaults in config, DB overrides in settings tables, and admin forms to edit content. For page seeders (example `DancePageSeeder`), use `INSERT IGNORE` so seed order does not matter. In app code and when inserting into `page_blocks`, always get `page_id` by slug — never hardcode IDs.
 
 ### Visitor: invoice, tickets, almost sold out
 
@@ -118,7 +118,7 @@ Public jazz pages read settings from **`jazz_settings`** merged with defaults in
    ```
 5. **Assessment smoke test (10 min demo):**
    1. **Visitor:** homepage → **`/tickets`** (try **jazz / dance / history / stories** tabs, note caps if seats are low) → add paid items to cart → **register** (if needed) → **checkout** (demo or Stripe) → success page → **My orders** → open order (**invoice + tickets**). Optional: `docker compose exec php cat /app/storage/mail/orders.log` (tail of log).
-   2. **Admin:** **`/admin/cms/homepage`** (WYSIWYG) → **`/admin/jazz`** or tickets CMS to change **seats** → **`/admin/orders`** + **Codes** link + **export**.
+   2. **Admin:** **`/admin/cms/homepage`** (WYSIWYG) → category CMS (**`/admin/cms/dance`** and/or **`/admin/jazz`**) and tickets CMS to change **seats/content** → **`/admin/orders`** + **Codes** link + **export**.
    3. **Employee:** logout → **`employee@haarlem.test`** / **`Employee123!`** → **`/admin/scan`** → scan a code from **My orders** (as visitor) or **admin order Codes**.
 
 6. **Demo admin + sample orders** (for **Export orders** CMS), if needed:

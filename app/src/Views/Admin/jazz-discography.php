@@ -1,4 +1,7 @@
 <?php
+/**
+ * Manage album/track rows for each jazz artist slug (what the public discography blocks show). AdminJazzController::discography().
+ */
 /** @var array $app */
 /** @var list<string> $slugs */
 /** @var string $slug */

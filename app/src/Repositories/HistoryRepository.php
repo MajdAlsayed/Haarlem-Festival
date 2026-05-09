@@ -82,7 +82,8 @@ class HistoryRepository implements HistoryRepositoryInterface
         $db = Database::getConnection();
 
         $stmt = $db->prepare(
-            'SELECT ht.history_tour_id, ht.session_id, ht.language_id, ht.tickets_available, s.start_time, l.name AS language_name
+            'SELECT ht.history_tour_id, ht.session_id, ht.language_id, ht.tickets_available, 
+            ht.ticket_details_id, ht.ticket_family_id,s.start_time, l.name AS language_name
             FROM history_tours ht
             INNER JOIN sessions s ON ht.session_id = s.session_id 
             INNER JOIN languages l ON ht.language_id = l.language_id

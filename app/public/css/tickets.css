@@ -1,4 +1,8 @@
-/* Tickets listing — mockup-aligned dark cards + category accent */
+/*
+ * Public /tickets page only (body.tickets-page). Linked from Views/Tickets/index.php.
+ * Category tabs swap accent via .tickets-page--jazz | dance | history | stories.
+ * Cards: .tickets-card*, BUY forms .tickets-buy-form, stock badges .tickets-stock-badge*.
+ */
 
 body.tickets-page > header,
 body.tickets-page header {

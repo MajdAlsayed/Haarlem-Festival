@@ -1,6 +1,12 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Sensible defaults for jazz — think of this as the “factory settings” file.
+ *
+ * When the site runs, JazzSettingsRepository merges this with whatever admins saved in the database, so you can
+ * change copy and ordering without redeploying PHP. The admin screen for that is /admin/jazz/settings.
+ */
 return [
     'hero_image' => 'hero-jazz.jpg',
     'placeholder_card' => 'placeholder-card.jpg',
@@ -69,16 +75,28 @@ return [
             'title' => 'Gumbo Kings',
             'tagline' => 'The Groove of New Orleans',
             'hero_image' => 'hero-gumbo-kings.jpg',
+            /** Plain text; shown under the artist name. Empty = built-in default or event description. */
+            'intro_text' => '',
+            /** Plain career highlights ([[accent]] markers). Empty = try HTML or built-in defaults. */
+            'career_highlights_plain' => '',
+            /** Legacy / advanced: sanitized HTML only when plain is empty. */
+            'career_highlights_html' => '',
         ],
         'karsu' => [
             'title' => 'Karsu',
             'tagline' => 'A symphony of Jazz and Turkish Soul',
             'hero_image' => 'hero-karsu.jpg',
+            'intro_text' => '',
+            'career_highlights_plain' => '',
+            'career_highlights_html' => '',
         ],
         'gare-du-nord' => [
             'title' => 'Gare du Nord',
             'tagline' => 'Cinematic Soul from the Urban Lounge',
             'hero_image' => 'hero-gare-du-nord.jpg',
+            'intro_text' => '',
+            'career_highlights_plain' => '',
+            'career_highlights_html' => '',
         ],
     ],
 ];

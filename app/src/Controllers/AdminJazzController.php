@@ -9,7 +9,16 @@ use App\Core\Session;
 use App\Repositories\JazzCmsRepository;
 use App\Repositories\JazzSettingsRepository;
 use App\Repositories\SettingsRepository;
+use App\Services\JazzAdminUploadService;
+use App\Services\JazzArtistHtmlSanitizer;
 
+/**
+ * Back-office for everything jazz-related.
+ *
+ * You’ll find the URLs in public/index.php under /admin/jazz/…. This controller talks to the database through
+ * JazzCmsRepository (events, audio, discography, band) and JazzSettingsRepository (the big JSON config).
+ * File uploads for preview audio and images go through JazzAdminUploadService so paths stay safe and consistent.
+ */
 final class AdminJazzController
 {
     private const ADMIN_ROLE_ID = 1;
@@ -18,6 +27,7 @@ final class AdminJazzController
     private JazzSettingsRepository $jazzSettings;
     private SettingsRepository $appSettings;
 
+    /** Hooks up DB writers (jazz CMS), merged JSON settings, and global site settings for the admin chrome. */
     public function __construct()
     {
         $this->cms = new JazzCmsRepository();
@@ -25,6 +35,7 @@ final class AdminJazzController
         $this->appSettings = new SettingsRepository();
     }
 
+    /** Same gate as other admin screens: must be logged in with the admin role or we bounce you out with a flash. */
     private function requireAdmin(): void
     {
         $auth = $_SESSION['auth'] ?? null;
@@ -40,11 +51,13 @@ final class AdminJazzController
         }
     }
 
+    /** Site name, CSS version, etc. — whatever SettingsRepository exposes for the layout. */
     private function app(): array
     {
         return $this->appSettings->getAll();
     }
 
+    /** Landing tile screen at /admin/jazz with links into events, JSON settings, discography, and band members. */
     public function index(): void
     {
         $this->requireAdmin();
@@ -52,6 +65,11 @@ final class AdminJazzController
         require __DIR__ . '/../Views/Admin/jazz-index.php';
     }
 
+    // -------------------------------------------------------------------------
+    // Jazz events — normal CRUD on the `events` table (only rows whose type is “jazz”), plus optional preview audio.
+    // -------------------------------------------------------------------------
+
+    /** Table of all jazz slots in `events` (typed as jazz) for quick edit/delete. */
     public function events(): void
     {
         $this->requireAdmin();
@@ -60,6 +78,7 @@ final class AdminJazzController
         require __DIR__ . '/../Views/Admin/jazz-events-list.php';
     }
 
+    /** Edit form for one existing jazz event, including optional preview-audio row from `event_audio`. */
     public function editEvent(): void
     {
         $this->requireAdmin();
@@ -81,6 +100,7 @@ final class AdminJazzController
         require __DIR__ . '/../Views/Admin/jazz-event-edit.php';
     }
 
+    /** Blank form to add a new jazz show (same fields as edit, no `event_id` yet). */
     public function newEvent(): void
     {
         $this->requireAdmin();
@@ -90,6 +110,10 @@ final class AdminJazzController
         require __DIR__ . '/../Views/Admin/jazz-event-new.php';
     }
 
+    /**
+     * Handles the “Save” button from new/edit event. Validates CSRF, saves the event row, then optionally
+     * saves or clears the short preview audio clip people hear on some artist pages.
+     */
     public function saveEvent(): void
     {
         $this->requireAdmin();
@@ -122,6 +146,22 @@ final class AdminJazzController
 
         if ($title === '' || $venueId <= 0 || $startTime === '') {
             Session::setFlash('admin_error', 'Title, venue, and start time are required.');
+            header('Location: ' . ($eventId > 0 ? '/admin/jazz/events/edit?id=' . $eventId : '/admin/jazz/events/new'));
+            exit;
+        }
+
+        $uploader = new JazzAdminUploadService();
+        try {
+            $uploadedPreview = $uploader->storePreviewAudio(
+                isset($_FILES['preview_audio_upload']) && is_array($_FILES['preview_audio_upload'])
+                    ? $_FILES['preview_audio_upload']
+                    : null
+            );
+            if ($uploadedPreview !== null) {
+                $audioPath = $uploadedPreview;
+            }
+        } catch (\InvalidArgumentException | \RuntimeException $e) {
+            Session::setFlash('admin_error', $e->getMessage());
             header('Location: ' . ($eventId > 0 ? '/admin/jazz/events/edit?id=' . $eventId : '/admin/jazz/events/new'));
             exit;
         }
@@ -171,6 +211,7 @@ final class AdminJazzController
         exit;
     }
 
+    /** POST-only delete for a jazz event (CSRF tied to the list form). */
     public function deleteEvent(): void
     {
         $this->requireAdmin();
@@ -199,6 +240,15 @@ final class AdminJazzController
         exit;
     }
 
+    // -------------------------------------------------------------------------
+    // Site-wide jazz “content” that isn’t a single event: hero image, card order, artist page text, image filenames…
+    // Stored as JSON rows in table `jazz_settings` and merged on top of Config/jazz.php when the site runs.
+    // -------------------------------------------------------------------------
+
+    /**
+     * Big jazz “site content” editor: GET shows merged config; POST saves JSON keys after optional image uploads
+     * and parses artist pages / sort lists / card image map from the form fields.
+     */
     public function settings(): void
     {
         $this->requireAdmin();
@@ -211,7 +261,9 @@ final class AdminJazzController
                 exit;
             }
             $config = $this->jazzSettings->getMergedConfig();
+            $uploader = new JazzAdminUploadService();
             try {
+                $this->applyJazzSettingsUploads($uploader, $_POST, $_FILES, $config);
                 $payload = $this->parseSettingsFromPost($_POST, $config);
                 $this->jazzSettings->saveMany($payload);
                 Session::setFlash('admin_success', 'Jazz settings saved.');
@@ -230,6 +282,52 @@ final class AdminJazzController
     }
 
     /**
+     * Moves any uploaded hero, placeholder, or per-artist hero files into public/images/jazz/… and patches `$post`
+     * so `parseSettingsFromPost` sees the new filenames.
+     *
+     * @param array<string, mixed> $post
+     * @param array<string, mixed> $files
+     * @param array<string, mixed> $config
+     */
+    private function applyJazzSettingsUploads(JazzAdminUploadService $uploader, array &$post, array $files, array $config): void
+    {
+        $hero = $uploader->storeLayoutImage(
+            isset($files['hero_image_upload']) && is_array($files['hero_image_upload']) ? $files['hero_image_upload'] : null,
+            'hero'
+        );
+        if ($hero !== null) {
+            $post['hero_image'] = $hero;
+        }
+
+        $ph = $uploader->storeLayoutImage(
+            isset($files['placeholder_card_upload']) && is_array($files['placeholder_card_upload'])
+                ? $files['placeholder_card_upload']
+                : null,
+            'placeholder'
+        );
+        if ($ph !== null) {
+            $post['placeholder_card'] = $ph;
+        }
+
+        $artistPages = is_array($config['artist_pages'] ?? null) ? $config['artist_pages'] : [];
+        foreach (array_keys($artistPages) as $slug) {
+            $slugKey = preg_replace('/[^a-z0-9\-]/', '', (string) $slug) ?? '';
+            if ($slugKey === '') {
+                continue;
+            }
+            $field = 'ap_hero_upload_' . $slugKey;
+            $raw = $files[$field] ?? null;
+            $up = $uploader->storeLayoutImage(is_array($raw) ? $raw : null, 'artist-' . preg_replace('/[^a-z0-9]+/i', '', $slugKey));
+            if ($up !== null) {
+                $post['ap_hero_' . $slugKey] = $up;
+            }
+        }
+    }
+
+    /**
+     * Turns the settings form into the array `JazzSettingsRepository::saveMany` expects: hero filenames, artist page blocks,
+     * weekday sort lists, “all events” order, and the title→image map for cards. Plain highlights win over raw HTML.
+     *
      * @param array<string, string> $post
      * @param array<string, mixed> $config
      * @return array<string, mixed>
@@ -255,10 +353,35 @@ final class AdminJazzController
             if ($t === '' || $heroImg === '') {
                 throw new \InvalidArgumentException("Artist page \"{$slugKey}\" needs title and hero image.");
             }
+            $prev = is_array($artistPages[$slug] ?? null) ? $artistPages[$slug] : [];
+            $keyIntro = 'ap_intro_' . $slugKey;
+            $keyPlain = 'ap_highlights_plain_' . $slugKey;
+            $keyHigh = 'ap_highlights_' . $slugKey;
+            $intro = array_key_exists($keyIntro, $post)
+                ? trim((string) $post[$keyIntro])
+                : trim((string) ($prev['intro_text'] ?? ''));
+            $highlightsPlain = array_key_exists($keyPlain, $post)
+                ? trim((string) $post[$keyPlain])
+                : trim((string) ($prev['career_highlights_plain'] ?? ''));
+            $highlightsHtmlRaw = array_key_exists($keyHigh, $post)
+                ? trim((string) $post[$keyHigh])
+                : trim((string) ($prev['career_highlights_html'] ?? ''));
+
+            if ($highlightsPlain !== '') {
+                $careerPlainOut = $highlightsPlain;
+                $careerHtmlOut = '';
+            } else {
+                $careerPlainOut = '';
+                $careerHtmlOut = JazzArtistHtmlSanitizer::purifyHighlights($highlightsHtmlRaw);
+            }
+
             $outPages[$slugKey] = [
                 'title' => $t,
                 'tagline' => $tag,
                 'hero_image' => $heroImg,
+                'intro_text' => $intro,
+                'career_highlights_plain' => $careerPlainOut,
+                'career_highlights_html' => $careerHtmlOut,
             ];
         }
 
@@ -318,6 +441,11 @@ final class AdminJazzController
         ];
     }
 
+    // -------------------------------------------------------------------------
+    // Discography tracks per artist (table artist_discography, keyed by slug like “gumbo-kings”).
+    // -------------------------------------------------------------------------
+
+    /** Pick an artist slug (tab) and list their album tracks for edit/delete links. */
     public function discography(): void
     {
         $this->requireAdmin();
@@ -345,6 +473,7 @@ final class AdminJazzController
         require __DIR__ . '/../Views/Admin/jazz-discography.php';
     }
 
+    /** Add or edit one discography row (?slug= for new, ?id= for existing). */
     public function editDiscTrack(): void
     {
         $this->requireAdmin();
@@ -372,6 +501,7 @@ final class AdminJazzController
         require __DIR__ . '/../Views/Admin/jazz-discography-edit.php';
     }
 
+    /** POST handler: optional cover/audio uploads, then insert or update `artist_discography`. */
     public function saveDiscTrack(): void
     {
         $this->requireAdmin();
@@ -395,9 +525,48 @@ final class AdminJazzController
         $playCount = (int) ($_POST['play_count'] ?? 0);
         $sortOrder = (int) ($_POST['sort_order'] ?? 0);
 
+        $uploader = new JazzAdminUploadService();
+        try {
+            $imgUp = $uploader->storeDiscographyCover(
+                isset($_FILES['disc_image_upload']) && is_array($_FILES['disc_image_upload'])
+                    ? $_FILES['disc_image_upload']
+                    : null
+            );
+            if ($imgUp !== null) {
+                $imageFile = $imgUp;
+            }
+            $audUp = $uploader->storeDiscographyTrackAudio(
+                isset($_FILES['disc_audio_upload']) && is_array($_FILES['disc_audio_upload'])
+                    ? $_FILES['disc_audio_upload']
+                    : null
+            );
+            if ($audUp !== null) {
+                $audioFile = $audUp;
+            }
+        } catch (\InvalidArgumentException | \RuntimeException $e) {
+            Session::setFlash('admin_error', $e->getMessage());
+            header('Location: ' . ($trackId > 0
+                ? '/admin/jazz/discography/edit?id=' . $trackId
+                : '/admin/jazz/discography/edit?slug=' . rawurlencode($slug !== '' ? $slug : 'karsu')));
+            exit;
+        }
+
+        $existing = $trackId > 0 ? $this->cms->getDiscographyTrack($trackId) : null;
+        if ($imageFile === '' && is_array($existing)) {
+            $imageFile = (string) ($existing['image_file'] ?? '');
+        }
+        if ($audioFile === '' && is_array($existing)) {
+            $audioFile = (string) ($existing['audio_file'] ?? '');
+        }
+
         if ($slug === '' || $title === '' || $imageFile === '' || $audioFile === '') {
-            Session::setFlash('admin_error', 'Slug, title, image file, and audio file are required.');
-            header('Location: /admin/jazz/discography/edit?slug=' . rawurlencode($slug));
+            Session::setFlash(
+                'admin_error',
+                'Slug and title are required. Add cover and audio using the file uploads and/or the path fields (when editing, leave a path blank only if you upload a replacement file).'
+            );
+            header('Location: ' . ($trackId > 0
+                ? '/admin/jazz/discography/edit?id=' . $trackId
+                : '/admin/jazz/discography/edit?slug=' . rawurlencode($slug !== '' ? $slug : 'karsu')));
             exit;
         }
 
@@ -418,6 +587,7 @@ final class AdminJazzController
         exit;
     }
 
+    /** POST-only removal of one track; redirects back to the discography list for that slug. */
     public function deleteDiscTrack(): void
     {
         $this->requireAdmin();
@@ -438,6 +608,159 @@ final class AdminJazzController
             Session::setFlash('admin_success', 'Track removed.');
         }
         header('Location: /admin/jazz/discography?slug=' . rawurlencode($slug));
+        exit;
+    }
+
+    // -------------------------------------------------------------------------
+    // Band lineup photos and captions (table jazz_band_members), again per artist slug.
+    // -------------------------------------------------------------------------
+
+    /** Same pattern as discography: choose slug, see everyone in `jazz_band_members` for that artist. */
+    public function bandMembers(): void
+    {
+        $this->requireAdmin();
+        $app = $this->app();
+        $defaults = require __DIR__ . '/../Config/jazz.php';
+        /** @var array<string, mixed> $artistPages */
+        $artistPages = $defaults['artist_pages'] ?? [];
+        $slugs = array_keys($artistPages);
+        foreach ($this->cms->listBandMemberSlugs() as $s) {
+            if (!in_array($s, $slugs, true)) {
+                $slugs[] = $s;
+            }
+        }
+        sort($slugs);
+        if ($slugs === []) {
+            $slugs = ['gumbo-kings', 'gare-du-nord'];
+        }
+
+        $slug = isset($_GET['slug']) ? strtolower(trim((string) $_GET['slug'])) : $slugs[0];
+        if ($slug === '') {
+            $slug = 'gumbo-kings';
+        }
+
+        $members = $this->cms->listBandMembersBySlug($slug);
+        require __DIR__ . '/../Views/Admin/jazz-band-members.php';
+    }
+
+    /** Add or edit one band member (?slug= new, ?id= edit). */
+    public function editBandMember(): void
+    {
+        $this->requireAdmin();
+        $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+        $slug = isset($_GET['slug']) ? strtolower(trim((string) $_GET['slug'])) : '';
+
+        if ($id > 0) {
+            $member = $this->cms->getBandMember($id);
+            if (!$member) {
+                Session::setFlash('admin_error', 'Band member not found.');
+                header('Location: /admin/jazz/band-members');
+                exit;
+            }
+            $slug = (string) $member['artist_slug'];
+        } else {
+            $member = null;
+            if ($slug === '') {
+                header('Location: /admin/jazz/band-members');
+                exit;
+            }
+        }
+
+        $app = $this->app();
+        $csrf = Csrf::token('admin_jazz_band');
+        require __DIR__ . '/../Views/Admin/jazz-band-member-edit.php';
+    }
+
+    /** POST handler: optional photo upload, then insert or update `jazz_band_members`. */
+    public function saveBandMember(): void
+    {
+        $this->requireAdmin();
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /admin/jazz/band-members');
+            exit;
+        }
+        if (!Csrf::validate('admin_jazz_band', $_POST['_csrf'] ?? null)) {
+            Session::setFlash('admin_error', 'Invalid request.');
+            header('Location: /admin/jazz/band-members');
+            exit;
+        }
+
+        $memberId = (int) ($_POST['member_id'] ?? 0);
+        $slug = strtolower(trim((string) ($_POST['artist_slug'] ?? '')));
+        $name = trim((string) ($_POST['name'] ?? ''));
+        $role = trim((string) ($_POST['role'] ?? ''));
+        $imageFile = trim((string) ($_POST['image_file'] ?? ''));
+        $sortOrder = (int) ($_POST['sort_order'] ?? 0);
+
+        $uploader = new JazzAdminUploadService();
+        try {
+            $imgUp = $uploader->storeBandMemberPhoto(
+                isset($_FILES['band_photo_upload']) && is_array($_FILES['band_photo_upload'])
+                    ? $_FILES['band_photo_upload']
+                    : null
+            );
+            if ($imgUp !== null) {
+                $imageFile = $imgUp;
+            }
+        } catch (\InvalidArgumentException | \RuntimeException $e) {
+            Session::setFlash('admin_error', $e->getMessage());
+            header('Location: ' . ($memberId > 0
+                ? '/admin/jazz/band-members/edit?id=' . $memberId
+                : '/admin/jazz/band-members/edit?slug=' . rawurlencode($slug !== '' ? $slug : 'gumbo-kings')));
+            exit;
+        }
+
+        $existing = $memberId > 0 ? $this->cms->getBandMember($memberId) : null;
+        if ($imageFile === '' && is_array($existing)) {
+            $imageFile = (string) ($existing['image_file'] ?? '');
+        }
+
+        if ($slug === '' || $name === '' || $role === '' || $imageFile === '') {
+            Session::setFlash(
+                'admin_error',
+                'Slug, name, role, and photo are required. Upload an image and/or enter a path under images/jazz/ (when editing, leave path blank only if you upload a new photo).'
+            );
+            header('Location: ' . ($memberId > 0
+                ? '/admin/jazz/band-members/edit?id=' . $memberId
+                : '/admin/jazz/band-members/edit?slug=' . rawurlencode($slug !== '' ? $slug : 'gumbo-kings')));
+            exit;
+        }
+
+        try {
+            if ($memberId > 0) {
+                $this->cms->updateBandMember($memberId, $slug, $name, $role, $imageFile, $sortOrder);
+            } else {
+                $this->cms->insertBandMember($slug, $name, $role, $imageFile, $sortOrder);
+            }
+            Session::setFlash('admin_success', 'Band member saved.');
+        } catch (\Throwable $e) {
+            Session::setFlash('admin_error', $e->getMessage());
+        }
+        header('Location: /admin/jazz/band-members?slug=' . rawurlencode($slug));
+        exit;
+    }
+
+    /** POST-only delete for one band member row. */
+    public function deleteBandMember(): void
+    {
+        $this->requireAdmin();
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /admin/jazz/band-members');
+            exit;
+        }
+        $form = (string) ($_POST['_csrf_form'] ?? '');
+        if ($form === '' || !Csrf::validate($form, $_POST['_csrf'] ?? null)) {
+            Session::setFlash('admin_error', 'Invalid request.');
+            header('Location: /admin/jazz/band-members');
+            exit;
+        }
+        $id = (int) ($_POST['member_id'] ?? 0);
+        $slug = (string) ($_POST['return_slug'] ?? '');
+        if ($id > 0) {
+            $this->cms->deleteBandMember($id);
+            Session::setFlash('admin_success', 'Band member removed.');
+        }
+        header('Location: /admin/jazz/band-members?slug=' . rawurlencode($slug));
         exit;
     }
 }

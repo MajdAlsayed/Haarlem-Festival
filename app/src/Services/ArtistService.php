@@ -10,6 +10,7 @@ use App\Models\Event;
 /** Artist page data: artist + gallery + events. Uses artists + event repos. */
 class ArtistService
 {
+    /** Inject artist + event repositories for artist detail composition. */
     public function __construct(
         private ArtistsRepositoryInterface $artistsRepository,
         private EventRepositoryInterface $eventRepository
@@ -38,6 +39,7 @@ class ArtistService
     }
 
     /** @return array<int, array{name: string, slug: string|null, bio: string|null, image: string}> */
+    /** Admin/overview list pass-through with stable repository ordering. */
     public function getAllOrdered(): array
     {
         return $this->artistsRepository->getAllOrdered();

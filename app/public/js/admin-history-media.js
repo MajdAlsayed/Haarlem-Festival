@@ -8,6 +8,7 @@
     var uploadFile = document.getElementById('history-upload-file');
     var uploadStatus = document.getElementById('history-upload-status');
 
+    // Open modal when Choose image button is clicked
     document.querySelectorAll('.history-media-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
             activeTarget = document.getElementById(btn.getAttribute('data-target'));
@@ -20,6 +21,7 @@
         modal.classList.remove('is-open');
     });
 
+    // Fetch all images from server and make them clickable cards
     function loadImages() {
         grid.innerHTML = '<p class="admin-cms-media-grid__status">Loading...</p>';
 
@@ -35,6 +37,7 @@
 
                 grid.innerHTML = '';
 
+                // Build a card for each image
                 data.images.forEach(function (img) {
                     var card = document.createElement('button');
                     card.type = 'button';
@@ -67,6 +70,7 @@
             });
     }
 
+    // Upload new image file
     uploadBtn.addEventListener('click', function () {
         var f = uploadFile.files && uploadFile.files[0];
 

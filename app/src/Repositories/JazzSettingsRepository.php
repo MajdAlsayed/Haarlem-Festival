@@ -5,11 +5,19 @@ namespace App\Repositories;
 
 use App\Core\Database;
 
+/**
+ * Builds the jazz config the site actually uses: start from the PHP file in Config/, then let admin edits win.
+ *
+ * Rows in `jazz_settings` store JSON blobs (artist pages, sort orders, image maps, …). We cache the merged
+ * result for one request so we’re not decoding JSON fifty times. After saving in admin, call clearCache() so
+ * the next page load sees fresh data.
+ */
 final class JazzSettingsRepository
 {
     /** @var array<string, mixed>|null */
     private static ?array $mergedCache = null;
 
+    /** Call after saving in admin so the next {@see getMergedConfig()} isn’t stale. */
     public static function clearCache(): void
     {
         self::$mergedCache = null;
@@ -67,13 +75,19 @@ final class JazzSettingsRepository
         return self::$mergedCache;
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * Alias for {@see getMergedConfig()} — handy when code expects a generic “get all settings”.
+     *
+     * @return array<string, mixed>
+     */
     public function getAll(): array
     {
         return $this->getMergedConfig();
     }
 
     /**
+     * Upserts JSON blobs for allowed keys only (anything else is ignored so the DB can’t grow random keys).
+     *
      * @param array<string, mixed> $settings Whitelisted keys from jazz.php
      */
     public function saveMany(array $settings): void

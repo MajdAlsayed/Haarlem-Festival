@@ -4,9 +4,7 @@ namespace App\ViewModels;
 
 use App\Models\Event;
 
-/**
- * Data for the Dance event detail view. The controller fills this; the view only uses these properties.
- */
+/** View model for a single Dance event (map, gallery, breadcrumbs, formatted labels). */
 class EventDetailViewModel
 {
     public Event $event;
@@ -23,6 +21,19 @@ class EventDetailViewModel
     public string $mapQuery;
     public string $artistsDisplay;
     public string $eventSubtitle;
+
+    /** @var list<array<string,mixed>> */
+    public array $eventTickets = [];
+
+    public ?string $cartFlashSuccess = null;
+
+    public ?string $cartFlashError = null;
+
+    /** Dance day pass for this event's weekday (pass_day), with optional `stock` from controller. */
+    public ?array $danceDayPass = null;
+
+    /** Dance all-access weekend pass, with optional `stock` from controller. */
+    public ?array $danceAllAccessPass = null;
 
     public function __construct(
         Event $event,

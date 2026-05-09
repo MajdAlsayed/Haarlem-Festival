@@ -10,6 +10,7 @@ use App\Validation\Validator;
 /** Event listing by category/day; validates input then delegates to repo. */
 class EventService implements EventServiceInterface
 {
+    /** Keep event lookups decoupled from concrete repository implementation. */
     public function __construct(
         private EventRepositoryInterface $eventRepository
     ) {
@@ -35,6 +36,7 @@ class EventService implements EventServiceInterface
         return $this->eventRepository->getByCategoryAndDay(trim($eventTypeName), trim($eventDay));
     }
 
+    /** Single event fetch with guard against invalid ids. */
     public function getById(int $id): ?Event
     {
         if ($id <= 0) {

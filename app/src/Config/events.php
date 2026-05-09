@@ -18,7 +18,7 @@ return [
         'dance' => '/dance',
         'jazz' => '/jazz',
         'history' => '/history',
-        'yammy' => '#',
-        'stories' => '#',
+        'yammy' => '/food',
+        'stories' => '/stories',
     ],
 ];

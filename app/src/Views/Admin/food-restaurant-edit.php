@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * /admin/food/restaurants/new  — create
  * /admin/food/restaurants/edit — edit (GET ?id=N, POST to /save)
@@ -116,11 +116,12 @@ $numVal = function (string $field, string $default = '') use ($row): string {
                                style="max-width:8rem;">
                     </div>
                     <div class="admin-field">
-                        <label for="seats">Total seats <span style="color:#e88a92">*</span></label>
+                        <label for="seats">Capacity (seats) <span style="color:#e88a92">*</span></label>
                         <input type="number" id="seats" name="seats"
                                value="<?= $h($numVal('seats', '')) ?>"
                                class="admin-input" required min="1"
                                style="max-width:10rem;">
+                        <small class="admin-hint">Total seats available for dining; this drives booking availability for this restaurant.</small>
                     </div>
                 </div>
             </fieldset>

@@ -20,7 +20,8 @@ services:
       APP_PUBLIC_URL: http://localhost
     volumes:
       - ./app:/app
-
+      # Overrides default 2M/8M limits without rebuilding the image (discography audio uploads).
+      - ./docker/php/conf.d/zz-uploads.ini:/usr/local/etc/php/conf.d/zz-uploads.ini:ro
 
   mysql:
       image: mariadb:latest

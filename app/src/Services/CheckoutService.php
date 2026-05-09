@@ -9,10 +9,7 @@ use App\Repositories\CartRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\TicketRepository;
 
-/**
- * Cart → paid order + ticket rows. Demo mode (no Stripe) or after Stripe Checkout success.
- * Pay later: pending order (24h) then complete payment → tickets.
- */
+/** Cart and pay-later checkout: create paid orders and ticket rows; triggers confirmation email. */
 final class CheckoutService
 {
     public function __construct(
@@ -30,9 +27,10 @@ final class CheckoutService
         return $this->finalizeOrder($userId, null);
     }
 
-    /** After Stripe redirects back with a paid Checkout Session (cart checkout or pending order). */
     public function completeAfterStripe(string $stripeSessionId, int $userId): int
     {
+        // Stripe (or the user) can hit the success URL twice. If we already stored this session on the order, bail out
+        // and return the same order id so we do not create tickets twice.
         $existing = $this->orderRepository->findOrderIdByStripeSessionId($stripeSessionId);
         if ($existing !== null) {
             return $existing;
@@ -43,6 +41,7 @@ final class CheckoutService
             throw new \RuntimeException('Payment was not completed.');
         }
 
+        // Pay-later checkout puts pending_order_id in metadata instead of cart_id — totally different path from normal cart Stripe.
         $pendingOid = (int) ($data['metadata']['pending_order_id'] ?? 0);
         if ($pendingOid > 0) {
             return $this->completePendingAfterStripe($pendingOid, $userId, $stripeSessionId, $data);
@@ -110,6 +109,7 @@ final class CheckoutService
             try {
                 (new OrderConfirmationMailer())->sendPendingReservation($orderId, $userId);
             } catch (\Throwable) {
+                // Mail is nice-to-have; never roll back the reservation if logging or mail() blows up.
             }
 
             return $orderId;
@@ -155,15 +155,18 @@ final class CheckoutService
         $db->beginTransaction();
 
         try {
+            // FOR UPDATE stops two tabs from both issuing tickets for the same pending order.
             $locked = $this->orderRepository->lockPendingOrderForPay($orderId, $userId);
             if ($locked === null) {
                 throw new \RuntimeException('This reservation has expired or was already paid.');
             }
 
+            // Admin could shrink capacity after they reserved; better fail than oversell.
             $this->assertPendingFulfillmentCapacity($orderId);
 
             $lines = $this->orderRepository->getOrderFulfillmentLines($orderId);
             foreach ($lines as $line) {
+                // One ticket row per seat (same idea as instant checkout).
                 for ($n = 0; $n < $line['quantity']; $n++) {
                     $this->ticketRepository->createForOrderItem($line['order_item_id']);
                 }
@@ -176,6 +179,7 @@ final class CheckoutService
             try {
                 (new OrderConfirmationMailer())->send($orderId, $userId);
             } catch (\Throwable) {
+                // Do not fail fulfillment if logging or mail() errors; order is already paid in DB.
             }
         } catch (\Throwable $e) {
             $db->rollBack();
@@ -193,6 +197,7 @@ final class CheckoutService
             }
             $sold = $this->ticketRepository->countSoldForTicketDetails($tid);
             $cart = $this->cartRepository->sumActiveCartQuantityForTicketDetails($tid);
+            // Includes this order’s lines too — that is intentional: total demand must still fit the room.
             $pending = $this->cartRepository->sumPendingOrderQuantityForTicketDetails($tid);
             if ($sold + $cart + $pending > $cap) {
                 throw new \RuntimeException(
@@ -242,6 +247,7 @@ final class CheckoutService
             try {
                 (new OrderConfirmationMailer())->send($orderId, $userId);
             } catch (\Throwable) {
+                // Same as pay-later: checkout succeeded in DB; don’t fail the user because mail broke.
             }
 
             return $orderId;

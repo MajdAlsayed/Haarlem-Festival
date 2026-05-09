@@ -8,6 +8,8 @@ $artistImg = $viewModel->profileImage;
 $albumCover = $viewModel->albumCoverImage;
 $tracks = $viewModel->musicTracks;
 $extraTracks = $viewModel->musicExtraTracks;
+// Normalize extra track cover paths so DB/config can store either
+// full `/images/...` paths or just dance-local filenames.
 foreach ($extraTracks as $i => $t) {
     if (isset($t['cover']) && strpos($t['cover'], '/images/') !== 0) {
         $extraTracks[$i]['cover'] = '/images/dance/' . $t['cover'];
@@ -33,6 +35,9 @@ $albumSub = $viewModel->albumSub;
                         <span class="artist-music-verified" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                         </span>
+                        <?php if (!empty($viewModel->followUrl)): ?>
+                        <a href="<?= htmlspecialchars($viewModel->followUrl) ?>" class="artist-music-follow" target="_blank" rel="noopener noreferrer">Follow</a>
+                        <?php endif; ?>
                     </div>
                     <p class="artist-music-real"><?= htmlspecialchars($realName) ?></p>
                     <p class="artist-music-location"><?= htmlspecialchars($location) ?></p>
@@ -145,11 +150,15 @@ $albumSub = $viewModel->albumSub;
 (function(){
     var audio = document.getElementById('artist-music-audio');
     if(!audio) return;
+    // One shared player for all rows/cards: avoids overlapping playback and
+    // keeps progress/volume state centralized.
     var currentRow = null;
     var currentSrc = '';
     function fmt(t){ var m=Math.floor(t/60), s=Math.floor(t%60); return m+':'+(s<10?'0':'')+s; }
     function getActiveSection(){
         if(!currentRow) return null;
+        // Tracks in album list render progress in the album header, while
+        // extra cards render progress inside each card.
         var wrap = currentRow.closest('.artist-music-tracklist');
         if(wrap) return wrap.previousElementSibling;
         return currentRow.closest('.artist-music-track-card');
@@ -215,6 +224,8 @@ $albumSub = $viewModel->albumSub;
             currentSrc = '';
             resetAllProgress();
         } else {
+            // Switching tracks: reset previous row icon state, then load/play
+            // the new source in the shared audio element.
             if(currentRow && currentRow !== row){ var b=currentRow.querySelector('.icon-play'); var p=currentRow.querySelector('.icon-pause'); if(b)b.style.display=''; if(p)p.style.display='none'; }
             currentSrc = src;
             audio.src = src;

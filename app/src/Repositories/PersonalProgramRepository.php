@@ -7,8 +7,10 @@ namespace App\Repositories;
 use App\Core\Database;
 use PDO;
 
+/** personal_program_items: written when adding to cart (logged in), read on /my-program. */
 final class PersonalProgramRepository
 {
+    /** Same ticket twice → INSERT IGNORE, no duplicate row. */
     public function addItem(int $userId, int $ticketDetailsId): void
     {
         if ($userId <= 0 || $ticketDetailsId <= 0) {

@@ -27,11 +27,12 @@
             <div class="footer-column">
                 <h3 class="footer-heading">EXPERIENCES</h3>
                 <ul>
-                    <li><a href="#">Jazz</a></li>
-                    <li><a href="#">Dance</a></li>
-                    <li><a href="#">History</a></li>
-                    <li><a href="#">Food</a></li>
-                    <li><a href="#">Stories</a></li>
+                    <li><a href="/jazz">Jazz</a></li>
+                    <li><a href="/dance">Dance</a></li>
+                    <li><a href="/dance#dance-artists">Dance artists</a></li>
+                    <li><a href="/history">History</a></li>
+                    <li><a href="/food">Food</a></li>
+                    <li><a href="/stories">Stories</a></li>
                 </ul>
             </div>
             <div class="footer-column">
@@ -45,7 +46,7 @@
             <div class="footer-column footer-column-social">
                 <h3 class="footer-heading">FOLLOW US</h3>
                 <div class="footer-social">
-                    <?php foreach ($app['footer']['social_icons'] as $icon): ?>
+                    <?php foreach (($app['footer']['social_icons'] ?? []) as $icon): ?>
                     <a href="#" class="footer-social-link" aria-label="<?= htmlspecialchars(pathinfo($icon, PATHINFO_FILENAME)) ?>"><img src="<?= htmlspecialchars($app['icons_path']) ?><?= rawurlencode($icon) ?>" alt="" class="footer-social-icon-img"></a>
                     <?php endforeach; ?>
                 </div>
@@ -55,7 +56,7 @@
         <div class="footer-app">
             <p class="footer-app-title">GET THE APP</p>
             <div class="footer-app-buttons">
-                <?php foreach ($app['footer']['app_icons'] as $i => $icon): $label = $app['footer']['app_labels'][$i] ?? ''; ?>
+                <?php foreach (($app['footer']['app_icons'] ?? []) as $i => $icon): $label = ($app['footer']['app_labels'] ?? [])[$i] ?? ''; ?>
                 <a href="#" class="footer-app-btn"><img src="<?= htmlspecialchars($app['icons_path']) ?><?= rawurlencode($icon) ?>" alt="<?= htmlspecialchars($label) ?>" class="footer-app-badge"></a>
                 <?php endforeach; ?>
             </div>

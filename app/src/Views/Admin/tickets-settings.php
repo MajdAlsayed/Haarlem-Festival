@@ -1,4 +1,7 @@
 <?php
+/**
+ * The friendly paragraph visitors read at the top of /tickets — stored as site_settings.tickets_intro. AdminTicketsController::settings().
+ */
 /** @var array $app */
 /** @var string $intro */
 /** @var string $csrf */

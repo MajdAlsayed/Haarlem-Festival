@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+/**
+ * One row in the shopping basket — populated from `cart_items` joined with `ticket_details` (+ event fields for display).
+ */
 class CartItem
 {
     public int $cartItemId;
@@ -19,6 +22,7 @@ class CartItem
     public ?string $eventDay = null;
     public ?string $startTime = null;
 
+    /** Unit price × quantity — what this line adds to the cart total. */
     public function getLineTotal(): float
     {
         return $this->price * $this->quantity;

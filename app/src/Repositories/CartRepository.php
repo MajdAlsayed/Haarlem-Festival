@@ -7,8 +7,13 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use PDO;
 
+/**
+ * Everything that touches `carts` and `cart_items` plus helpers the availability service needs (capacity, reserved counts).
+ * Higher-level rules (who owns the cart, merge on login) live in CartService.
+ */
 class CartRepository
 {
+    /** Latest open cart for this login, if any. */
     public function findActiveCartByUserId(int $userId): ?Cart
     {
         $db = Database::getConnection();
@@ -27,6 +32,7 @@ class CartRepository
         return $row ? $this->mapRowToCart($row) : null;
     }
 
+    /** Guest carts use this after we stash `cart_id` in the session. */
     public function findActiveCartById(int $cartId): ?Cart
     {
         $db = Database::getConnection();
@@ -44,6 +50,7 @@ class CartRepository
         return $row ? $this->mapRowToCart($row) : null;
     }
 
+    /** New empty cart — `user_id` null means “browser session cart”. */
     public function createCart(?int $userId): int
     {
         $db = Database::getConnection();
@@ -59,6 +66,7 @@ class CartRepository
         return (int)$db->lastInsertId();
     }
 
+    /** Called when someone logs in with items still in a guest cart — points the row at their user id. */
     public function attachCartToUser(int $cartId, int $userId): void
     {
         $db = Database::getConnection();
@@ -75,6 +83,7 @@ class CartRepository
         ]);
     }
 
+    /** One line in the basket for this catalog id, if it already exists (used to merge quantities). */
     public function findCartItem(int $cartId, int $ticketDetailsId): ?array
     {
         $db = Database::getConnection();
@@ -96,6 +105,7 @@ class CartRepository
         return $row ?: null;
     }
 
+    /** Inserts a brand-new cart line (first time this ticket type is added). */
     public function addCartItem(int $cartId, int $ticketDetailsId, int $quantity): int
     {
         $db = Database::getConnection();
@@ -114,6 +124,7 @@ class CartRepository
         return (int)$db->lastInsertId();
     }
 
+    /** Adds more seats onto an existing line (`quantity + :delta`). */
     public function incrementCartItem(int $cartItemId, int $quantity): void
     {
         $db = Database::getConnection();
@@ -130,6 +141,7 @@ class CartRepository
         ]);
     }
 
+    /** Sets absolute quantity (used when the user types a number on /cart). */
     public function updateCartItemQuantity(int $cartItemId, int $quantity): void
     {
         $db = Database::getConnection();
@@ -146,6 +158,7 @@ class CartRepository
         ]);
     }
 
+    /** Removes a single line (or whole line when qty hits zero in the service). */
     public function deleteCartItem(int $cartItemId): void
     {
         $db = Database::getConnection();
@@ -158,6 +171,7 @@ class CartRepository
         $stmt->execute(['cart_item_id' => $cartItemId]);
     }
 
+    /** Quick guard before we insert — stops typos and deleted catalog ids. */
     public function ticketDetailsExists(int $ticketDetailsId): bool
     {
         $db = Database::getConnection();
@@ -175,13 +189,72 @@ class CartRepository
     }
 
     /**
-     * Capacity for this catalog row: session slot, event seats, or unlimited (passes / no cap).
+     * How many seats exist for this catalog row: tied to a session cap, an event’s `seats`, or unlimited (passes / no cap).
      */
     public function getTicketDetailsCapacity(int $ticketDetailsId): ?int
     {
+        if ($ticketDetailsId <= 0) {
+            return null;
+        }
+        $row = $this->fetchTicketDetailsCapacityRow($ticketDetailsId);
+        if (!$row) {
+            return null;
+        }
+
+        return $this->capacityFromJoinedTicketRow($row);
+    }
+
+    /**
+     * Same as {@see getTicketDetailsCapacity} but in one query for many ids — used by the admin catalog table.
+     *
+     * @param list<int> $ticketDetailsIds
+     * @return array<int, ?int> ticket_details_id => capacity or null
+     */
+    public function getTicketDetailsCapacitiesForIds(array $ticketDetailsIds): array
+    {
+        $ids = [];
+        foreach ($ticketDetailsIds as $tid) {
+            $i = (int) $tid;
+            if ($i > 0) {
+                $ids[] = $i;
+            }
+        }
+        $ids = array_values(array_unique($ids));
+        if ($ids === []) {
+            return [];
+        }
+
+        $db = Database::getConnection();
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $db->prepare(
+            "SELECT td.ticket_details_id, td.ticket_type, td.session_id, td.event_id,
+                    s.tickets_available AS session_cap,
+                    e.seats AS event_seats
+             FROM ticket_details td
+             LEFT JOIN sessions s ON s.session_id = td.session_id
+             LEFT JOIN events e ON e.event_id = td.event_id
+             WHERE td.ticket_details_id IN ($placeholders)"
+        );
+        $stmt->execute($ids);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $out = [];
+        foreach ($rows as $row) {
+            $out[(int) $row['ticket_details_id']] = $this->capacityFromJoinedTicketRow($row);
+        }
+
+        return $out;
+    }
+
+    /**
+     * Single-row join used by {@see getTicketDetailsCapacity}.
+     *
+     * @return ?array<string,mixed>
+     */
+    private function fetchTicketDetailsCapacityRow(int $ticketDetailsId): ?array
+    {
         $db = Database::getConnection();
         $stmt = $db->prepare(
-            "SELECT td.ticket_type, td.session_id, td.event_id,
+            "SELECT td.ticket_details_id, td.ticket_type, td.session_id, td.event_id,
                     s.tickets_available AS session_cap,
                     e.seats AS event_seats
              FROM ticket_details td
@@ -192,10 +265,17 @@ class CartRepository
         );
         $stmt->execute(['id' => $ticketDetailsId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row) {
-            return null;
-        }
 
+        return $row ?: null;
+    }
+
+    /**
+     * Turns the joined DB row into a single seat limit (or null = no numeric cap for availability math).
+     *
+     * @param array<string,mixed> $row joined ticket_details + sessions + events
+     */
+    private function capacityFromJoinedTicketRow(array $row): ?int
+    {
         $type = (string) ($row['ticket_type'] ?? '');
         if (in_array($type, ['day_pass', 'all_access_pass'], true)) {
             return null;
@@ -216,7 +296,7 @@ class CartRepository
         return null;
     }
 
-    /** Sum of quantities in all active carts for this ticket option. */
+    /** How many tickets of this type are currently “held” in open carts — counts toward the cap. */
     public function sumActiveCartQuantityForTicketDetails(int $ticketDetailsId): int
     {
         $db = Database::getConnection();
@@ -232,7 +312,8 @@ class CartRepository
     }
 
     /**
-     * Seats held by pay-later orders (pending with a future expiry). Ignores legacy pending rows without expires_at.
+     * Pay-later orders still reserve seats until they expire or get paid — this counts those pending lines.
+     * Rows without `expires_at` are ignored so stray seed data cannot block sales forever.
      */
     public function sumPendingOrderQuantityForTicketDetails(int $ticketDetailsId): int
     {
@@ -251,7 +332,11 @@ class CartRepository
         return (int) $stmt->fetchColumn();
     }
 
-    /** @return array{cart_item_id: int, cart_id: int, ticket_details_id: int, quantity: int}|null */
+    /**
+     * Looks up one basket line by primary key (update/remove paths).
+     *
+     * @return array{cart_item_id: int, cart_id: int, ticket_details_id: int, quantity: int}|null
+     */
     public function findCartItemById(int $cartItemId): ?array
     {
         $db = Database::getConnection();
@@ -273,6 +358,8 @@ class CartRepository
     }
 
     /**
+     * Lines for the drawer and /cart — includes ticket name, price, and event title/time for display.
+     *
      * @return CartItem[]
      */
     public function getCartItemsDetailed(int $cartId): array
@@ -311,6 +398,7 @@ class CartRepository
         return $items;
     }
 
+    /** Clears every line — used after checkout converts the cart. */
     public function deleteAllItemsForCart(int $cartId): void
     {
         $db = Database::getConnection();
@@ -318,6 +406,7 @@ class CartRepository
         $stmt->execute(['cid' => $cartId]);
     }
 
+    /** Stops the old cart from counting toward “reserved” stock once an order is placed. */
     public function markCartConverted(int $cartId): void
     {
         $db = Database::getConnection();
@@ -327,6 +416,7 @@ class CartRepository
         $stmt->execute(['cid' => $cartId]);
     }
 
+    /** PDO row → Cart model. */
     private function mapRowToCart(array $row): Cart
     {
         $cart = new Cart();
@@ -338,6 +428,7 @@ class CartRepository
         return $cart;
     }
 
+    /** PDO row → CartItem model (includes joined event fields for the UI). */
     private function mapRowToCartItem(array $row): CartItem
     {
         $item = new CartItem();

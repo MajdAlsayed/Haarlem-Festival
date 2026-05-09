@@ -4,9 +4,7 @@ namespace App\ViewModels;
 
 use App\Models\Event;
 
-/**
- * Data for the Dance index view. The controller fills this; the view only uses these properties.
- */
+/** View model for the Dance index: keeps the template thin by passing structured data only. */
 class DanceViewModel
 {
     public array $events;

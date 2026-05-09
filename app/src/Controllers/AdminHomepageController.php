@@ -11,6 +11,10 @@ use App\Repositories\PageRepository;
 use App\Repositories\SettingsRepository;
 use App\ViewModels\AdminHomepageEditViewModel;
 
+/**
+ * CMS: edit the public homepage title (pages.slug = home) and WYSIWYG/plain fields under `cms_home_*` in site_settings.
+ * Rich HTML fields go through HtmlSanitizer; hrefs and image paths are validated to block javascript: and path traversal.
+ */
 final class AdminHomepageController
 {
     private PageRepository $pageRepository;
@@ -22,6 +26,7 @@ final class AdminHomepageController
         $this->settingsRepository = new SettingsRepository();
     }
 
+    /** GET (or re-display after validation error): show HomepageEdit with merged CMS values and CSRF tokens. */
     public function showForm(?string $error = null, ?string $success = null): void
     {
         if (!AdminAuth::requireAdmin()) {
@@ -46,6 +51,7 @@ final class AdminHomepageController
         require __DIR__ . '/../Views/Admin/HomepageEdit.php';
     }
 
+    /** POST: validate CSRF, save page title, then each cms_home field (purify HTML where configured, upsert into settings). */
     public function save(): void
     {
         if (!AdminAuth::requireAdmin()) {
@@ -126,7 +132,12 @@ final class AdminHomepageController
             return 'Field "' . $key . '" is too long (max ' . $max . ' characters).';
         }
 
-        $requiredPlain = ['hero_heading', 'hero_cta_label', 'welcome_heading', 'about_heading', 'about_image_alt', 'about_more_label'];
+        $requiredPlain = [
+            'hero_heading', 'hero_cta_label', 'welcome_heading', 'about_heading', 'about_image_alt', 'about_more_label',
+            'events_heading', 'events_subtitle', 'events_info_label', 'events_tickets_label',
+            'events_category_dance', 'events_category_jazz', 'events_category_history', 'events_category_yammy', 'events_category_stories',
+            'expect_heading', 'expect_intro', 'expect_subheading', 'expect_cta'
+        ];
         if (in_array($key, $requiredPlain, true) && $val === '') {
             return 'Fill in headings, button label and image alt.';
         }
@@ -154,9 +165,17 @@ final class AdminHomepageController
             }
         }
 
+        if ($key === 'expect_cards_json') {
+            $decoded = json_decode($val, true);
+            if (!is_array($decoded)) {
+                return 'Expect cards must be valid JSON array.';
+            }
+        }
+
         return null;
     }
 
+    /** Allows #fragment, same-site paths, or http(s) URLs; rejects everything else and `..`. */
     private static function looksUnsafeHref(string $href): bool
     {
         $t = trim($href);

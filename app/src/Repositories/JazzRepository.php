@@ -5,6 +5,13 @@ namespace App\Repositories;
 
 use App\Core\Database;
 
+/**
+ * All the SELECTs the jazz front-end needs — no writes here.
+ *
+ * We join events to venues and filter to the “jazz” type. There’s a little subquery that finds the matching
+ * `ticket_details` row so artist pages can build “Add to program” forms that know which catalog id to post.
+ * attachPreviewAudio() is a helper that turns file paths from `event_audio` into real /audio/… URLs.
+ */
 final class JazzRepository
 {
     /**
@@ -19,12 +26,18 @@ final class JazzRepository
      *   seats:?int,
      *   price:?string,
      *   venue_name:string,
-     *   venue_city:string
+     *   venue_city:string,
+     *   ticket_details_id:?int
      * }>
+     *
+     * Main query powering the /jazz grid — tries the “wide” SELECT first, falls back if older DBs lack columns.
      */
     public function getAll(): array
     {
         $db = Database::getConnection();
+
+        $ticketSub = "(SELECT td.ticket_details_id FROM ticket_details td
+            WHERE td.event_id = e.event_id AND td.ticket_type = 'event_ticket' LIMIT 1) AS ticket_details_id";
 
         $baseSql = "
             SELECT
@@ -34,7 +47,8 @@ final class JazzRepository
                 e.event_day,
                 e.start_time,
                 v.name AS venue_name,
-                v.city AS venue_city
+                v.city AS venue_city,
+                {$ticketSub}
             FROM events e
             JOIN event_types et ON e.event_type_id = et.event_type_id
             JOIN venues v ON e.venue_id = v.venue_id
@@ -62,7 +76,8 @@ final class JazzRepository
                 e.seats,
                 e.price,
                 v.name AS venue_name,
-                v.city AS venue_city
+                v.city AS venue_city,
+                {$ticketSub}
             FROM events e
             JOIN event_types et ON e.event_type_id = et.event_type_id
             JOIN venues v ON e.venue_id = v.venue_id
@@ -88,6 +103,8 @@ final class JazzRepository
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return array_map(function ($r) {
+            $tid = $r['ticket_details_id'] ?? null;
+
             return [
                 'event_id' => (int)$r['event_id'],
                 'title' => (string)$r['title'],
@@ -100,11 +117,16 @@ final class JazzRepository
                 'price' => isset($r['price']) && $r['price'] !== null ? (string)$r['price'] : null,
                 'venue_name' => (string)$r['venue_name'],
                 'venue_city' => (string)$r['venue_city'],
+                'ticket_details_id' => $tid !== null && $tid !== '' ? (int) $tid : null,
             ];
         }, $rows);
     }
 
-    /** @return array<int, array<string,mixed>> */
+    /**
+     * Filters {@see getAll()} to a single weekday string (thursday…sunday).
+     *
+     * @return array<int, array<string,mixed>>
+     */
     public function getByDay(string $day): array
     {
         $day = strtolower(trim($day));
@@ -112,7 +134,11 @@ final class JazzRepository
         return array_values(array_filter($all, fn($e) => ($e['event_day'] ?? '') === $day));
     }
 
-    /** @return array<int, array<string,mixed>> */
+    /**
+     * All jazz rows whose title matches exactly (case-insensitive) — used to build one artist’s schedule.
+     *
+     * @return array<int, array<string,mixed>>
+     */
     public function getByTitle(string $title): array
     {
         $title = strtolower(trim($title));
@@ -124,7 +150,7 @@ final class JazzRepository
     }
 
     /**
-     * Attach preview_audio (url + track_title) from event_audio table when present.
+     * Enriches schedule rows with `preview_audio` URLs when `event_audio` has a clip (Gumbo / Gare pages).
      *
      * @param array<int, array<string,mixed>> $events
      * @return array<int, array<string,mixed>>
@@ -170,6 +196,7 @@ final class JazzRepository
         return $events;
     }
 
+    /** Turns a stored relative path into a browser-safe `/audio/...` URL with encoded segments. */
     private function buildAudioPublicUrl(string $relativePath): string
     {
         $relativePath = str_replace('\\', '/', trim($relativePath, '/'));
@@ -183,6 +210,7 @@ final class JazzRepository
 
     /**
      * Discography rows for a jazz artist page (e.g. Karsu). Empty if table missing or none.
+     * Paths become absolute `image_url` / `audio_url` for the templates.
      *
      * @return list<array{
      *   track_id:int,
@@ -231,6 +259,42 @@ final class JazzRepository
         }, $rows);
     }
 
+    /**
+     * Band members for an artist page (ordered). Empty if table missing or none.
+     * Image paths are expanded to full `/images/jazz/...` URLs.
+     *
+     * @return list<array{name:string,role:string,img:string}>
+     */
+    public function getBandMembersByArtistSlug(string $slug): array
+    {
+        $slug = strtolower(trim($slug));
+        if ($slug === '') {
+            return [];
+        }
+
+        $db = Database::getConnection();
+        try {
+            $stmt = $db->prepare(
+                'SELECT name, role, image_file FROM jazz_band_members
+                 WHERE artist_slug = :slug ORDER BY sort_order ASC, member_id ASC'
+            );
+            $stmt->execute(['slug' => $slug]);
+            /** @var array<int, array<string, mixed>> $rows */
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Throwable) {
+            return [];
+        }
+
+        return array_map(function (array $r): array {
+            return [
+                'name' => (string) $r['name'],
+                'role' => (string) $r['role'],
+                'img' => $this->buildJazzImagePublicUrl((string) $r['image_file']),
+            ];
+        }, $rows);
+    }
+
+    /** File name or subpath under `public/images/jazz` → public URL. */
     private function buildJazzImagePublicUrl(string $fileName): string
     {
         $fileName = str_replace('\\', '/', trim($fileName, '/'));

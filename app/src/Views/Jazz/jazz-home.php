@@ -1,9 +1,17 @@
 <?php
+/**
+ * Jazz landing page (/jazz) — the big grid of shows with day filters.
+ *
+ * JazzController::index() hands us events + config; we group by weekday, sort Thursday/Friday the way CMS prefers,
+ * and build “All events” so repeat acts don’t spam the list. Hearts use localStorage for a lightweight “my program”.
+ * We load Bootstrap + our stylesheet here ($skipHeaderStyleSheet) so this page matches the rest of the site header.
+ */
 /** @var \App\ViewModels\JazzViewModel $vm */
 /** @var array<string, mixed> $jazzConfig */
 
 $app = (new \App\Repositories\SettingsRepository())->getAll();
 $h = fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+$skipHeaderStyleSheet = true;
 
 $heroFile = (string) ($jazzConfig['hero_image'] ?? 'hero-jazz.jpg');
 $hero = '/images/jazz/' . rawurlencode($heroFile);
@@ -14,7 +22,7 @@ $fridayOrder = $jazzConfig['friday_order'] ?? [];
 $saturdayOrder = $jazzConfig['saturday_order'] ?? [];
 $sundayOrder = $jazzConfig['sunday_order'] ?? [];
 
-// One card per event (so each day shows all its events; same artist can appear on multiple days)
+// Split the flat list into buckets — every show keeps its own card even if the same band plays twice
 $byDay = ['thursday' => [], 'friday' => [], 'saturday' => [], 'sunday' => []];
 $allEvents = is_array($vm->events) ? $vm->events : [];
 foreach ($allEvents as $e) {
@@ -24,7 +32,7 @@ foreach ($allEvents as $e) {
     }
 }
 
-// Sort Thursday by thursday_order, Friday by friday_order, then start_time; other days by start_time
+// CMS can pin headline acts: if a title is in thursday_order / friday_order / …, respect that order, else fall back to clock time
 $sortByOrder = function (array $order) {
     return function ($a, $b) use ($order) {
         $posA = array_search((string)$a['title'], $order, true);
@@ -42,13 +50,13 @@ usort($byDay['sunday'], $sortByOrder($sundayOrder));
 
 $events = array_merge($byDay['thursday'], $byDay['friday'], $byDay['saturday'], $byDay['sunday']);
 
-// For All Events: show only one card per artist (hide 2nd+ occurrence) for these titles
+// “All events” tab: these names only get one card so the grid doesn’t look like copy-paste when they play multiple slots
 $allEventsDedupTitles = ['Wicked Jazz Sounds', 'Evolve', 'The Nordanians', 'Gumbo Kings', 'Gare du Nord'];
 $seenForAll = [];
 $allEventsDuplicateKeys = [];
 foreach ($events as $i => $e) {
     $title = trim((string)($e['title'] ?? ''));
-    $titleKey = $title; // match exactly from DB
+    $titleKey = $title; // keep DB spelling for the duplicate check
     $isInDedupList = false;
     foreach ($allEventsDedupTitles as $dedupTitle) {
         if (strcasecmp($title, $dedupTitle) === 0) {
@@ -74,6 +82,7 @@ $slugify = function (string $s): string {
 
 $allowedDetails = [];
 $artistPages = is_array($jazzConfig['artist_pages'] ?? null) ? $jazzConfig['artist_pages'] : [];
+// Map “slug from URL” → artist detail link so card buttons know where to send people
 foreach ($artistPages as $pageSlug => $meta) {
     if (!is_array($meta)) {
         continue;
@@ -91,7 +100,8 @@ foreach ($artistPages as $pageSlug => $meta) {
 <head>
     <meta charset="UTF-8">
     <title><?= $h($vm->pageTitle) ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>&jazz=4">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>&jazz=5">
 </head>
 <body class="jazz-page jazz-filter-all">
 
@@ -149,7 +159,7 @@ foreach ($artistPages as $pageSlug => $meta) {
 
                 $price = $e['price'] !== null ? (float)$e['price'] : null;
 
-                // Use prototype card image if mapped, else try slug.png then slug.jpg
+                // Prefer the filename from jazz config; otherwise guess from the URL-friendly slug
                 $imgFile = $eventCardImages[$title] ?? ($slug . '.png');
                 $img = '/images/jazz/' . rawurlencode($imgFile);
 

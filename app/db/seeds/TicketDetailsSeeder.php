@@ -28,7 +28,7 @@ final class TicketDetailsSeeder extends AbstractSeed
              FROM events e
              JOIN event_types et ON et.event_type_id = e.event_type_id
              JOIN venues v ON v.venue_id = e.venue_id
-             WHERE LOWER(et.name) IN ('jazz','dance','history','stories')"
+             WHERE LOWER(et.name) IN ('jazz','dance','stories')"
         );
 
         foreach ($rows as $ev) {
@@ -98,7 +98,7 @@ final class TicketDetailsSeeder extends AbstractSeed
                     'schedule_display' => $d['schedule_display'] ?? null,
                     'sort_order' => (int) $d['sort'],
                     'is_free' => 0,
-                    'name' => 'Day Pass',
+                    'name' => $cat === 'dance' ? 'All-Access Day Pass' : 'Day Pass',
                     'description' => $d['description'],
                     'price' => $d['price'],
                 ];
@@ -113,7 +113,7 @@ final class TicketDetailsSeeder extends AbstractSeed
                 'schedule_display' => $allAccess['schedule_display'],
                 'sort_order' => 10,
                 'is_free' => 0,
-                'name' => 'All-Access Pass',
+                'name' => $cat === 'dance' ? 'All-Access Festival Pass' : 'All-Access Pass',
                 'description' => $allAccess['description'],
                 'price' => $allAccess['price'],
             ];
@@ -144,16 +144,16 @@ final class TicketDetailsSeeder extends AbstractSeed
             ],
             'dance' => [
                 [
-                    ['description' => 'All access only for the day', 'pass_day' => 'friday', 'pass_time' => '20:00', 'schedule_display' => null, 'price' => '125.00', 'sort' => 1],
-                    ['description' => 'All access only for the day', 'pass_day' => 'saturday', 'pass_time' => '14:00', 'schedule_display' => null, 'price' => '125.00', 'sort' => 2],
-                    ['description' => 'All access only for the day', 'pass_day' => 'sunday', 'pass_time' => '14:00', 'schedule_display' => null, 'price' => '125.00', 'sort' => 3],
+                    ['description' => "Access to all DANCE! events on Friday\nIncludes evening club sessions\nBest option for multiple Friday events", 'pass_day' => 'friday', 'pass_time' => '20:00', 'schedule_display' => null, 'price' => '150.00', 'sort' => 1],
+                    ['description' => "Access to all DANCE! events on Saturday\nIncludes Caprera Openluchttheater session\nBest option for multiple Saturday events", 'pass_day' => 'saturday', 'pass_time' => '14:00', 'schedule_display' => null, 'price' => '150.00', 'sort' => 2],
+                    ['description' => "Access to all DANCE! events on Sunday\nIncludes daytime and evening sets\nBest option for multiple Sunday events", 'pass_day' => 'sunday', 'pass_time' => '14:00', 'schedule_display' => null, 'price' => '150.00', 'sort' => 3],
                 ],
                 [
-                    'description' => 'All access for all dance nights',
+                    'description' => "Access to all DANCE! events on Friday, Saturday & Sunday\nOne pass for the full festival weekend\nIncludes Caprera Openluchttheater sessions",
                     'pass_day' => null,
                     'pass_time' => null,
                     'schedule_display' => 'Friday, Saturday, Sunday',
-                    'price' => '299.00',
+                    'price' => '250.00',
                 ],
             ],
         };
@@ -169,7 +169,6 @@ final class TicketDetailsSeeder extends AbstractSeed
         return match ($cat) {
             'dance' => 75.0,
             'jazz' => 15.0,
-            'history' => 17.50,
             'stories' => 10.0,
             default => 20.0,
         };

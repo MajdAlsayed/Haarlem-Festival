@@ -64,7 +64,7 @@ CREATE TABLE `pages` (
   `is_published` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
+admin
 --
 -- Dumping data for table `pages`
 --

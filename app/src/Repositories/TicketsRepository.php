@@ -7,10 +7,17 @@ namespace App\Repositories;
 use App\Core\Database;
 use PDO;
 
+/**
+ * Feeds the public tickets page with the right rows for the active tab.
+ *
+ * “Special offer” pulls day passes and all-access passes. Under each weekday we list normal event tickets whose
+ * event type matches jazz, dance, history, or stories depending on ?cat=. History rows can join session times.
+ */
 final class TicketsRepository
 {
     public const CATEGORIES = ['jazz', 'dance', 'history', 'stories'];
 
+    /** Hero paragraph on /tickets — from `site_settings` or a built-in default if the row is missing. */
     public function getIntroText(): string
     {
         try {
@@ -29,6 +36,8 @@ final class TicketsRepository
     }
 
     /**
+     * Day + all-access bundles that belong to this tab (category filter matches jazz/dance/… or “all”).
+     *
      * @return list<array<string,mixed>>
      */
     public function getPassesForCategory(string $category): array
@@ -54,6 +63,57 @@ final class TicketsRepository
     }
 
     /**
+     * Dance day pass for the event weekday (matches ticket_details.pass_day).
+     *
+     * @return array<string,mixed>|null
+     */
+    public function getDanceDayPassForDay(string $eventDay): ?array
+    {
+        $normalized = strtolower(trim($eventDay));
+        if (!in_array($normalized, ['thursday', 'friday', 'saturday', 'sunday'], true)) {
+            return null;
+        }
+
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            "SELECT ticket_details_id, ticket_type, category, pass_day, pass_time, schedule_display,
+                    sort_order, is_free, name, description, price
+             FROM ticket_details
+             WHERE ticket_type = 'day_pass'
+               AND LOWER(category) = 'dance'
+               AND LOWER(COALESCE(pass_day, '')) = :day
+             LIMIT 1"
+        );
+        $stmt->execute(['day' => $normalized]);
+        $r = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $r ? $this->normalizeRow($r) : null;
+    }
+
+    /**
+     * Dance all-access weekend pass (not tied to a single event).
+     *
+     * @return array<string,mixed>|null
+     */
+    public function getDanceAllAccessPass(): ?array
+    {
+        $db = Database::getConnection();
+        $stmt = $db->query(
+            "SELECT ticket_details_id, ticket_type, category, pass_day, pass_time, schedule_display,
+                    sort_order, is_free, name, description, price
+             FROM ticket_details
+             WHERE ticket_type = 'all_access_pass'
+               AND LOWER(category) = 'dance'
+             LIMIT 1"
+        );
+        $r = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $r ? $this->normalizeRow($r) : null;
+    }
+
+    /**
+     * Per-event tickets for the active tab, bucketed Thursday→Sunday for the template loops.
+     *
      * @return array<string, list<array<string,mixed>>>
      */
     public function getEventTicketsGroupedByDay(string $category): array
@@ -66,10 +126,19 @@ final class TicketsRepository
         $db = Database::getConnection();
         $stmt = $db->prepare(
             "SELECT td.ticket_details_id, td.name, td.description, td.price, td.is_free,
-                    e.event_id, e.event_day, e.start_time, e.end_time, e.hall,
-                    v.name AS venue_name
+                    e.event_id, e.event_day,
+                    CASE
+                        WHEN LOWER(et.name) = 'history' THEN s.start_time
+                        ELSE e.start_time
+                   END AS start_time,
+                   CASE
+                       WHEN LOWER(et.name) = 'history' THEN s.end_time
+                       ELSE e.end_time
+                   END AS end_time,
+                    e.hall,v.name AS venue_name
              FROM ticket_details td
              INNER JOIN events e ON e.event_id = td.event_id
+             LEFT JOIN sessions s ON s.session_id = td.session_id
              INNER JOIN event_types et ON et.event_type_id = e.event_type_id
              INNER JOIN venues v ON v.venue_id = e.venue_id
              WHERE td.ticket_type = 'event_ticket'
@@ -113,7 +182,11 @@ final class TicketsRepository
         return $grouped;
     }
 
-    /** @param array<string,mixed> $r */
+    /**
+     * Makes pass rows consistent for the view (booleans, trimmed strings).
+     *
+     * @param array<string,mixed> $r
+     */
     private function normalizeRow(array $r): array
     {
         return [

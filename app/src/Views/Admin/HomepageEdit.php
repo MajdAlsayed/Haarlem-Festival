@@ -10,40 +10,34 @@ $c = $viewModel->cmsHome;
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Edit homepage — <?= htmlspecialchars((string)($app['site_name'] ?? 'Haarlem Festival')) ?></title>
     <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string)($app['css_version'] ?? '1.0')) ?>">
-    <style>
-        .admin-cms-wrap { max-width: 720px; margin: 1rem auto; padding: 0 1rem; }
-        .admin-cms-nav { margin: 0.75rem 0 1rem; font-size: 0.95rem; }
-        .admin-cms-nav a { color: #c9a227; font-weight: 600; }
-        .admin-cms-field { margin: 1rem 0; }
-        .admin-cms-field label { display: block; margin-bottom: 0.35rem; font-weight: 600; }
-        .admin-cms-field input[type="text"], .admin-cms-field textarea { width: 100%; max-width: 640px; padding: 0.5rem; box-sizing: border-box; }
-        .admin-cms-field textarea { min-height: 4rem; }
-        .admin-cms-hint { font-size: 0.85rem; color: #888; margin-top: 0.25rem; }
-        .admin-cms-msg-ok { background: #143; border: 1px solid #2a5; padding: 0.75rem; margin-bottom: 1rem; border-radius: 4px; }
-        .admin-cms-msg-err { background: #fee; border: 1px solid #c00; padding: 0.75rem; margin-bottom: 1rem; border-radius: 4px; color: #300; }
-        .admin-cms-section { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #333; }
-        .admin-cms-section h2 { font-size: 1.15rem; margin-bottom: 0.5rem; }
-        .admin-cms-upload { margin: 0.5rem 0 1rem; padding: 0.75rem; background: #1a1a1a; border-radius: 6px; font-size: 0.9rem; }
-        .admin-cms-upload input[type="file"] { max-width: 100%; }
-    </style>
+    <link rel="stylesheet" href="/css/admin.css?v=<?= htmlspecialchars((string)($app['css_version'] ?? '1.0')) ?>">
 </head>
-<body data-upload-csrf="<?= htmlspecialchars($viewModel->uploadCsrf) ?>" data-upload-url="/admin/cms/upload">
+<body class="admin-page" data-upload-csrf="<?= htmlspecialchars($viewModel->uploadCsrf) ?>" data-upload-url="/admin/cms/upload">
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
-<main class="admin-cms-wrap">
-    <?php require __DIR__ . '/partials/admin_nav.php'; ?>
+<main class="admin-main">
+    <div class="admin-container admin-container--cms-form admin-cms-home">
+        <nav class="admin-breadcrumb">
+            <a href="/"><?= htmlspecialchars((string)($app['site_name'] ?? 'Festival')) ?></a>
+            <span class="admin-breadcrumb-sep">›</span>
+            <a href="/admin">Admin</a>
+            <span class="admin-breadcrumb-sep">›</span>
+            <span>Homepage CMS</span>
+        </nav>
 
-    <h1>Edit homepage (CMS)</h1>
-    <p>Title = <code>pages</code> (slug home). Other fields = <code>site_settings</code> (keys <code>cms_home_*</code>). TinyMCE for some fields; you can upload the about image. <a href="/">View site</a></p>
+        <h1 class="admin-title">Edit homepage</h1>
+        <p class="admin-lead admin-lead--cms">Title comes from <code class="admin-cms-inline-code">pages</code> (slug <code class="admin-cms-inline-code">home</code>). Other fields are <code class="admin-cms-inline-code">site_settings</code> keys <code class="admin-cms-inline-code">cms_home_*</code>. TinyMCE on selected fields; you can upload the about image. <a href="/" target="_blank" rel="noopener">View site</a></p>
+
+        <?php require __DIR__ . '/partials/admin_nav.php'; ?>
 
     <?php if ($viewModel->success !== null): ?>
-        <div class="admin-cms-msg-ok"><?= htmlspecialchars($viewModel->success) ?></div>
+        <div class="admin-alert admin-alert-success"><?= htmlspecialchars($viewModel->success) ?></div>
     <?php endif; ?>
     <?php if ($viewModel->error !== null): ?>
-        <div class="admin-cms-msg-err"><?= htmlspecialchars($viewModel->error) ?></div>
+        <div class="admin-alert admin-alert-error"><?= htmlspecialchars($viewModel->error) ?></div>
     <?php endif; ?>
 
-    <form method="post" action="/admin/cms/homepage">
+    <form method="post" action="/admin/cms/homepage" class="admin-cms-home-form">
         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($viewModel->csrf) ?>">
 
         <div class="admin-cms-field">
@@ -115,11 +109,11 @@ $c = $viewModel->cmsHome;
                        value="<?= htmlspecialchars($c['about_image_src'] ?? '') ?>">
                 <p class="admin-cms-hint">Site path, e.g. <code>/images/cms/home/…</code> or upload below.</p>
             </div>
-            <div class="admin-cms-upload">
-                <strong>Upload about image</strong> (max 5 MB) → <code>/images/cms/home/</code>
-                <div style="margin-top:0.5rem;">
+            <div class="admin-cms-upload admin-cms-upload--home">
+                <strong>Upload about image</strong> (max 5 MB) → <code class="admin-cms-inline-code">/images/cms/home/</code>
+                <div class="admin-cms-upload-row">
                     <input type="file" id="cms-upload-home-file" accept="image/jpeg,image/png,image/gif,image/webp">
-                    <button type="button" class="btn btn-primary" id="cms-upload-home-btn" style="margin-left:0.5rem;">Upload &amp; fill path</button>
+                    <button type="button" class="admin-btn admin-btn-primary admin-btn-sm" id="cms-upload-home-btn">Upload &amp; fill path</button>
                 </div>
             </div>
             <div class="admin-cms-field">
@@ -139,8 +133,86 @@ $c = $viewModel->cmsHome;
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Save homepage</button>
+        <div class="admin-cms-section">
+            <h2>Events section</h2>
+            <div class="admin-cms-field">
+                <label for="cms_events_heading">Section heading</label>
+                <input type="text" id="cms_events_heading" name="cms[events_heading]" maxlength="500"
+                       value="<?= htmlspecialchars($c['events_heading'] ?? '') ?>">
+            </div>
+            <div class="admin-cms-field">
+                <label for="cms_events_subtitle">Section subtitle</label>
+                <input type="text" id="cms_events_subtitle" name="cms[events_subtitle]" maxlength="500"
+                       value="<?= htmlspecialchars($c['events_subtitle'] ?? '') ?>">
+            </div>
+            <div class="admin-cms-field">
+                <label for="cms_events_info_label">Info button label</label>
+                <input type="text" id="cms_events_info_label" name="cms[events_info_label]" maxlength="500"
+                       value="<?= htmlspecialchars($c['events_info_label'] ?? '') ?>">
+            </div>
+            <div class="admin-cms-field">
+                <label for="cms_events_tickets_label">Tickets button label</label>
+                <input type="text" id="cms_events_tickets_label" name="cms[events_tickets_label]" maxlength="500"
+                       value="<?= htmlspecialchars($c['events_tickets_label'] ?? '') ?>">
+            </div>
+            <div class="admin-cms-field">
+                <label for="cms_events_category_dance">Dance category display label</label>
+                <input type="text" id="cms_events_category_dance" name="cms[events_category_dance]" maxlength="500"
+                       value="<?= htmlspecialchars($c['events_category_dance'] ?? '') ?>">
+            </div>
+            <div class="admin-cms-field">
+                <label for="cms_events_category_jazz">Jazz category display label</label>
+                <input type="text" id="cms_events_category_jazz" name="cms[events_category_jazz]" maxlength="500"
+                       value="<?= htmlspecialchars($c['events_category_jazz'] ?? '') ?>">
+            </div>
+            <div class="admin-cms-field">
+                <label for="cms_events_category_history">History category display label</label>
+                <input type="text" id="cms_events_category_history" name="cms[events_category_history]" maxlength="500"
+                       value="<?= htmlspecialchars($c['events_category_history'] ?? '') ?>">
+            </div>
+            <div class="admin-cms-field">
+                <label for="cms_events_category_yammy">Food category display label</label>
+                <input type="text" id="cms_events_category_yammy" name="cms[events_category_yammy]" maxlength="500"
+                       value="<?= htmlspecialchars($c['events_category_yammy'] ?? '') ?>">
+            </div>
+            <div class="admin-cms-field">
+                <label for="cms_events_category_stories">Stories category display label</label>
+                <input type="text" id="cms_events_category_stories" name="cms[events_category_stories]" maxlength="500"
+                       value="<?= htmlspecialchars($c['events_category_stories'] ?? '') ?>">
+            </div>
+        </div>
+
+        <div class="admin-cms-section">
+            <h2>Expect section</h2>
+            <div class="admin-cms-field">
+                <label for="cms_expect_heading">Section heading</label>
+                <input type="text" id="cms_expect_heading" name="cms[expect_heading]" maxlength="500"
+                       value="<?= htmlspecialchars($c['expect_heading'] ?? '') ?>">
+            </div>
+            <div class="admin-cms-field">
+                <label for="cms_expect_intro">Intro text</label>
+                <textarea id="cms_expect_intro" name="cms[expect_intro]"><?= htmlspecialchars($c['expect_intro'] ?? '') ?></textarea>
+            </div>
+            <div class="admin-cms-field">
+                <label for="cms_expect_subheading">Subheading</label>
+                <input type="text" id="cms_expect_subheading" name="cms[expect_subheading]" maxlength="500"
+                       value="<?= htmlspecialchars($c['expect_subheading'] ?? '') ?>">
+            </div>
+            <div class="admin-cms-field">
+                <label for="cms_expect_cta">CTA text</label>
+                <textarea id="cms_expect_cta" name="cms[expect_cta]"><?= htmlspecialchars($c['expect_cta'] ?? '') ?></textarea>
+            </div>
+            <div class="admin-cms-field">
+                <label for="cms_expect_cards_json">Cards JSON (array of {icon,title,items[]})</label>
+                <textarea id="cms_expect_cards_json" class="admin-cms-json-textarea" name="cms[expect_cards_json]"><?= htmlspecialchars($c['expect_cards_json'] ?? '[]') ?></textarea>
+            </div>
+        </div>
+
+        <div class="admin-cms-home-actions">
+            <button type="submit" class="admin-btn admin-btn-primary">Save homepage</button>
+        </div>
     </form>
+    </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.4/tinymce.min.js" referrerpolicy="origin"></script>

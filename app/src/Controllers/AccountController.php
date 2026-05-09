@@ -9,9 +9,7 @@ use App\Core\Session;
 use App\Repositories\OrderRepository;
 use App\Repositories\SettingsRepository;
 
-/**
- * Logged-in customer: order history, invoice + tickets (assessment visitor flow).
- */
+/** Customer order history, invoice and tickets; pending pay-later orders expose payment actions here. */
 final class AccountController
 {
     public function orders(): void
@@ -38,6 +36,7 @@ final class AccountController
         $tickets = $orders->getTicketCodesForOrder($orderId);
         $app = (new SettingsRepository())->getAll();
         $orderError = Session::getFlash('order_error');
+        // Same CSRF bucket as /checkout so the pending-order forms can post to /checkout/pay-pending*.
         $checkoutCsrf = Csrf::token('checkout');
         $stripeOn = \App\Services\StripePaymentService::isConfigured();
 

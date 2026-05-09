@@ -6,13 +6,21 @@ namespace App\Repositories;
 use App\Core\Database;
 use PDO;
 
+/**
+ * Database writes for the jazz admin screens — the counterpart to JazzRepository (which only reads).
+ *
+ * Inserts/updates/deletes jazz events, optional preview audio, discography tracks, and band member rows.
+ * Everything is scoped to the jazz event type so we don’t accidentally touch dance or history rows.
+ */
 final class JazzCmsRepository
 {
+    /** Shared PDO handle for this request. */
     private function db(): PDO
     {
         return Database::getConnection();
     }
 
+    /** Primary key for the “jazz” row in `event_types` — every create uses this. */
     public function getJazzEventTypeId(): int
     {
         $stmt = $this->db()->query("SELECT event_type_id FROM event_types WHERE LOWER(name) = 'jazz' LIMIT 1");
@@ -24,7 +32,11 @@ final class JazzCmsRepository
         return (int) $row['event_type_id'];
     }
 
-    /** @return list<array{venue_id:int,name:string,city:string}> */
+    /**
+     * Venues dropdown for event create/edit.
+     *
+     * @return list<array{venue_id:int,name:string,city:string}>
+     */
     public function listVenues(): array
     {
         $stmt = $this->db()->query('SELECT venue_id, name, city FROM venues ORDER BY name ASC');
@@ -39,6 +51,8 @@ final class JazzCmsRepository
     }
 
     /**
+     * All jazz events for the admin table, with venue names, weekday order, then time.
+     *
      * @return list<array<string,mixed>>
      */
     public function listJazzEventsForAdmin(): array
@@ -65,7 +79,11 @@ final class JazzCmsRepository
         return array_map(fn (array $r): array => $this->normalizeEventRow($r), $rows);
     }
 
-    /** @return ?array<string,mixed> */
+    /**
+     * Fetch one jazz event if it exists and still belongs to the jazz type.
+     *
+     * @return ?array<string,mixed>
+     */
     public function getJazzEventById(int $eventId): ?array
     {
         if ($eventId <= 0) {
@@ -90,7 +108,11 @@ final class JazzCmsRepository
         return $this->normalizeEventRow($r);
     }
 
-    /** @return array<string,mixed> */
+    /**
+     * Normalizes types/strings so the admin form always sees predictable keys.
+     *
+     * @return array<string,mixed>
+     */
     private function normalizeEventRow(array $r): array
     {
         return [
@@ -110,6 +132,7 @@ final class JazzCmsRepository
         ];
     }
 
+    /** UPDATE path for the admin jazz event form. */
     public function updateJazzEvent(
         int $eventId,
         int $venueId,
@@ -142,6 +165,7 @@ final class JazzCmsRepository
         ]);
     }
 
+    /** INSERT path — returns the new `event_id`. */
     public function createJazzEvent(
         int $venueId,
         string $title,
@@ -174,6 +198,7 @@ final class JazzCmsRepository
         return (int) $this->db()->lastInsertId();
     }
 
+    /** Hard delete — only allowed after assertJazzEvent passes. */
     public function deleteJazzEvent(int $eventId): void
     {
         $this->assertJazzEvent($eventId);
@@ -181,6 +206,7 @@ final class JazzCmsRepository
         $stmt->execute(['id' => $eventId]);
     }
 
+    /** Ensures we’re not touching another genre’s row by mistake. */
     private function assertJazzEvent(int $eventId): void
     {
         if ($this->getJazzEventById($eventId) === null) {
@@ -188,7 +214,11 @@ final class JazzCmsRepository
         }
     }
 
-    /** @return ?array{audio_id:int,event_id:int,file_path:string,track_title:?string} */
+    /**
+     * Optional teaser clip linked to this event (`event_audio`).
+     *
+     * @return ?array{audio_id:int,event_id:int,file_path:string,track_title:?string}
+     */
     public function getEventAudio(int $eventId): ?array
     {
         try {
@@ -212,6 +242,7 @@ final class JazzCmsRepository
         ];
     }
 
+    /** Insert or update the single preview-audio row for this event. */
     public function upsertEventAudio(int $eventId, string $filePath, ?string $trackTitle): void
     {
         $filePath = str_replace('\\', '/', trim($filePath));
@@ -240,6 +271,7 @@ final class JazzCmsRepository
         }
     }
 
+    /** Removes preview audio (ignored if the table is missing — older DBs). */
     public function deleteEventAudio(int $eventId): void
     {
         try {
@@ -250,7 +282,11 @@ final class JazzCmsRepository
         }
     }
 
-    /** @return list<array<string,mixed>> */
+    /**
+     * Admin list: raw rows from `artist_discography` for one slug.
+     *
+     * @return list<array<string,mixed>>
+     */
     public function listDiscographyBySlug(string $slug): array
     {
         $slug = strtolower(trim($slug));
@@ -272,7 +308,11 @@ final class JazzCmsRepository
         return $rows;
     }
 
-    /** @return ?array<string,mixed> */
+    /**
+     * Single track for the edit screen.
+     *
+     * @return ?array<string,mixed>
+     */
     public function getDiscographyTrack(int $trackId): ?array
     {
         if ($trackId <= 0) {
@@ -292,6 +332,7 @@ final class JazzCmsRepository
         return $r ?: null;
     }
 
+    /** New album row — returns `track_id`. */
     public function insertDiscographyTrack(
         string $artistSlug,
         string $title,
@@ -320,6 +361,7 @@ final class JazzCmsRepository
         return (int) $this->db()->lastInsertId();
     }
 
+    /** Overwrites metadata/paths for an existing track. */
     public function updateDiscographyTrack(
         int $trackId,
         string $artistSlug,
@@ -348,18 +390,145 @@ final class JazzCmsRepository
         ]);
     }
 
+    /** Deletes one discography row by id. */
     public function deleteDiscographyTrack(int $trackId): void
     {
         $stmt = $this->db()->prepare('DELETE FROM artist_discography WHERE track_id = :id');
         $stmt->execute(['id' => $trackId]);
     }
 
-    /** @return list<string> */
+    /**
+     * Which artist slugs already have tracks (for admin tabs).
+     *
+     * @return list<string>
+     */
     public function listDiscographySlugs(): array
     {
         try {
             $stmt = $this->db()->query(
                 'SELECT DISTINCT artist_slug FROM artist_discography ORDER BY artist_slug ASC'
+            );
+            $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            return array_map('strval', $rows);
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
+    /**
+     * Band admin table for one artist slug.
+     *
+     * @return list<array<string,mixed>>
+     */
+    public function listBandMembersBySlug(string $slug): array
+    {
+        $slug = strtolower(trim($slug));
+        if ($slug === '') {
+            return [];
+        }
+        try {
+            $stmt = $this->db()->prepare(
+                'SELECT member_id, artist_slug, name, role, image_file, sort_order
+                 FROM jazz_band_members WHERE artist_slug = :s ORDER BY sort_order ASC, member_id ASC'
+            );
+            $stmt->execute(['s' => $slug]);
+            /** @var list<array<string,mixed>> $rows */
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Throwable) {
+            return [];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * One band member row for editing.
+     *
+     * @return ?array<string,mixed>
+     */
+    public function getBandMember(int $memberId): ?array
+    {
+        if ($memberId <= 0) {
+            return null;
+        }
+        try {
+            $stmt = $this->db()->prepare(
+                'SELECT member_id, artist_slug, name, role, image_file, sort_order
+                 FROM jazz_band_members WHERE member_id = :id LIMIT 1'
+            );
+            $stmt->execute(['id' => $memberId]);
+            $r = $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        return $r ?: null;
+    }
+
+    /** New person on the lineup — returns `member_id`. */
+    public function insertBandMember(
+        string $artistSlug,
+        string $name,
+        string $role,
+        string $imageFile,
+        int $sortOrder
+    ): int {
+        $stmt = $this->db()->prepare(
+            'INSERT INTO jazz_band_members (artist_slug, name, role, image_file, sort_order)
+             VALUES (:slug, :name, :role, :img, :so)'
+        );
+        $stmt->execute([
+            'slug' => strtolower(trim($artistSlug)),
+            'name' => $name,
+            'role' => $role,
+            'img' => str_replace('\\', '/', trim($imageFile)),
+            'so' => $sortOrder,
+        ]);
+
+        return (int) $this->db()->lastInsertId();
+    }
+
+    /** Update name/role/photo/order for someone already in the table. */
+    public function updateBandMember(
+        int $memberId,
+        string $artistSlug,
+        string $name,
+        string $role,
+        string $imageFile,
+        int $sortOrder
+    ): void {
+        $stmt = $this->db()->prepare(
+            'UPDATE jazz_band_members SET artist_slug = :slug, name = :name, role = :role,
+             image_file = :img, sort_order = :so WHERE member_id = :id'
+        );
+        $stmt->execute([
+            'slug' => strtolower(trim($artistSlug)),
+            'name' => $name,
+            'role' => $role,
+            'img' => str_replace('\\', '/', trim($imageFile)),
+            'so' => $sortOrder,
+            'id' => $memberId,
+        ]);
+    }
+
+    /** Remove one band member row. */
+    public function deleteBandMember(int $memberId): void
+    {
+        $stmt = $this->db()->prepare('DELETE FROM jazz_band_members WHERE member_id = :id');
+        $stmt->execute(['id' => $memberId]);
+    }
+
+    /**
+     * Which slugs already have band rows (for admin tabs).
+     *
+     * @return list<string>
+     */
+    public function listBandMemberSlugs(): array
+    {
+        try {
+            $stmt = $this->db()->query(
+                'SELECT DISTINCT artist_slug FROM jazz_band_members ORDER BY artist_slug ASC'
             );
             $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
 

@@ -16,6 +16,7 @@ final class AdminUserViewModel
         string       $sortBy = 'created_at',
         string       $sortDir = 'DESC',
     ) {
+        // Only allow sorting by these columns
         $allowed = ['first_name', 'email', 'created_at'];
         $this->search = $search;
         $this->sortBy = in_array($sortBy, $allowed, true) ? $sortBy : 'created_at';
@@ -31,7 +32,7 @@ final class AdminUserViewModel
             . '&search=' . rawurlencode($this->search);
     }
 
-    // Returns empty string if this column is not the active sort
+    // Return an arrow or empty string if this column is not the active sort
     public function sortArrow(string $col): string
     {
         if ($this->sortBy !== $col){

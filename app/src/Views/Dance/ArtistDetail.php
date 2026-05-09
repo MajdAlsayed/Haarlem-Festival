@@ -1,7 +1,9 @@
 <?php
+/** Dance artist profile for /dance/artist/{slug}. */
 /** @var \App\ViewModels\ArtistDetailViewModel $viewModel */
 $artist = $viewModel->artist;
 $appSettings = $viewModel->appSettings;
+// Map DB day keys to UI labels for schedule rendering.
 $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday'];
 ?>
 <!DOCTYPE html>
@@ -20,7 +22,9 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
     <section class="artist-detail-hero" style="background-image: linear-gradient(to right, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 45%, transparent 70%), linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.65) 100%), url('<?= htmlspecialchars($viewModel->heroImage) ?>');">
         <div class="artist-detail-hero-content">
             <h1 class="artist-detail-hero-name"><?= htmlspecialchars($artist['name']) ?></h1>
-            <p class="artist-detail-hero-tagline"><?= htmlspecialchars($artist['bio'] ?? '') ?></p>
+            <?php if (($viewModel->heroTagline ?? '') !== ''): ?>
+            <p class="artist-detail-hero-tagline"><?= htmlspecialchars((string) $viewModel->heroTagline) ?></p>
+            <?php endif; ?>
             <a href="#about" class="artist-detail-hero-btn">More info <span aria-hidden="true">&#8594;</span></a>
         </div>
     </section>
@@ -40,6 +44,7 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
         <h2 class="artist-detail-section-title">About <?= htmlspecialchars($artist['name']) ?></h2>
         <div class="artist-detail-about">
             <div class="artist-detail-about-text">
+                <!-- Prefer curated paragraph splits from the view model; fallback to legacy bio text. -->
                 <?php if ($viewModel->aboutParagraphs !== null): ?>
                     <?php foreach ($viewModel->aboutParagraphs as $p): ?>
                     <p><?= htmlspecialchars($p) ?></p>
@@ -51,7 +56,7 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
         </div>
     </section>
 
-    <?php if ($viewModel->hasFullPage() && $viewModel->careerHighlights !== null): ?>
+    <?php if ($viewModel->careerHighlights !== null && count($viewModel->careerHighlights) > 0): ?>
     <section class="artist-detail-section artist-detail-section-alt container">
         <div class="artist-detail-features">
             <div class="artist-detail-desc-text">
@@ -67,6 +72,10 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
             </div>
         </div>
     </section>
+    <?php endif; ?>
+
+    <?php if (!empty($viewModel->musicTracks) || !empty($viewModel->musicExtraTracks)): ?>
+    <!-- Music section is a reusable partial shared by multiple artists. -->
     <?php require __DIR__ . '/partials/artist-music-section.php'; ?>
     <?php endif; ?>
 
@@ -80,6 +89,7 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
                     <div class="artist-detail-schedule-dot"></div>
                     <div class="artist-detail-schedule-content">
                         <p class="artist-detail-schedule-time"><span class="artist-detail-schedule-day"><?= htmlspecialchars($dayLabels[$ev->eventDay ?? 'friday'] ?? ucfirst($ev->eventDay ?? '')) ?></span><img src="/images/icons/dateIcon.png" alt="" class="artist-detail-schedule-icon" aria-hidden="true"><span class="artist-detail-schedule-hour"><?= htmlspecialchars($ev->startTime ?? '20:00') ?></span></p>
+                        <!-- If title contains "Artist - Set Type", extract and render only the set type suffix. -->
                         <p class="artist-detail-schedule-venue"><img src="/images/icons/locationIcon.png" alt="" class="artist-detail-schedule-icon" aria-hidden="true"><?= htmlspecialchars($ev->venueName . ', ' . ($ev->venueCity ?? 'Haarlem')) ?><?php if (preg_match('/^.+?[–—-]\s*(.+)$/u', $ev->title ?? '', $m) && trim($m[1])): ?> — <span class="artist-detail-schedule-type"><?= htmlspecialchars(trim($m[1])) ?></span><?php endif; ?></p>
                         <p class="artist-detail-schedule-desc"><?= htmlspecialchars($ev->description ?? '') ?></p>
                     </div>
@@ -91,12 +101,13 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
             </div>
         </div>
         <div class="artist-detail-schedule-cta">
-            <a href="/dance/event/<?= (int) ($viewModel->artistEvents[0]->id ?? 0) ?>" class="artist-detail-schedule-btn">Ticket <span aria-hidden="true">&#8594;</span></a>
+            <a href="/dance/event/<?= (int) ($viewModel->artistEvents[0]->id ?? 0) ?>" class="artist-detail-schedule-btn">Tickets <span aria-hidden="true">&#8594;</span></a>
         </div>
     </section>
     <?php endif; ?>
 
-    <?php if ($viewModel->hasFullPage() && count($viewModel->galleryImages) >= 4): ?>
+    <?php if (count($viewModel->galleryImages) >= 4): ?>
+    <!-- Gallery layout expects at least 4 items; indices 2/3 have safe fallback to index 0. -->
     <section class="artist-detail-section artist-detail-gallery-section">
         <div class="artist-detail-gallery-header">
             <h2 class="artist-detail-gallery-title">Gallery</h2>

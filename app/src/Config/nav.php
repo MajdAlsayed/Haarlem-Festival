@@ -9,6 +9,5 @@ return [
     ['path' => '/food', 'label' => 'FOOD'],
     ['path' => '/history', 'label' => 'HISTORY'],
     ['path' => '/stories', 'label' => 'STORIES'],
-    ['path' => '/program', 'label' => 'PROGRAM'],
     ['path' => '/tickets', 'label' => 'TICKETS'],
 ];

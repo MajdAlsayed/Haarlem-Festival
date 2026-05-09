@@ -7,13 +7,14 @@ use App\Services\DanceService;
 use App\ViewModels\DanceViewModel;
 
 /**
- * Dance page. Controller gets data from services, builds the view model, then loads the view.
+ * Public Dance landing (/dance): grouped events, CMS/config copy, featured strip; builds DanceViewModel for the index view.
  */
 class DanceController
 {
     private DanceService $danceService;
     private SettingsRepository $settingsRepository;
 
+    /** Wire dance page dependencies (events + dance settings + global app settings). */
     public function __construct()
     {
         $this->danceService = new DanceService(
@@ -23,6 +24,7 @@ class DanceController
         $this->settingsRepository = new SettingsRepository();
     }
 
+    /** Build homepage-ready dance data and render /dance. */
     public function index(): void
     {
         try {
@@ -39,19 +41,20 @@ class DanceController
         $sundayEvents = $grouped['sunday'];
         $events = $grouped['all'];
 
+        // Curated hero strip: first Saturday slot plus two Sunday cards (design choice, not all Saturday).
         $featuredEvents = array_merge(
             array_slice($saturdayEvents, 0, 1),
             array_slice($sundayEvents, 1, 2)
         );
 
         $breadcrumbs = [
-            ['label' => 'HOME', 'url' => '/'],
-            ['label' => 'DANCE', 'url' => null],
+            ['label' => (string) ($danceSettings['breadcrumb_home_label'] ?? ''), 'url' => '/'],
+            ['label' => (string) ($danceSettings['breadcrumb_dance_label'] ?? ''), 'url' => null],
         ];
 
-        $pageTitle = isset($danceSettings['dance_page_title']) && is_string($danceSettings['dance_page_title']) && $danceSettings['dance_page_title'] !== ''
+        $pageTitle = isset($danceSettings['dance_page_title']) && is_string($danceSettings['dance_page_title'])
             ? $danceSettings['dance_page_title']
-            : 'Dance Festival';
+            : '';
 
         $viewModel = new DanceViewModel(
             $events,
