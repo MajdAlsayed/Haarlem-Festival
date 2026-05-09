@@ -28,6 +28,16 @@ $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceS
 $pageTitle = $viewModel->pageTitle;
 $pageStyles = ['/css/pages/dance.css'];
 $bodyClass = 'dance-page';
+
+// Hero settings
+$heroModifier = 'festival-hero--dance';
+$heroImage = $danceHeroImage;
+$heroImageAlt = (string) ($danceSettings['hero_title'] ?? 'Dance');
+$heroTitle = (string) ($danceSettings['hero_title'] ?? 'Dance');
+$heroSubtitle = $heroSubtitle;
+$heroButtonText = (string) ($danceSettings['hero_button_text'] ?? 'Explore events');
+$heroButtonUrl = (string) ($danceSettings['hero_button_url'] ?? '#featured-events');
+$heroButtonClass = 'btn btn--light';
 ?>
 
 <!DOCTYPE html>
@@ -38,19 +48,13 @@ $bodyClass = 'dance-page';
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main>
-    <section class="dance-hero" style="background-image: linear-gradient(120deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('<?= htmlspecialchars($danceHeroImage) ?>');">
-        <div class="dance-hero-overlay"></div>
-        <div class="dance-hero-content">
-            <h1><?= htmlspecialchars($viewModel->pageTitle) ?></h1>
-            <div class="dance-hero-subtitle cms-html"><?= \App\Core\HtmlSanitizer::purify($heroSubtitle) ?></div>
-            <a href="#featured-events" class="btn btn--light"><?= htmlspecialchars((string) ($danceSettings['hero_cta_label'] ?? '')) ?></a>
-        </div>
-    </section>
+    <!-- Hero -->
+    <?php require __DIR__ . '/../partials/festival-hero.php'; ?>
 
     <!-- Breadcrumbs nav -->
     <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
-    <section class="section section--compact dance-about container">
+    <section class="dance-about container">
         <h2 class="section-title section-title--accent dance-about-heading"><?= htmlspecialchars((string) ($danceSettings['about_section_heading'] ?? '')) ?></h2>
         <div class="dance-about-content">
             <?php foreach ($aboutParagraphs as $para): ?>
@@ -75,7 +79,7 @@ $bodyClass = 'dance-page';
                 $venue = $event->venueName . ', ' . $event->venueCity;
                 $desc = $event->description ?? '';
                 ?>
-                <a href="/dance/event/<?= (int) $event->id ?>" class="dance-card" style="text-decoration: none; color: inherit;">
+                <a href="/dance/event/<?= (int) $event->id ?>" class="festival-card festival-card--dance-event dance-card" style="text-decoration: none; color: inherit;">
                     <?php if ($imagePath !== ''): ?>
                     <div class="dance-card-image-wrap">
                         <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= htmlspecialchars($title) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -83,10 +87,10 @@ $bodyClass = 'dance-page';
                     </div>
                     <?php endif; ?>
                     <div class="dance-card-body">
-                        <p class="dance-card-meta"><span class="dance-meta-icon">&#128197;</span> <?= htmlspecialchars($timeLine) ?></p>
-                        <p class="dance-card-meta"><span class="dance-meta-icon">&#128205;</span> <?= htmlspecialchars($venue) ?></p>
+                        <p class="copy-text copy-text--sm dance-card-meta"><span class="dance-meta-icon">&#128197;</span> <?= htmlspecialchars($timeLine) ?></p>
+                        <p class="copy-text copy-text--sm dance-card-meta"><span class="dance-meta-icon">&#128205;</span> <?= htmlspecialchars($venue) ?></p>
                         <h3 class="dance-card-title"><?= htmlspecialchars($title) ?></h3>
-                        <p class="dance-card-desc"><?= htmlspecialchars($desc) ?></p>
+                        <p class="copy-text copy-text--sm dance-card-desc"><?= htmlspecialchars($desc) ?></p>
                         <span class="dance-genre-badge"><?= htmlspecialchars($genre) ?></span>
                     </div>
                 </a>
@@ -131,7 +135,7 @@ $bodyClass = 'dance-page';
                     $genre = !empty($dayGenres) ? $dayGenres[$i % count($dayGenres)] : '';
                     $dateTime = $dayLabel . ' • ' . ($event->startTime ?? $defaultEventTime);
                 ?>
-                    <a href="/dance/event/<?= (int) $event->id ?>" class="dance-card dance-card-vertical" style="text-decoration: none; color: inherit;">
+                    <a href="/dance/event/<?= (int) $event->id ?>" class="festival-card festival-card--dance-event dance-card dance-card-vertical" style="text-decoration: none; color: inherit;">
                         <?php if ($imagePath !== ''): ?>
                         <div class="dance-card-image-wrap">
                             <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= htmlspecialchars($event->title) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -139,11 +143,11 @@ $bodyClass = 'dance-page';
                         </div>
                         <?php endif; ?>
                         <div class="dance-card-body dance-card-body-stack">
-                            <p class="dance-card-venue"><?= htmlspecialchars($event->venueName) ?>, <?= htmlspecialchars($event->venueCity) ?></p>
+                            <p class="copy-text copy-text--sm dance-card-venue"><?= htmlspecialchars($event->venueName) ?>, <?= htmlspecialchars($event->venueCity) ?></p>
                             <h3 class="dance-card-title"><?= htmlspecialchars($event->title) ?></h3>
-                            <p class="dance-card-datetime"><?= htmlspecialchars($dateTime) ?></p>
-                            <p class="dance-card-desc"><?= htmlspecialchars($event->description ?? '') ?></p>
-                            <span class="dance-genre-badge--pill"><?= htmlspecialchars($genre) ?></span>
+                            <p class="copy-text copy-text--sm dance-card-datetime"><?= htmlspecialchars($dateTime) ?></p>
+                            <p class="copy-text copy-text--sm dance-card-desc"><?= htmlspecialchars($event->description ?? '') ?></p>
+                            <span class="dance-genre-badge"><?= htmlspecialchars($genre) ?></span>
                         </div>
                     </a>
                 <?php endforeach; ?>
@@ -164,7 +168,7 @@ $bodyClass = 'dance-page';
                 $artistSlug = isset($artist['slug']) ? (string) $artist['slug'] : '';
                 $artistUrl = $artistSlug !== '' ? '/dance/artist/' . htmlspecialchars($artistSlug) : '#';
                 ?>
-            <article class="dance-artist-card dance-artist-card-with-image">
+            <article class="festival-card festival-card--dance-artist dance-artist-card">
                 <?php if ($artistImagePath !== ''): ?>
                 <div class="dance-artist-card-image-wrap">
                     <img src="<?= htmlspecialchars($artistImagePath) ?>" alt="<?= htmlspecialchars($artistName) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -172,14 +176,14 @@ $bodyClass = 'dance-page';
                 </div>
                 <?php endif; ?>
                 <div class="dance-artist-card-body">
-                    <h3 class="dance-artist-name"><?= htmlspecialchars($artistName) ?></h3>
-                    <p class="dance-artist-bio"><?= htmlspecialchars($artistBio) ?></p>
+                    <h3 class="section-subtitle dance-artist-name"><?= htmlspecialchars($artistName) ?></h3>
+                    <p class="copy-text copy-text--sm dance-artist-bio"><?= htmlspecialchars($artistBio) ?></p>
                     <a href="<?= $artistUrl ?>" class="btn btn--outline btn--sm dance-artist-info-link"><?= htmlspecialchars((string) ($danceSettings['artist_info_label'] ?? '')) ?></a>
                 </div>
             </article>
             <?php endforeach; ?>
         </div>
-        <button type="button" class="btn btn-outline dance-show-more"><?= htmlspecialchars((string) ($danceSettings['show_more_artists_label'] ?? '')) ?></button>
+        <button type="button" class="btn btn--outline dance-show-more"><?= htmlspecialchars((string) ($danceSettings['show_more_artists_label'] ?? '')) ?></button>
     </section>
 </main>
 

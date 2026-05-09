@@ -6,17 +6,14 @@ $cmsHome = $viewModel->cmsHome;
 // shared for header/footer and any partial that needs them
 $app = (new \App\Repositories\SettingsRepository())->getAll();
 $navLinks = (new \App\Repositories\MenuRepository())->getNavLinks();
-$skipHeaderStyleSheet = true;
+
+// Settings for the page title, styles, body class
+$pageTitle = (string) ($page->title ?? ($app['site_name'] ?? 'Haarlem Festival'));
+$pageStyles = ['/css/pages/home.css'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= htmlspecialchars((string) ($page->title ?? '')) ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string) ($app['css_version'] ?? '1')) ?>">
-</head>
+<?php require __DIR__ . '/../partials/head.php'; ?>
 <body>
 
 <?php require __DIR__ . '/../partials/header.php'; ?>

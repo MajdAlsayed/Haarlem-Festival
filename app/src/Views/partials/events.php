@@ -14,7 +14,9 @@ $categoryDisplayLabels = [
 <section id="events" class="events-section">
     <div class="container">
         <div class="section-header">
-            <h2><?= htmlspecialchars((string) ($h['events_heading'] ?? '')) ?></h2>
+            <h2 class="section-title section-title--underlined">
+                <?= htmlspecialchars((string) ($h['events_heading'] ?? '')) ?>
+            </h2>
             <p class="section-subtitle">
                 <?= htmlspecialchars((string) ($h['events_subtitle'] ?? '')) ?>
             </p>
@@ -40,7 +42,7 @@ $categoryDisplayLabels = [
                 }
                 $cardTitle = $categoryDisplayLabels[strtolower($category->name)] ?? ucfirst($category->name);
             ?>
-                <article class="card event-card">
+                <article class="festival-card festival-card--home event-card">
                     <div class="event-image-wrapper">
                         <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= htmlspecialchars($cardTitle) ?>" class="event-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                         <div class="event-image-placeholder" style="display:none;">
@@ -52,9 +54,9 @@ $categoryDisplayLabels = [
                                 <p class="event-location"><?= htmlspecialchars($app['default_event_location']) ?></p>
                                 <p class="event-description"><?= htmlspecialchars($category->description) ?></p>
                                 <div class="event-actions<?= $showTickets ? '' : ' event-actions--single' ?>">
-                                    <a href="<?= htmlspecialchars($infoUrl) ?>" class="event-link"><?= htmlspecialchars((string) ($h['events_info_label'] ?? '')) ?></a>
+                                    <a href="<?= htmlspecialchars($infoUrl) ?>" class="btn btn--outline btn--sm event-link"><?= htmlspecialchars((string) ($h['events_info_label'] ?? '')) ?></a>
                                     <?php if ($showTickets): ?>
-                                    <a href="<?= htmlspecialchars($ticketUrl) ?>" class="event-link"><?= htmlspecialchars((string) ($h['events_tickets_label'] ?? '')) ?></a>
+                                    <a href="<?= htmlspecialchars($ticketUrl) ?>" class="btn btn--outline btn--sm event-link"><?= htmlspecialchars((string) ($h['events_tickets_label'] ?? '')) ?></a>
                                     <?php endif; ?>
                                 </div>
                             </div>

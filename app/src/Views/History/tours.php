@@ -1,13 +1,21 @@
+<?php
+
+// Settings for the page title, styles, body class
+$pageTitle = $viewModel->hero['title'] ?? 'History — Haarlem Festival';
+$pageStyles = ['/css/pages/history.css'];
+$bodyClass = 'history-page';
+
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'History', 'url' => '/history'],
+        ['label' => 'Landmarks', 'url' => '/history/locations'],
+        ['label' => 'Tours', 'url' => null],
+];
+?>
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($viewModel->hero['title'] ?? '') ?></title>
-
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/history.css">
-</head>
+<?php require __DIR__ . '/../partials/head.php'; ?>
 <body class="history-page">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
@@ -16,36 +24,29 @@
     <!-- HERO -->
     <?php
     $sectionModifier = '';
-    $titleModifier = 'history-hero-title--yellow';
+    $titleModifier = '';
     $showSubtitle = true;
     $showButton = false;
     require __DIR__ . '/../partials/history/history-hero.php';
     ?>
 
     <!-- BREADCRUMBS -->
-    <?php
-    $breadcrumbs = [
-        ['label' => 'HOME', 'url' => '/'],
-        ['label' => 'HISTORY', 'url' => '/history'],
-        ['label' => 'TOURS', 'url' => null],
-    ];
-    require __DIR__ . '/../partials/history/history-breadcrumb.php';
-    ?>
+    <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
     <!-- IMPORTANT INFORMATION -->
     <section class="history-tours-info">
         <div class="container">
-            <h2>
+            <h2 class="section-title section-title--accent history-tours-section-title">
                 <?= htmlspecialchars($viewModel->infoCards['title'] ?? '') ?>
             </h2>
             <div class="history-tours-info-cards">
                 <?php foreach ($viewModel->infoCards['cards'] ?? [] as $card): ?>
                     <div class="history-tours-info-card">
-                        <h3>
-                            <?= htmlspecialchars($card['title']) ?>
+                        <h3 class="section-subtitle history-tours-info-card-title">
+                            <?= htmlspecialchars($card['title'] ?? '') ?>
                         </h3>
                         <?php if (!empty($card['items'])): ?>
-                            <ul>
+                            <ul class="copy-text copy-text--sm history-tours-info-card-list">
                                 <?php foreach ($card['items'] as $item): ?>
                                     <li>
                                         <?= htmlspecialchars($item) ?>
@@ -53,10 +54,43 @@
                                 <?php endforeach; ?>
                             </ul>
                         <?php else: ?>
-                            <p>
-                                <?= htmlspecialchars($card['text']) ?>
+                            <p class="copy-text copy-text--sm history-tours-info-card-text">
+                                <?= htmlspecialchars($card['text'] ?? '') ?>
                             </p>
                         <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
+    <!-- SELECT TICKET -->
+    <section class="history-tours-tickets">
+        <div class="container">
+            <h2 class="section-title history-tours-section-title history-tours-section-title--center">
+                <?= htmlspecialchars($viewModel->ticketOptions['title'] ?? '') ?>
+            </h2>
+            <div class="history-tours-tickets-cards">
+                <?php foreach ($viewModel->ticketOptions['tickets'] ?? [] as $ticket): ?>
+                    <div class="festival-card festival-card--history history-tours-ticket-card">
+                        <h3 class="section-subtitle history-tours-ticket-card-title">
+                            <?= htmlspecialchars($ticket['name']) ?>
+                        </h3>
+                        <?php if (!empty($ticket['price'])): ?>
+                            <p class="section-title section-title--accent history-tours-ticket-price">
+                                <?= htmlspecialchars($ticket['price']) ?>
+                            </p>
+                        <?php endif; ?>
+                        <p class="copy-text copy-text--sm history-tours-ticket-per">
+                            <?= htmlspecialchars($ticket['per']) ?>
+                        </p>
+                        <ul class="copy-text copy-text--sm history-tours-ticket-list">
+                            <?php foreach ($ticket['items'] as $item): ?>
+                                <li>
+                                    <?= htmlspecialchars($item) ?>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -70,15 +104,15 @@
 
                 <!-- LEFT: Schedule -->
                 <div class="history-tours-schedule">
-                    <h2>
+                    <h2 class="section-title history-tours-section-title">
                         SCHEDULE YOUR TOUR
                     </h2>
 
                     <!-- Day tabs -->
-                    <div class="history-tours-day-tabs">
+                    <div class="filter-tabs history-tours-day-tabs">
                         <?php $first = true; ?>
                         <?php foreach ($viewModel->toursByDay as $date => $tours): ?>
-                            <button class="history-tours-day-tab <?= $first ? 'active' : '' ?>"
+                            <button class="filter-tab history-tours-day-tab <?= $first ? 'active' : '' ?>"
                                     data-filter="<?= htmlspecialchars($date) ?>">
                                 <?= htmlspecialchars(date('l', strtotime($date))) ?>
                             </button>
@@ -91,29 +125,31 @@
                     <?php foreach ($viewModel->toursByDay as $date => $tours): ?>
                         <div class="history-tours-day-panel <?= $first ? 'active' : '' ?>"
                              data-filter="<?= htmlspecialchars($date) ?>">
-                            <p class="history-tours-day-title">
+                            <p class="section-subtitle history-tours-day-title">
                                 Available Times for <?= htmlspecialchars(date('l', strtotime($date))) ?>
                             </p>
+                            <div class="history-tours-slots-grid">
                             <?php foreach ($tours as $tour): ?>
-                                <div class="history-tours-item">
+                                <div class="festival-card festival-card--history history-tours-item">
                                     <div class="history-tours-time-lang">
-                                        <span class="history-tours-time">
+                                        <span class="section-subtitle history-tours-time">
                                             <?= htmlspecialchars(date('H:i', strtotime($tour['start_time']))) ?>
                                         </span>
-                                        <span class="history-tours-lang">
+                                        <span class="copy-text copy-text--sm history-tours-lang">
                                             <?= htmlspecialchars($tour['flag']) ?>
                                             <?= htmlspecialchars($tour['language_name']) ?>
                                         </span>
                                     </div>
                                     <button
                                         type="button"
-                                        class="history-button-big history-button-big--yellow"
+                                        class="btn btn--light btn--sm btn--block history-tours-add-button"
                                         data-ticket-details-id="<?= (int) $tour['ticket_details_id'] ?>"
                                     >
                                         ADD TO CART
                                     </button>
                                 </div>
                             <?php endforeach; ?>
+                            </div>
                         </div>
                         <?php $first = false; ?>
                     <?php endforeach; ?>
@@ -121,7 +157,7 @@
 
                 <!-- RIGHT: Tour Details -->
                 <div class="history-tours-details">
-                    <h2>
+                    <h2 class="section-title history-tours-section-title">
                         <?= htmlspecialchars($viewModel->tourDetails['title'] ?? '') ?>
                     </h2>
                     <div class="history-tours-details-list">
@@ -144,10 +180,11 @@
                                     <?php endif; ?>
                                 </div>
                                 <div class="history-tours-detail-content">
-                                    <p>
+                                    <p class="section-subtitle history-tours-detail-label">
                                         <?= htmlspecialchars($item['label']) ?>
                                     </p>
-                                    <p>
+
+                                    <p class="copy-text copy-text--sm history-tours-detail-value">
                                         <?= htmlspecialchars($item['value']) ?>
                                     </p>
                                 </div>
@@ -159,38 +196,7 @@
         </div>
     </section>
 
-    <!-- WHAT'S INCLUDED -->
-    <section class="history-tours-tickets">
-        <div class="container">
-            <h2>
-                <?= htmlspecialchars($viewModel->ticketOptions['title'] ?? '') ?>
-            </h2>
-            <div class="history-tours-tickets-cards">
-                <?php foreach ($viewModel->ticketOptions['tickets'] ?? [] as $ticket): ?>
-                    <div class="history-tours-ticket-card">
-                        <h3>
-                            <?= htmlspecialchars($ticket['name']) ?>
-                        </h3>
-                        <?php if (!empty($ticket['price'])): ?>
-                            <p class="history-tours-ticket-price">
-                                <?= htmlspecialchars($ticket['price']) ?>
-                            </p>
-                        <?php endif; ?>
-                        <p class="history-tours-ticket-per">
-                            <?= htmlspecialchars($ticket['per']) ?>
-                        </p>
-                        <ul>
-                            <?php foreach ($ticket['items'] as $item): ?>
-                                <li>
-                                    <?= htmlspecialchars($item) ?>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    </section>
+
 
     <!-- ROUTE MAP: Leaflet map with all tour locations from the database -->
     <?php

@@ -1,13 +1,21 @@
+<?php
+
+// Settings for the page title, styles, body class
+$pageTitle = $viewModel->hero['title'] ?? 'History — Haarlem Festival';
+$pageStyles = ['/css/pages/history.css'];
+$bodyClass = 'history-page';
+
+$breadcrumbs = [
+['label' => 'Home', 'url' => '/'],
+['label' => 'History', 'url' => '/history'],
+['label' => 'Landmarks', 'url' => '/history/locations'],
+['label' => $viewModel->location->name, 'url' => null],
+];
+?>
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($viewModel->hero['title'] ?? '') ?></title>
-
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/history.css">
-</head>
+<?php require __DIR__ . '/../partials/head.php'; ?>
 <body class="history-page">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
@@ -23,15 +31,7 @@
     ?>
 
     <!-- BREADCRUMBS -->
-    <?php
-    $breadcrumbs = [
-        ['label' => 'HOME', 'url' => '/'],
-        ['label' => 'HISTORY', 'url' => '/history'],
-        ['label' => 'LOCATIONS', 'url' => '/history/locations'],
-        ['label' => strtoupper($viewModel->location->name), 'url' => null],
-    ];
-    require __DIR__ . '/../partials/history/history-breadcrumb.php';
-    ?>
+    <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
     <!-- ABOUT BANNER -->
     <?php if ($viewModel->aboutBanner): ?>
@@ -49,10 +49,10 @@
             <div class="container">
                 <?php foreach ($viewModel->statsBar['stats'] as $stat): ?>
                     <div class="history-stats-item">
-                        <span class="history-stats-value">
+                        <span class="section-title section-title--accent history-stats-value">
                             <?= htmlspecialchars($stat['value']) ?>
                         </span>
-                        <span class="history-stats-label">
+                        <span class="copy-text copy-text--sm history-stats-label">
                             <?= htmlspecialchars($stat['label']) ?>
                         </span>
                     </div>
@@ -71,18 +71,18 @@
 
                 <!-- Text block -->
                 <div class="history-content-text-block">
-                    <h2 class="history-content-section-title">
+                    <h2 class="section-title section-title--accent history-content-section-title">
                         <?= htmlspecialchars($section['title'] ?? '') ?>
                     </h2>
 
                     <?php foreach ($section['sections'] as $subsection): ?>
                         <div class="history-content-section-item">
-                            <p class="history-content-section-subtitle">
+                            <h3 class="section-subtitle history-content-section-subtitle">
                                 <?= htmlspecialchars($subsection['subtitle'] ?? '') ?>
-                            </p>
+                            </h3>
 
                             <?php foreach ($subsection['paragraphs'] as $paragraph): ?>
-                                <div class="history-content-section-paragraph cms-html">
+                                <div class="copy-text history-content-section-paragraph cms-html">
                                     <?= $paragraph ?>
                                 </div>
                             <?php endforeach; ?>
@@ -107,12 +107,12 @@
 
                     <?php if (!empty($section['did_you_know'])): ?>
                         <div class="history-did-you-know">
-                            <p class="history-did-you-know-title">
+                            <p class="section-subtitle history-did-you-know-title">
                                 DID YOU KNOW?
                             </p>
 
                             <?php foreach ($section['did_you_know'] as $fact): ?>
-                                <div class="history-did-you-know-text cms-html">
+                                <div class="copy-text history-did-you-know-text cms-html">
                                     <?= $fact ?>
                                 </div>
                             <?php endforeach; ?>
@@ -128,29 +128,29 @@
     <?php if ($viewModel->experience): ?>
         <section class="history-experience-banner">
             <div class="container">
-                <h2 class="history-experience-banner-title">
+                <h2 class="section-title section-title--dark history-experience-banner-title">
                     <?= htmlspecialchars($viewModel->experience['title'] ?? '') ?>
                 </h2>
                 <div class="history-experience-cards">
 
                     <!-- Independent Visit -->
                     <div class="history-experience-card-wrapper">
-                        <h3 class="history-experience-card-title history-experience-card-title--dark">
+                        <h3 class="section-subtitle history-experience-card-title history-experience-card-title--dark">
                             <?= htmlspecialchars($viewModel->experience['independent']['title'] ?? '') ?>
                         </h3>
                         <div class="history-experience-card history-experience-card--white">
-                            <div class="history-experience-card-text cms-html">
+                            <div class="copy-text copy-text--dark history-experience-card-text cms-html">
                                 <?= $viewModel->experience['independent']['text'] ?? '' ?>
                             </div>
 
                             <?php if (!empty($viewModel->experience['independent']['subtitle'])): ?>
-                                <p class="history-experience-card-subtitle">
+                                <h3 class="section-subtitle history-experience-card-subtitle">
                                     <?= htmlspecialchars($viewModel->experience['independent']['subtitle']) ?>
-                                </p>
+                                </h3>
                             <?php endif; ?>
 
                             <?php foreach ($viewModel->experience['independent']['details'] ?? [] as $detail): ?>
-                                <p class="history-experience-card-detail">
+                                <p class="copy-text copy-text--dark copy-text--sm history-experience-card-detail">
                                     <span class="history-experience-card-detail-label">
                                         <?= htmlspecialchars($detail['label']) ?>
                                     </span>
@@ -162,14 +162,14 @@
 
                     <!-- Guided Tour -->
                     <div class="history-experience-card-wrapper">
-                        <h3 class="history-experience-card-title history-experience-card-title--dark">
+                        <h3 class="section-subtitle history-experience-card-title history-experience-card-title--dark">
                             <?= htmlspecialchars($viewModel->experience['guided']['title'] ?? '') ?>
                         </h3>
-                        <div class="history-experience-card history-experience-card--orange">
-                            <div class="history-experience-card-text cms-html">
+                        <div class="history-experience-card history-experience-card--accent">
+                            <div class="copy-text history-experience-card-text cms-html">
                                 <?= $viewModel->experience['guided']['text'] ?? '' ?>
                             </div>
-                            <a href="/history/tours" class="history-button-big">
+                            <a href="/history/tours" class="btn btn--light btn--fit btn--light-on-accent history-experience-card-button">
                                 <span class="history-button-text">
                                     VIEW TOUR DETAILS
                                 </span>
@@ -187,26 +187,22 @@
         <div class="container">
 
             <?php if ($viewModel->prevLocation): ?>
-                <a href="/history/location/<?= htmlspecialchars($viewModel->prevLocation->slug) ?>" class="history-button-big">
-                    <span class="history-button-text">
-                        < <?= htmlspecialchars($viewModel->prevLocation->name) ?>
-                    </span>
+                <a href="/history/location/<?= htmlspecialchars($viewModel->prevLocation->slug) ?>" class="btn btn--outline">
+                    ← Previous
                 </a>
             <?php else: ?>
                 <span></span>
             <?php endif; ?>
 
-            <a href="/history/locations" class="history-button-big">
+            <a href="/history/locations" class="btn btn--outline">
                 <span class="history-button-text">
-                    ALL LANDMARKS
+                    All Locations
                 </span>
             </a>
 
             <?php if ($viewModel->nextLocation): ?>
-                <a href="/history/location/<?= htmlspecialchars($viewModel->nextLocation->slug) ?>" class="history-button-big">
-                    <span class="history-button-text">
-                        <?= htmlspecialchars($viewModel->nextLocation->name) ?> >
-                    </span>
+                <a href="/history/location/<?= htmlspecialchars($viewModel->nextLocation->slug) ?>" class="btn btn--outline">
+                    Next →
                 </a>
             <?php else: ?>
                 <span></span>

@@ -2,48 +2,8 @@
     background-color: #0A0A0A;
 }
 
-.dance-hero {
-    position: relative;
-    min-height: 420px;
-    color: #fff;
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.dance-hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.5) 100%);
-}
-
-.dance-hero-content {
-    position: relative;
-    padding: 80px 40px;
-    border-radius: 18px;
-    background: linear-gradient(145deg, rgba(18, 18, 18, 0.42), rgba(18, 18, 18, 0.2));
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(2px);
-}
-
-.dance-hero h1 {
-    font-size: 48px;
-    font-weight: 700;
-    margin: 0 0 16px;
-    color: #FFC107;
-    letter-spacing: -0.02em;
-}
-
-.dance-hero-subtitle {
-    font-size: 18px;
-    color: #e8e8e8;
-    max-width: 520px;
-    margin: 0 auto 28px;
-    line-height: 1.5;
+.festival-hero--dance .festival-hero__background img {
+    object-position: center;
 }
 
 .dance-about {
@@ -88,17 +48,14 @@
 .dance-card {
     display: flex;
     flex-direction: column;
-    background: #212121;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    color: inherit;
+    text-decoration: none;
 }
 
-.dance-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 0 2px #FFC107, 0 0 24px rgba(255, 193, 7, 0.35);
-    border-color: #FFC107;
+.dance-card:hover,
+.dance-card:focus {
+    color: inherit;
+    text-decoration: none;
 }
 
 .dance-card-image-wrap {
@@ -136,39 +93,28 @@
 }
 
 .dance-card-meta {
-    font-size: 13px;
-    color: #c6c6c6;
-    margin: 0 0 6px;
     display: flex;
     align-items: center;
     gap: 6px;
+    margin-bottom: 6px;
 }
 
 .dance-meta-icon {
     font-size: 14px;
-    color: #ffd86a;
+    color: var(--color-accent);
 }
 
 .dance-card-title {
+    margin: 0 0 10px;
+
+    color: var(--color-accent);
     font-size: 18px;
     font-weight: 700;
-    margin: 0 0 10px;
-    color: #FFC107;
     line-height: 1.3;
 }
 
 .dance-card-desc {
-    font-size: 14px;
-    color: #B0B0B0;
-    line-height: 1.5;
-    margin: 0 0 14px;
-}
-
-.dance-card-price {
-    font-size: 16px;
-    font-weight: 700;
-    color: #FFC107;
-    margin: 0 0 14px;
+    margin-bottom: 14px;
 }
 
 .dance-genre-badge {
@@ -184,11 +130,6 @@
     border: none;
     cursor: default;
     box-shadow: 0 6px 14px rgba(244, 177, 15, 0.35);
-}
-
-.dance-card-btn {
-    width: 100%;
-    text-align: center;
 }
 
 .dance-all {
@@ -215,11 +156,6 @@
     padding-bottom: 52%;
 }
 
-.dance-card-vertical .dance-card-image-wrap img,
-.dance-card-vertical .dance-card-placeholder {
-    border-radius: 12px 12px 0 0;
-}
-
 .dance-card-body-stack {
     padding: 20px;
     display: flex;
@@ -228,33 +164,30 @@
     flex: 1;
 }
 
-.dance-card-venue {
-    font-size: 14px;
-    font-weight: 600;
-    color: #e0e0e0;
+.dance-card-venue,
+.dance-card-datetime {
     margin: 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-weight: 600;
+}
+
+.dance-card-venue {
+    font-weight: 600;
 }
 
 .dance-card-body-stack .dance-card-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #FFC107;
-    margin: 0;
-    line-height: 1.3;
-}
-
-.dance-card-datetime {
-    font-size: 13px;
-    color: #B0B0B0;
     margin: 0;
 }
 
 .dance-card-body-stack .dance-card-desc {
-    font-size: 14px;
-    color: #B0B0B0;
-    line-height: 1.5;
     margin: 0;
     flex: 1;
+}
+
+.festival-card--dance-event,
+.festival-card--dance-artist {
+    --festival-card-bg: #212121;
+    --festival-card-border: rgba(255, 255, 255, 0.06);
 }
 
 .dance-genre-badge--pill {
@@ -272,10 +205,20 @@
     box-shadow: 0 6px 14px rgba(244, 177, 15, 0.3);
 }
 
-.dance-genre-badge,
-.dance-genre-badge--pill {
-    margin-top: auto;
+.dance-genre-badge {
+    display: inline-block;
     width: fit-content;
+    margin-top: auto;
+    padding: 8px 20px;
+
+    background: var(--color-accent);
+    color: #000;
+    border-radius: var(--radius-pill);
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .dance-artists {
@@ -303,31 +246,10 @@
 }
 
 .dance-artist-card {
-    background: #212121;
-    border-radius: 12px;
-    padding: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    text-align: center;
-    transition: transform 0.25s ease;
-}
-
-.dance-artist-card:hover {
-    transform: translateY(-4px);
-}
-
-/* Artist card with image on top (Robbert Hardwell, Tiësto style) */
-.dance-artist-card-with-image {
     display: flex;
     flex-direction: column;
     padding: 0;
-    overflow: hidden;
     text-align: left;
-}
-
-.dance-artist-card-with-image:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 0 2px #FFC107, 0 0 24px rgba(255, 193, 7, 0.35);
-    border-color: #FFC107;
 }
 
 .dance-artist-card-image-wrap {
@@ -337,7 +259,6 @@
     padding-bottom: 48%;
     overflow: hidden;
     background: #252525;
-    border-radius: 12px 12px 0 0;
 }
 
 .dance-artist-card-image-wrap img,
@@ -384,30 +305,13 @@
     width: fit-content;
 }
 
-.dance-artist-image {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 16px;
-    background: #252525;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-}
-
 .dance-artist-name {
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0 0 8px;
-    color: #fff;
+    margin-bottom: 10px;
+    color: var(--color-accent);
 }
 
 .dance-artist-bio {
-    font-size: 14px;
-    color: #b0b0b0;
-    margin: 0 0 16px;
-    line-height: 1.5;
+    margin-bottom: 14px;
 }
 
 /* ---------- Artist Detail page (Figma-matched, aligned with Dance / event detail) ---------- */
@@ -433,46 +337,28 @@
 }
 
 .artist-detail-hero {
-    position: relative;
     min-height: 520px;
-    background: var(--bg-dark) center/cover no-repeat;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    overflow: hidden;
 }
-.artist-detail-hero-hardwell {
-    /* Position so face is visible: favor top of image */
-    background-position: 70% 30%;
+
+.artist-detail-hero-background img {
+    object-position: center 30%;
 }
+
 .artist-detail-hero-content {
-    position: relative;
-    z-index: 2;
-    padding: 100px 24px 80px;
-    max-width: 800px;
-    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 48px;
 }
+
 .artist-detail-hero-name {
-    font-family: var(--font-body);
-    font-size: clamp(2.75rem, 6vw, 4.5rem);
-    font-weight: 700;
-    color: #fff;
-    margin: 0 0 12px;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
-    text-shadow: 0 2px 24px rgba(0,0,0,0.6);
+    margin: 0;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
 }
-/* Hero blurb: fixed size so it stays smaller than the name. */
-.artist-detail-hero .artist-detail-hero-content p.artist-detail-hero-tagline {
-    font-family: var(--font-body);
-    font-size: 15px !important;
-    font-weight: 400 !important;
-    line-height: 1.55 !important;
-    color: #ff9800 !important;
-    margin: 0 auto 28px !important;
-    max-width: 36rem !important;
-    letter-spacing: 0.02em;
+
+.artist-detail-hero-tagline {
+    margin: 6px 0 32px;
+    color: var(--color-accent);
 }
 
 .artist-detail-section {
@@ -481,44 +367,27 @@
     margin: 0 auto;
     box-sizing: border-box;
 }
+
 .artist-detail-section-alt {
     background: var(--bg-alt);
-}
-
-/* Full-bleed band for career highlights (matches schedule / gallery rhythm) */
-.artist-detail-page .artist-detail-section-alt.container {
-    max-width: none;
-    width: 100%;
-    padding: 64px clamp(24px, 4vw, 48px) 80px;
-    box-sizing: border-box;
-}
-
-.artist-detail-page .artist-detail-section-alt.container > * {
-    max-width: 1280px;
-    margin-left: auto;
-    margin-right: auto;
+    border-radius: 16px;
 }
 
 .artist-detail-section-title {
-    font-family: var(--font-body);
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--accent);
-    margin: 0 0 28px;
-    letter-spacing: -0.02em;
+    margin-bottom: 28px;
 }
 
 .artist-detail-about {
     max-width: 780px;
 }
-.artist-detail-about .artist-detail-section-title { margin-bottom: 24px; }
-.artist-detail-about p {
-    color: #fff;
-    font-size: 1rem;
-    line-height: 1.75;
-    margin: 0 0 18px;
+
+.artist-detail-about-paragraph {
+    margin-bottom: 18px;
 }
-.artist-detail-about p:last-child { margin-bottom: 0; }
+
+.artist-detail-about-paragraph:last-child {
+    margin-bottom: 0;
+}
 
 .artist-detail-features {
     display: grid;
@@ -533,11 +402,9 @@
     margin: 0;
 }
 .artist-detail-highlights li {
-    color: #fff;
-    font-size: 1rem;
-    line-height: 1.6;
-    padding: 10px 0 10px 32px;
     position: relative;
+    padding: 10px 0 10px 32px;
+    color: white;
 }
 .artist-detail-highlights li::before {
     content: '';
@@ -545,9 +412,11 @@
     left: 0;
     top: 1.1em;
     transform: translateY(-50%);
+
     width: 10px;
     height: 10px;
-    background: var(--accent);
+
+    background: var(--color-accent);
     border-radius: 50%;
 }
 .artist-detail-desc-image {
@@ -574,25 +443,17 @@
     box-sizing: border-box;
 }
 
-.artist-detail-schedule-section > .artist-detail-schedule-title,
-.artist-detail-schedule-section > .artist-detail-schedule-wrap,
-.artist-detail-schedule-section > .artist-detail-schedule-cta {
-    max-width: 1280px;
-    margin-left: auto;
-    margin-right: auto;
+.artist-detail-schedule-inner {
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .artist-detail-schedule-title {
-    font-family: var(--font-body);
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0 0 40px;
+    margin-bottom: 40px;
 }
-.artist-detail-schedule-title-main {
-    color: var(--accent);
-}
+
 .artist-detail-schedule-title-sub {
-    color: var(--accent-muted);
+    color: rgba(var(--color-accent-rgb), 0.82);
     font-weight: 600;
 }
 .artist-detail-schedule-wrap {
@@ -613,7 +474,11 @@
     top: 8px;
     bottom: 8px;
     width: 2px;
-    background: linear-gradient(to bottom, var(--accent) 0%, rgba(255, 152, 0, 0.25) 100%);
+    background: linear-gradient(
+            to bottom,
+            var(--color-accent) 0%,
+            rgba(var(--color-accent-rgb), 0.25) 100%
+    );
     border-radius: 1px;
 }
 .artist-detail-schedule-item {
@@ -628,10 +493,10 @@
     top: 4px;
     width: 20px;
     height: 20px;
-    background: var(--accent);
+    background: var(--color-accent);
     border-radius: 50%;
     border: 4px solid var(--bg-section);
-    box-shadow: 0 0 0 1px rgba(255, 152, 0, 0.45);
+    box-shadow: 0 0 0 1px rgba(var(--color-accent-rgb), 0.45);
 }
 .artist-detail-schedule-content {
     display: flex;
@@ -639,14 +504,13 @@
     gap: 4px;
 }
 .artist-detail-schedule-time {
-    font-family: var(--font-body);
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--accent);
-    margin: 0;
     display: flex;
     align-items: center;
     gap: 8px;
+
+    margin: 0;
+    color: var(--color-accent);
+    font-weight: 600;
 }
 
 .artist-detail-schedule-icon {
@@ -656,23 +520,19 @@
     flex-shrink: 0;
 }
 .artist-detail-schedule-venue {
-    font-family: var(--font-body);
-    color: var(--accent-muted);
-    font-size: 0.9rem;
-    margin: 0;
     display: flex;
     align-items: center;
     gap: 8px;
+
+    margin: 0;
+    color: rgba(var(--color-accent-rgb), 0.82);
 }
 .artist-detail-schedule-type {
-    color: var(--accent-muted);
+    color: rgba(var(--color-accent-rgb), 0.82);
 }
 .artist-detail-schedule-desc {
-    font-family: var(--font-body);
-    color: #e8e8e8;
-    font-size: 0.95rem;
-    line-height: 1.6;
     margin: 8px 0 0;
+    color: white;
 }
 .artist-detail-schedule-cta {
     display: flex;
@@ -709,32 +569,18 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.artist-detail-gallery-section > * {
-    max-width: 1280px;
-    margin-left: auto;
-    margin-right: auto;
+.artist-detail-gallery-inner {
+    max-width: 1200px;
+    margin: 0 auto;
 }
 .artist-detail-gallery-header {
     margin-bottom: 36px;
 }
 .artist-detail-gallery-title {
-    font-family: var(--font-body);
-    font-size: 2rem;
-    font-weight: 700;
-    color: #fff;
-    margin: 0 0 8px;
-    letter-spacing: -0.02em;
+    margin-bottom: 8px;
 }
-.artist-detail-gallery-title-line {
-    display: block;
-    width: 48px;
-    height: 3px;
-    background: var(--accent);
-    margin-bottom: 12px;
-}
+
 .artist-detail-gallery-sub {
-    color: var(--text-muted);
-    font-size: 1rem;
     margin: 0;
 }
 .artist-detail-gallery {
@@ -765,24 +611,15 @@
     gap: 24px;
 }
 .artist-detail-stat {
-    background: #1e1e1e;
     padding: 32px 24px;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
     text-align: center;
-    transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.artist-detail-stat:hover {
-    background: #252525;
-    border-color: rgba(255, 152, 0, 0.2);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-}
+
 .artist-detail-stat-num {
     font-family: var(--font-heading);
     font-size: 2.25rem;
     font-weight: 800;
-    color: var(--accent);
+    color: var(--color-accent);
     display: block;
     margin-bottom: 6px;
 }
@@ -832,17 +669,16 @@
 
 /* ---------- Artist Music Section (streaming-style) ---------- */
 .artist-music-section {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    background: #0c0c0c;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 48px clamp(24px, 4vw, 48px) 64px;
-    box-sizing: border-box;
-}
-.artist-music-inner {
     max-width: 1280px;
     margin: 0 auto;
+    padding: 64px clamp(24px, 4vw, 48px) 80px;
+    box-sizing: border-box;
+
+    background: #0c0c0c;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.artist-music-inner {
     display: flex;
     flex-direction: column;
     gap: 48px;
@@ -856,7 +692,7 @@
 @media (min-width: 1024px) {
     .artist-music-top {
         flex-direction: row;
-        align-items: center;
+        align-items: flex-start;
         justify-content: space-between;
         width: 100%;
     }
@@ -925,23 +761,13 @@
 }
 .artist-music-follow {
     margin-left: auto;
-    padding: 8px 18px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 152, 0, 0.45);
-    color: #ff9800;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-decoration: none;
-    transition: background 0.2s ease, color 0.2s ease;
     flex-shrink: 0;
 }
-.artist-music-follow:hover {
-    background: rgba(255, 152, 0, 0.12);
-    color: #ffb74d;
+
+.artist-music-real,
+.artist-music-location {
+    margin: 0;
 }
-.artist-music-real { color: #9ca3af; margin: 0; font-size: 1rem; }
-.artist-music-location { color: #6b7280; margin: 0; font-size: 0.875rem; }
 .artist-music-featured {
     background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
     border: 1px solid #475569;
@@ -977,23 +803,24 @@
     object-fit: cover;
     object-position: center;
 }
-.artist-music-featured-info { flex: 1; }
-.artist-music-featured-title { font-weight: 600; color: #fff; margin: 0 0 4px; font-size: 1rem; }
-.artist-music-featured-sub { color: #9ca3af; margin: 0; font-size: 0.875rem; }
-.artist-music-featured-btn {
-    width: 100%;
-    background: #fff;
-    color: #000;
-    font-weight: 600;
-    padding: 12px 24px;
-    border-radius: 9999px;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.2s;
+.artist-music-featured-info {
+    flex: 1;
 }
-.artist-music-featured-btn { margin-top: 8px; }
-.artist-music-featured-btn:hover { background: #f3f4f6; }
+.artist-music-featured-title {
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 4px;
+    font-size: 1rem;
+}
+.artist-music-featured-sub {
+    color: #9ca3af;
+    margin: 0;
+    font-size: 0.875rem;
+}
+.artist-music-featured-btn {
+    margin-top: 8px;
+}
+
 .artist-music-featured-src { font-size: 0.75rem; color: #6b7280; margin: 8px 0 0; text-align: right; }
 .artist-music-album { display: flex; flex-direction: column; gap: 24px; }
 .artist-music-album-header {
@@ -1073,14 +900,14 @@
 .artist-music-progress-wrap {
     flex: 1;
     height: 8px;
-    background: rgba(255, 152, 0, 0.18);
+    background: rgba(var(--color-accent-rgb), 0.18);
     border-radius: 4px;
     cursor: pointer;
     overflow: hidden;
 }
 .artist-music-progress-bar {
     height: 100%;
-    background: #ff9800;
+    background: var(--color-accent);
     border-radius: 4px;
     transition: width 0.1s linear;
 }
@@ -1102,13 +929,19 @@
     border-radius: 2px;
     transition: background 0.2s;
 }
-.artist-music-waveform:hover .artist-music-wave-bar { background: #ff9800; }
+.artist-music-waveform:hover .artist-music-wave-bar {
+    background: var(--color-accent);
+}
+
 .artist-music-tag {
     display: inline-block;
-    background: rgba(255, 152, 0, 0.12);
-    color: #ff9800;
+    width: fit-content;
+
+    background: rgba(var(--color-accent-rgb), 0.12);
+    color: var(--color-accent);
     padding: 4px 12px;
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
+
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -1419,8 +1252,6 @@
 
 .event-detail-group-title {
     margin-bottom: 28px;
-    font-family: var(--font-heading);
-    letter-spacing: 0.12em;
 }
 
 .event-detail-group--panel.event-detail-group--info,
@@ -1474,16 +1305,6 @@
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 6px;
-}
-
-.event-detail-section h2 {
-    font-family: var(--font-heading);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--gold);
-    margin: 0 0 28px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
 }
 
 .event-detail-overview {
@@ -1595,8 +1416,6 @@
 
 .event-detail-desc-text .event-detail-desc-paragraphs {
     color: var(--text-secondary);
-    font-size: 1.15rem;
-    line-height: 1.85;
     margin-bottom: 32px;
 }
 
@@ -1819,7 +1638,6 @@
 
 .event-detail-tickets-empty {
     grid-column: 1 / -1;
-    color: #c0c0c0;
     margin: 0 0 1rem;
     max-width: 560px;
 }
@@ -2019,8 +1837,6 @@
     text-align: center;
     max-width: 520px;
     margin: 0 auto 20px;
-    line-height: 1.55;
-    color: #b8b8b8;
 }
 
 .event-detail-ticket-features {
@@ -2032,7 +1848,6 @@
 
 .event-detail-location-hint {
     color: var(--text-muted);
-    font-size: 0.9rem;
     margin: 8px 0 24px;
 }
 
