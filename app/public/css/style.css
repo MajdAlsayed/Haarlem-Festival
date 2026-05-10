@@ -976,57 +976,9 @@ main {
     margin: 0;
 }
 
-.jazz-lead {
-    max-width: 720px;
-    margin: 0 auto 18px;
-    font-size: 16px;
-    color: #d8d8d8;
-    line-height: 1.7;
-}
-
 /* =========================
    JAZZ - Events grid cards
    ========================= */
-
-.jazz-intro {
-    text-align: center;
-}
-
-/* Filter bar: prototype – active purple, inactive dark with thin white border */
-.jazz-filterbar {
-    display: inline-flex;
-    flex-wrap: wrap;
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 8px;
-    overflow: hidden;
-    margin: 10px auto 24px auto;
-    background: transparent;
-}
-
-.jazz-filterbtn {
-    background: rgba(30,30,35,0.9);
-    color: #fff;
-    border: 0;
-    border-right: 1px solid rgba(255,255,255,0.2);
-    padding: 12px 20px;
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 14px;
-}
-
-.jazz-filterbtn:last-of-type {
-    border-right: 0;
-}
-
-.jazz-filterbtn:hover {
-    background: rgba(255,255,255,0.08);
-}
-
-.jazz-filterbtn.is-active {
-    background: #7b2cbf;
-    color: #fff;
-    border-right-color: rgba(255,255,255,0.2);
-}
 
 /* All Events: 6 columns; Day filter: 3 columns (2 rows) */
 .jazz-events-grid {
@@ -1068,16 +1020,6 @@ main {
 }
 
 /* Cards: prototype – light grey to stand out from dark page, rounded */
-.jazz-event-card {
-    display: flex;
-    flex-direction: column;
-    border-radius: 12px;
-    overflow: hidden;
-    background: rgba(55,55,62,0.95);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.12);
-    text-align: left;
-}
 
 .jazz-event-card.is-hidden {
     display: none;
@@ -1109,18 +1051,7 @@ body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only {
     display: none !important;
 }
 
-.jazz-event-media {
-    position: relative;
-    height: 190px;
-    background: rgba(255,255,255,0.06);
-}
 
-.jazz-event-media img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
 
 /* Heart: default = white/outline; .is-saved = red filled */
 .jazz-heart-btn {
@@ -1182,40 +1113,7 @@ body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
     text-align: left;
 }
 
-.jazz-event-whenwhere,
-.jazz-event-whenwhere-compact,
-.jazz-event-desc {
-    text-align: left;
-}
-
 /* Card title centered (prototype); time, description, buttons left-aligned */
-.jazz-event-title {
-    margin: 0 0 8px 0;
-    font-size: 17px;
-    font-weight: 800;
-    color: #fff;
-    text-align: center;
-}
-
-.jazz-event-whenwhere {
-    margin: 0 0 10px 0;
-    font-size: 13px;
-    color: rgba(255,255,255,0.88);
-}
-
-.jazz-event-whenwhere-compact {
-    margin: 0 0 14px 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.9);
-}
-
-.jazz-event-desc {
-    margin: 0 0 14px 0;
-    font-size: 13px;
-    line-height: 1.5;
-    color: rgba(255,255,255,0.88);
-}
 
 .jazz-event-actions {
     display: flex;

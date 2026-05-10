@@ -11,7 +11,6 @@
 
 $app = (new \App\Repositories\SettingsRepository())->getAll();
 $h = fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
-$skipHeaderStyleSheet = true;
 
 $heroFile = (string) ($jazzConfig['hero_image'] ?? 'hero-jazz.jpg');
 $hero = '/images/jazz/' . rawurlencode($heroFile);
@@ -94,47 +93,56 @@ foreach ($artistPages as $pageSlug => $meta) {
     }
     $allowedDetails[$slugify($artistTitle)] = '/jazz/' . $pageSlug;
 }
+
+// Settings for the page title, styles, body class
+$pageTitle = $vm->pageTitle;
+$pageStyles = ['/css/pages/jazz.css'];
+$bodyClass = 'jazz-page jazz-filter-all';
+
+// Hero settings
+$heroModifier = 'festival-hero--jazz';
+$heroImage = $hero;
+$heroImageAlt = 'The Jazz Lounge';
+$heroTitle = 'The Jazz Lounge';
+$heroSubtitle = 'The heartbeat of the historic square.';
+$heroButtonText = '';
+$heroButtonUrl = '';
+$heroButtonClass = 'btn btn--light';
+
+// Breadcrumbs
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'Jazz', 'url' => null],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title><?= $h($vm->pageTitle) ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>&jazz=5">
-</head>
-<body class="jazz-page jazz-filter-all">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+<body class="<?= htmlspecialchars($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main>
     <!-- Hero -->
-    <section class="jazz-hero" style="background-image: linear-gradient(120deg, rgba(0,0,0,0.45), rgba(0,0,0,0.80)), url('<?= $h($hero) ?>');">
-        <div class="jazz-hero-content container">
-            <h1 class="jazz-hero-title">The Jazz Lounge</h1>
-            <p class="jazz-hero-subtitle">The heartbeat of the historic square.</p>
-        </div>
-    </section>
+    <?php require __DIR__ . '/../partials/festival-hero.php'; ?>
+
+    <!-- Breadcrumbs nav -->
+    <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
     <!-- Intro + filter + grid -->
     <section class="container jazz-intro">
-        <nav class="breadcrumbs jazz-breadcrumbs">
-            <a href="/">Festival</a>
-            <span class="breadcrumb-sep">›</span>
-            <span class="breadcrumb-current">Jazz</span>
-        </nav>
 
-        <p class="jazz-lead">
+        <p class="section-lead section-lead--center jazz-lead">
             Find your rhythm in the heart of the city. Haarlem Jazz Festival is where timeless melodies meet
             modern grooves. Join the celebration, feel the beat, and experience the true spirit of jazz.
         </p>
 
-        <div class="jazz-filterbar" role="tablist" aria-label="Jazz day filter">
-            <button class="jazz-filterbtn is-active" type="button" data-jazz-filter="all" aria-pressed="true">All Events</button>
-            <button class="jazz-filterbtn" type="button" data-jazz-filter="thursday" aria-pressed="false">Thursday</button>
-            <button class="jazz-filterbtn" type="button" data-jazz-filter="friday" aria-pressed="false">Friday</button>
-            <button class="jazz-filterbtn" type="button" data-jazz-filter="saturday" aria-pressed="false">Saturday</button>
-            <button class="jazz-filterbtn" type="button" data-jazz-filter="sunday" aria-pressed="false">Sunday</button>
+        <div class="filter-tabs jazz-filterbar" role="tablist" aria-label="Jazz day filter">
+            <button class="filter-tab jazz-filterbtn is-active" type="button" data-jazz-filter="all" aria-pressed="true">All Events</button>
+            <button class="filter-tab jazz-filterbtn" type="button" data-jazz-filter="thursday" aria-pressed="false">Thursday</button>
+            <button class="filter-tab jazz-filterbtn" type="button" data-jazz-filter="friday" aria-pressed="false">Friday</button>
+            <button class="filter-tab jazz-filterbtn" type="button" data-jazz-filter="saturday" aria-pressed="false">Saturday</button>
+            <button class="filter-tab jazz-filterbtn" type="button" data-jazz-filter="sunday" aria-pressed="false">Sunday</button>
         </div>
 
         <div class="jazz-events-grid" id="jazzGrid">
@@ -164,9 +172,10 @@ foreach ($artistPages as $pageSlug => $meta) {
                 $img = '/images/jazz/' . rawurlencode($imgFile);
 
                 $detailsUrl = $allowedDetails[$slug] ?? null;
+                $isBookable = $detailsUrl !== null;
                 $isAllEventsDuplicate = isset($allEventsDuplicateKeys[$i]);
             ?>
-            <article class="jazz-event-card<?= $isAllEventsDuplicate ? ' jazz-all-events-duplicate' : '' ?>" data-day="<?= $h($day) ?>" data-event-id="<?= (int)$e['event_id'] ?>">
+            <article class="festival-card festival-card--jazz jazz-event-card<?= $isAllEventsDuplicate ? ' jazz-all-events-duplicate' : '' ?>" data-day="<?= $h($day) ?>" data-event-id="<?= (int)$e['event_id'] ?>">
                 <div class="jazz-event-media">
                     <img src="<?= $h($img) ?>"
                          alt="<?= $h($title) ?>">
@@ -181,17 +190,17 @@ foreach ($artistPages as $pageSlug => $meta) {
                     <h3 class="jazz-event-title"><?= $h($title) ?></h3>
 
                     <!-- All Events: compact line only -->
-                    <p class="jazz-event-whenwhere jazz-event-whenwhere-compact jazz-card-compact-only">
+                    <p class="copy-text copy-text--sm jazz-event-whenwhere jazz-event-whenwhere-compact jazz-card-compact-only">
                         <?= $h($whenWhereCompact) ?>
                     </p>
 
                     <!-- Day filter: full time + venue -->
-                    <p class="jazz-event-whenwhere jazz-card-day-only">
+                    <p class="copy-text copy-text--sm  jazz-event-whenwhere jazz-card-day-only">
                         (<?= $h($timeRange) ?>) at <?= $h($placeDisplay) ?>
                     </p>
 
                     <!-- Day filter: description + price -->
-                    <p class="jazz-event-desc jazz-card-day-only">
+                    <p class="copy-text copy-text--sm  jazz-event-desc jazz-card-day-only">
                         <?= $h($e['description'] ?? '') ?>
                         <?php if ($price !== null && $price > 0): ?>
                             <br> - Ticket price: <?= $h(number_format($price, 2)) ?>€
@@ -203,11 +212,31 @@ foreach ($artistPages as $pageSlug => $meta) {
                     <!-- Day view (Thu–Sun): Artist details + Save to program use same primary style -->
                     <div class="jazz-event-actions">
                         <?php if ($detailsUrl): ?>
-                            <a class="jazz-btn jazz-btn-primary" href="<?= $h($detailsUrl) ?>">Artist details</a>
+                            <a class="btn btn--light btn--sm jazz-event-details-btn" href="<?= $h($detailsUrl) ?>">Artist details</a>
                         <?php else: ?>
-                            <button class="jazz-btn jazz-btn-primary" type="button" disabled aria-disabled="true">Artist details</button>
+                            <button class="btn btn--light btn--sm jazz-event-details-btn" type="button" disabled aria-disabled="true">Artist details</button>
                         <?php endif; ?>
-                        <button class="jazz-btn jazz-btn-primary jazz-card-day-only" type="button" data-save-event="<?= (int)$e['event_id'] ?>">Save to program</button>
+
+                        <!-- If you can save event to the program/cart -->
+                        <?php if ($isBookable): ?>
+                            <button
+                                    class="btn btn--primary btn--sm jazz-card-day-only"
+                                    type="button"
+                                    data-save-event="<?= (int)$e['event_id'] ?>"
+                            >
+                                Save to program
+                            </button>
+                        <?php else: ?>
+                            <button
+                                    class="btn btn--primary btn--sm jazz-card-day-only"
+                                    type="button"
+                                    disabled
+                                    aria-disabled="true"
+                            >
+                                Save to program
+                            </button>
+                        <?php endif; ?>
+
                     </div>
                 </div>
             </article>

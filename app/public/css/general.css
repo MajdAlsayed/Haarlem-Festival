@@ -186,7 +186,13 @@ html {
 
 .festival-hero__panel {
     width: min(100%, 680px);
+    min-height: 320px;
     padding: 40px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
     text-align: center;
 
@@ -196,12 +202,12 @@ html {
     background:
             linear-gradient(
                     135deg,
-                    rgba(255, 255, 255, 0.10),
+                    rgba(255, 255, 255, 0.20),
                     rgba(255, 255, 255, 0.03)
             ),
-            rgba(12, 12, 12, 0.28);
+            rgba(12, 12, 12, 0.32);
 
-    backdrop-filter: blur(1.5px);
+    backdrop-filter: blur(2px);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
 }
 
@@ -261,6 +267,7 @@ html {
     }
 
     .festival-hero__panel {
+        min-height: 220px;
         padding: 28px 22px;
     }
 
@@ -456,6 +463,8 @@ html {
     background: var(--color-accent);
     color: #111;
     border-color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .btn--primary:hover,
@@ -483,7 +492,7 @@ html {
     font-weight: 700;
     font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.04em;
     text-decoration: none;
 
     border: 1px solid rgba(0, 0, 0, 0.06);
@@ -685,12 +694,12 @@ html {
 
 /* === Page Themes Start === */
 body.home-page {
-    --color-accent: #e7a90e;
+    --color-accent: #DECCAB;
     --color-accent-rgb: 231, 169, 14;
 }
 
 body.dance-page {
-    --color-accent: #ff9800;
+    --color-accent: #E58708;
     --color-accent-rgb: 255, 152, 0;
 }
 
@@ -702,7 +711,7 @@ body.food-detail-page {
 
 body.jazz-page,
 body.jazz-artist-page {
-    --color-accent: #8b5cf6;
+    --color-accent: #7258DB;
     --color-accent-rgb: 139, 92, 246;
 }
 

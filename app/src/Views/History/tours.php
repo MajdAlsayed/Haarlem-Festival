@@ -16,7 +16,7 @@ $breadcrumbs = [
 <!DOCTYPE html>
 <html lang="en">
 <?php require __DIR__ . '/../partials/head.php'; ?>
-<body class="history-page">
+<body class="<?= htmlspecialchars($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 

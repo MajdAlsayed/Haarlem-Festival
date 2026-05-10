@@ -1,0 +1,90 @@
+.jazz-intro {
+    text-align: center;
+}
+
+.jazz-lead {
+    margin-bottom: 48px;
+}
+
+.jazz-filterbar {
+    margin-bottom: 36px;
+}
+
+.jazz-event-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    text-align: left;
+}
+
+.festival-card--jazz {
+    background:
+            linear-gradient(
+                    145deg,
+                    rgba(255, 255, 255, 0.08),
+                    rgba(255, 255, 255, 0.035)
+            ),
+            var(--color-surface);
+
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.jazz-event-media {
+    position: relative;
+    height: 190px;
+    background: rgba(255,255,255,0.05);
+}
+
+.jazz-event-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.jazz-event-details-btn.is-disabled {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.jazz-event-title {
+    margin: 0 0 10px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #fff;
+    text-align: center;
+}
+
+.jazz-event-whenwhere,
+.jazz-event-whenwhere-compact {
+    text-align: center;
+}
+
+.jazz-event-whenwhere.jazz-card-day-only {
+    color: #fff;
+    font-weight: 600;
+}
+
+.jazz-event-whenwhere {
+    margin: 0 0 10px;
+}
+
+.jazz-event-whenwhere-compact {
+    margin: 0 0 14px;
+    font-weight: 600;
+}
+
+.jazz-event-desc {
+    margin: 0 0 14px;
+    text-align: left;
+}
+
+.jazz-gare-detail-hero .page-hero__background img {
+    object-position: center 25%;
+}
+
+.jazz-detail-hero__content {
+    padding-bottom: 48px;
+}
+
