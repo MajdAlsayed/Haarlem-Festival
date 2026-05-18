@@ -1,4 +1,7 @@
 :root {
+    --container-max: 1280px;
+    --container-padding: 40px;
+
     --color-bg: #0c0c0c;
     --color-surface: #1a1a1a;
     --color-text: #ffffff;
@@ -29,6 +32,18 @@
     --font-hero: clamp(2.75rem, 6vw, 4.5rem);
 }
 
+@media (max-width: 768px) {
+    :root {
+        --container-padding: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --container-padding: 16px;
+    }
+}
+
 * {
     box-sizing: border-box;
 }
@@ -45,10 +60,28 @@ html {
     scroll-behavior: smooth;
 }
 
+.text-accent {
+    color: var(--color-accent);
+    font-weight: 700;
+}
+
 .container {
-    max-width: 1200px;
+    width: 100%;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 var(--space-md);
+    padding-inline: var(--container-padding);
+}
+
+.nav-container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    width: 100%;
+    padding: 16px var(--container-padding);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 48px;
 }
 
 /* === Section Start === */
@@ -573,6 +606,14 @@ html {
     font-size: 0.8rem;
     font-weight: 600;
 }
+
+.btn--xs {
+    min-height: 28px;
+    padding: 4px 10px;
+
+    font-size: 12px;
+    font-weight: 600;
+}
 /* === Button End === */
 
 /* === Breadcrumbs Start === */
@@ -920,3 +961,78 @@ body.stories-page {
     }
 }
 /* === Footer End === */
+
+/* === Festival Table Start === */
+.festival-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: var(--radius-card);
+    background: rgba(0, 0, 0, 0.32);
+}
+
+.festival-table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+}
+
+.festival-table th,
+.festival-table td {
+    height: 52px;
+    padding: 13px 14px;
+    font-size: 13px;
+    line-height: 1.45;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.festival-table th {
+    background: var(--color-accent);
+    color: var(--color-text);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.festival-table td {
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.festival-table-empty {
+    color: var(--color-muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+.festival-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.festival-table tbody tr:nth-child(odd) {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+.festival-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.festival-table th:last-child,
+.festival-table td:last-child {
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .festival-table th,
+    .festival-table td {
+        padding: 9px 8px;
+        font-size: 12px;
+    }
+}
+/* === Festival Table End === */

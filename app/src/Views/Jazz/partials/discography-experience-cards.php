@@ -1,6 +1,6 @@
 <?php
 /**
- * Gumbo-style discography cards (cover, audio play, title, meta). Included from gumbo-king.php when $discography is non-empty.
+ * Shared Jazz discography media cards.
  *
  * @var \App\ViewModels\JazzArtistViewModel $viewModel
  * @var list<array<string,mixed>> $discography
@@ -29,24 +29,24 @@ foreach ($discography as $idx => $track):
         ? 'Track played ' . number_format($pc) . ' times'
         : 'Listen to the full track.';
     ?>
-                    <article class="jazz-gumbo-experience-card jazz-gumbo-experience-card--disc">
-                        <div class="jazz-gumbo-exp-media">
-                            <div class="jazz-gumbo-exp-poster">
-                                <img src="<?= $h($coverSrc) ?>" alt="" class="jazz-gumbo-exp-img" loading="lazy" decoding="async">
+                    <article class="jazz-media-card jazz-discography-card">
+                        <div class="jazz-media-card__media">
+                            <div class="jazz-media-card__poster">
+                                <img src="<?= $h($coverSrc) ?>" alt="" class="jazz-media-card__img" loading="lazy" decoding="async">
                             </div>
                             <?php if ($tAudio !== ''): ?>
-                            <button type="button" class="jazz-gumbo-exp-play" aria-label="Play <?= $h($tTitle) ?>" title="Play">
-                                <span class="jazz-gumbo-exp-play-icon" aria-hidden="true">▶</span>
+                            <button type="button" class="jazz-media-card__play" aria-label="Play <?= $h($tTitle) ?>" title="Play">
+                                <span class="jazz-media-card__play-icon" aria-hidden="true">▶</span>
                             </button>
-                            <audio class="jazz-gumbo-exp-audio" src="<?= $h($tAudio) ?>" preload="metadata"></audio>
+                            <audio class="jazz-media-card__audio" src="<?= $h($tAudio) ?>" preload="metadata"></audio>
                             <?php endif; ?>
                         </div>
-                        <div class="jazz-gumbo-exp-body">
-                            <div class="jazz-gumbo-exp-head">
-                                <span class="jazz-gumbo-exp-artist"><?= $h($tTitle) ?></span>
-                                <span class="jazz-gumbo-exp-meta"><?= $h($metaLine) ?></span>
+                        <div class="jazz-media-card__body">
+                            <div class="jazz-media-card__head">
+                                <span class="jazz-media-card__title"><?= $h($tTitle) ?></span>
+                                <span class="jazz-media-card__meta"><?= $h($metaLine) ?></span>
                             </div>
-                            <p class="jazz-gumbo-exp-desc"><?= $h($viewModel->artistTitle) ?> — <?= $h($descLine) ?></p>
+                            <p class="copy-text copy-text--sm jazz-media-card__desc"><?= $h($viewModel->artistTitle) ?> — <?= $h($descLine) ?></p>
                         </div>
                     </article>
 <?php endforeach; ?>

@@ -159,7 +159,7 @@ $bodyClass = 'dance-page artist-detail-page';
                 <?php endforeach; ?>
             </div>
             <div class="artist-detail-back-wrap">
-                <a href="/dance" class="btn btn--outline"> ← BACK <span aria-hidden="true"></span></a>
+                <a href="/dance" class="btn btn--primary"> ← BACK <span aria-hidden="true"></span></a>
             </div>
             </div>
         </section>

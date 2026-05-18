@@ -318,7 +318,7 @@ $storyName = $story['name'] ?? 'Story';
             </section>
 
             <div class="admin-form-actions">
-                <a href="/cms/stories" class="admin-btn admin-btn-secondary">← Back</a>
+                <a href="/cms/stories" class="admin-btn admin-btn-secondary">← BACK</a>
                 <button type="submit" class="admin-btn admin-btn-primary">
                     <?= $isEdit ? '💾 Save Changes' : '✨ Create Detail Page' ?>
                 </button>

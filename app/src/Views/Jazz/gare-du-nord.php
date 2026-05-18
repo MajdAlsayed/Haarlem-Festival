@@ -53,6 +53,14 @@ $pageTitle = $viewModel->artistTitle . ' — Jazz — Haarlem Festival';
 $pageStyles = ['/css/pages/jazz.css'];
 $bodyClass = 'jazz-page jazz-artist-page jazz-gare-page';
 
+// Hero settings
+$pageHeroTitle = $viewModel->artistTitle;
+$pageHeroSubtitle = $viewModel->tagline;
+$pageHeroImage = $heroImage;
+$pageHeroAlt = $viewModel->artistTitle;
+$pageHeroClass = 'jazz-detail-hero jazz-gare-detail-hero';
+$pageHeroContentClass = 'jazz-detail-hero__content jazz-gare-detail-hero__content';
+
 // Breadcrumbs
 $breadcrumbs = [
         ['label' => 'Home', 'url' => '/'],
@@ -79,54 +87,38 @@ $breadcrumbs = [
     <?php if (!empty($cartFlashError)): ?>
         <div class="container jazz-cart-flash jazz-cart-flash--error" role="alert"><?= $h($cartFlashError) ?></div>
     <?php endif; ?>
-    <section class="page-hero jazz-detail-hero jazz-gare-detail-hero" aria-label="<?= $h($viewModel->artistTitle) ?> hero">
-        <div class="page-hero__background">
-            <img
-                    src="<?= $h($heroImage) ?>"
-                    alt="<?= $h($viewModel->artistTitle) ?>"
-            >
-        </div>
 
-        <div class="container page-hero__inner">
-            <div class="page-hero__content jazz-detail-hero__content jazz-gare-detail-hero__content">
-                <h1 class="page-hero__title">
-                    <?= $h($viewModel->artistTitle) ?>
-                </h1>
+    <!-- Hero -->
+    <?php require __DIR__ . '/../partials/page-hero.php'; ?>
 
-                <?php if (trim((string) $viewModel->tagline) !== ''): ?>
-                    <p class="page-hero__subtitle">
-                        <?= $h($viewModel->tagline) ?>
-                    </p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </section>
-
+    <!-- Breadcrumbs nav -->
     <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
     <section class="container jazz-artist-body jazz-gare-body">
         <article class="jazz-gare-intro">
-            <h2 class="jazz-section-title"><?= $h($viewModel->artistTitle) ?></h2>
+            <h2 class="section-title section-title--accent section-title--underlined"><?= $h($viewModel->artistTitle) ?></h2>
             <?php
             $pageIntro = trim($viewModel->pageIntroText);
             ?>
             <?php if ($pageIntro !== ''): ?>
-                <p class="jazz-artist-bio jazz-gare-bio"><?= nl2br($h($pageIntro)) ?></p>
+                <p class="section-lead jazz-artist-bio"><?= nl2br($h($pageIntro)) ?></p>
             <?php elseif ($isPlaceholderBio): ?>
-                <p class="jazz-artist-bio jazz-gare-bio">
+                <p class="section-lead jazz-artist-bio">
                     Gare du Nord are Dutch jazz royalty: a cinematic soul collective rooted in the urban lounge, where film-noir atmosphere meets tight grooves and luminous vocals. For years their sound has defined late-night Haarlem and beyond—smoky hooks, brass shimmer, and a stage presence that feels both intimate and immense.
                 </p>
             <?php else: ?>
-                <p class="jazz-artist-bio jazz-gare-bio"><?= nl2br($h($introBio)) ?></p>
+                <p class="section-lead jazz-artist-bio"><?= nl2br($h($introBio)) ?></p>
             <?php endif; ?>
         </article>
 
         <section class="jazz-plan-section jazz-gare-plan">
-            <h3 class="jazz-section-subtitle">Plan your <?= $h($viewModel->artistTitle) ?> experience</h3>
+            <h3 class="jazz-artist-subtitle section-subtitle section-title--underlined">Plan your <?= $h($viewModel->artistTitle) ?> experience</h3>
 
             <div class="jazz-gare-media-block">
                 <?php if ($discography !== []): ?>
-                    <p class="jazz-gare-media-lead">Discography — listen to tracks for this artist.</p>
+                    <p class="copy-text copy-text--sm jazz-artist-note">
+                        Discography — listen to tracks for this artist.
+                    </p>
                     <div class="jazz-gumbo-experience-outer jazz-gare-discography-cards">
                         <div class="jazz-gumbo-cards jazz-gumbo-experience-grid">
                             <?php
@@ -136,7 +128,9 @@ $breadcrumbs = [
                         </div>
                     </div>
                 <?php elseif ($firstEventPreview !== null): ?>
-                    <p class="jazz-gare-media-lead">Preview — from the jazz event (admin → Jazz → Events → preview audio).</p>
+                    <p class="copy-text copy-text--sm jazz-artist-note">
+                        Preview — listen to a sample from this artist.
+                    </p>
                     <div class="jazz-gare-disc-row jazz-gare-disc-row--preview">
                         <div class="jazz-gare-disc-cover jazz-gare-disc-cover--hero">
                             <img src="<?= $h($viewModel->heroImage) ?>" alt="" loading="lazy" decoding="async">
@@ -162,12 +156,11 @@ $breadcrumbs = [
                             </span>
                         </a>
                     </div>
-                    <p class="jazz-gare-media-fallback-hint jazz-muted">Add audio under <strong>Admin → Jazz → Discography</strong> with artist slug exactly <code>gare-du-nord</code>, or set <strong>preview audio</strong> on a Gare du Nord event.</p>
                 <?php endif; ?>
             </div>
 
-            <div class="jazz-schedule jazz-schedule--artist-detail jazz-gare-schedule" aria-label="Event schedule from Jazz admin">
-                <table class="jazz-table jazz-table-buy jazz-gare-table">
+            <div class="festival-table-wrap jazz-artist-schedule" aria-label="Event schedule from Jazz admin">
+                <table class="festival-table">
                     <thead>
                     <tr>
                         <th scope="col">Date</th>
@@ -213,12 +206,12 @@ $breadcrumbs = [
                                         <?php
                                         $ticketDetailsId = (int) ($e['ticket_details_id'] ?? 0);
                                         $returnUrl = $jazzCartReturnUrl;
-                                        $buttonClass = 'jazz-btn jazz-btn-primary jazz-gare-buy';
+                                        $buttonClass = 'btn btn--light btn--xs';
                                         $buttonLabel = 'Add to program';
                                         require __DIR__ . '/partials/jazz-add-to-cart-form.php';
                                         ?>
                                     <?php else: ?>
-                                        <span class="jazz-muted">—</span>
+                                        <span class="festival-table-empty">—</span>
                                     <?php endif; ?>
                                 </td>
                             </tr>
@@ -230,19 +223,19 @@ $breadcrumbs = [
         </section>
 
         <section class="jazz-highlights jazz-gare-highlights">
-            <h3 class="jazz-section-subtitle">Career highlights</h3>
+            <h3 class="section-title section-title--accent section-title--underlined jazz-artist-section-title">Career highlights</h3>
             <?php if (trim($viewModel->careerHighlightsHtml) !== ''): ?>
-                <div class="jazz-gare-highlights-cms">
+                <div class="jazz-gare-highlights-cms copy-text">
                     <?= \App\Services\JazzArtistHtmlSanitizer::purifyHighlights($viewModel->careerHighlightsHtml) ?>
                 </div>
             <?php else: ?>
-            <p class="jazz-highlight-text">
+            <p class="copy-text jazz-highlight-text">
                 Gare du Nord helped shape the Dutch live circuit with a signature blend of soul, jazz, and soundtrack drama—always cinematic, always danceable. Their recordings and festival appearances built a loyal following that expects both velvet melancholy and explosive release in a single set.
             </p>
-            <p class="jazz-highlight-text">
-                The collective became known for the <strong class="jazz-gare-accent">Sex ’n’ Jazz</strong> phenomenon: a long-running celebration where groove, glamour, and improvisation collided night after night. That era cemented their reputation as architects of the modern urban-lounge sound.
+            <p class="copy-text jazz-highlight-text">
+                The collective became known for the <strong class="text-accent">Sex ’n’ Jazz</strong> phenomenon: a long-running celebration where groove, glamour, and improvisation collided night after night. That era cemented their reputation as architects of the modern urban-lounge sound.
             </p>
-            <p class="jazz-highlight-text">
+            <p class="copy-text jazz-highlight-text">
                 After time away from the spotlight, Gare du Nord returned to the stage with renewed fire—proving that their chemistry, storytelling, and sonic identity still resonate with audiences who want jazz that feels like a film score you can move to.
             </p>
             <?php endif; ?>
@@ -253,51 +246,14 @@ $breadcrumbs = [
         require __DIR__ . '/partials/band-members-section.php';
         ?>
 
-        <div class="jazz-back jazz-gare-back">
-            <a class="jazz-back-btn jazz-gare-back-btn" href="/jazz">Back</a>
+        <div class="jazz-back">
+            <a href="/jazz" class="btn btn--primary">← BACK</a>
         </div>
     </section>
 </main>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
 
-<script>
-(function () {
-    document.querySelectorAll('.jazz-gumbo-experience-card').forEach(function (card) {
-        var btn = card.querySelector('.jazz-gumbo-exp-play');
-        var audio = card.querySelector('.jazz-gumbo-exp-audio');
-        if (!btn || !audio) return;
-        var icon = btn.querySelector('.jazz-gumbo-exp-play-icon');
-        btn.addEventListener('click', function () {
-            document.querySelectorAll('.jazz-gumbo-exp-audio').forEach(function (a) {
-                if (a !== audio) {
-                    a.pause();
-                    a.currentTime = 0;
-                    var ob = a.closest('.jazz-gumbo-experience-card');
-                    if (ob) {
-                        var pb = ob.querySelector('.jazz-gumbo-exp-play');
-                        var ic = ob.querySelector('.jazz-gumbo-exp-play-icon');
-                        if (pb) pb.classList.remove('is-playing');
-                        if (ic) ic.textContent = '▶';
-                    }
-                }
-            });
-            if (audio.paused) {
-                audio.play().catch(function () {});
-                btn.classList.add('is-playing');
-                if (icon) icon.textContent = '⏸';
-            } else {
-                audio.pause();
-                btn.classList.remove('is-playing');
-                if (icon) icon.textContent = '▶';
-            }
-        });
-        audio.addEventListener('ended', function () {
-            btn.classList.remove('is-playing');
-            if (icon) icon.textContent = '▶';
-        });
-    });
-})();
-</script>
+<?php require __DIR__ . '/partials/jazz-media-card-player-script.php'; ?>
 </body>
 </html>
