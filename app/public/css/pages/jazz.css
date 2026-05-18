@@ -1,3 +1,11 @@
+.jazz-page {
+    background-color: #0a0a0a;
+}
+
+/* =========================
+   JAZZ — Overview page
+   ========================= */
+
 .jazz-intro {
     text-align: center;
 }
@@ -10,11 +18,28 @@
     margin-bottom: 36px;
 }
 
+.jazz-events-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(140px, 1fr));
+    gap: 20px;
+    padding: 10px 0 32px;
+    text-align: left;
+    align-items: stretch;
+}
+
+.jazz-filter-day .jazz-events-grid {
+    grid-template-columns: repeat(3, minmax(200px, 1fr));
+}
+
 .jazz-event-card {
     display: flex;
     flex-direction: column;
     overflow: hidden;
     text-align: left;
+}
+
+.jazz-event-card.is-hidden {
+    display: none;
 }
 
 .festival-card--jazz {
@@ -25,14 +50,13 @@
                     rgba(255, 255, 255, 0.035)
             ),
             var(--color-surface);
-
     border-color: rgba(255, 255, 255, 0.12);
 }
 
 .jazz-event-media {
     position: relative;
     height: 190px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .jazz-event-media img {
@@ -42,28 +66,95 @@
     display: block;
 }
 
-.jazz-event-details-btn.is-disabled {
-    opacity: 0.35;
-    pointer-events: none;
+.jazz-filter-all .jazz-card-day-only {
+    display: none !important;
+}
+
+body.jazz-filter-all .jazz-event-card.jazz-all-events-duplicate {
+    display: none !important;
+}
+
+.jazz-filter-day .jazz-card-compact-only {
+    display: none !important;
+}
+
+.jazz-heart-btn.jazz-card-all-only,
+body.jazz-filter-day .jazz-heart-btn.jazz-card-all-only,
+body.jazz-filter-day .jazz-event-media .jazz-heart-btn.jazz-card-all-only {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only,
+body.jazz-filter-all .jazz-event-media .jazz-heart-btn.jazz-card-all-only {
+    display: grid !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+.jazz-heart-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+
+    display: grid;
+    place-items: center;
+
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+
+    background: rgba(0, 0, 0, 0.4);
+    color: rgba(255, 255, 255, 0.95) !important;
+
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only:not(.is-saved) {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.jazz-heart-btn:hover {
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff !important;
+}
+
+.jazz-heart-btn.is-saved,
+body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
+    background: rgba(0, 0, 0, 0.55);
+    color: #e63946 !important;
+}
+
+.jazz-heart-btn.is-saved:hover {
+    color: #ff6b7a !important;
+}
+
+.jazz-event-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding: 14px 16px 16px;
+    text-align: left;
 }
 
 .jazz-event-title {
     margin: 0 0 10px;
+    color: #fff;
     font-size: 16px;
     font-weight: 700;
     line-height: 1.25;
-    color: #fff;
     text-align: center;
 }
 
 .jazz-event-whenwhere,
 .jazz-event-whenwhere-compact {
     text-align: center;
-}
-
-.jazz-event-whenwhere.jazz-card-day-only {
-    color: #fff;
-    font-weight: 600;
 }
 
 .jazz-event-whenwhere {
@@ -75,101 +166,42 @@
     font-weight: 600;
 }
 
+.jazz-event-whenwhere.jazz-card-day-only {
+    color: #fff;
+    font-weight: 600;
+}
+
 .jazz-event-desc {
     margin: 0 0 14px;
     text-align: left;
 }
 
-.jazz-gumbo-detail-hero .page-hero__background img {
-    object-position: center 20%;
-}
-
-.jazz-gare-detail-hero .page-hero__background img {
-    object-position: center 25%;
-}
-
-.jazz-detail-hero__content {
-    padding-bottom: 48px;
-}
-
-.jazz-gare-intro {
-    margin: 0 0 var(--space-2xl);
-}
-
-.jazz-gare-intro .section-title {
-    text-align: left;
-    margin-bottom: var(--space-sm);
-}
-
-/* =========================
-   JAZZ (public) — /jazz + artist pages (gumbo-kings, karsu, gare-du-nord)
-   Shared with jazz-home.php, gumbo-king.php, karsu.php, gare-du-nord.php (most rules are .jazz-* / .jazz-*-page).
-   ========================= */
-
-.jazz-page {
-    background-color: #0A0A0A;
-}
-
-.jazz-hero {
-    position: relative;
-    min-height: 420px;
-    color: #fff;
-    background-size: cover;
-    background-position: center;
+.jazz-event-actions {
     display: flex;
-    align-items: flex-end;
-}
-
-.jazz-hero-content {
-    padding: 80px 40px;
-}
-
-.jazz-hero-title {
-    font-size: 48px;
-    font-weight: 700;
-    margin: 0 0 10px;
-    color: #ffffff;
-    letter-spacing: -0.02em;
-}
-
-.jazz-hero-subtitle {
-    font-size: 18px;
-    color: #e8e8e8;
-    max-width: 520px;
-    margin: 0;
-}
-
-/* =========================
-   JAZZ - Events grid cards
-   ========================= */
-
-/* All Events: 6 columns; Day filter: 3 columns (2 rows) */
-.jazz-events-grid {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(140px, 1fr));
-    gap: 20px;
-    padding: 10px 0 32px 0;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: auto;
     text-align: left;
-    align-items: stretch;
 }
 
-.jazz-filter-day .jazz-events-grid {
-    grid-template-columns: repeat(3, minmax(200px, 1fr));
+.jazz-event-details-btn.is-disabled {
+    opacity: 0.35;
+    pointer-events: none;
 }
 
 @media (max-width: 1200px) {
     .jazz-events-grid {
         grid-template-columns: repeat(3, minmax(160px, 1fr));
     }
+
     .jazz-filter-day .jazz-events-grid {
         grid-template-columns: repeat(3, minmax(180px, 1fr));
     }
 }
 
 @media (max-width: 900px) {
-    .jazz-events-grid {
-        grid-template-columns: repeat(2, minmax(180px, 1fr));
-    }
+    .jazz-events-grid,
     .jazz-filter-day .jazz-events-grid {
         grid-template-columns: repeat(2, minmax(180px, 1fr));
     }
@@ -182,177 +214,32 @@
     }
 }
 
-/* Cards: prototype – light grey to stand out from dark page, rounded */
-
-.jazz-event-card.is-hidden {
-    display: none;
-}
-
-/* All Events: show compact line only; hide full time/venue + description */
-.jazz-filter-all .jazz-card-day-only {
-    display: none !important;
-}
-
-/* All Events: hide duplicate cards (2nd+ occurrence of same artist) */
-body.jazz-filter-all .jazz-event-card.jazz-all-events-duplicate {
-    display: none !important;
-}
-
-/* Heart button: only on "All Events" tab; never on Thursday/Friday/Saturday/Sunday */
-.jazz-heart-btn.jazz-card-all-only {
-    display: none !important;
-}
-body.jazz-filter-day .jazz-heart-btn.jazz-card-all-only {
-    display: none !important;
-}
-body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only {
-    display: grid !important;
-}
-
-/* Day filter (Thu–Sun): show full time/venue, description, price */
-.jazz-filter-day .jazz-card-compact-only {
-    display: none !important;
-}
-
-
-
-/* Heart: default = white/outline; .is-saved = red filled */
-.jazz-heart-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 0;
-    cursor: pointer;
-    background: rgba(0,0,0,0.4);
-    color: rgba(255,255,255,0.95) !important;
-    font-size: 18px;
-    font-weight: 900;
-    display: grid;
-    place-items: center;
-    line-height: 1;
-}
-
-/* Heart only in "All Events" – hide when Thursday/Friday/Saturday/Sunday is selected (override above) */
-body.jazz-filter-day .jazz-event-media .jazz-heart-btn.jazz-card-all-only {
-    display: none !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-}
-body.jazz-filter-all .jazz-event-media .jazz-heart-btn.jazz-card-all-only {
-    display: grid !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-}
-/* Unsaved heart = white; saved = red (override any other color) */
-body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only:not(.is-saved) {
-    color: rgba(255,255,255,0.95) !important;
-}
-body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
-    color: #e63946 !important;
-}
-
-.jazz-heart-btn:hover {
-    background: rgba(0,0,0,0.6);
-    color: rgba(255,255,255,1) !important;
-}
-
-.jazz-heart-btn.is-saved {
-    color: #e63946 !important;
-    background: rgba(0,0,0,0.55);
-}
-.jazz-heart-btn.is-saved:hover {
-    color: #ff6b7a !important;
-}
-
-.jazz-event-body {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-    padding: 14px 16px 16px 16px;
-    text-align: left;
-}
-
-/* Card title centered (prototype); time, description, buttons left-aligned */
-
-.jazz-event-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    text-align: left;
-    margin-top: auto;
-}
-
-.jazz-btn {
-    border: 0;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-weight: 700;
-    font-size: 13px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.jazz-btn-primary {
-    background: #e68a00;
-    color: #fff;
-}
-
-.jazz-btn-primary:hover {
-    background: #f0a020;
-}
-
-/* Day view: Artist details = solid orange; Save to program = outline (orange border) */
-.jazz-btn-secondary {
-    background: transparent;
-    color: #e68a00;
-    border: 2px solid #e68a00;
-}
-
-.jazz-btn-secondary:hover {
-    background: rgba(230,138,0,0.15);
-}
-
-.jazz-btn:disabled,
-.jazz-btn[aria-disabled="true"] {
-    opacity: 0.35;
-    cursor: not-allowed;
-}
-
 /* =========================
-   JAZZ - Artist pages
+   JAZZ — Artist pages base
    ========================= */
 
 .jazz-artist-page {
     background: radial-gradient(circle at top, #25201a 0, #0c0c0c 45%, #050505 100%);
 }
 
-.jazz-artist-hero {
-    min-height: 300px;
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    align-items: flex-end;
-}
-
-.jazz-artist-hero-content {
-    padding: 46px 0 26px 0;
-}
-
-.jazz-artist-tagline {
-    margin: 8px 0 0 0;
-    color: #e0e0e0;
-}
-
 .jazz-artist-body {
     padding-block: 36px 60px;
+}
+
+.jazz-detail-hero__content {
+    padding-bottom: 48px;
+}
+
+.jazz-gumbo-detail-hero .page-hero__background img {
+    object-position: center 20%;
+}
+
+.jazz-gare-detail-hero .page-hero__background img {
+    object-position: center 25%;
+}
+
+.jazz-karsu-detail-hero .page-hero__background img {
+    object-position: center center;
 }
 
 .jazz-artist-subtitle {
@@ -360,106 +247,43 @@ body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
     margin-bottom: var(--space-xl);
 }
 
-.jazz-artist-note {
-    margin: 0 0 var(--space-md);
-}
-
-.jazz-section-title {
-    margin-top: 18px;
-    margin-bottom: 10px;
-    font-size: 26px;
-    color: #f0a020;
-}
-
-.jazz-section-subtitle {
-    margin: 24px 0 12px;
-    font-size: 20px;
-    color: #f0a020;
-    text-align: left;
-}
-
 .jazz-artist-bio {
     padding-left: 0;
     text-align: left;
 }
 
+.jazz-artist-note {
+    margin: 0 0 var(--space-md);
+}
+
 .jazz-muted {
-    color: #aaaaaa;
+    color: #aaa;
     font-size: 14px;
 }
 
 .jazz-plan-section {
     margin-top: 32px;
-}
-
-.jazz-plan-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-    gap: 24px;
-    align-items: flex-start;
-}
-
-@media (max-width: 900px) {
-    .jazz-plan-layout {
-        grid-template-columns: 1fr;
-    }
-}
-
-.jazz-plan-media-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 18px;
-}
-
-.jazz-plan-card {
-    background: linear-gradient(145deg, #2a2825 0%, #22201d 100%);
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.06);
-    padding: 16px 16px 18px 16px;
-}
-
-.jazz-plan-card-img {
-    width: 100%;
-    height: 180px;
-    border-radius: 10px;
-    object-fit: cover;
-    display: block;
-}
-
-.jazz-image-placeholder {
-    width: 100%;
-    height: 180px;
-    border-radius: 10px;
-    background: radial-gradient(circle at top, #4b3b26 0%, #1d1710 55%, #120f0a 100%);
-    opacity: 0.6;
-}
-
-.jazz-plan-card-title {
-    margin: 14px 0 6px;
-    font-size: 16px;
-    font-weight: 700;
-    color: #ffffff;
-}
-
-.jazz-plan-card-text {
-    margin: 0;
-    font-size: 14px;
-    color: #d0d0d0;
-    line-height: 1.6;
+    text-align: left;
 }
 
 .jazz-artist-schedule {
     margin-top: var(--space-lg);
 }
 
-/* Avoid double frame: outer wrap already has panel border (Gumbo) */
-.jazz-gumbo-schedule-wrap .jazz-schedule.jazz-schedule--artist-detail {
-    background: transparent;
-    border: none;
-    box-shadow: none;
+.jazz-highlights {
+    margin-top: 32px;
 }
 
-/* Inline POST /cart/add on jazz artist pages (partials/jazz-add-to-cart-form.php) + Session flash under <main> */
+.jazz-highlight-text {
+    max-width: none;
+}
+
+.jazz-back {
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-xl);
+    text-align: center;
+}
+
 .jazz-cart-add-form {
     display: inline;
     margin: 0;
@@ -491,254 +315,18 @@ body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
     color: rgba(255, 220, 220, 0.98);
 }
 
-.jazz-primary-slot {
-    margin-top: 16px;
-    font-size: 14px;
-    color: #e0e0e0;
-}
-
-/* Band members */
-
-.jazz-band {
-    margin-top: 36px;
-}
-
-.jazz-band-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
-}
-
-@media (max-width: 900px) {
-    .jazz-band-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 640px) {
-    .food-cards-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 600px) {
-    .jazz-band-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-.jazz-band-card {
-    background: #211b14;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.06);
-    padding: 16px 14px 18px;
-    text-align: center;
-}
-
-.jazz-band-image-placeholder {
-    width: 100%;
-    height: 140px;
-    border-radius: 10px;
-    background: radial-gradient(circle at top, #3a2c22 0%, #150f0a 55%, #0b0806 100%);
-    margin-bottom: 10px;
-}
-
-.jazz-band-name {
-    margin: 0 0 4px;
-    font-size: 15px;
-    font-weight: 700;
-    color: #ffffff;
-}
-
-.jazz-band-role {
-    margin: 0;
-    font-size: 13px;
-    color: #d0d0d0;
-}
-
-.jazz-highlights {
-    margin-top: 32px;
-}
-
-.jazz-highlight-text {
-    max-width: none;
-}
-
-.jazz-back {
-    margin: 28px 0 40px 0;
-    text-align: center;
-}
-
-.jazz-gumbo-page .jazz-back {
-    text-align: center;
-}
-
 /* =========================
-   JAZZ - Gumbo Kings artist page (prototype)
+   JAZZ — Shared media cards
    ========================= */
 
-.jazz-gumbo-intro {
-    margin-top: 18px;
-    max-width: none;
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-}
-
-.jazz-gumbo-intro .jazz-artist-bio {
-    max-width: none;
-}
-
-.jazz-gumbo-bio-justified {
-    text-align: justify;
-}
-
-.jazz-gumbo-page .jazz-section-title,
-.jazz-gumbo-page .jazz-section-subtitle {
-    text-align: left;
-}
-
-/* Intro title left-aligned (matches page copy). Must follow .jazz-gumbo-page .jazz-section-title (same specificity). */
-.jazz-gumbo-intro .jazz-section-title {
-    text-align: left;
-}
-
-.jazz-gumbo-plan {
-    text-align: left;
-}
-
-.jazz-gumbo-plan .jazz-section-subtitle {
-    margin-top: 32px;
-}
-
-.jazz-gumbo-subblock-title {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: #f39200;
-    margin: 24px 0 14px;
-    letter-spacing: 0.02em;
-    text-align: left;
-}
-
-.jazz-gumbo-plan .jazz-gumbo-discography-outer {
-    margin-bottom: 28px;
-}
-
-.jazz-gumbo-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-top: 20px;
-}
-
-@media (max-width: 768px) {
-    /* Do not stretch experience cards full width — they have their own layout */
-    .jazz-gumbo-cards:not(.jazz-gumbo-experience-grid) {
-        grid-template-columns: 1fr;
-    }
-}
-
-.jazz-gumbo-card {
-    background: linear-gradient(145deg, #2a2825 0%, #22201d 100%);
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.06);
-    padding: 16px;
-    text-align: left;
-}
-
-.jazz-gumbo-card-media {
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 10px;
-    overflow: hidden;
-    background: rgba(0,0,0,0.3);
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.jazz-gumbo-video-thumb {
-    background: linear-gradient(135deg, #4a3a20 0%, #2a2218 100%);
-}
-
-.jazz-gumbo-play {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.95);
-    color: #1a1a1a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    padding-left: 4px;
-}
-
-.jazz-gumbo-album-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.jazz-gumbo-card-desc {
-    margin: 0 0 14px 0;
-    font-size: 14px;
-    color: #d0d0d0;
-    line-height: 1.6;
-}
-
-.jazz-gumbo-card-btn {
-    display: inline-block;
-    text-decoration: none;
-}
-
-/* Sized between “tiny” and full container: ~2× card width; centered in the plan section */
-.jazz-gumbo-experience-outer {
-    max-width: 620px;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    box-sizing: border-box;
-}
-
-.jazz-gumbo-cards.jazz-gumbo-experience-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
-    margin: 0;
-    max-width: 100%;
-    width: 100%;
-    align-items: stretch;
-    box-sizing: border-box;
-}
-
-@media (max-width: 640px) {
-    .jazz-gumbo-experience-outer {
-        max-width: 100%;
-        padding: 0 8px;
-    }
-}
-
-@media (max-width: 500px) {
-    .jazz-gumbo-cards.jazz-gumbo-experience-grid {
-        grid-template-columns: 1fr;
-        max-width: 340px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-}
-
-/* Shared Jazz media cards: discography/audio previews */
 .jazz-media-card {
     display: flex;
     flex-direction: column;
     overflow: hidden;
 
+    width: 100%;
     max-width: 100%;
     min-width: 0;
-    width: 100%;
 
     border-radius: var(--radius-card);
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -781,7 +369,6 @@ body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
     height: 100%;
     object-fit: cover;
     display: block;
-
     transition: transform 0.2s ease;
 }
 
@@ -839,10 +426,8 @@ body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
     flex: 1;
     display: flex;
     flex-direction: column;
-
     min-height: 0;
     padding: var(--space-md);
-
     text-align: left;
 }
 
@@ -878,69 +463,94 @@ body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
     word-break: break-word;
 }
 
-.jazz-gumbo-save-program {
-    align-self: flex-start;
-    font-size: 0.9rem;
-    padding: 0.45rem 1rem;
+/* =========================
+   JAZZ — Gumbo Kings
+   ========================= */
+
+.jazz-gumbo-intro {
+    margin-top: 18px;
+    max-width: none;
+    width: 100%;
 }
 
-.jazz-gumbo-schedule-wrap {
-    margin-top: 28px;
-    background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(230,138,0,0.35);
-    border-radius: 12px;
-    padding: 18px;
+.jazz-gumbo-intro .jazz-artist-bio {
+    max-width: none;
 }
 
-.jazz-gumbo-plan-visit {
-    margin: 0 0 14px 0;
-    font-size: 15px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.jazz-gumbo-cal-icon {
-    font-size: 18px;
-}
-
-.jazz-gumbo-table th,
-.jazz-gumbo-table td {
-    padding: 10px 12px;
-    font-size: 14px;
+.jazz-gumbo-plan {
     text-align: left;
 }
 
-.jazz-btn.jazz-btn-primary.jazz-gumbo-add-btn {
-    padding: 8px 16px;
-    font-size: 12px;
-    font-weight: 700;
-    white-space: nowrap;
-    border-radius: 8px;
-    background: rgb(230, 138, 0);
-    border: none;
-    color: #fff;
+.jazz-gumbo-discography-outer {
+    margin-bottom: 28px;
 }
 
-.jazz-btn.jazz-btn-primary.jazz-gumbo-add-btn:hover {
-    background: rgb(245, 160, 30);
-    color: #fff;
+.jazz-gumbo-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 20px;
 }
 
-.jazz-gumbo-schedule-note {
-    margin: 12px 0 0 0;
-    font-size: 13px;
-    color: #aaa;
+.jazz-gumbo-experience-outer {
+    max-width: 620px;
+    width: 100%;
+    margin-inline: auto;
+    box-sizing: border-box;
 }
 
-/* Career Highlights: years in orange */
-.jazz-gumbo-year {
-    color: #e68a00;
-    font-weight: 700;
+.jazz-gumbo-cards.jazz-gumbo-experience-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin: 0;
+    max-width: 100%;
+    width: 100%;
+    align-items: stretch;
+    box-sizing: border-box;
 }
 
-/* Band Members — shared Jazz artist block */
+.jazz-gumbo-highlights {
+    max-width: none;
+    width: 100%;
+    margin-inline: 0;
+}
+
+.jazz-gumbo-highlights > .jazz-highlight-text {
+    padding-left: 0;
+    text-align: justify;
+    hyphens: auto;
+}
+
+.jazz-gumbo-highlights-cms {
+    padding-left: 3.5rem;
+}
+
+@media (max-width: 768px) {
+    .jazz-gumbo-cards:not(.jazz-gumbo-experience-grid) {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .jazz-gumbo-experience-outer {
+        max-width: 100%;
+        padding: 0 8px;
+    }
+}
+
+@media (max-width: 500px) {
+    .jazz-gumbo-cards.jazz-gumbo-experience-grid {
+        grid-template-columns: 1fr;
+        max-width: 340px;
+        margin-inline: auto;
+    }
+}
+
+/* =========================
+   JAZZ — Band members
+   ========================= */
+
 .jazz-band-section {
     margin-top: var(--space-2xl);
     padding: var(--space-xl);
@@ -966,12 +576,12 @@ body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
     align-items: flex-start;
     gap: clamp(20px, 5vw, 56px);
 
-    background: rgba(var(--color-accent-rgb), 0.18);
-    border: 1px solid rgba(var(--color-accent-rgb), 0.24);
-    border-radius: var(--radius-card);
-
-    padding: 0 clamp(16px, 4vw, 40px) 26px;
     margin-top: 88px;
+    padding: 0 clamp(16px, 4vw, 40px) 26px;
+
+    border-radius: var(--radius-card);
+    border: 1px solid rgba(var(--color-accent-rgb), 0.24);
+    background: rgba(var(--color-accent-rgb), 0.18);
 }
 
 .jazz-band-row--three,
@@ -995,11 +605,12 @@ body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
 .jazz-band-member-photo {
     width: 158px;
     height: 158px;
-    border-radius: var(--radius-card);
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.35);
     margin-top: -79px;
     margin-bottom: var(--space-md);
+
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background: rgba(0, 0, 0, 0.35);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
@@ -1041,24 +652,26 @@ body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
     .jazz-band-member-photo {
         width: 128px;
         height: 128px;
-        border-radius: 12px;
         margin-top: -64px;
+        border-radius: 12px;
     }
 }
 
 /* =========================
-   JAZZ - Gare du Nord artist page (reference layout)
+   JAZZ — Gare du Nord
    ========================= */
 
 body.jazz-gare-page.jazz-artist-page {
-    background: radial-gradient(circle at 50% 0%, #2a2218 0%, #0a0a0a 50%, #000000 100%);
+    background: radial-gradient(circle at 50% 0%, #2a2218 0%, #0a0a0a 50%, #000 100%);
 }
 
-.jazz-gare-tagline {
-    margin: 10px 0 0;
-    font-size: clamp(0.95rem, 1.6vw, 1.15rem);
-    color: rgba(255, 255, 255, 0.95);
-    max-width: 36rem;
+.jazz-gare-intro {
+    margin: 0 0 var(--space-2xl);
+}
+
+.jazz-gare-intro .section-title {
+    text-align: left;
+    margin-bottom: var(--space-sm);
 }
 
 .jazz-gare-plan {
@@ -1070,8 +683,7 @@ body.jazz-gare-page.jazz-artist-page {
 }
 
 .jazz-gare-media-block .jazz-gare-discography-cards {
-    margin-left: auto;
-    margin-right: auto;
+    margin-inline: auto;
 }
 
 .jazz-gare-discography {
@@ -1087,9 +699,10 @@ body.jazz-gare-page.jazz-artist-page {
     gap: 16px;
     align-items: center;
     padding: 16px;
+
     border-radius: 14px;
+    border: 1px solid rgba(var(--color-accent-rgb), 0.3);
     background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(243, 146, 0, 0.3);
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
 
@@ -1102,10 +715,10 @@ body.jazz-gare-page.jazz-artist-page {
     flex-shrink: 0;
     width: 96px;
     height: 96px;
-    border-radius: 10px;
     overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid rgba(var(--color-accent-rgb), 0.25);
     background: #1a1510;
-    border: 1px solid rgba(243, 146, 0, 0.25);
 }
 
 .jazz-gare-disc-cover--hero {
@@ -1126,10 +739,10 @@ body.jazz-gare-page.jazz-artist-page {
 }
 
 .jazz-gare-disc-title {
+    margin-bottom: 8px;
+    color: #fff;
     font-weight: 700;
     font-size: 15px;
-    color: #fff;
-    margin-bottom: 8px;
 }
 
 .jazz-gare-audio {
@@ -1155,7 +768,6 @@ body.jazz-gare-page.jazz-artist-page {
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: rgba(255, 255, 255, 0.04);
     text-decoration: none;
-
     box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
 
     transition:
@@ -1175,7 +787,6 @@ body.jazz-gare-page.jazz-artist-page {
 .jazz-gare-video-poster {
     position: absolute;
     inset: 0;
-
     background-size: cover;
     background-position: center;
     transform: scale(1.02);
@@ -1221,8 +832,7 @@ body.jazz-gare-page.jazz-artist-page {
 .jazz-gare-highlights {
     max-width: none;
     width: 100%;
-    margin-left: 0;
-    margin-right: 0;
+    margin-inline: 0;
 }
 
 .jazz-gare-highlights .section-title {
@@ -1238,253 +848,60 @@ body.jazz-gare-page.jazz-artist-page {
     margin-top: var(--space-md);
 }
 
-.jazz-gare-highlights-cms > p {
-    margin: 0 0 var(--space-md);
-    color: inherit;
-    font: inherit;
-    line-height: inherit;
-}
+/* =========================
+   JAZZ — CMS career highlights
+   ========================= */
 
-.jazz-gare-highlights-cms > p:last-child {
-    margin-bottom: 0;
-}
-
-.jazz-gare-accent,
-.jazz-gare-highlights-cms strong.jazz-gare-accent,
-.jazz-gare-highlights-cms span.jazz-gare-accent,
-.jazz-gare-highlights-cms b.jazz-gare-accent,
-.jazz-gare-highlights-cms strong.jazz-artist-accent,
-.jazz-gare-highlights-cms span.jazz-artist-accent {
-    color: var(--color-accent);
-    font-weight: 700;
-}
-
-.jazz-gumbo-highlights {
-    max-width: none;
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-}
-
-.jazz-gumbo-highlights .jazz-section-subtitle {
-    text-align: left;
-}
-
-.jazz-gumbo-page .jazz-gumbo-plan .jazz-gumbo-plan-visit,
-.jazz-gumbo-page .jazz-gumbo-plan .jazz-gumbo-schedule-note {
-    padding-left: 3.5rem;
-}
-
-.jazz-gumbo-highlights > .jazz-highlight-text {
-    padding-left: 0;
-    text-align: justify;
-    hyphens: auto;
-}
-
-/* CMS career highlights: match default block typography + spacing */
 .jazz-gare-highlights-cms,
 .jazz-gumbo-highlights-cms {
     max-width: none;
     width: 100%;
-    margin-left: 0;
-    margin-right: 0;
+    margin-inline: 0;
 }
 
-.jazz-gumbo-highlights-cms {
-    padding-left: 3.5rem;
-}
-
-.jazz-gare-highlights-cms p.jazz-highlight-text,
-.jazz-gumbo-highlights-cms p.jazz-highlight-text,
 .jazz-gare-highlights-cms > p,
-.jazz-gumbo-highlights-cms > p {
-    font-size: 14px;
-    color: #d0d0d0;
-    line-height: 1.75;
+.jazz-gumbo-highlights-cms > p,
+.jazz-gare-highlights-cms p.jazz-highlight-text,
+.jazz-gumbo-highlights-cms p.jazz-highlight-text {
     margin: 0 0 1.25rem;
+    color: #d0d0d0;
+    font-size: 14px;
+    line-height: 1.75;
     text-align: justify;
     hyphens: auto;
 }
 
-.jazz-gare-highlights-cms p.jazz-highlight-text:last-child,
-.jazz-gumbo-highlights-cms p.jazz-highlight-text:last-child,
 .jazz-gare-highlights-cms > p:last-child,
-.jazz-gumbo-highlights-cms > p:last-child {
+.jazz-gumbo-highlights-cms > p:last-child,
+.jazz-gare-highlights-cms p.jazz-highlight-text:last-child,
+.jazz-gumbo-highlights-cms p.jazz-highlight-text:last-child {
     margin-bottom: 0;
 }
 
-/* Accents inside CMS HTML (classes must match sanitizer allowlist) */
+.jazz-gare-accent,
+.jazz-gumbo-accent,
+.jazz-gumbo-year,
+.jazz-artist-accent,
 .jazz-gare-highlights-cms strong.jazz-gare-accent,
 .jazz-gare-highlights-cms span.jazz-gare-accent,
-.jazz-gare-highlights-cms b.jazz-gare-accent {
-    color: #f39200;
-    font-weight: 700;
-}
-
+.jazz-gare-highlights-cms b.jazz-gare-accent,
 .jazz-gumbo-highlights-cms strong.jazz-gumbo-year,
 .jazz-gumbo-highlights-cms span.jazz-gumbo-year,
-.jazz-gumbo-highlights-cms b.jazz-gumbo-year {
-    color: #e68a00;
-    font-weight: 700;
-}
-
-.jazz-gumbo-highlights-cms strong.jazz-gare-accent,
-.jazz-gumbo-highlights-cms span.jazz-gare-accent {
-    color: #e68a00;
-    font-weight: 700;
-}
-
-.jazz-gare-highlights-cms strong.jazz-gumbo-year,
-.jazz-gare-highlights-cms span.jazz-gumbo-year {
-    color: #f39200;
-    font-weight: 700;
-}
-
+.jazz-gumbo-highlights-cms b.jazz-gumbo-year,
 .jazz-gare-highlights-cms strong.jazz-artist-accent,
 .jazz-gare-highlights-cms span.jazz-artist-accent,
 .jazz-gumbo-highlights-cms strong.jazz-artist-accent,
 .jazz-gumbo-highlights-cms span.jazz-artist-accent {
-    color: #f39200;
+    color: var(--color-accent);
     font-weight: 700;
 }
 
-.jazz-back {
-    margin-top: var(--space-lg);
-    margin-bottom: var(--space-xl);
-    text-align: center;
-}
-
 /* =========================
-   JAZZ - Karsu artist page
+   JAZZ — Karsu
    ========================= */
 
 .jazz-karsu-page.jazz-artist-page {
     background: radial-gradient(ellipse 140% 100% at 50% 20%, #1a1510 0%, #0f0c09 50%, #060504 100%);
-}
-
-.jazz-karsu-page .jazz-artist-hero {
-    justify-content: flex-start;
-}
-
-.jazz-karsu-page .jazz-artist-hero-content {
-    text-align: left;
-    width: 100%;
-}
-
-/* Narrow content column; headings flush left, body copy indented (prototype layout) */
-.jazz-karsu-page {
-    --jazz-karsu-body-indent: 3.25rem;
-}
-
-.jazz-karsu-centered {
-    text-align: left;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.jazz-karsu-centered .jazz-karsu-schedule-panel,
-.jazz-karsu-centered .jazz-karsu-discography {
-    text-align: left;
-}
-
-.jazz-karsu-centered .jazz-karsu-disco-stage,
-.jazz-karsu-centered .jazz-karsu-disco-back-wrap,
-.jazz-karsu-centered .jazz-karsu-disco-controls,
-.jazz-karsu-centered .jazz-karsu-disco-detail,
-.jazz-karsu-centered .jazz-karsu-disco-panel,
-.jazz-karsu-centered .jazz-karsu-disco-orangerow {
-    text-align: center;
-}
-
-.jazz-karsu-page .jazz-karsu-intro .jazz-section-title {
-    text-align: left;
-}
-
-.jazz-karsu-page .jazz-karsu-intro .jazz-artist-bio {
-    max-width: none;
-    text-align: left;
-}
-
-.jazz-karsu-page .jazz-karsu-alt-bg .jazz-section-subtitle {
-    padding-left: 0;
-    color: rgb(230, 138, 0);
-    text-align: left;
-}
-
-.jazz-karsu-page .jazz-karsu-alt-bg .jazz-highlight-text {
-    padding-left: 0;
-    text-align: left;
-}
-
-
-
-.jazz-karsu-page .jazz-artist-hero-content h1 {
-    color: #fff;
-    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.65);
-}
-
-.jazz-karsu-page .jazz-artist-tagline {
-    color: rgba(255, 255, 255, 0.92);
-}
-
-.jazz-karsu-page .jazz-artist-bio {
-    max-width: 820px;
-}
-
-.jazz-karsu-page .jazz-muted {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.jazz-karsu-page .jazz-karsu-video-block {
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(230, 138, 0, 0.35);
-    border-radius: 12px;
-}
-
-.jazz-karsu-page .jazz-karsu-schedule-block {
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(230, 138, 0, 0.35);
-    border-radius: 12px;
-}
-
-.jazz-karsu-page .jazz-karsu-schedule-intro,
-.jazz-karsu-page .jazz-karsu-schedule-note {
-    color: rgba(255, 255, 255, 0.78);
-}
-
-.jazz-karsu-page .jazz-schedule {
-    background: rgba(0, 0, 0, 0.28);
-    border: 1px solid rgba(230, 138, 0, 0.3);
-    border-radius: 10px;
-}
-
-.jazz-karsu-page .jazz-table th {
-    background: rgba(230, 138, 0, 0.52);
-    color: #fff;
-}
-
-.jazz-karsu-page .jazz-table td {
-    color: rgba(255, 255, 255, 0.92);
-}
-
-.jazz-karsu-page .jazz-btn-primary {
-    background: rgb(230, 138, 0);
-}
-
-.jazz-karsu-page .jazz-btn-primary:hover {
-    background: rgb(245, 160, 30);
-}
-
-.jazz-karsu-page .jazz-btn-buy {
-    background: #f39200;
-    color: #fff;
-    border-radius: 6px;
-}
-
-.jazz-karsu-page .jazz-karsu-video-meta,
-.jazz-karsu-page .jazz-karsu-video-desc {
-    color: rgba(255, 255, 255, 0.82);
 }
 
 .jazz-karsu-intro {
@@ -1495,196 +912,14 @@ body.jazz-gare-page.jazz-artist-page {
     margin-top: 14px;
 }
 
-/* Karsu intro + plan — dark panel (prototype: only plan + card + schedule inside) */
-.jazz-karsu-experience-region {
-    margin-top: 28px;
-    margin-bottom: 20px;
-    padding: 32px 22px 36px;
-    border-radius: 16px;
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(230, 138, 0, 0.35);
-    box-shadow: none;
-}
-
-.jazz-karsu-experience-region .jazz-karsu-plan-section .jazz-section-subtitle {
-    margin-top: 0;
-}
-
-.jazz-karsu-experience-region .jazz-karsu-intro {
+.jazz-karsu-plan-section {
     text-align: left;
 }
 
-.jazz-karsu-plan-section .jazz-section-subtitle {
-    text-align: left;
-    margin-top: 28px;
-}
-
-/* Centered video / event card */
 .jazz-karsu-video-card-wrap {
     display: flex;
     justify-content: center;
-    margin-top: 22px;
-}
-
-.jazz-karsu-experience-region .jazz-karsu-video-card {
-    width: 100%;
-    max-width: 520px;
-    padding: 14px 16px 16px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(230, 138, 0, 0.35);
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-}
-
-/* Prototype: thumbnail left, copy + Buy Tickets right */
-.jazz-karsu-video-card-row {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 16px;
-}
-
-.jazz-karsu-video-card-media {
-    flex: 0 0 auto;
-    width: 168px;
-}
-
-.jazz-karsu-video-card-main {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    text-align: left;
-}
-
-.jazz-karsu-experience-region .jazz-karsu-video-card .jazz-karsu-video-thumb {
-    border-radius: 8px;
-    margin-bottom: 0;
-    aspect-ratio: 16 / 10;
-    width: 100%;
-    max-height: none;
-    min-height: 102px;
-    background: linear-gradient(135deg, #5a1f7a 0%, #2a0f48 45%, #0f061c 100%);
-}
-
-.jazz-karsu-card-audio--below-row {
-    margin-top: 14px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(230, 138, 0, 0.2);
-}
-
-.jazz-karsu-experience-region .jazz-karsu-video-thumb--live {
-    background-image:
-            radial-gradient(ellipse 120% 80% at 50% 100%, rgba(180, 60, 220, 0.35), transparent 55%),
-            linear-gradient(165deg, #3d1860 0%, #1a0a30 55%, #0a0418 100%);
-}
-
-.jazz-karsu-experience-region .jazz-karsu-video-card .jazz-karsu-video-play {
-    width: 48px;
-    height: 48px;
-    background: rgba(255, 255, 255, 0.78);
-    color: #111;
-    font-size: 18px;
-    padding-left: 3px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
-}
-
-/* Compact music preview on event card (first discography track) */
-.jazz-karsu-card-audio {
-    margin: 0 0 10px;
-    padding: 8px 10px;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.jazz-karsu-card-audio-label {
-    display: block;
-    font-size: 11px;
-    font-weight: 700;
-    color: rgb(230, 138, 0);
-    margin-bottom: 6px;
-    letter-spacing: 0.02em;
-}
-
-.jazz-karsu-card-audio-label::before {
-    content: '♪ ';
-    opacity: 0.9;
-}
-
-.jazz-karsu-card-audio-el {
-    display: block;
-    width: 100%;
-    height: 32px;
-    max-height: 36px;
-}
-
-.jazz-karsu-card-audio-el::-webkit-media-controls-panel {
-    background: rgba(35, 32, 40, 0.95);
-}
-
-.jazz-karsu-experience-region .jazz-karsu-video-body {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    text-align: left;
-    width: 100%;
-}
-
-.jazz-karsu-video-headline {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 6px 12px;
-    width: 100%;
-    margin-bottom: 8px;
-}
-
-.jazz-karsu-video-headline .jazz-karsu-video-title {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 700;
-    color: #fff;
-}
-
-.jazz-karsu-video-headline .jazz-karsu-video-meta {
-    margin: 0;
-    flex: 1 1 160px;
-    text-align: right;
-    font-size: 10px;
-    line-height: 1.35;
-    color: rgba(255, 255, 255, 0.85);
-}
-
-.jazz-karsu-experience-region .jazz-karsu-video-card .jazz-karsu-video-desc {
-    margin: 0 0 12px;
-    font-size: 12px;
-    line-height: 1.4;
-    color: rgba(255, 255, 255, 0.88);
-}
-
-.jazz-karsu-experience-region .jazz-karsu-video-card .jazz-karsu-video-btn {
-    align-self: flex-start;
-    border-radius: 8px;
-    padding: 9px 20px;
-    font-size: 12px;
-    font-weight: 700;
-    background: rgb(230, 138, 0);
-    color: #fff;
-    text-decoration: none;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.jazz-karsu-experience-region .jazz-karsu-video-card .jazz-karsu-video-btn:hover {
-    background: rgb(245, 160, 30);
-    color: #fff;
+    margin: var(--space-2xl) 0 var(--space-xl);
 }
 
 .jazz-karsu-media-card {
@@ -1695,228 +930,45 @@ body.jazz-gare-page.jazz-artist-page {
     height: 220px;
 }
 
-/* Full-width event schedule panel below card */
-.jazz-karsu-schedule-panel {
-    margin-top: 32px;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 820px;
-    padding: 22px 20px 20px;
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(230, 138, 0, 0.35);
-    border-radius: 12px;
-    backdrop-filter: none;
+.jazz-karsu-page .jazz-highlights {
+    margin-top: var(--space-2xl);
 }
 
-.jazz-karsu-schedule-heading {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    margin-bottom: 16px;
+.jazz-karsu-page .jazz-highlights .section-title {
+    text-align: left;
+    margin-bottom: var(--space-lg);
 }
 
-.jazz-karsu-schedule-icon {
-    flex-shrink: 0;
-    color: rgb(230, 138, 0);
-    margin-top: 2px;
-    display: flex;
+.jazz-karsu-page .jazz-highlight-text {
+    max-width: none;
+    padding-left: 0;
+    text-align: left;
 }
 
-.jazz-karsu-schedule-heading-text {
-    flex: 1;
-    min-width: 0;
+.jazz-karsu-page .copy-text + .copy-text {
+    margin-top: var(--space-md);
 }
 
-.jazz-karsu-schedule-title {
-    margin: 0 0 8px;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: rgb(230, 138, 0);
-    letter-spacing: 0.02em;
-}
-
-.jazz-karsu-schedule-heading-text .jazz-karsu-schedule-intro {
+.jazz-karsu-list {
+    max-width: none;
     margin: 0;
-    font-size: 13px;
-    line-height: 1.45;
-    color: rgba(255, 255, 255, 0.82);
+    padding-left: 1.25rem;
+    list-style: disc;
 }
 
-.jazz-karsu-page .jazz-karsu-schedule-heading-text .jazz-karsu-schedule-intro {
-    padding-left: var(--jazz-karsu-body-indent);
+.jazz-karsu-list li {
+    margin-bottom: var(--space-sm);
 }
 
-.jazz-karsu-schedule-panel .jazz-schedule {
-    margin-top: 0;
-    border-radius: 10px;
-    overflow-x: auto;
-    overflow-y: visible;
-    background: rgba(0, 0, 0, 0.28);
-    border: 1px solid rgba(230, 138, 0, 0.28);
+.jazz-karsu-list li:last-child {
+    margin-bottom: 0;
 }
 
-.jazz-karsu-loc-underline {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-}
-
-.jazz-karsu-btn-ticket {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 7px 18px;
-    border-radius: 8px;
-    background: rgb(230, 138, 0);
-    color: #fff !important;
+.jazz-karsu-list .text-accent {
+    color: var(--color-accent);
     font-weight: 700;
-    font-size: 12px;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
 }
 
-.jazz-karsu-btn-ticket:hover {
-    background: rgb(245, 160, 30);
-    color: #fff;
-}
-
-.jazz-karsu-schedule-panel .jazz-karsu-schedule-note {
-    margin: 18px 0 0;
-    padding: 0;
-    text-align: center;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.72);
-}
-
-@media (max-width: 640px) {
-    .jazz-karsu-video-headline .jazz-karsu-video-meta {
-        text-align: left;
-        flex: 1 1 100%;
-    }
-}
-
-@media (max-width: 520px) {
-    .jazz-karsu-video-card-row {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .jazz-karsu-video-card-media {
-        width: 100%;
-        max-width: 280px;
-    }
-
-    .jazz-karsu-video-card-main {
-        width: 100%;
-        align-items: flex-start;
-    }
-}
-
-@media (max-width: 900px) {
-    .jazz-karsu-experience-region {
-        padding: 28px 18px 32px;
-        margin-left: -12px;
-        margin-right: -12px;
-    }
-
-    .jazz-schedule.jazz-schedule--artist-detail .jazz-table th,
-    .jazz-schedule.jazz-schedule--artist-detail .jazz-table td {
-        padding: 9px 8px;
-        font-size: 12px;
-    }
-}
-
-.jazz-karsu-video-block {
-    background: rgba(0, 0, 0, 0.35);
-    border-radius: 12px;
-    border: 1px solid rgba(230, 138, 0, 0.35);
-    padding: 16px;
-}
-
-.jazz-karsu-video-thumb {
-    width: 100%;
-    aspect-ratio: 16/9;
-    background: linear-gradient(135deg, #3d2a4a 0%, #2a1f35 100%);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 12px;
-}
-
-.jazz-karsu-video-play {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.95);
-    color: #1a1a1a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    padding-left: 4px;
-}
-
-.jazz-karsu-video-title {
-    margin: 0 0 4px 0;
-    font-size: 15px;
-    font-weight: 700;
-    color: #fff;
-}
-
-.jazz-karsu-video-meta {
-    margin: 0 0 6px 0;
-    font-size: 13px;
-    color: #d0d0d0;
-}
-
-.jazz-karsu-video-desc {
-    margin: 0 0 12px 0;
-    font-size: 13px;
-    color: #d0d0d0;
-}
-
-.jazz-karsu-video-btn {
-    display: inline-block;
-    text-decoration: none;
-}
-
-.jazz-karsu-schedule-block {
-    background: rgba(0, 0, 0, 0.35);
-    border-radius: 12px;
-    border: 1px solid rgba(230, 138, 0, 0.35);
-    padding: 18px;
-}
-
-.jazz-karsu-schedule-intro {
-    margin: 0 0 14px 0;
-    font-size: 14px;
-    color: #e0e0e0;
-}
-
-.jazz-karsu-schedule-table {
-    margin-top: 0;
-}
-
-.jazz-table-buy th,
-.jazz-table-buy td {
-    padding: 10px 12px;
-    font-size: 13px;
-}
-
-.jazz-btn-buy {
-    padding: 6px 14px;
-    font-size: 12px;
-    font-weight: 800;
-    text-transform: uppercase;
-    text-decoration: none;
-}
-
-.jazz-karsu-discography {
-    margin-top: 40px;
-}
-
-/* Karsu discography carousel */
 .jazz-karsu-discography {
     margin-top: var(--space-2xl);
 }
@@ -1925,10 +977,6 @@ body.jazz-gare-page.jazz-artist-page {
     position: relative;
     padding: var(--space-xl);
     overflow: hidden;
-}
-.jazz-karsu-disco-heading {
-    text-align: left;
-    margin-bottom: var(--space-xl);
 }
 
 .jazz-karsu-disco-empty {
@@ -1943,8 +991,8 @@ body.jazz-gare-page.jazz-artist-page {
     position: relative;
     max-width: none;
     margin: 0;
-    text-align: center;
     padding: 0;
+    text-align: center;
 }
 
 .jazz-karsu-disco-orangerow {
@@ -1974,9 +1022,9 @@ body.jazz-gare-page.jazz-artist-page {
     flex: 0 0 auto;
     padding: 0;
     border: none;
+    border-radius: var(--radius-card);
     background: transparent;
     cursor: pointer;
-    border-radius: var(--radius-card);
     line-height: 0;
 
     transition:
@@ -1995,7 +1043,6 @@ body.jazz-gare-page.jazz-artist-page {
     height: auto;
     aspect-ratio: 1;
     object-fit: cover;
-
     display: block;
     box-sizing: border-box;
 
@@ -2009,13 +1056,13 @@ body.jazz-gare-page.jazz-artist-page {
 
 .jazz-karsu-disco-cover-btn--focus .jazz-karsu-disco-cover-img {
     width: clamp(148px, 38vw, 220px);
-    transform: scale(1.06);
-    opacity: 1;
-    filter: none;
     border-color: var(--color-accent);
     box-shadow:
             0 14px 36px rgba(0, 0, 0, 0.55),
             0 0 0 2px var(--color-accent);
+    opacity: 1;
+    filter: none;
+    transform: scale(1.06);
 }
 
 .jazz-karsu-disco-panel {
@@ -2023,44 +1070,41 @@ body.jazz-gare-page.jazz-artist-page {
     z-index: 2;
 
     width: calc(100% + (var(--space-xl) * 2));
-    margin-left: calc(var(--space-xl) * -1);
-    margin-right: calc(var(--space-xl) * -1);
-    margin-bottom: calc(var(--space-xl) * -1);
-    margin-top: var(--space-sm);
-
+    margin: var(--space-sm) calc(var(--space-xl) * -1) calc(var(--space-xl) * -1);
     padding: var(--space-xl);
-    text-align: center;
-    background: rgba(var(--color-accent-rgb), 0.18);
-    border: 1px solid rgba(var(--color-accent-rgb), 0.24);
+
     border-radius: var(--radius-card);
+    border: 1px solid rgba(var(--color-accent-rgb), 0.24);
+    background: rgba(var(--color-accent-rgb), 0.18);
     box-shadow: none;
+    text-align: center;
 }
 
 .jazz-karsu-disco-detail {
+    max-width: 420px;
     margin: 0 auto var(--space-md);
     color: #fff;
-    max-width: 420px;
 }
 
 .jazz-karsu-disco-title {
     margin: 0 0 var(--space-sm);
+    color: #fff;
     font-size: 1.35rem;
     font-weight: 700;
-    color: #fff;
     letter-spacing: 0.02em;
 }
 
 .jazz-karsu-disco-meta,
 .jazz-karsu-disco-plays {
     margin: 0;
-    font-size: 0.95rem;
     color: rgba(255, 255, 255, 0.95);
+    font-size: 0.95rem;
 }
 
 .jazz-karsu-disco-plays {
     margin-top: var(--space-sm);
-    font-size: 0.88rem;
     color: rgba(255, 255, 255, 0.85);
+    font-size: 0.88rem;
 }
 
 .jazz-karsu-disco-controls {
@@ -2098,8 +1142,8 @@ body.jazz-gare-page.jazz-artist-page {
 }
 
 .jazz-karsu-disco-ctrl--side:hover {
-    background: rgba(255, 255, 255, 0.18);
     border-color: #fff;
+    background: rgba(255, 255, 255, 0.18);
     transform: scale(1.05);
 }
 
@@ -2127,8 +1171,8 @@ body.jazz-gare-page.jazz-artist-page {
 .jazz-karsu-disco-ctrl--play .jazz-karsu-disco-icon-play,
 .jazz-karsu-disco-ctrl--play .jazz-karsu-disco-icon-pause {
     position: absolute;
-    left: 50%;
     top: 50%;
+    left: 50%;
 
     display: block;
     transform: translate(-50%, -50%);
@@ -2158,49 +1202,8 @@ body.jazz-gare-page.jazz-artist-page {
     transition: width 0.1s linear;
 }
 
-.jazz-karsu-disco-back-wrap {
-    position: relative;
-    z-index: 1;
-
-    margin-top: var(--space-xl);
-    padding: 0;
-    text-align: center;
+@media (max-width: 640px) {
+    .jazz-karsu-media-card .jazz-media-card__media {
+        height: 180px;
+    }
 }
-
-.jazz-karsu-page .jazz-highlights {
-    margin-top: var(--space-2xl);
-}
-
-.jazz-karsu-page .jazz-highlights .section-title {
-    text-align: left;
-    margin-bottom: var(--space-lg);
-}
-
-.jazz-karsu-page .jazz-highlight-text {
-    max-width: none;
-}
-
-.jazz-karsu-page .copy-text + .copy-text {
-    margin-top: var(--space-md);
-}
-
-.jazz-karsu-list {
-    max-width: none;
-    margin: 0;
-    padding-left: 1.25rem;
-    list-style: disc;
-}
-
-.jazz-karsu-list li {
-    margin-bottom: var(--space-sm);
-}
-
-.jazz-karsu-list li:last-child {
-    margin-bottom: 0;
-}
-
-.jazz-karsu-list .text-accent {
-    color: var(--color-accent);
-    font-weight: 700;
-}
-
