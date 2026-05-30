@@ -1,13 +1,12 @@
 <?php
-$app = $viewModel->appSettings;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login — <?= htmlspecialchars((string)($app['site_name'] ?? 'Haarlem Festival')) ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string)($app['css_version'] ?? '1.0')) ?>">
-    <link rel="stylesheet" href="/css/auth.css?v=<?= htmlspecialchars((string)($app['css_version'] ?? '1.0')) ?>">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body class="auth-page">
 
@@ -67,20 +66,36 @@ $app = $viewModel->appSettings;
 (function () {
     document.querySelectorAll('.auth-eye-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
-            var targetId = this.getAttribute('data-target');
-            var input = document.getElementById(targetId);
-            var img = this.querySelector('.eye-icon');
-
-            if (!input) return;
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                img.src = '/images/eye.jpg';
-            } else {
-                input.type = 'password';
-                img.src = '/images/eye.jpg';
-            }
+            var input = document.getElementById(this.getAttribute('data-target'));
+            if (input) input.type = input.type === 'password' ? 'text' : 'password';
         });
+    });
+
+    function showErr(input, msg) {
+        var field = input.closest('.auth-field');
+        if (!field) return;
+        var err = field.querySelector('.auth-field-error');
+        if (!err) {
+            err = document.createElement('span');
+            err.className = 'auth-field-error';
+            field.appendChild(err);
+        }
+        err.textContent = msg;
+        input.classList.toggle('auth-input-invalid', msg !== '');
+    }
+
+    var id = document.getElementById('identifier');
+    var pw = document.getElementById('password');
+
+    [id, pw].forEach(function (el) {
+        if (el) el.addEventListener('input', function () { showErr(this, ''); });
+    });
+
+    document.querySelector('form').addEventListener('submit', function (e) {
+        var ok = true;
+        if (!id.value.trim()) { showErr(id, 'Please enter your email or username.'); ok = false; } else showErr(id, '');
+        if (!pw.value)        { showErr(pw, 'Please enter your password.');           ok = false; } else showErr(pw, '');
+        if (!ok) e.preventDefault();
     });
 })();
 </script>

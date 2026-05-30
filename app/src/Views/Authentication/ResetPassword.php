@@ -1,13 +1,12 @@
 <?php
-$app = $viewModel->appSettings;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Reset password — <?= htmlspecialchars($app['site_name']) ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars($app['css_version']) ?>">
-    <link rel="stylesheet" href="/css/auth.css?v=<?= htmlspecialchars($app['css_version']) ?>">
+    <title>Reset password</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body class="auth-page">
 
@@ -63,7 +62,57 @@ $app = $viewModel->appSettings;
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
 
+<script>
+(function () {
+    document.querySelectorAll('.auth-eye-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var input = document.getElementById(this.getAttribute('data-target'));
+            if (input) input.type = input.type === 'password' ? 'text' : 'password';
+        });
+    });
 
+    function showErr(input, msg) {
+        var field = input.closest('.auth-field');
+        if (!field) return;
+        var err = field.querySelector('.auth-field-error');
+        if (!err) {
+            err = document.createElement('span');
+            err.className = 'auth-field-error';
+            field.appendChild(err);
+        }
+        err.textContent = msg;
+        input.classList.toggle('auth-input-invalid', msg !== '');
+    }
+
+    function strongPassword(p) {
+        return p.length >= 12 && /[a-z]/.test(p) && /[A-Z]/.test(p) && /\d/.test(p) && /[^a-zA-Z0-9]/.test(p);
+    }
+
+    var pw  = document.getElementById('password');
+    var pwc = document.getElementById('password_confirm');
+    var form = document.querySelector('form');
+
+    if (!form) return;
+
+    [pw, pwc].forEach(function (el) {
+        if (el) el.addEventListener('input', function () { showErr(this, ''); });
+    });
+
+    form.addEventListener('submit', function (e) {
+        var ok = true;
+
+        if (!pw.value) { showErr(pw, 'Password is required.'); ok = false; }
+        else if (!strongPassword(pw.value)) { showErr(pw, 'Password must be 12+ characters with uppercase, lowercase, number and symbol.'); ok = false; }
+        else showErr(pw, '');
+
+        if (!pwc.value) { showErr(pwc, 'Please confirm your password.'); ok = false; }
+        else if (pwc.value !== pw.value) { showErr(pwc, 'Passwords do not match.'); ok = false; }
+        else showErr(pwc, '');
+
+        if (!ok) e.preventDefault();
+    });
+})();
+</script>
 
 </body>
 </html>

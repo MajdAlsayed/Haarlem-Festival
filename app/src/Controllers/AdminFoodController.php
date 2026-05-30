@@ -8,7 +8,6 @@ use App\Core\Csrf;
 use App\Core\Session;
 use App\Repositories\FoodSettingsRepository;
 use App\Repositories\RestaurantRepository;
-use App\Repositories\SettingsRepository;
 use App\Services\AdminFoodService;
 
 /**
@@ -28,16 +27,14 @@ final class AdminFoodController
 {
     private const ADMIN_ROLE_ID = 1;
 
-    private AdminFoodService   $service;
-    private SettingsRepository $appSettings;
+    private AdminFoodService $service;
 
     public function __construct()
     {
-        $this->service     = new AdminFoodService(
+        $this->service = new AdminFoodService(
             new RestaurantRepository(),
             new FoodSettingsRepository()
         );
-        $this->appSettings = new SettingsRepository();
     }
 
     // -------------------------------------------------------------------------
@@ -47,7 +44,6 @@ final class AdminFoodController
     public function index(): void
     {
         $this->requireAdmin();
-        $app = $this->appSettings->getAll();
         require __DIR__ . '/../Views/Admin/food-index.php';
     }
 
@@ -58,11 +54,15 @@ final class AdminFoodController
     public function settings(): void
     {
         $this->requireAdmin();
-        $app      = $this->appSettings->getAll();
-        $settings = $this->service->getAllFoodSettings();
-        $success  = Session::getFlash('admin_food_success');
-        $error    = Session::getFlash('admin_food_error');
-        $csrf     = Csrf::token('admin_food_settings');
+        $success = Session::getFlash('admin_food_success');
+        $error   = Session::getFlash('admin_food_error');
+        try {
+            $settings = $this->service->getAllFoodSettings();
+        } catch (\Throwable $e) {
+            $error    = 'Could not load settings: ' . $e->getMessage();
+            $settings = [];
+        }
+        $csrf = Csrf::token('admin_food_settings');
         require __DIR__ . '/../Views/Admin/food-settings.php';
     }
 
@@ -76,12 +76,15 @@ final class AdminFoodController
             exit;
         }
 
-        $errors = $this->service->saveSettings($_POST);
-
-        if ($errors !== []) {
-            Session::setFlash('admin_food_error', implode(' ', $errors));
-        } else {
-            Session::setFlash('admin_food_success', 'Food settings saved.');
+        try {
+            $errors = $this->service->saveSettings($_POST);
+            if ($errors !== []) {
+                Session::setFlash('admin_food_error', implode(' ', $errors));
+            } else {
+                Session::setFlash('admin_food_success', 'Food settings saved.');
+            }
+        } catch (\Throwable $e) {
+            Session::setFlash('admin_food_error', 'Could not save settings: ' . $e->getMessage());
         }
 
         header('Location: /admin/food/settings');
@@ -95,10 +98,14 @@ final class AdminFoodController
     public function restaurants(): void
     {
         $this->requireAdmin();
-        $app         = $this->appSettings->getAll();
-        $restaurants = $this->service->getAllRestaurants();
-        $success     = Session::getFlash('admin_food_success');
-        $error       = Session::getFlash('admin_food_error');
+        $success = Session::getFlash('admin_food_success');
+        $error   = Session::getFlash('admin_food_error');
+        try {
+            $restaurants = $this->service->getAllRestaurants();
+        } catch (\Throwable $e) {
+            $error       = 'Could not load restaurants: ' . $e->getMessage();
+            $restaurants = [];
+        }
         require __DIR__ . '/../Views/Admin/food-restaurants-list.php';
     }
 
@@ -109,7 +116,6 @@ final class AdminFoodController
     public function newRestaurant(): void
     {
         $this->requireAdmin();
-        $app  = $this->appSettings->getAll();
         $row  = null;
         $csrf = Csrf::token('admin_food_restaurant');
         $error = Session::getFlash('admin_food_error');
@@ -124,8 +130,14 @@ final class AdminFoodController
     {
         $this->requireAdmin();
 
-        $id  = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-        $row = $id > 0 ? $this->service->getRestaurantById($id) : null;
+        $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+        try {
+            $row = $id > 0 ? $this->service->getRestaurantById($id) : null;
+        } catch (\Throwable $e) {
+            Session::setFlash('admin_food_error', 'Could not load restaurant: ' . $e->getMessage());
+            header('Location: /admin/food/restaurants');
+            exit;
+        }
 
         if ($row === null) {
             Session::setFlash('admin_food_error', 'Restaurant not found.');
@@ -133,7 +145,6 @@ final class AdminFoodController
             exit;
         }
 
-        $app   = $this->appSettings->getAll();
         $csrf  = Csrf::token('admin_food_restaurant');
         $error = Session::getFlash('admin_food_error');
         require __DIR__ . '/../Views/Admin/food-restaurant-edit.php';
@@ -153,17 +164,25 @@ final class AdminFoodController
             exit;
         }
 
-        $id     = (int) ($_POST['restaurant_id'] ?? 0);
-        $errors = $this->service->validateRestaurantPost($_POST);
+        $id = (int) ($_POST['restaurant_id'] ?? 0);
+        try {
+            $errors = $this->service->validateRestaurantPost($_POST);
+        } catch (\Throwable $e) {
+            Session::setFlash('admin_food_error', 'Validation error: ' . $e->getMessage());
+            header('Location: /admin/food/restaurants');
+            exit;
+        }
 
         if ($errors !== []) {
-            // Re-render the form with errors without losing the posted data
-            $app  = $this->appSettings->getAll();
-            $csrf = Csrf::token('admin_food_restaurant');
+            $csrf  = Csrf::token('admin_food_restaurant');
             $error = implode(' ', $errors);
-            // Build a temporary Restaurant-like object from POST so the form
-            // shows the user's input back
-            $row = $this->service->buildRestaurantFromPost($_POST);
+            try {
+                $row = $this->service->buildRestaurantFromPost($_POST);
+            } catch (\Throwable $e) {
+                Session::setFlash('admin_food_error', 'Could not rebuild form: ' . $e->getMessage());
+                header('Location: /admin/food/restaurants');
+                exit;
+            }
             require __DIR__ . '/../Views/Admin/food-restaurant-edit.php';
             return;
         }

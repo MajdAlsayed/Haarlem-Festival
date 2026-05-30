@@ -1,13 +1,13 @@
 <?php
-$app = $viewModel->appSettings;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register — <?= htmlspecialchars($app['site_name']) ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars($app['css_version']) ?>">
-    <link rel="stylesheet" href="/css/auth.css?v=<?= htmlspecialchars($app['css_version']) ?>">
+    <title>Register</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/auth.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body class="auth-page">
 
@@ -77,9 +77,7 @@ $app = $viewModel->appSettings;
                 </div>
 
                 <div class="auth-field auth-captcha">
-                    <label for="captcha"><?= htmlspecialchars($viewModel->captchaQuestion) ?></label>
-                    <input type="text" id="captcha" name="captcha" required maxlength="4"
-                           autocomplete="off" inputmode="numeric">
+                    <div class="g-recaptcha" data-sitekey="<?= htmlspecialchars($viewModel->recaptchaSiteKey) ?>"></div>
                 </div>
 
                 <button type="submit" class="btn btn-primary auth-btn">Create account</button>
@@ -95,7 +93,69 @@ $app = $viewModel->appSettings;
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
 
+<script>
+(function () {
+    document.querySelectorAll('.auth-eye-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var input = document.getElementById(this.getAttribute('data-target'));
+            if (input) input.type = input.type === 'password' ? 'text' : 'password';
+        });
+    });
 
+    function showErr(input, msg) {
+        var field = input.closest('.auth-field');
+        if (!field) return;
+        var err = field.querySelector('.auth-field-error');
+        if (!err) {
+            err = document.createElement('span');
+            err.className = 'auth-field-error';
+            field.appendChild(err);
+        }
+        err.textContent = msg;
+        input.classList.toggle('auth-input-invalid', msg !== '');
+    }
+
+    function strongPassword(p) {
+        return p.length >= 12 && /[a-z]/.test(p) && /[A-Z]/.test(p) && /\d/.test(p) && /[^a-zA-Z0-9]/.test(p);
+    }
+
+    var fields = ['username', 'email', 'first_name', 'last_name', 'password', 'password_confirm'];
+    fields.forEach(function (name) {
+        var el = document.getElementById(name);
+        if (el) el.addEventListener('input', function () { showErr(this, ''); });
+    });
+
+    document.querySelector('form').addEventListener('submit', function (e) {
+        var username = document.getElementById('username');
+        var email    = document.getElementById('email');
+        var firstName = document.getElementById('first_name');
+        var lastName  = document.getElementById('last_name');
+        var pw  = document.getElementById('password');
+        var pwc = document.getElementById('password_confirm');
+        var ok  = true;
+
+        if (!username.value.trim()) { showErr(username, 'Username is required.'); ok = false; } else showErr(username, '');
+
+        var ev = email.value.trim();
+        if (!ev) { showErr(email, 'Email is required.'); ok = false; }
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ev)) { showErr(email, 'Please enter a valid email address.'); ok = false; }
+        else showErr(email, '');
+
+        if (!firstName.value.trim()) { showErr(firstName, 'First name is required.'); ok = false; } else showErr(firstName, '');
+        if (!lastName.value.trim())  { showErr(lastName,  'Last name is required.');  ok = false; } else showErr(lastName,  '');
+
+        if (!pw.value) { showErr(pw, 'Password is required.'); ok = false; }
+        else if (!strongPassword(pw.value)) { showErr(pw, 'Password must be 12+ characters with uppercase, lowercase, number and symbol.'); ok = false; }
+        else showErr(pw, '');
+
+        if (!pwc.value) { showErr(pwc, 'Please confirm your password.'); ok = false; }
+        else if (pwc.value !== pw.value) { showErr(pwc, 'Passwords do not match.'); ok = false; }
+        else showErr(pwc, '');
+
+        if (!ok) e.preventDefault();
+    });
+})();
+</script>
 
 </body>
 </html>

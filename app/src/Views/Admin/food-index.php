@@ -6,9 +6,9 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Food CMS — Admin — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/admin.css?v=<?= $h($app['css_version'] ?? '1') ?>">
+    <title>Food CMS — Admin </title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body class="admin-page">
 
@@ -17,7 +17,7 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 <main class="admin-main">
     <div class="admin-container">
         <nav class="admin-breadcrumb">
-            <a href="/"><?= $h($app['site_name'] ?? 'Festival') ?></a>
+            <a href="/"><?= $h('Festival') ?></a>
             <span class="admin-breadcrumb-sep">›</span>
             <a href="/admin">Admin</a>
             <span class="admin-breadcrumb-sep">›</span>

@@ -1,13 +1,12 @@
 <?php
-$app = $viewModel->appSettings;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Forgot password — <?= htmlspecialchars($app['site_name']) ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars($app['css_version']) ?>">
-    <link rel="stylesheet" href="/css/auth.css?v=<?= htmlspecialchars($app['css_version']) ?>">
+    <title>Forgot password</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body class="auth-page">
 
@@ -67,6 +66,35 @@ $app = $viewModel->appSettings;
 </main>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
+
+<script>
+(function () {
+    function showErr(input, msg) {
+        var field = input.closest('.auth-field');
+        if (!field) return;
+        var err = field.querySelector('.auth-field-error');
+        if (!err) {
+            err = document.createElement('span');
+            err.className = 'auth-field-error';
+            field.appendChild(err);
+        }
+        err.textContent = msg;
+        input.classList.toggle('auth-input-invalid', msg !== '');
+    }
+
+    var id = document.getElementById('identifier');
+    if (id) id.addEventListener('input', function () { showErr(this, ''); });
+
+    document.querySelector('form').addEventListener('submit', function (e) {
+        if (!id.value.trim()) {
+            showErr(id, 'Please enter your email or username.');
+            e.preventDefault();
+        } else {
+            showErr(id, '');
+        }
+    });
+})();
+</script>
 
 </body>
 </html>

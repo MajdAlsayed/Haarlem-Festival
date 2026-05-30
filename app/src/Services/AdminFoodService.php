@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\Restaurant;
 use App\Repositories\FoodSettingsRepository;
 use App\Repositories\RestaurantRepository;
+use App\Repositories\SettingsRepository;
 
 /**
  * Business logic for the food admin CMS.
@@ -22,11 +23,15 @@ use App\Repositories\RestaurantRepository;
  */
 final class AdminFoodService
 {
+    private SettingsRepository $settingsRepo;
+
     public function __construct(
         private RestaurantRepository   $restaurantRepo,
         private FoodSettingsRepository $foodSettingsRepo
     ) {
+        $this->settingsRepo = new SettingsRepository();
     }
+
 
     // =========================================================================
     // Restaurants

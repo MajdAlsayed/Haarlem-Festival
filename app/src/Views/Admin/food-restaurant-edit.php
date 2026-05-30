@@ -26,9 +26,9 @@ $numVal = function (string $field, string $default = '') use ($row): string {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><?= $isNew ? 'New' : 'Edit' ?> restaurant — Admin — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/admin.css?v=<?= $h($app['css_version'] ?? '1') ?>">
+    <title><?= $isNew ? 'New' : 'Edit' ?> restaurant — Admin — </title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body class="admin-page">
 
@@ -38,7 +38,7 @@ $numVal = function (string $field, string $default = '') use ($row): string {
     <div class="admin-container admin-container--wide">
 
         <nav class="admin-breadcrumb">
-            <a href="/"><?= $h($app['site_name'] ?? 'Festival') ?></a>
+            <a href="/"><?= $h( 'Festival') ?></a>
             <span class="admin-breadcrumb-sep">›</span>
             <a href="/admin">Admin</a>
             <span class="admin-breadcrumb-sep">›</span>

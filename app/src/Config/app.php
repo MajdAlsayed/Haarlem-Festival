@@ -25,6 +25,10 @@ return [
     /** Absolute site URL for Stripe redirects (e.g. http://localhost or https://yourdomain.nl). */
     'public_base_url' => rtrim((string) (getenv('APP_PUBLIC_URL') ?: 'http://localhost'), '/'),
 
+    /** Google reCAPTCHA v2. Replace env vars with real keys in production. Test keys always pass. */
+    'recaptcha_site_key'   => getenv('RECAPTCHA_SITE_KEY')   ?: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+    'recaptcha_secret_key' => getenv('RECAPTCHA_SECRET_KEY') ?: '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe',
+
     /**
      * Homepage hero / welcome / about copy. Overridden by site_settings keys `cms_home_*` (see SettingsRepository::getMergedCmsHome).
      *

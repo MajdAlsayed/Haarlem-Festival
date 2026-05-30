@@ -5,21 +5,38 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Core\Database;
 use App\Exceptions\NotFoundException;
 use App\Models\Restaurant;
 use App\Repositories\CartRepository;
 use App\Repositories\FoodSettingsRepository;
-use App\Repositories\RestaurantRepository;
 use App\Repositories\ReservationRepository;
+use App\Repositories\RestaurantRepository;
+use App\Repositories\TicketDetailsRepository;
+use App\Repositories\TicketRepository;
+use App\Repositories\UserRepository;
 
 final class FoodService
 {
-    public function __construct(
-        private readonly RestaurantRepository   $restaurantRepo,
-        private readonly FoodSettingsRepository $foodSettingsRepo,
-        private readonly ReservationRepository  $reservationRepo,
-    ) {}
+    private RestaurantRepository   $restaurantRepo;
+    private FoodSettingsRepository $foodSettingsRepo;
+    private ReservationRepository  $reservationRepo;
+    private UserRepository         $userRepo;
+    private TicketDetailsRepository $ticketDetailsRepo;
+    private CartService            $cartService;
+
+    public function __construct()
+    {
+        $this->restaurantRepo    = new RestaurantRepository();
+        $this->foodSettingsRepo  = new FoodSettingsRepository();
+        $this->reservationRepo   = new ReservationRepository();
+        $this->userRepo          = new UserRepository();
+        $this->ticketDetailsRepo = new TicketDetailsRepository();
+        $cartRepo = new CartRepository();
+        $this->cartService = new CartService(
+            $cartRepo,
+            new TicketAvailabilityService($cartRepo, new TicketRepository())
+        );
+    }
 
     // ── Index ─────────────────────────────────────────────────────────────────
 
@@ -65,6 +82,11 @@ final class FoodService
     }
 
     // ── Booking form ──────────────────────────────────────────────────────────
+
+    public function getUserByEmail(string $email): ?\App\Models\User
+    {
+        return $this->userRepo->findByEmail($email);
+    }
 
     public function getDefaultInput(?object $user): array
     {
@@ -160,51 +182,28 @@ final class FoodService
     // ── Private helpers ───────────────────────────────────────────────────────
 
     private function createTicketDetailsForReservation(
-    Restaurant $restaurant,
-    array      $input,
-    float      $reservationFee,
-    int        $reservationId
-): int {
-    $adults   = (int) ($input['adults']   ?? 0);
-    $children = (int) ($input['children'] ?? 0);
-    $date     = $input['booking_date']  ?? '';
-    $time     = substr($input['session_time'], 0, 5);
+        Restaurant $restaurant,
+        array      $input,
+        float      $reservationFee,
+        int        $reservationId
+    ): int {
+        $adults   = (int) ($input['adults']   ?? 0);
+        $children = (int) ($input['children'] ?? 0);
+        $date     = $input['booking_date']    ?? '';
+        $time     = substr($input['session_time'], 0, 5);
 
-    $guestParts = [];
-    if ($adults > 0)   $guestParts[] = $adults   . ' adult'    . ($adults   !== 1 ? 's' : '');
-    if ($children > 0) $guestParts[] = $children . ' child'    . ($children !== 1 ? 'ren' : '');
+        $guestParts = [];
+        if ($adults > 0)   $guestParts[] = $adults   . ' adult'   . ($adults   !== 1 ? 's' : '');
+        if ($children > 0) $guestParts[] = $children . ' child'   . ($children !== 1 ? 'ren' : '');
 
-    $name        = $restaurant->name . ' — Table Reservation';
-    $description = sprintf(
-        '%s · %s at %s · %s',
-        $restaurant->name,
-        $date,
-        $time,
-        implode(', ', $guestParts)
-    );
+        $name        = $restaurant->name . ' — Table Reservation';
+        $description = sprintf('%s · %s at %s · %s', $restaurant->name, $date, $time, implode(', ', $guestParts));
 
-    $db   = Database::getConnection();
-    $stmt = $db->prepare('
-        INSERT INTO ticket_details
-            (reservation_id, event_id, session_id, ticket_type, name, description, price)
-        VALUES
-            (:reservation_id, NULL, NULL, :ticket_type, :name, :description, :price)
-    ');
-
-    $stmt->execute([
-        'reservation_id' => $reservationId,
-        'ticket_type'    => 'event_ticket',
-        'name'           => $name,
-        'description'    => $description,
-        'price'          => number_format($reservationFee, 2, '.', ''),
-    ]);
-
-    return (int) $db->lastInsertId();
-}
+        return $this->ticketDetailsRepo->createForReservation($reservationId, $name, $description, $reservationFee);
+    }
 
     private function addToCart(int $ticketDetailsId): void
     {
-        $cartService = new \App\Services\CartService(new CartRepository());
-        $cartService->addItem($ticketDetailsId, 1);
+        $this->cartService->addItem($ticketDetailsId, 1);
     }
 }

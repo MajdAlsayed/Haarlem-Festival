@@ -199,3 +199,24 @@
     display: block;
     margin-top: 8px;
 }
+
+/* ========== FIELD-LEVEL VALIDATION ========== */
+
+.auth-field-error {
+    display: block;
+    font-size: 12px;
+    color: #ff6b6b;
+    margin-top: 5px;
+}
+
+.auth-field-error:empty {
+    display: none;
+}
+
+.auth-input-invalid {
+    border-color: #ff6b6b !important;
+}
+
+.auth-input-invalid:focus {
+    border-color: #ff6b6b !important;
+}
