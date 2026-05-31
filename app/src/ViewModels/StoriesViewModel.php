@@ -6,6 +6,7 @@ class StoriesViewModel
 {
     public string $selectedDay     = 'all';
     public array  $stories         = [];
+    public array  $featured        = [];
     public array  $allVenueStories = [];
     public array  $schedule        = ['NL' => [], 'ENG' => []];
     public string $pageTitle       = 'Stories';
@@ -17,6 +18,7 @@ class StoriesViewModel
     {
         $this->selectedDay     = $selectedDay ?: 'all';
         $this->stories         = $data['stories']         ?? [];
+        $this->featured        = $data['featured']        ?? [];
         $this->allVenueStories = $data['allVenueStories'] ?? [];
         $this->schedule        = $data['schedule']        ?? ['NL' => [], 'ENG' => []];
         $this->pageTitle       = $data['pageTitle']       ?? 'Stories';

@@ -8,6 +8,8 @@ use App\Validation\StoryValidator;
 use App\Core\AdminAuth;
 use App\Core\Csrf;
 use App\Core\Session;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\ValidationException;
 
 class AdminStoriesController
 {
@@ -47,9 +49,7 @@ class AdminStoriesController
         $story   = $this->storiesService->getStoryForEdit($storyId);
 
         if (!$story) {
-            http_response_code(404);
-            echo 'Story not found.';
-            return;
+            throw new NotFoundException('Story not found.');
         }
 
         $errors = [];
@@ -87,16 +87,16 @@ class AdminStoriesController
             'event_id'    => (int)($_POST['event_id'] ?? 0),
         ];
 
-        $errors = $validator->validateStory($data);
-
-        if (!empty($errors)) {
+        try {
+            $validator->validateStory($data);
+            $this->storiesService->updateStory($storyId, $data);
+        } catch (ValidationException $e) {
             $story = array_merge(['story_id' => $storyId], $data);
+            $errors = $e->getErrors();
             $csrf = Csrf::token('admin_stories_edit');
             require __DIR__ . '/../Views/Stories/Admin/Edit.php';
             return;
         }
-
-        $this->storiesService->updateStory($storyId, $data);
 
         Session::setFlash('admin_success', 'Story updated successfully.');
         header('Location: /admin/stories');
@@ -129,9 +129,7 @@ class AdminStoriesController
         $data = $this->storiesService->getDetailPageForCms($slug);
 
         if (empty($data['story'])) {
-            http_response_code(404);
-            echo 'Story not found.';
-            return;
+            throw new NotFoundException('Story not found.');
         }
 
         $story      = $data['story'];

@@ -6,7 +6,6 @@ interface StoriesServiceInterface
 {
     // Public/frontend
     public function getStoriesHomeData(?string $day = null): array;
-    public function getVenuePageData(string $slug, ?string $day = null): array;
     public function getStoryDetailData(int $storyId): array;
 
     // CMS - story CRUD
