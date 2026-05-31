@@ -61,17 +61,6 @@ $selectedDay = $vm->selectedDay ?? 'all';
         </div>
     </section>
 
-    <!-- Venue buttons -->
-    <section class="stories-venues" aria-label="Venue navigation">
-        <div class="venues-container">
-            <a href="#" class="venue-btn">Verhalenhuis Haarlem</a>
-            <a href="/stories/venue?slug=de-schuur" class="venue-btn">De Schuur</a>
-            <a href="/stories/venue?slug=kweekcafe" class="venue-btn">Kweekcafé</a>
-            <a href="#" class="venue-btn">Ten Boom Museum</a>
-            <a href="#" class="venue-btn">Elswout Theater</a>
-        </div>
-    </section>
-
     <!-- Section header -->
     <div class="stories-hero">
         <h1>Haarlem Stories – Events to Explore</h1>

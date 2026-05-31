@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Repositories\StoriesRepository;
 use App\Services\StoriesService;
 use App\ViewModels\StoriesViewModel;
+use App\Exceptions\NotFoundException;
 
 // Main controller for Stories
 class StoriesController
@@ -19,7 +20,21 @@ class StoriesController
         $this->storiesService = new StoriesService(new StoriesRepository());
     }
 
-    public function index(): void
+    public function home(): void
+    {
+        // Get first 3 stories for featured cards on home page
+        $allStories = $this->storiesService->getStoriesHomeData('all')['stories'] ?? [];
+        $featured = array_slice($allStories, 0, 3);
+        
+        $data = [
+            'featured' => $featured,
+            'pageTitle' => 'Stories in Haarlem',
+        ];
+        $vm = new StoriesViewModel($data, 'all');
+        require __DIR__ . '/../Views/Stories/Home.php';
+    }
+
+    public function events(): void
     {
         // Get the day filter from user
         $day  = $this->normalizeDay($_GET['day'] ?? 'all');
@@ -28,30 +43,7 @@ class StoriesController
         $data = $this->storiesService->getStoriesHomeData($day);
         $data['pageTitle'] = 'Stories in Haarlem';
         $vm = new StoriesViewModel($data, $day);
-        require __DIR__ . '/../Views/Stories/Index.php';
-    }
-
-    public function venue(): void
-    {
-        $slug = trim((string)($_GET['slug'] ?? ''));
-        $day  = $this->normalizeDay($_GET['day'] ?? 'all');
-
-        if ($slug === '') {
-            $this->renderNotFound('Venue slug is required.');
-            return;
-        }
-
-        $data = $this->storiesService->getVenuePageData($slug, $day);
-
-        if (empty($data['venue'])) {
-            $this->renderNotFound('Venue not found.');
-            return;
-        }
-
-        $data['pageTitle'] = $data['venue']['name'] ?? 'Venue';
-        $vm = new StoriesViewModel($data, $day);
-
-        require __DIR__ . '/../Views/Stories/Venue.php';
+        require __DIR__ . '/../Views/Stories/Events.php';
     }
 
     public function detail(): void
@@ -61,15 +53,13 @@ class StoriesController
         ]);
 
         if ($id === false || $id === 0) {
-            $this->renderNotFound('Invalid or missing story ID.');
-            return;
+            throw new NotFoundException('Invalid or missing story ID.');
         }
 
         $data = $this->storiesService->getStoryDetailData((int)$id);
 
         if (empty($data['story'])) {
-            $this->renderNotFound('Story not found.');
-            return;
+            throw new NotFoundException('Story not found.');
         }
 
         $data['pageTitle'] = $data['story']['name'] ?? 'Story Details';
@@ -120,11 +110,5 @@ class StoriesController
     {
         $day = strtolower(trim($input));
         return in_array($day, self::ALLOWED_DAYS, true) ? $day : 'all';
-    }
-
-    private function renderNotFound(string $message): void
-    {
-        http_response_code(404);
-        echo $message;
     }
 }

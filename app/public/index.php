@@ -123,7 +123,12 @@ switch ($uri) {
         break;
 
     case '/stories':
-        if ($method === 'GET') (new StoriesController())->index();
+        if ($method === 'GET') (new StoriesController())->home();
+        else http_response_code(405);
+        break;
+
+    case '/stories/events':
+        if ($method === 'GET') (new StoriesController())->events();
         else http_response_code(405);
         break;
 

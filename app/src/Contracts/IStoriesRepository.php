@@ -6,9 +6,7 @@ interface IStoriesRepository
 {
     // Public/frontend
     public function getStories(?string $day = null): array;
-    public function getStoriesByVenue(int $venueId, ?string $day = null): array;
     public function getStoryById(int $storyId): ?array;
-    public function getVenueBySlug(string $slug): ?array;
 
     // CMS - story CRUD
     public function getAllStoriesForAdmin(): array;

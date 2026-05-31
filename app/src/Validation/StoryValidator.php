@@ -11,7 +11,7 @@ class StoryValidator
     private const ALLOWED_TEMPLATES = ['generic', 'omdenken', 'buurderij'];
     private const ALLOWED_AUDIENCES = ['all-ages', 'kids', 'teens', 'adults', 'families'];
 
-    public function validateStory(array $data): array
+    public function validateStory(array $data): void
     {
         $errors = [];
 
@@ -27,7 +27,7 @@ class StoryValidator
             try {
                 Validator::validateSlug($slug);
             } catch (ValidationException $e) {
-                $errors['slug'] = $e->getDetails()['slug'] ?? 'Invalid slug.';
+                $errors['slug'] = $e->getErrors()['slug'] ?? 'Invalid slug.';
             }
         }
 
@@ -75,6 +75,8 @@ class StoryValidator
             $errors['event_id'] = 'Event ID is required.';
         }
 
-        return $errors;
+        if (!empty($errors)) {
+            throw new ValidationException('Story validation failed', $errors);
+        }
     }
 }

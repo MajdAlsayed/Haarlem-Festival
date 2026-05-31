@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\IStoriesRepository;
 use App\Contracts\ServiceInterface\StoriesServiceInterface;
+use App\Exceptions\NotFoundException;
 
 class StoriesService implements StoriesServiceInterface
 {
@@ -22,70 +23,16 @@ class StoriesService implements StoriesServiceInterface
         ];
     }
 
-    public function getVenuePageData(string $slug, ?string $day = null): array
-    {
-        $venue = $this->repo->getVenueBySlug($slug);
-
-        if (!$venue) {
-            return [
-                'venue'           => null,
-                'stories'         => [],
-                'allVenueStories' => [],
-                'schedule'        => ['NL' => [], 'ENG' => []],
-            ];
-        }
-
-        $storiesFiltered = $this->repo->getStoriesByVenue((int)$venue['venue_id'], $day);
-        $allStories      = $this->repo->getStories('all');
-
-
-        $explorePool = array_values(array_filter(
-            $allStories,
-            function (array $story) use ($venue): bool {
-                $storyVenueId   = (int)($story['venue_id']  ?? 0);
-                $currentVenueId = (int)($venue['venue_id']  ?? 0);
-                $storyId        = (int)($story['story_id']  ?? 0);
-                return $storyVenueId !== $currentVenueId && $storyId > 0;
-            }
-        ));
-
-        shuffle($explorePool);
-        $exploreMore = array_slice($explorePool, 0, 4);
-
-        return [
-            'venue'           => $venue,
-            'stories'         => $storiesFiltered,
-            'allVenueStories' => $exploreMore,
-            'schedule'        => $this->buildSchedule($storiesFiltered),
-        ];
-    }
-
     public function getStoryDetailData(int $storyId): array
     {
         $story = $this->repo->getStoryById($storyId);
 
         if (!$story) {
-            return [
-                'story'      => null,
-                'stories'    => [],
-                'schedule'   => ['NL' => [], 'ENG' => []],
-                'detailPage' => null,
-            ];
-        }
-
-        $more = [];
-        if (!empty($story['venue_id'])) {
-            $more = $this->repo->getStoriesByVenue((int)$story['venue_id'], 'all');
-            $more = array_values(array_filter(
-                $more,
-                fn(array $item): bool => (int)($item['story_id'] ?? 0) !== $storyId
-            ));
+            throw new NotFoundException('Story not found.');
         }
 
         return [
             'story'      => $story,
-            'stories'    => $more,
-            'schedule'   => $this->buildSchedule($more),
             'detailPage' => $this->repo->getDetailPageByStoryId($storyId),
         ];
     }
@@ -128,10 +75,7 @@ class StoriesService implements StoriesServiceInterface
         $story = $this->repo->getStoryBySlug($slug);
 
         if (!$story) {
-            return [
-                'story'      => null,
-                'detailPage' => null,
-            ];
+            throw new NotFoundException('Story not found.');
         }
 
         $detailPage = $this->repo->getDetailPageByStoryId((int)$story['story_id']);

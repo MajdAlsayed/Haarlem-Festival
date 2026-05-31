@@ -33,13 +33,7 @@ $template   = $vm->getTemplate(); // 'omdenken' | 'buurderij' | 'generic'
             <span class="stories-breadcrumb-separator">→</span>
             <a href="/stories" class="stories-breadcrumb-link">STORIES</a>
 
-            <?php if (!empty($story['venue_slug']) && !empty($story['venue_name'])): ?>
-                <span class="stories-breadcrumb-separator">→</span>
-                <a href="/stories/venue?slug=<?= h($story['venue_slug']) ?>"
-                   class="stories-breadcrumb-link">
-                    <?= h($story['venue_name']) ?>
-                </a>
-            <?php endif; ?>
+
 
             <span class="stories-breadcrumb-separator">→</span>
             <span class="stories-breadcrumb-link active" aria-current="page">
