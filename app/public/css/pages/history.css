@@ -1,65 +1,19 @@
-/* Hero Section Start */
-.history-hero-section h1,
-.history-hero-section p {
-    margin: 0;
-}
-
-.history-hero-content {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-    padding-bottom: 24px;
-}
-
-.history-hero-title-container {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.history-hero-bottom {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.history-hero-bottom {
-    width: fit-content;
-}
-
-.history-hero-title {
-    text-shadow: 2px 4px 2px rgba(0, 0, 0, 0.5);
-}
-
-.history-hero-title--yellow {
-    color: #f8dc3d;
-}
-
-.history-hero-subtitle,
-.history-hero-description {
-    text-shadow: 2px 4px 2px rgba(0, 0, 0, 0.5);
-}
-
-.history-hero-subtitle {
-    color: #f8dc3d;
-    font-weight: 700;
-}
-
-.history-hero-section--locations .history-hero-background img {
+.history-locations-hero .page-hero__background img {
     object-position: center 80%;
 }
-
-.history-hero-section--st-bavo .history-hero-background img {
-    object-position: center 60%;
-}
-/* Hero Section End */
 
 /* About Banner Start */
 .history-about-banner {
     width: 100%;
     padding: 32px 0;
-    background: #deccab;
-    color: #292929;
+    background:
+            linear-gradient(
+                    145deg,
+                    rgba(255, 255, 255, 0.08),
+                    rgba(255, 255, 255, 0.035)
+            ),
+            var(--color-surface);
+    color: var(--color-text);
 }
 
 .history-about-banner .container {
@@ -69,9 +23,7 @@
 }
 
 .history-about-banner-title {
-    max-width: 900px;
-    margin: 0 0 24px;
-    color: #292929;
+    color: var(--color-accent);
 }
 
 .history-about-banner-content {
@@ -111,7 +63,7 @@
 }
 
 .history-sites-title {
-    color: #f8dc3d;
+    color: var(--color-accent);
 }
 
 .history-sites-description {
@@ -196,7 +148,7 @@
     font-size: 18px;
     line-height: 1.3;
     letter-spacing: 2px;
-    color: #f8dc3d;
+    color: var(--color-text);
     text-align: left;
 }
 
@@ -242,7 +194,7 @@
 }
 
 .history-experience-title {
-    color: #f8dc3d;
+    color: var(--color-accent);
     text-align: center;
 }
 
@@ -351,7 +303,7 @@
 }
 
 .history-location-title {
-    color: #f8dc3d;
+    color: var(--color-accent);
     margin-bottom: 12px;
 }
 
@@ -407,7 +359,7 @@
 }
 
 .history-stats-value {
-    color: #F8DC3D;
+    color: var(--color-accent);
     font-size: clamp(2rem, 4vw, 3rem);
     line-height: 1;
     margin: 0;
@@ -453,11 +405,12 @@
 }
 
 .history-content-section-title {
-    color: #f8dc3d;
+    color: var(--color-accent);
     margin: 0;
 }
 
 .history-content-section-subtitle {
+    color: var(--color-text);
     margin: 0 0 5px 0;
 }
 
@@ -520,7 +473,15 @@
 .history-experience-banner {
     width: 100%;
     padding: 60px 0;
-    background: #deccab;
+    background:
+            linear-gradient(
+                    145deg,
+                    rgba(255, 255, 255, 0.08),
+                    rgba(255, 255, 255, 0.035)
+            ),
+            var(--color-surface);
+    color: var(--color-text);
+    border-block: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .history-experience-banner .container {
@@ -640,7 +601,7 @@
 }
 
 .history-tours-info h2 {
-    color: #f8dc3d;
+    color: var(--color-accent);
 }
 
 .history-tours-info-cards {
@@ -696,7 +657,7 @@
 }
 
 .history-tours-section-title {
-    color: #f8dc3d;
+    color: var(--color-accent);
     margin: 0 0 32px;
 }
 
@@ -741,7 +702,7 @@
 
 .history-tours-day-title {
     margin: 0 0 8px;
-    color: #f8dc3d;
+    color: var(--color-text);
 }
 
 /* Tour item row */
@@ -837,7 +798,7 @@
 
 .history-tours-detail-label {
     margin: 0;
-    color: #f8dc3d;
+    color: var(--color-text);
 }
 
 .history-tours-detail-value {
@@ -880,7 +841,7 @@
     font-size: var(--font-xl);
     line-height: 1;
     letter-spacing: -0.02em;
-    color: #f8dc3d;
+    color: var(--color-accent);
 }
 
 .history-tours-ticket-per {

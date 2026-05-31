@@ -1,7 +1,3 @@
-.jazz-page {
-    background-color: #0a0a0a;
-}
-
 /* =========================
    JAZZ — Overview page
    ========================= */
@@ -218,16 +214,8 @@ body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
    JAZZ — Artist pages base
    ========================= */
 
-.jazz-artist-page {
-    background: radial-gradient(circle at top, #25201a 0, #0c0c0c 45%, #050505 100%);
-}
-
 .jazz-artist-body {
     padding-block: 36px 60px;
-}
-
-.jazz-detail-hero__content {
-    padding-bottom: 48px;
 }
 
 .jazz-gumbo-detail-hero .page-hero__background img {

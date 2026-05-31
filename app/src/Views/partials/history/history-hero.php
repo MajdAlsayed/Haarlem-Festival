@@ -9,7 +9,7 @@
     <div class="container page-hero__inner">
         <div class="page-hero__content history-hero-content">
             <div class="history-hero-title-container">
-            <h1 class="page-hero__title history-hero-title <?= htmlspecialchars($titleModifier ?? '') ?>">
+            <h1 class="page-hero__title section-title--shadow htmlspecialchars($titleModifier ?? '') ?>">
                 <?= nl2br(htmlspecialchars($viewModel->hero['title'] ?? '')) ?>
             </h1>
             <?php if ($showSubtitle ?? false): ?>

@@ -29,6 +29,8 @@ class ArtistDetailViewModel
     public string $albumCoverImage;
     public ?string $heroTagline;
     public ?string $followUrl;
+    public string $heroTitle;
+    public string $heroAlt;
 
     public function __construct(
         array $artist,
@@ -76,6 +78,8 @@ class ArtistDetailViewModel
         $this->albumCoverImage = $albumCoverImage;
         $this->heroTagline = $heroTagline;
         $this->followUrl = $followUrl;
+        $this->heroTitle = (string) ($artist['name'] ?? 'Dance Artist');
+        $this->heroAlt = $this->heroTitle;
     }
 
     /** @deprecated Prefer checking sections individually (career highlights, tracks, gallery). */

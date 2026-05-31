@@ -29,7 +29,7 @@ $h = $h ?? fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 
     <div class="container page-hero__inner">
         <div class="page-hero__content <?= $h($pageHeroContentClass) ?>">
-            <h1 class="page-hero__title">
+            <h1 class="page-hero__title section-title--shadow">
                 <?= $h($pageHeroTitle) ?>
             </h1>
 

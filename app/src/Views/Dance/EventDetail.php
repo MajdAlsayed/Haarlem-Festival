@@ -76,6 +76,14 @@ $figmaSpanDayTop = !$hasEventTickets && $hasDayPass;
 $pageTitle = $viewModel->pageTitle;
 $pageStyles = ['/css/pages/dance.css'];
 $bodyClass = 'dance-page event-detail-page';
+
+// Hero settings
+$pageHeroTitle = $event->venueName ?? $event->title;
+$pageHeroSubtitle = $viewModel->eventSubtitle;
+$pageHeroImage = $viewModel->heroImage;
+$pageHeroAlt = $event->title;
+$pageHeroClass = 'dance-detail-hero dance-event-detail-hero';
+$pageHeroContentClass = 'dance-detail-hero__content dance-event-detail-hero__content';
 ?>
 
 <!DOCTYPE html>
@@ -121,17 +129,8 @@ if (!empty($viewModel->cartFlashSuccess)) {
 <?php endif; ?>
 
 <main>
-    <section class="event-detail-hero"
-             style="background-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.6) 100%), url('<?= htmlspecialchars($viewModel->heroImage) ?>');">
-        <div class="event-detail-hero-overlay"></div>
-        <div class="event-detail-hero-content">
-            <p class="event-detail-hero-venue"><?= htmlspecialchars($event->venueName) ?></p>
-            <h1 class="event-detail-hero-title">
-                <span class="title-orange"><?= htmlspecialchars($viewModel->eventSubtitle) ?></span>
-            </h1>
-            <a href="#event-info" class="btn btn--light">More info <span aria-hidden="true">&#8594;</span></a>
-        </div>
-    </section>
+    <!-- Hero -->
+    <?php require __DIR__ . '/../partials/page-hero.php'; ?>
 
     <!-- Breadcrumbs nav -->
     <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>

@@ -12,6 +12,14 @@ $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunda
 $pageTitle = ($artist['name'] ?? 'Artist') . ' — Haarlem Festival';
 $pageStyles = ['/css/pages/dance.css'];
 $bodyClass = 'dance-page artist-detail-page';
+
+// Hero settings
+$pageHeroTitle = $viewModel->heroTitle;
+$pageHeroSubtitle = $viewModel->heroTagline ?? '';
+$pageHeroImage = $viewModel->heroImage;
+$pageHeroAlt = $viewModel->heroAlt;
+$pageHeroClass = 'dance-detail-hero';
+$pageHeroContentClass = 'dance-detail-hero__content';
 ?>
 
 <!DOCTYPE html>
@@ -22,23 +30,8 @@ $bodyClass = 'dance-page artist-detail-page';
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main>
-    <section class="page-hero artist-detail-hero">
-    <div class="page-hero__background artist-detail-hero-background">
-        <img
-                src="<?= htmlspecialchars($viewModel->heroImage) ?>"
-                alt="<?= htmlspecialchars($artist['name']) ?>"
-        >
-    </div>
-    <div class="container page-hero__inner">
-        <div class="page-hero__content artist-detail-hero-content">
-            <h1 class="page-hero__title artist-detail-hero-name"><?= htmlspecialchars($artist['name']) ?></h1>
-            <?php if (($viewModel->heroTagline ?? '') !== ''): ?>
-                <p class="page-hero__subtitle artist-detail-hero-tagline"><?= htmlspecialchars((string)$viewModel->heroTagline) ?></p>
-            <?php endif; ?>
-            <a href="#about" class="btn btn--light btn--fit">More info <span aria-hidden="true">&#8594;</span></a>
-        </div>
-    </div>
-    </section>
+    <!-- Hero -->
+    <?php require __DIR__ . '/../partials/page-hero.php'; ?>
 
     <!-- Breadcrumbs nav -->
     <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>

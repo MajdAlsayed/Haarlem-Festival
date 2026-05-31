@@ -2,7 +2,7 @@
     --container-max: 1280px;
     --container-padding: 40px;
 
-    --color-bg: #0c0c0c;
+    --color-bg: #0a0a0a;
     --color-surface: #1a1a1a;
     --color-text: #ffffff;
     --color-muted: rgba(255, 255, 255, 0.7);
@@ -105,6 +105,10 @@ html {
 
 .section-title--dark {
     color: #292929;
+}
+
+.section-title--shadow {
+    text-shadow: 2px 4px 2px rgba(0, 0, 0, 0.5);
 }
 
 .section-title--underlined::after {
@@ -320,7 +324,6 @@ html {
     width: 100%;
     min-height: 420px;
     overflow: hidden;
-    color: var(--color-text);
 }
 
 .page-hero__background {
@@ -379,23 +382,22 @@ html {
 
 .page-hero__title {
     margin: 0;
-
-    color: var(--color-text);
     font-size: clamp(2.2rem, 4.5vw, 3.25rem);
     font-weight: 700;
     line-height: 1.08;
     letter-spacing: -0.02em;
     text-transform: uppercase;
+    color: var(--color-accent);
 }
 
 .page-hero__subtitle {
-    max-width: 640px;
-    margin: 16px 0 0;
+    max-width: 720px;
+    margin: 18px 0 0;
 
-    color: rgba(255, 255, 255, 0.88);
-    font-size: var(--font-md);
-    font-weight: 400;
-    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: clamp(1.2rem, 2vw, var(--font-lg));
+    font-weight: 500;
+    line-height: 1.45;
 }
 
 .page-hero__title + .page-hero__subtitle {
@@ -416,7 +418,7 @@ html {
     }
 
     .page-hero__subtitle {
-        font-size: var(--font-base);
+        font-size: var(--font-md);
     }
 }
 /* === Page Hero End === */
