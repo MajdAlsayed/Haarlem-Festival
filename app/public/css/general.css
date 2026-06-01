@@ -1038,3 +1038,66 @@ body.stories-page {
     }
 }
 /* === Festival Table End === */
+
+/* === Map Start === */
+
+.map-section {
+    padding: 80px 0 100px;
+    background: linear-gradient(180deg, #1a1612 0%, #141210 50%, #0f0e0c 100%);
+}
+
+.map-heading {
+    margin: 0 0 12px;
+}
+
+.map-intro {
+    max-width: 680px;
+    margin: 0 0 40px;
+
+    color: var(--color-muted);
+    font-size: 16px;
+    line-height: 1.75;
+}
+
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+
+    overflow: hidden;
+    border-radius: 18px;
+    background: #0f0f0f;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    transition: box-shadow 0.3s ease;
+}
+
+.map-wrapper:hover {
+    box-shadow:
+            0 16px 56px rgba(0, 0, 0, 0.55),
+            0 0 0 1px rgba(var(--color-accent-rgb), 0.15);
+}
+
+.map-iframe,
+#festival-map {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+    border: 0;
+
+    z-index: 0;
+}
+
+.map-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 32px;
+}
+
+/* === Map End === */

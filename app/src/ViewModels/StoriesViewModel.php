@@ -118,7 +118,7 @@ class StoriesViewModel
     public function getOmdenkenAssets(): array
     {
         return [
-            'hero'   => '/images/Stories/details/omdenken-hero.jpg',
+            'hero'   => '/images/Stories/events/omdenken-podcast-event.jpg',
             'block1' => '/images/Stories/details/omdenken2.jpg',
             'block2' => '/images/Stories/details/omdenken3.jpg',
             'poster' => '/images/Stories/details/omdenken1.jpg',
@@ -128,7 +128,7 @@ class StoriesViewModel
     public function getBuurderijAssets(): array
     {
         return [
-            'hero'     => '/images/Stories/details/Kweekcafehero.jpg',
+            'hero'     => '/images/Stories/events/buurderij-haarlem-event.jpg',
             'main'     => '/images/Stories/details/Kweekcafe1.jpg',
             'main2'    => '/images/Stories/details/Kweekcafe2.jpg',
             'gallery1' => '/images/Stories/details/Kweekcafeg1.jpg',

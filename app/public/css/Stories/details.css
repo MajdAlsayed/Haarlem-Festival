@@ -646,12 +646,6 @@ body.stories-detail-page {
     letter-spacing: -0.02em;
 }
 
-.buurderij-content {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 0 24px 40px;
-}
-
 .buurderij-intro {
     background: linear-gradient(145deg, #1a1a1a 0%, #141414 100%);
     color: #ffffff;
@@ -928,25 +922,6 @@ body.stories-detail-page {
     line-height: 1.4;
 }
 
-.buurderij-reserve-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 42px;
-    width: 100%;
-    margin-top: 40px;
-    background: #f5b400;
-    color: #111;
-    text-decoration: none;
-    font-size: 14px;
-    line-height: 1;
-    font-weight: 700;
-    border-radius: 6px;
-}
-
-.buurderij-reserve-btn:hover {
-    background: #e0a600;
-}
 
 .buurderij-info-card--design {
     display: flex;
@@ -1127,9 +1102,6 @@ body.stories-detail-page {
         min-height: auto;
     }
 
-    .buurderij-reserve-btn {
-        margin-top: 26px;
-    }
 
     .buurderij-content {
         padding: 0 16px 28px;

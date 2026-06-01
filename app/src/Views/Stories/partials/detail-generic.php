@@ -48,24 +48,18 @@ $tags = array_filter([
 ?>
 
 <section class="generic-detail">
+<?php
+    $pageHeroTitle = $heroTitle;
+    $pageHeroSubtitle = $venueText ? '📍 ' . $venueText : '';
+    $pageHeroImage = $heroImage;
+    $pageHeroAlt = $heroTitle;
+    $pageHeroClass = 'stories-detail-hero stories-generic-detail-hero';
+    $pageHeroContentClass = 'stories-detail-hero__content';
+    ?>
 
-    <!-- ── Hero ── -->
-    <div class="generic-hero" style="background-image:url('<?= h($heroImage) ?>');">
-        <div class="generic-hero-overlay"></div>
-        <div class="generic-hero-inner">
-            <?php if (!empty($tags)): ?>
-                <div class="generic-hero-tags">
-                    <?php foreach ($tags as $tag): ?>
-                        <span class="generic-tag"><?= h($tag) ?></span>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-            <h1 class="generic-hero-title"><?= h($heroTitle) ?></h1>
-            <?php if ($venueText): ?>
-                <p class="generic-hero-venue">📍 <?= h($venueText) ?></p>
-            <?php endif; ?>
-        </div>
-    </div>
+    <?php require __DIR__ . '/../../partials/page-hero.php'; ?>
+
+    <?php require __DIR__ . '/../../partials/breadcrumbs.php'; ?>
 
     <!-- ── Two-column body ── -->
     <div class="generic-body">
@@ -157,54 +151,59 @@ $tags = array_filter([
         <!-- Right: event info + ticket button -->
         <div class="generic-col-side">
 
-            <div class="generic-info-card">
-                <h3 class="generic-info-heading">Event Info</h3>
+            <div class="festival-card festival-card--stories generic-info-card">
+                <h3 class="section-subtitle generic-info-heading">Event Info</h3>
 
                 <dl class="generic-info-list">
                     <?php if ($venueText): ?>
                         <div class="generic-info-row">
-                            <dt>📍 Venue</dt>
-                            <dd><?= h($venueText) ?></dd>
+                            <dt class="copy-text copy-text--sm">📍 Venue</dt>
+                            <dd class="copy-text copy-text--sm copy-text--muted"><?= h($venueText) ?></dd>
                         </div>
                     <?php endif; ?>
+
                     <?php if ($dayText): ?>
                         <div class="generic-info-row">
-                            <dt>📅 Day</dt>
-                            <dd><?= h($dayText) ?></dd>
+                            <dt class="copy-text copy-text--sm">📅 Day</dt>
+                            <dd class="copy-text copy-text--sm copy-text--muted"><?= h($dayText) ?></dd>
                         </div>
                     <?php endif; ?>
+
                     <?php if ($timeText): ?>
                         <div class="generic-info-row">
-                            <dt>🕒 Time</dt>
-                            <dd><?= h($timeText) ?></dd>
+                            <dt class="copy-text copy-text--sm">🕒 Time</dt>
+                            <dd class="copy-text copy-text--sm copy-text--muted"><?= h($timeText) ?></dd>
                         </div>
                     <?php endif; ?>
+
                     <?php if ($langText): ?>
                         <div class="generic-info-row">
-                            <dt>🌐 Language</dt>
-                            <dd><?= h($langText) ?></dd>
+                            <dt class="copy-text copy-text--sm">🌐 Language</dt>
+                            <dd class="copy-text copy-text--sm copy-text--muted"><?= h($langText) ?></dd>
                         </div>
                     <?php endif; ?>
+
                     <?php if ($ageText): ?>
                         <div class="generic-info-row">
-                            <dt>👥 Age</dt>
-                            <dd><?= h($ageText) ?></dd>
+                            <dt class="copy-text copy-text--sm">👥 Age</dt>
+                            <dd class="copy-text copy-text--sm copy-text--muted"><?= h($ageText) ?></dd>
                         </div>
                     <?php endif; ?>
+
                     <?php if ($typeText): ?>
                         <div class="generic-info-row">
-                            <dt>🎭 Type</dt>
-                            <dd><?= h($typeText) ?></dd>
+                            <dt class="copy-text copy-text--sm">🎭 Type</dt>
+                            <dd class="copy-text copy-text--sm copy-text--muted"><?= h($typeText) ?></dd>
                         </div>
                     <?php endif; ?>
                 </dl>
 
                 <div class="generic-ticket-wrap">
-                    <p class="generic-ticket-note">
+                    <p class="copy-text copy-text--sm copy-text--muted generic-ticket-note">
                         Reservation is required to guarantee entry. Seats are limited.
                     </p>
-                    <a href="/tickets" class="generic-ticket-btn">
-                        Buy Tickets &rsaquo;
+                    <a href="/tickets" class="btn btn--primary btn--sm">
+                        Buy Tickets →
                     </a>
                 </div>
             </div>

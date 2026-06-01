@@ -7,59 +7,64 @@ function h($s) {
 }
 
 $featured = $vm->featured ?? [];
+
+// Settings for the page title, styles, body class
+$pageTitle = $vm->pageTitle ?? 'Stories in Haarlem';
+$pageStyles = ['/css/pages/stories.css'];
+$bodyClass = 'stories-page';
+
+// Hero settings
+$heroModifier = 'festival-hero--stories';
+$heroImage = '/images/Stories/stories-home-hero.jpg';
+$heroImageAlt = 'Stories in Haarlem';
+$heroTitle = "Welcome to Stories In Haarlem";
+$heroSubtitle = 'Experience Haarlem Through Stories – Past, Present & Future';
+
+// Breadcrumbs
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'Stories', 'url' => null],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= h($vm->pageTitle ?? 'Stories in Haarlem') ?></title>
+<?php require __DIR__ . '/../partials/head.php'; ?>
 
-    <link rel="stylesheet" href="/css/style.css?v=<?= h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/Stories/home-featured.css?v=<?= h($app['css_version'] ?? '1') ?>">
-</head>
-
-<body class="stories-home">
+<body class="<?= htmlspecialchars($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main>
 
     <!-- Hero banner -->
-    <section class="stories-hero-banner" aria-label="Hero images">
-        <div class="hero-img" style="background-image: url('/images/Stories/hero-1.jpg');" role="img" aria-label="Stories banner image 1"></div>
-        <div class="hero-img" style="background-image: url('/images/Stories/hero-2.jpg');" role="img" aria-label="Stories banner image 2"></div>
-        <div class="hero-overlay">
-            <h1>Welcome to Stories<br>In Haarlem</h1>
-            <p>Experience Haarlem Through Stories – Past, Present &amp; Future.</p>
-        </div>
-    </section>
+    <?php require __DIR__ . '/../partials/festival-hero.php'; ?>
 
     <!-- Breadcrumb -->
-    <nav class="stories-breadcrumb" aria-label="Breadcrumb">
-        <div class="stories-breadcrumb-inner">
-            <a href="/" class="stories-breadcrumb-link">HOME</a>
-            <span class="stories-breadcrumb-separator" aria-hidden="true">→</span>
-            <span class="stories-breadcrumb-link active" aria-current="page">STORIES</span>
-        </div>
-    </nav>
+    <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
     <!-- Intro section -->
-    <section class="stories-heading-section">
-        <div class="stories-heading-inner">
-            <h2 class="stories-heading-title">The City That Speaks Through Its People</h2>
-            <p class="stories-heading-text">
-                Haarlem's rich tradition of storytelling lives in every corner of the city — from narrow cobblestone streets
-                to centuries-old courtyards. During Stories in Haarlem, local residents, historians, and performers bring
-                hidden tales to life through intimate sessions that reveal the city's humor, heart, and heritage.
-            </p>
+    <section class="stories-about-banner">
+        <div class="container">
+            <div class="stories-about-banner-content">
+                <h2 class="section-title section-title--accent section-title--underlined stories-about-banner-title">
+                    The City That Speaks Through Its People
+                </h2>
+
+                <p class="copy-text">
+                    Haarlem's rich tradition of storytelling lives in every corner of the city — from narrow cobblestone streets
+                    to centuries-old courtyards. During Stories in Haarlem, local residents, historians, and performers bring
+                    hidden tales to life through intimate sessions that reveal the city's humor, heart, and heritage.
+                </p>
+            </div>
         </div>
     </section>
 
     <!-- Featured Stories Section -->
-    <section class="stories-featured" aria-label="Featured stories">
+    <section class="container stories-featured" aria-label="Featured stories">
         <div class="stories-featured-header">
-            <h2>Featured Stories</h2>
+            <h2 class="section-title section-title--accent section-title--underlined" >
+                Featured Stories
+            </h2>
         </div>
 
         <div class="stories-featured-grid">
@@ -75,18 +80,20 @@ $featured = $vm->featured ?? [];
                     $type = $story['story_type'] ?? '';
                     $age = $story['age'] ?? '';
                     ?>
-                    <article class="featured-card">
-                        <div class="featured-card-image" style="background-image: url('<?= h($image) ?>')"></div>
-                        <div class="featured-card-body">
-                            <h3 class="featured-card-title"><?= h($name) ?></h3>
+                    <article class="festival-card festival-card--stories story-card">
+                        <div class="story-card-image-wrap">
+                            <img src="<?= h($image) ?>" alt="<?= h($name) ?>" class="story-card-image">
+                        </div>
+                        <div class="story-card-body">
+                            <h3 class="story-card-title"><?= h($name) ?></h3>
                             <?php if ($type): ?>
-                                <p class="featured-card-type"><?= h($type) ?></p>
+                                <p class="copy-text copy-text--sm story-card-type"><?= h($type) ?></p>
                             <?php endif; ?>
-                            <p class="featured-card-desc"><?= h(substr($desc, 0, 100)) ?>...</p>
+                            <p class="copy-text copy-text--sm story-card-desc"><?= h(substr($desc, 0, 100)) ?>...</p>
                             <?php if ($age): ?>
-                                <div class="featured-card-age">Age <?= h($age) ?></div>
+                                <span class="story-card-age">Age <?= h($age) ?></span>
                             <?php endif; ?>
-                            <a href="/stories/detail?id=<?= $storyId ?>" class="featured-card-link">
+                            <a href="/stories/detail?id=<?= $storyId ?>" class="btn btn--sm btn--primary story-card-link">
                                 Read More →
                             </a>
                         </div>
@@ -96,7 +103,7 @@ $featured = $vm->featured ?? [];
         </div>
 
         <div class="stories-featured-footer">
-            <a href="/stories/events" class="btn-primary">View All Events →</a>
+            <a href="/stories/events" class="btn btn--sm btn--outline">VIEW ALL EVENTS →</a>
         </div>
     </section>
 
