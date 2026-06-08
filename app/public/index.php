@@ -132,11 +132,6 @@ switch ($uri) {
         else http_response_code(405);
         break;
 
-    case '/stories/venue':
-        if ($method === 'GET') (new StoriesController())->venue();
-        else http_response_code(405);
-        break;
-
     case '/stories/detail':
         if ($method === 'GET') (new StoriesController())->detail();
         else http_response_code(405);
@@ -190,6 +185,24 @@ case '/api/stories':
     }
     break;
 
+case '/admin/stories/create':
+    case '/cms/stories/create':
+    if ($method === 'GET') {
+        (new AdminStoriesController())->create();
+    } else {
+        http_response_code(405);
+    }
+    break;
+
+case '/admin/stories/store':
+    case '/cms/stories/store':
+    if ($method === 'POST') {
+        (new AdminStoriesController())->store();
+    } else {
+        http_response_code(405);
+    }
+    break;
+
 case '/admin/stories/edit':
     case '/cms/stories/edit':
     if ($method === 'GET') {
@@ -210,7 +223,7 @@ case '/admin/stories/update':
 
 case '/admin/stories/delete':
     case '/cms/stories/delete':
-    if ($method === 'GET' || $method === 'POST') {
+    if ($method === 'POST') {
         (new AdminStoriesController())->delete();
     } else {
         http_response_code(405);

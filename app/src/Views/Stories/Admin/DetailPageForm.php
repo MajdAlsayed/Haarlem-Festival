@@ -58,7 +58,7 @@ $storyName = $story['name'] ?? 'Story';
             <div class="story-cms-badge">📖 <?= h($storyName) ?></div>
         </div>
 
-        <form method="post" action="/cms/stories/detail-page/save" class="admin-form admin-form--wide" id="detailForm">
+        <form method="post" action="/cms/stories/detail-page/save" class="admin-form admin-form--wide" id="detailForm" enctype="multipart/form-data">
             <input type="hidden" name="story_id" value="<?= (int)($story['story_id'] ?? 0) ?>">
 
             <section class="story-cms-card">
@@ -67,6 +67,17 @@ $storyName = $story['name'] ?? 'Story';
                 </div>
                 <div class="story-cms-card__body">
                     <div class="story-cms-grid-2">
+
+                        <div class="admin-field story-cms-col-full">
+                            <label>Upload Hero Image</label>
+                            <input
+                                class="admin-input"
+                                type="file"
+                                name="hero_image_upload"
+                                accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
+                            >
+                            <span class="story-cms-hint">JPG, PNG, WebP, or GIF — max 10 MB. Leave empty to use path below.</span>
+                        </div>
 
                         <div class="admin-field story-cms-col-full">
                             <label>Hero Image <span class="story-cms-live-badge">live preview</span></label>
@@ -89,7 +100,7 @@ $storyName = $story['name'] ?? 'Story';
                                 value="<?= h($detailPage['hero_image'] ?? '') ?>"
                                 placeholder="/images/Stories/details/your-hero.jpg"
                             >
-                            <span class="story-cms-hint">Path relative to your public folder.</span>
+                            <span class="story-cms-hint">Path relative to your public folder. Or upload file above.</span>
                         </div>
 
                         <div class="admin-field story-cms-col-full">
@@ -135,6 +146,17 @@ $storyName = $story['name'] ?? 'Story';
                         </div>
 
                         <div class="admin-field story-cms-col-full">
+                            <label>Upload Article Image</label>
+                            <input
+                                class="admin-input"
+                                type="file"
+                                name="article_image_upload"
+                                accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
+                            >
+                            <span class="story-cms-hint">JPG, PNG, WebP, or GIF — max 10 MB. Leave empty to use path below.</span>
+                        </div>
+
+                        <div class="admin-field story-cms-col-full">
                             <label>Article Image <span class="story-cms-live-badge">live preview</span></label>
                             <div class="story-cms-preview" id="articlePreviewWrap">
                                 <?php if (!empty($detailPage['article_image'])): ?>
@@ -155,6 +177,7 @@ $storyName = $story['name'] ?? 'Story';
                                 value="<?= h($detailPage['article_image'] ?? '') ?>"
                                 placeholder="/images/Stories/details/article.jpg"
                             >
+                            <span class="story-cms-hint">Or upload file above.</span>
                         </div>
 
                         <div class="admin-field story-cms-col-full">

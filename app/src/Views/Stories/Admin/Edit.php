@@ -4,13 +4,20 @@ if (!function_exists('h')) {
         return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
     }
 }
+
+$isCreate = empty($story['story_id']);
+$pageTitle = $isCreate ? 'Add New Story' : 'Edit Story';
+$formAction = $isCreate ? '/cms/stories/store' : '/cms/stories/update';
+$submitButton = $isCreate ? '✨ Create Story' : '💾 Save Story';
+$csrfToken = $isCreate ? 'admin_stories_create' : 'admin_stories_edit';
+$formNote = $isCreate ? 'All fields with * are required.' : 'All changes are saved immediately on submit.';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Story — CMS</title>
+    <title><?= h($pageTitle) ?> — CMS</title>
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/Stories/storiescms.css?v=2">
 </head>
@@ -24,21 +31,29 @@ if (!function_exists('h')) {
             <span class="admin-breadcrumb-sep">/</span>
             <a href="/cms/stories">Stories</a>
             <span class="admin-breadcrumb-sep">/</span>
-            <span>Edit Story</span>
+            <span><?= h($pageTitle) ?></span>
         </nav>
 
         <div class="story-cms-header">
             <div>
-                <h1 class="admin-title">Edit Story</h1>
-                <p class="admin-lead">Update the story card details shown on the public site.</p>
+                <h1 class="admin-title"><?= h($pageTitle) ?></h1>
+                <p class="admin-lead">
+                    <?php if ($isCreate): ?>
+                        Create a new story card that will appear on the public site.
+                    <?php else: ?>
+                        Update the story card details shown on the public site.
+                    <?php endif; ?>
+                </p>
             </div>
 
-            <?php if (!empty($story['name'])): ?>
+            <?php if (!$isCreate && !empty($story['name'])): ?>
                 <div class="story-cms-badge">📖 <?= h($story['name']) ?></div>
+            <?php elseif ($isCreate): ?>
+                <div class="story-cms-badge">✨ New Story</div>
             <?php endif; ?>
         </div>
 
-        <form method="post" action="/cms/stories/update" class="admin-form admin-form--wide">
+        <form method="post" action="<?= h($formAction) ?>" class="admin-form admin-form--wide" enctype="multipart/form-data">
             <input type="hidden" name="story_id" value="<?= (int)($story['story_id'] ?? 0) ?>">
             <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
 
@@ -50,7 +65,7 @@ if (!function_exists('h')) {
 
                     <div class="story-cms-grid-2">
                         <div class="admin-field">
-                            <label for="name">Story Name</label>
+                            <label for="name">Story Name <?php if ($isCreate): ?>*<?php endif; ?></label>
                             <input
                                 class="admin-input <?= !empty($errors['name']) ? 'has-error' : '' ?>"
                                 type="text"
@@ -58,6 +73,7 @@ if (!function_exists('h')) {
                                 name="name"
                                 value="<?= h($story['name'] ?? '') ?>"
                                 placeholder="e.g. Winnie de Poeh"
+                                <?php if ($isCreate): ?>required<?php endif; ?>
                             >
                             <?php if (!empty($errors['name'])): ?>
                                 <span class="field-error"><?= h($errors['name']) ?></span>
@@ -65,7 +81,7 @@ if (!function_exists('h')) {
                         </div>
 
                         <div class="admin-field">
-                            <label for="slug">Slug</label>
+                            <label for="slug">Slug <?php if ($isCreate): ?>*<?php endif; ?></label>
                             <input
                                 class="admin-input <?= !empty($errors['slug']) ? 'has-error' : '' ?>"
                                 type="text"
@@ -73,6 +89,7 @@ if (!function_exists('h')) {
                                 name="slug"
                                 value="<?= h($story['slug'] ?? '') ?>"
                                 placeholder="e.g. winnie-de-poeh"
+                                <?php if ($isCreate): ?>required<?php endif; ?>
                             >
                             <span class="story-cms-hint">Used in the URL — lowercase, hyphens only.</span>
                             <?php if (!empty($errors['slug'])): ?>
@@ -82,12 +99,13 @@ if (!function_exists('h')) {
                     </div>
 
                     <div class="admin-field">
-                        <label for="description">Description</label>
+                        <label for="description">Description <?php if ($isCreate): ?>*<?php endif; ?></label>
                         <textarea
                             class="admin-input admin-textarea <?= !empty($errors['description']) ? 'has-error' : '' ?>"
                             id="description"
                             name="description"
                             placeholder="Short description shown on the story card..."
+                            <?php if ($isCreate): ?>required<?php endif; ?>
                         ><?= h($story['description'] ?? '') ?></textarea>
                         <?php if (!empty($errors['description'])): ?>
                             <span class="field-error"><?= h($errors['description']) ?></span>
@@ -99,12 +117,24 @@ if (!function_exists('h')) {
 
             <section class="story-cms-card">
                 <div class="story-cms-card__header">
-                    <h2 class="story-cms-card__title">Card Image</h2>
+                    <h2 class="story-cms-card__title">Card Image <?php if ($isCreate): ?>*<?php endif; ?></h2>
                 </div>
                 <div class="story-cms-card__body">
 
                     <div class="admin-field">
-                        <label for="image_path">Image Path</label>
+                        <label for="image_upload">Upload Story Image</label>
+                        <input
+                            class="admin-input"
+                            type="file"
+                            id="image_upload"
+                            name="image_upload"
+                            accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
+                        >
+                        <span class="story-cms-hint">JPG, PNG, WebP, or GIF — max 10 MB. <?php if ($isCreate): ?>Either upload or enter path below.<?php else: ?>Leave empty to keep current image.<?php endif; ?></span>
+                    </div>
+
+                    <div class="admin-field">
+                        <label for="image_path">Or Image Path <?php if ($isCreate): ?>*<?php endif; ?></label>
                         <input
                             class="admin-input <?= !empty($errors['image_path']) ? 'has-error' : '' ?>"
                             type="text"
@@ -113,6 +143,7 @@ if (!function_exists('h')) {
                             value="<?= h($story['image_path'] ?? '') ?>"
                             placeholder="/images/Stories/cards/my-story.jpg"
                             oninput="previewImg(this.value)"
+                            <?php if ($isCreate): ?>required<?php endif; ?>
                         >
                         <span class="story-cms-hint">Path relative to /public — for example: /images/Stories/cards/story.jpg</span>
                         <?php if (!empty($errors['image_path'])): ?>
@@ -135,11 +166,12 @@ if (!function_exists('h')) {
 
                     <div class="story-cms-grid-3">
                         <div class="admin-field">
-                            <label for="story_type">Story Type</label>
+                            <label for="story_type">Story Type <?php if ($isCreate): ?>*<?php endif; ?></label>
                             <select
                                 class="admin-input <?= !empty($errors['story_type']) ? 'has-error' : '' ?>"
                                 id="story_type"
                                 name="story_type"
+                                <?php if ($isCreate): ?>required<?php endif; ?>
                             >
                                 <option value="">— Select Type —</option>
                                 <option value="historical" <?= ($story['story_type'] ?? '') === 'historical' ? 'selected' : '' ?>>Historical</option>
@@ -156,7 +188,7 @@ if (!function_exists('h')) {
                         </div>
 
                         <div class="admin-field">
-                            <label for="age">Age Group</label>
+                            <label for="age">Age Group <?php if ($isCreate): ?>*<?php endif; ?></label>
                             <input
                                 class="admin-input"
                                 type="text"
@@ -164,6 +196,7 @@ if (!function_exists('h')) {
                                 name="age"
                                 value="<?= h($story['age'] ?? '') ?>"
                                 placeholder="e.g. 4+, 16+, All ages"
+                                <?php if ($isCreate): ?>required<?php endif; ?>
                             >
                             <?php if (!empty($errors['age'])): ?>
                                 <span class="field-error"><?= h($errors['age']) ?></span>
@@ -171,7 +204,7 @@ if (!function_exists('h')) {
                         </div>
 
                         <div class="admin-field">
-                            <label for="language">Language</label>
+                            <label for="language">Language <?php if ($isCreate): ?>*<?php endif; ?></label>
                             <input
                                 class="admin-input"
                                 type="text"
@@ -179,6 +212,7 @@ if (!function_exists('h')) {
                                 name="language"
                                 value="<?= h($story['language'] ?? '') ?>"
                                 placeholder="e.g. NL, ENG"
+                                <?php if ($isCreate): ?>required<?php endif; ?>
                             >
                             <?php if (!empty($errors['language'])): ?>
                                 <span class="field-error"><?= h($errors['language']) ?></span>
@@ -242,9 +276,9 @@ if (!function_exists('h')) {
             </section>
 
             <div class="admin-form-actions">
-                <span class="story-cms-form-note">All changes are saved immediately on submit.</span>
+                <span class="story-cms-form-note"><?= h($formNote) ?></span>
                 <a href="/cms/stories" class="admin-btn admin-btn-secondary">Cancel</a>
-                <button type="submit" class="admin-btn admin-btn-primary">💾 Save Story</button>
+                <button type="submit" class="admin-btn admin-btn-primary"><?= h($submitButton) ?></button>
             </div>
         </form>
 

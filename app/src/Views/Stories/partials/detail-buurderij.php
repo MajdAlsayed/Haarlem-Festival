@@ -9,7 +9,6 @@ $gallery    = json_decode((string)($detailPage['gallery']    ?? '[]'), true);
 if (!is_array($highlights)) $highlights = [];
 if (!is_array($gallery))    $gallery    = [];
 
-$venueText = $vm->getStoryVenueText();
 $ageText   = $vm->getStoryAgeText();
 $dayText   = $vm->getStoryDayText();
 $timeText  = $vm->getStoryTimeText();
@@ -89,7 +88,6 @@ $gallery3 = [
 
             <div class="buurderij-contribute-card">
                 <h3>Contribution (pay as you like)</h3>
-                <div class="buurderij-place-name"><?= h($venueText ?: 'Kweekcafé') ?></div>
 
                 <div class="buurderij-age-box">
                     <div class="buurderij-age-top">
@@ -125,15 +123,11 @@ $gallery3 = [
                     <strong>€0.00</strong>
                 </div>
 
-                <a href="/tickets" class="buurderij-reserve-btn">Reserve ›</a>
+                <a href="<?= h($vm->getTicketUrl()) ?>" class="buurderij-reserve-btn">Reserve ›</a>
             </div>
 
             <div class="buurderij-info-card buurderij-info-card--design">
                 <div class="buurderij-info-top">
-                    <div class="buurderij-info-block">
-                        <strong>Venue</strong>
-                        <span><?= h($venueText ?: 'Kweekcafe, Haarlem') ?></span>
-                    </div>
                     <div class="buurderij-info-block">
                         <strong>Day</strong>
                         <div class="buurderij-day-tabs buurderij-day-tabs-large">

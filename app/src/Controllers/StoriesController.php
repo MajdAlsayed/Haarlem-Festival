@@ -3,37 +3,56 @@
 namespace App\Controllers;
 
 use App\Repositories\StoriesRepository;
+use App\Repositories\StoriesSettingsRepository;
 use App\Services\StoriesService;
 use App\ViewModels\StoriesViewModel;
 use App\Exceptions\NotFoundException;
 
-// Main controller for Stories
 class StoriesController
 {
-    private const ALLOWED_DAYS = ['all', 'thursday', 'friday', 'saturday', 'sunday'];
-
+    /**
+     * @var StoriesService Service for story business logic
+     */
     private StoriesService $storiesService;
+
+    /**
+     * @var StoriesSettingsRepository Repository for stories settings
+     */
+    private StoriesSettingsRepository $settingsRepo;
 
     public function __construct()
     {
         // Using a Service to keep business logic separate
         $this->storiesService = new StoriesService(new StoriesRepository());
+        $this->settingsRepo = new StoriesSettingsRepository();
     }
 
+    /**
+     * Display stories home page
+     * @return void
+     */
     public function home(): void
     {
         // Get first 3 stories for featured cards on home page
         $allStories = $this->storiesService->getStoriesHomeData('all')['stories'] ?? [];
         $featured = array_slice($allStories, 0, 3);
         
+        // Fetch settings from database
+        $settings = $this->settingsRepo->getAll();
+        
         $data = [
             'featured' => $featured,
             'pageTitle' => 'Stories in Haarlem',
+            'settings' => $settings,
         ];
         $vm = new StoriesViewModel($data, 'all');
         require __DIR__ . '/../Views/Stories/Home.php';
     }
 
+    /**
+     * Display stories filtered by day
+     * @return void
+     */
     public function events(): void
     {
         // Get the day filter from user
@@ -42,10 +61,20 @@ class StoriesController
         // Fetch stories and prepare for display
         $data = $this->storiesService->getStoriesHomeData($day);
         $data['pageTitle'] = 'Stories in Haarlem';
+        
+        // Fetch settings from database
+        $settings = $this->settingsRepo->getAll();
+        $data['settings'] = $settings;
+        
         $vm = new StoriesViewModel($data, $day);
         require __DIR__ . '/../Views/Stories/Events.php';
     }
 
+    /**
+     * Display single story detail page
+     * @return void
+     * @throws NotFoundException If story ID is invalid or story not found
+     */
     public function detail(): void
     {
         $id = filter_var($_GET['id'] ?? 0, FILTER_VALIDATE_INT, [
@@ -69,6 +98,10 @@ class StoriesController
     }
 
 
+    /**
+     * Provide stories data as JSON API endpoint
+     * @return void Outputs JSON and exits
+     */
     public function apiStories(): void
     {
         $day  = $this->normalizeDay($_GET['day'] ?? 'all');
@@ -76,10 +109,10 @@ class StoriesController
 
         $stories = $data['stories'] ?? [];
 
-        // Only expose the fields the frontend needs — never leak internal IDs blindly
         $output = array_map(function (array $s): array {
             return [
                 'story_id'    => (int)($s['story_id']   ?? 0),
+                'ticket_details_id' => (int)($s['ticket_details_id'] ?? 0),
                 'name'        => $s['story_name']  ?? $s['name']       ?? '',
                 'description' => $s['description'] ?? '',
                 'image_path'  => $s['image_path']  ?? '',
@@ -90,8 +123,6 @@ class StoriesController
                 'audience'    => $s['audience']    ?? '',
                 'event_day'   => $s['event_day']   ?? '',
                 'start_time'  => $s['start_time']  ?? '',
-                'venue_name'  => $s['venue_name']  ?? '',
-                'venue_city'  => $s['venue_city']  ?? '',
             ];
         }, $stories);
 
@@ -106,6 +137,15 @@ class StoriesController
         exit;
     }
 
+     /**
+     * @var array Allowed day values for filtering
+     */
+    private const ALLOWED_DAYS = ['all', 'thursday', 'friday', 'saturday', 'sunday'];
+
+
+    /**
+     * Normalize and validate day input
+     */
     private function normalizeDay(string $input): string
     {
         $day = strtolower(trim($input));

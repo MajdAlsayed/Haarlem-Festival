@@ -9,7 +9,6 @@ $gallery    = json_decode((string)($detailPage['gallery']    ?? '[]'), true);
 if (!is_array($highlights)) $highlights = [];
 if (!is_array($gallery))    $gallery    = [];
 
-$venueText = $vm->getStoryVenueText();
 $ageText   = $vm->getStoryAgeText();
 $dayText   = $vm->getStoryDayText();
 $timeText  = $vm->getStoryTimeText();
@@ -53,9 +52,6 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
                 <img src="<?= h($posterImage) ?>" alt="<?= h($story['name'] ?? 'Story') ?>">
             </div>
             <div class="omdenken-event-meta">
-                <?php if ($venueText): ?>
-                    <div class="omdenken-meta-line"><span>Venue :</span> <?= h($venueText) ?></div>
-                <?php endif; ?>
                 <?php if ($ageText): ?>
                     <div class="omdenken-meta-line"><span>Age Group :</span> <?= h($ageText) ?></div>
                 <?php endif; ?>
@@ -157,7 +153,7 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
         </div>
 
         <div class="omdenken-ticket-row">
-            <a class="omdenken-ticket-btn" href="/tickets">BUY TICKETS</a>
+            <a class="omdenken-ticket-btn" href="<?= h($vm->getTicketUrl()) ?>">BUY TICKETS</a>
         </div>
 
     </section>

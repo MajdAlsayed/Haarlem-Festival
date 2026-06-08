@@ -160,36 +160,6 @@ $selectedDay = $vm->selectedDay ?? 'all';
     </section>
 
     <!-- Map section -->
-    <section class="stories-map-section" aria-label="Venue map">
-        <h2 class="stories-map-title">Places To Visit For Events</h2>
-        <p class="stories-map-subtitle">Location: Haarlem, Netherlands</p>
-
-        <div class="map-venue-buttons" id="mapVenueButtons">
-            <button type="button" class="map-venue-btn" data-lat="52.40385" data-lng="4.64628">Verhalenhuis Haarlem</button>
-            <button type="button" class="map-venue-btn" data-lat="52.3818"  data-lng="4.63931">Schuur</button>
-            <button type="button" class="map-venue-btn" data-lat="52.39613" data-lng="4.63569">Kweekcafé</button>
-            <button type="button" class="map-venue-btn" data-lat="52.38227" data-lng="4.6354" >Ten Boom Museum</button>
-            <button type="button" class="map-venue-btn" data-lat="52.37631" data-lng="4.59906">Elswout Theater</button>
-        </div>
-
-        <div class="stories-map-frame">
-            <iframe
-                id="storiesMap"
-                src="https://www.google.com/maps/d/u/0/embed?mid=1Y0K04QlhJ-dwhjVOe-8iT3bFJQ5yPAw&ll=52.387877486255384%2C4.630817341343083&z=14"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-                allowfullscreen
-                title="Haarlem stories venues map">
-            </iframe>
-        </div>
-
-        <a class="btn-map"
-           href="https://www.google.com/maps/d/u/0/viewer?mid=1Y0K04QlhJ-dwhjVOe-8iT3bFJQ5yPAw&ll=52.387877486255384%2C4.630817341343083&z=14"
-           target="_blank" rel="noopener noreferrer">
-            View Live Map ›
-        </a>
-    </section>
-
 </main>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
@@ -222,14 +192,10 @@ $selectedDay = $vm->selectedDay ?? 'all';
         const name     = DOMPurify.sanitize(s.name        || 'Story');
         const day      = DOMPurify.sanitize(s.event_day   ? s.event_day.charAt(0).toUpperCase() + s.event_day.slice(1) : '');
         const time     = DOMPurify.sanitize(s.start_time  || '');
-        const venue    = DOMPurify.sanitize(s.venue_name  || '');
-        const city     = DOMPurify.sanitize(s.venue_city  || '');
         const lang     = DOMPurify.sanitize(s.language    || '');
         const age      = DOMPurify.sanitize(s.age         || '');
         const desc     = DOMPurify.sanitize(s.description || '');
         const storyId  = parseInt(s.story_id, 10) || 0;
-
-        const venueLine = venue + (city ? ', ' + city : '');
 
         const langRow = lang
             ? `<div class="meta-row"><span class="meta-ico">🌐</span><span>Lang: ${lang}</span></div>`
@@ -251,10 +217,6 @@ $selectedDay = $vm->selectedDay ?? 'all';
                         <div class="meta-row">
                             <span class="meta-ico">📅</span>
                             <span>${day} ${time}</span>
-                        </div>
-                        <div class="meta-row">
-                            <span class="meta-ico">📍</span>
-                            <span>${venueLine}</span>
                         </div>
                         ${langRow}
                         ${ageRow}
@@ -293,35 +255,6 @@ $selectedDay = $vm->selectedDay ?? 'all';
         });
 
     /* ── 2. Map venue buttons (Lecture 5: addEventListener, no inline onclick) ── */
-
-    const mapFrame   = document.getElementById('storiesMap');
-    const mapButtons = document.getElementById('mapVenueButtons');
-    const MAP_MID    = '1Y0K04QlhJ-dwhjVOe-8iT3bFJQ5yPAw';
-    const MAP_ZOOM   = 16;
-
-    if (mapFrame && mapButtons) {
-        mapButtons.addEventListener('click', function (e) {
-            const btn = e.target.closest('.map-venue-btn');
-            if (!btn) return;
-
-            const lat = btn.dataset.lat;
-            const lng = btn.dataset.lng;
-            if (!lat || !lng) return;
-
-            mapFrame.src = 'https://www.google.com/maps/d/u/0/embed?mid='
-                + MAP_MID
-                + '&ll=' + encodeURIComponent(lat + ',' + lng)
-                + '&z='  + MAP_ZOOM;
-
-            mapFrame.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            // Update active state
-            mapButtons.querySelectorAll('.map-venue-btn').forEach(function (b) {
-                b.classList.remove('active');
-            });
-            btn.classList.add('active');
-        });
-    }
 
 })();
 </script>

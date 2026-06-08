@@ -18,7 +18,6 @@ $storyName  = $story['name']        ?? '';
 $storyDesc  = $story['description'] ?? '';
 $storyImage = $story['image_path']  ?? '/images/Stories/cards/default.jpg';
 
-$venueText = $vm->getStoryVenueText();
 $ageText   = $vm->getStoryAgeText();
 $dayText   = $vm->getStoryDayText();
 $timeText  = $vm->getStoryTimeText();
@@ -61,9 +60,6 @@ $tags = array_filter([
                 </div>
             <?php endif; ?>
             <h1 class="generic-hero-title"><?= h($heroTitle) ?></h1>
-            <?php if ($venueText): ?>
-                <p class="generic-hero-venue">📍 <?= h($venueText) ?></p>
-            <?php endif; ?>
         </div>
     </div>
 
@@ -161,12 +157,6 @@ $tags = array_filter([
                 <h3 class="generic-info-heading">Event Info</h3>
 
                 <dl class="generic-info-list">
-                    <?php if ($venueText): ?>
-                        <div class="generic-info-row">
-                            <dt>📍 Venue</dt>
-                            <dd><?= h($venueText) ?></dd>
-                        </div>
-                    <?php endif; ?>
                     <?php if ($dayText): ?>
                         <div class="generic-info-row">
                             <dt>📅 Day</dt>
@@ -203,7 +193,7 @@ $tags = array_filter([
                     <p class="generic-ticket-note">
                         Reservation is required to guarantee entry. Seats are limited.
                     </p>
-                    <a href="/tickets" class="generic-ticket-btn">
+                    <a href="<?= h($vm->getTicketUrl()) ?>" class="generic-ticket-btn">
                         Buy Tickets &rsaquo;
                     </a>
                 </div>

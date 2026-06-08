@@ -7,6 +7,10 @@ function h($s) {
 }
 
 $selectedDay = $vm->selectedDay ?? 'all';
+$heroImage1 = $vm->settings['events_hero_image_1'] ?? '/images/Stories/event-main1.png';
+$heroImage2 = $vm->settings['events_hero_image_2'] ?? '/images/Stories/event-main2.png';
+$heroImage1 = trim((string)$heroImage1) !== '' ? $heroImage1 : '/images/Stories/event-main1.png';
+$heroImage2 = trim((string)$heroImage2) !== '' ? $heroImage2 : '/images/Stories/event-main2.png';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +20,7 @@ $selectedDay = $vm->selectedDay ?? 'all';
     <title><?= h($vm->pageTitle ?? 'Events - Haarlem Stories') ?></title>
 
     <link rel="stylesheet" href="/css/style.css?v=<?= h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/Stories/events.css?v=<?= h($app['css_version'] ?? '1') ?>">
+    <link rel="stylesheet" href="/css/Stories/events.css?v=<?= h($app['css_version'] ?? '1') ?>-eventmain">
 </head>
 
 <body class="stories-events-page">
@@ -24,6 +28,16 @@ $selectedDay = $vm->selectedDay ?? 'all';
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main>
+
+    <!-- Hero banner -->
+    <section class="stories-hero-banner" aria-label="Events hero images">
+        <div class="hero-img hero-img-left" style="background-image: url('<?= h($heroImage1) ?>');" role="img" aria-label="Events banner image 1"></div>
+        <div class="hero-img hero-img-right" style="background-image: url('<?= h($heroImage2) ?>');" role="img" aria-label="Events banner image 2"></div>
+        <div class="hero-overlay">
+            <h1><?= h($vm->settings['events_hero_heading'] ?? 'The Event of Haarlem Stories') ?></h1>
+            <p><?= h($vm->settings['events_hero_tagline'] ?? 'Experience Haarlem Through Stories – Past, Present & Future.') ?></p>
+        </div>
+    </section>
 
     <!-- Breadcrumb -->
     <nav class="stories-breadcrumb" aria-label="Breadcrumb">
@@ -36,20 +50,21 @@ $selectedDay = $vm->selectedDay ?? 'all';
         </div>
     </nav>
 
-    <!-- Section header -->
-    <div class="stories-hero">
-        <h1>Events of Haarlem Stories</h1>
-        <p class="stories-subtitle">
-            Discover the best of Haarlem through various storytelling experiences.<br>
-            Check age labels for each event.
-        </p>
-    </div>
+    <!-- Intro section -->
+    <section class="stories-heading-section">
+        <div class="stories-heading-inner">
+            <h2 class="stories-heading-title"><?= h($vm->settings['events_intro_heading'] ?? 'Discover Stories Across Haarlem') ?></h2>
+            <p class="stories-heading-text">
+                <?= h($vm->settings['events_intro_text'] ?? 'Explore storytelling events across Haarlem and discover experiences for different ages and interests. From playful family stories to inspiring talks and unique performances, each venue offers its own special atmosphere and story.') ?>
+            </p>
+        </div>
+    </section>
 
     <!-- Schedule / day filter -->
     <section class="schedule-section" aria-label="Day filter and schedule">
 
         <div class="schedule-row">
-            <div class="schedule-label">Select the Day:</div>
+            <div class="schedule-label"><?= h($vm->settings['events_schedule_label'] ?? 'Select the Day:') ?></div>
             <div class="schedule-content">
                 <div class="day-tabs day-tabs-inline">
                     <?php
@@ -130,37 +145,6 @@ $selectedDay = $vm->selectedDay ?? 'all';
         </div>
     </section>
 
-    <!-- Map section -->
-    <section class="stories-map-section" aria-label="Venue map">
-        <h2 class="stories-map-title">Places To Visit For Events</h2>
-        <p class="stories-map-subtitle">Location: Haarlem, Netherlands</p>
-
-        <div class="map-venue-buttons" id="mapVenueButtons">
-            <button type="button" class="map-venue-btn" data-lat="52.40385" data-lng="4.64628">Verhalenhuis Haarlem</button>
-            <button type="button" class="map-venue-btn" data-lat="52.3818"  data-lng="4.63931">Schuur</button>
-            <button type="button" class="map-venue-btn" data-lat="52.39613" data-lng="4.63569">Kweekcafé</button>
-            <button type="button" class="map-venue-btn" data-lat="52.38227" data-lng="4.6354" >Ten Boom Museum</button>
-            <button type="button" class="map-venue-btn" data-lat="52.37631" data-lng="4.59906">Elswout Theater</button>
-        </div>
-
-        <div class="stories-map-frame">
-            <iframe
-                id="storiesMap"
-                src="https://www.google.com/maps/d/u/0/embed?mid=1Y0K04QlhJ-dwhjVOe-8iT3bFJQ5yPAw&ll=52.387877486255384%2C4.630817341343083&z=14"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-                allowfullscreen
-                title="Haarlem stories venues map">
-            </iframe>
-        </div>
-
-        <a class="btn-map"
-           href="https://www.google.com/maps/d/u/0/viewer?mid=1Y0K04QlhJ-dwhjVOe-8iT3bFJQ5yPAw&ll=52.387877486255384%2C4.630817341343083&z=14"
-           target="_blank" rel="noopener noreferrer">
-            View Live Map ›
-        </a>
-    </section>
-
 </main>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
@@ -169,7 +153,93 @@ $selectedDay = $vm->selectedDay ?? 'all';
     DOMPurify — sanitises API data before writing to innerHTML.
     Lecture 6 requirement: "use a library like DOMPurify to handle sanitization".
 -->
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
-<script src="/js/Stories/cards.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js"></script>
+
+<script>
+(function () {
+
+    /* ── 1. Story cards via fetch() (Lecture 6) ── */
+
+    const grid    = document.getElementById('storiesGrid');
+    const loading = document.getElementById('cardsLoading');
+
+    // Read the current day filter from PHP so the API call matches the page
+    const currentDay = <?= json_encode($selectedDay) ?>;
+
+    const apiUrl = '/api/stories' + (currentDay !== 'all' ? '?day=' + encodeURIComponent(currentDay) : '');
+
+    /**
+     * Build one card's HTML string from an API story object.
+     * Every value is passed through DOMPurify.sanitize() before use in innerHTML.
+     */
+    function buildCard(s) {
+        const img      = DOMPurify.sanitize(s.image_path  || '/images/Stories/cards/default.jpg');
+        const name     = DOMPurify.sanitize(s.name        || 'Story');
+        const day      = DOMPurify.sanitize(s.event_day   ? s.event_day.charAt(0).toUpperCase() + s.event_day.slice(1) : '');
+        const time     = DOMPurify.sanitize(s.start_time  || '');
+        const lang     = DOMPurify.sanitize(s.language    || '');
+        const age      = DOMPurify.sanitize(s.age         || '');
+        const desc     = DOMPurify.sanitize(s.description || '');
+        const storyId  = parseInt(s.story_id, 10) || 0;
+
+        const langRow = lang
+            ? `<div class="meta-row"><span class="meta-ico">🌐</span><span>Lang: ${lang}</span></div>`
+            : '';
+
+        const ageRow = age
+            ? `<div class="meta-row"><span class="meta-ico">🔞</span><span>Age ${age}</span></div>`
+            : '';
+
+        return `
+            <article class="stories-card">
+                <div class="stories-card-img"
+                     style="background-image:url('${img}')"
+                     role="img"
+                     aria-label="${name}"></div>
+                <div class="stories-card-body">
+                    <h3 class="stories-card-title">${name}</h3>
+                    <div class="stories-card-meta">
+                        <div class="meta-row">
+                            <span class="meta-ico">📅</span>
+                            <span>${day} ${time}</span>
+                        </div>
+                        ${langRow}
+                        ${ageRow}
+                    </div>
+                    <p class="stories-card-desc">${desc}</p>
+                    <div class="stories-card-actions">
+                        <a class="card-btn primary" href="/tickets">BUY TICKETS</a>
+                        <a class="card-btn outline" href="/stories/detail?id=${storyId}">MORE INFO</a>
+                    </div>
+                </div>
+            </article>`;
+    }
+
+    // Fetch stories from the JSON API
+    fetch(apiUrl)
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(function (data) {
+            loading.remove();
+
+            if (!data.stories || data.stories.length === 0) {
+                grid.innerHTML = '<p style="color:#cfcfcf;padding:20px;">No stories found.</p>';
+                return;
+            }
+
+            // Build all cards and inject in one operation
+            grid.innerHTML = data.stories.map(buildCard).join('');
+        })
+        .catch(function (err) {
+            console.error('Failed to load stories:', err);
+            loading.innerHTML = '<p style="color:#cfcfcf;">Could not load stories. Please refresh the page.</p>';
+        });
+
+})();
+</script>
 </body>
 </html>

@@ -8,8 +8,16 @@ use App\Exceptions\AppException;
 use PDO;
 use PDOException;
 
+
 class StoriesRepository extends Repository implements IStoriesRepository
 {
+    /**
+     * Get stories filtered by day
+     * 
+     * @param string|null $day Optional day filter (thursday, friday, saturday, sunday)
+     * @return array Array of story records with associated event data
+     * @throws AppException If database query fails
+     */
     public function getStories(?string $day = null): array
     {
         try {
@@ -26,19 +34,27 @@ class StoriesRepository extends Repository implements IStoriesRepository
                     s.language,
                     s.template,
                     COALESCE(s.audience, '') AS audience,
-                    s.venue_id,
                     s.event_id,
                     e.event_day,
                     e.start_time,
                     e.end_time,
-                    e.title AS event_title
+                    e.title AS event_title,
+                    (
+                        SELECT td.ticket_details_id
+                        FROM ticket_details td
+                        WHERE td.event_id = s.event_id
+                          AND td.ticket_type = 'event_ticket'
+                        ORDER BY td.sort_order ASC, td.ticket_details_id ASC
+                        LIMIT 1
+                    ) AS ticket_details_id
                 FROM stories s
                 LEFT JOIN events e ON e.event_id = s.event_id
             ";
 
             $params = [];
 
-            if (!empty($day) && strtolower(trim($day)) !== 'all') {
+            if (!empty($day) && strtolower(trim($day)) !== 'all') 
+            {
                 $sql .= " WHERE LOWER(TRIM(e.event_day)) = :day";
                 $params['day'] = strtolower(trim($day));
             }
@@ -49,19 +65,27 @@ class StoriesRepository extends Repository implements IStoriesRepository
                     e.start_time ASC
             ";
 
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute($params);
+            $result = $this->db->prepare($sql);
+            $result->execute($params);
 
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
+            return $result->fetchAll(PDO::FETCH_ASSOC);
+        } 
+        catch (PDOException $e) 
+        {
             throw new AppException('Unable to fetch stories. Please try again later.');
         }
     }
 
+    /**
+     * Get a single story by ID
+     * @param int $storyId The ID of the story to retrieve
+     * @return array|null Story record or null if not found
+     * @throws AppException If database query fails
+     */
     public function getStoryById(int $storyId): ?array
     {
         try {
-            $stmt = $this->db->prepare("
+            $result = $this->db->prepare("
                 SELECT
                     s.story_id,
                     s.name,
@@ -73,62 +97,82 @@ class StoriesRepository extends Repository implements IStoriesRepository
                     s.language,
                     s.template,
                     COALESCE(s.audience, '') AS audience,
-                    s.venue_id,
                     s.event_id,
                     e.event_day,
                     e.start_time,
                     e.end_time,
-                    e.title AS event_title
+                    e.title AS event_title,
+                    (
+                        SELECT td.ticket_details_id
+                        FROM ticket_details td
+                        WHERE td.event_id = s.event_id
+                          AND td.ticket_type = 'event_ticket'
+                        ORDER BY td.sort_order ASC, td.ticket_details_id ASC
+                        LIMIT 1
+                    ) AS ticket_details_id
                 FROM stories s
                 LEFT JOIN events e ON e.event_id = s.event_id
                 WHERE s.story_id = :id
                 LIMIT 1
             ");
 
-            $stmt->execute(['id' => $storyId]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $result->execute(['id' => $storyId]);
+            $row = $result->fetch(PDO::FETCH_ASSOC);
 
             return $row ?: null;
-        } catch (PDOException $e) {
+        } 
+        catch (PDOException $e)
+       {
             throw new AppException('Unable to fetch story data. Please try again later.');
         }
     }
 
+    /**
+     * Get all stories for admin panel
+     * @return array Array of all story records
+     * @throws AppException If database query fails
+     */
     public function getAllStoriesForAdmin(): array
     {
         try {
-            $stmt = $this->db->query("
+            $result = $this->db->query("
                 SELECT
                     story_id, name, slug, description,
                     image_path, story_type, age, language, template,
                     COALESCE(audience, '') AS audience,
-                    venue_id, event_id
+                    event_id
                 FROM stories
                 ORDER BY story_id ASC
             ");
 
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $result->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw new AppException('Unable to fetch stories. Please try again later.');
         }
     }
 
+    /**
+     * Get story by slug
+     * @param string $slug The slug of the story to retrieve
+     * @return array|null Story record or null if not found
+     * @throws AppException If database query fails
+     */
     public function getStoryBySlug(string $slug): ?array
     {
         try {
-            $stmt = $this->db->prepare("
+            $result = $this->db->prepare("
                 SELECT
                     story_id, name, slug, description,
                     image_path, story_type, age, language, template,
                     COALESCE(audience, '') AS audience,
-                    venue_id, event_id
+                    event_id
                 FROM stories
                 WHERE slug = :slug
                 LIMIT 1
             ");
 
-            $stmt->execute(['slug' => trim($slug)]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $result->execute(['slug' => trim($slug)]);
+            $row = $result->fetch(PDO::FETCH_ASSOC);
 
             return $row ?: null;
         } catch (PDOException $e) {
@@ -136,17 +180,26 @@ class StoriesRepository extends Repository implements IStoriesRepository
         }
     }
 
+    /**
+     * Create a new story
+     * @param array $data Story data (name, slug, description, image_path, etc.)
+     * @return int The ID of the newly created story
+     * @throws AppException If database insert fails
+     */
     public function createStory(array $data): int
     {
         try {
-            $stmt = $this->db->prepare("
+            $eventId = (int)($data['event_id'] ?? 0);
+            $venueId = $this->getVenueIdForEvent($eventId);
+
+            $result = $this->db->prepare("
                 INSERT INTO stories
                     (name, slug, description, image_path, story_type, age, language, template, event_id, venue_id)
                 VALUES
                     (:name, :slug, :description, :image_path, :story_type, :age, :language, :template, :event_id, :venue_id)
             ");
 
-            $stmt->execute([
+            $result->execute([
                 'name'        => $data['name'],
                 'slug'        => $data['slug'],
                 'description' => $data['description'],
@@ -155,8 +208,8 @@ class StoriesRepository extends Repository implements IStoriesRepository
                 'age'         => $data['age'],
                 'language'    => $data['language'],
                 'template'    => isset($data['template']) && $data['template'] !== '' ? $data['template'] : 'generic',
-                'event_id'    => (int)($data['event_id']  ?? 0),
-                'venue_id'    => (int)($data['venue_id']  ?? 0),
+                'event_id'    => $eventId,
+                'venue_id'    => $venueId,
             ]);
 
             return (int)$this->db->lastInsertId();
@@ -166,9 +219,19 @@ class StoriesRepository extends Repository implements IStoriesRepository
     }
 
 
+    /**
+     * Update an existing story
+     * @param int $storyId The ID of the story to update
+     * @param array $data Story data to update
+     * @return bool True if update successful, false otherwise
+     * @throws AppException If database update fails
+     */
     public function updateStory(int $storyId, array $data): bool
     {
         try {
+            $eventId = (int)($data['event_id'] ?? 0);
+            $venueId = $this->getVenueIdForEvent($eventId);
+
             $sql = "
                 UPDATE stories SET
                     name        = :name,
@@ -179,7 +242,8 @@ class StoriesRepository extends Repository implements IStoriesRepository
                     age         = :age,
                     language    = :language,
                     template    = :template,
-                    event_id    = :event_id
+                    event_id    = :event_id,
+                    venue_id    = :venue_id
                 WHERE story_id  = :story_id
             ";
 
@@ -192,38 +256,51 @@ class StoriesRepository extends Repository implements IStoriesRepository
                 'age'         => $data['age'],
                 'language'    => $data['language'],
                 'template'    => isset($data['template']) && $data['template'] !== '' ? $data['template'] : 'generic',
-                'event_id'    => (int)($data['event_id'] ?? 0),
+                'event_id'    => $eventId,
+                'venue_id'    => $venueId,
                 'story_id'    => $storyId,
             ];
 
-            $stmt = $this->db->prepare($sql);
-            return $stmt->execute($params);
+            $result = $this->db->prepare($sql);
+            return $result->execute($params);
         } catch (PDOException $e) {
             throw new AppException('Unable to update story. Please try again later.');
         }
     }
 
+    /**
+     * Delete a story
+     * @param int $storyId The ID of the story to delete
+     * @return bool True if deletion successful, false otherwise
+     * @throws AppException If database delete fails
+     */
     public function deleteStory(int $storyId): bool
     {
         try {
-            $stmt = $this->db->prepare("DELETE FROM stories WHERE story_id = :story_id");
-            return $stmt->execute(['story_id' => $storyId]);
+            $result = $this->db->prepare("DELETE FROM stories WHERE story_id = :story_id");
+            return $result->execute(['story_id' => $storyId]);
         } catch (PDOException $e) {
             throw new AppException('Unable to delete story. Please try again later.');
         }
     }
 
+    /**
+     * Get detail page by story ID
+     * @param int $storyId The ID of the story to get detail page for
+     * @return array|null Detail page record or null if not found
+     * @throws AppException If database query fails
+     */
     public function getDetailPageByStoryId(int $storyId): ?array
     {
         try {
-            $stmt = $this->db->prepare("
+            $result = $this->db->prepare("
                 SELECT * FROM story_detail_pages
                 WHERE story_id = :story_id
                 LIMIT 1
             ");
 
-            $stmt->execute(['story_id' => $storyId]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $result->execute(['story_id' => $storyId]);
+            $row = $result->fetch(PDO::FETCH_ASSOC);
 
             return $row ?: null;
         } catch (PDOException $e) {
@@ -231,22 +308,35 @@ class StoriesRepository extends Repository implements IStoriesRepository
         }
     }
 
+    /**
+     * Check if story has a detail page
+     * @param int $storyId The ID of the story to check
+     * @return bool True if detail page exists, false otherwise
+     * @throws AppException If database query fails
+     */
     public function hasDetailPage(int $storyId): bool
     {
         try {
-            $stmt = $this->db->prepare("
+            $result = $this->db->prepare("
                 SELECT 1 FROM story_detail_pages
                 WHERE story_id = :story_id
                 LIMIT 1
             ");
 
-            $stmt->execute(['story_id' => $storyId]);
-            return (bool)$stmt->fetchColumn();
+            $result->execute(['story_id' => $storyId]);
+            return (bool)$result->fetchColumn();
         } catch (PDOException $e) {
             throw new AppException('Unable to check story detail page. Please try again later.');
         }
     }
 
+    /**
+     * Save or update story detail page
+     * @param int $storyId The ID of the story
+     * @param array $data Detail page data with fields like hero_image, article_*, highlights, gallery
+     * @return bool True if save successful, false otherwise
+     * @throws AppException If database operation fails
+     */
     public function saveDetailPage(int $storyId, array $data): bool
     {
         try {
@@ -268,7 +358,9 @@ class StoriesRepository extends Repository implements IStoriesRepository
                         gallery                = :gallery
                     WHERE story_id = :story_id
                 ";
-            } else {
+            } 
+            else 
+            {
                 $sql = "
                     INSERT INTO story_detail_pages (
                         story_id, hero_image, hero_heading, hero_description,
@@ -284,9 +376,9 @@ class StoriesRepository extends Repository implements IStoriesRepository
                 ";
             }
 
-            $stmt = $this->db->prepare($sql);
+            $result = $this->db->prepare($sql);
 
-            return $stmt->execute([
+            return $result->execute([
                 'story_id'              => $storyId,
                 'hero_image'            => $data['hero_image']            ?? null,
                 'hero_heading'          => $data['hero_heading']          ?? null,
@@ -300,8 +392,22 @@ class StoriesRepository extends Repository implements IStoriesRepository
                 'highlights'            => $data['highlights']            ?? null,
                 'gallery'               => $data['gallery']               ?? null,
             ]);
-        } catch (PDOException $e) {
+        } 
+        catch (PDOException $e) 
+        {
             throw new AppException('Unable to save story detail page. Please try again later.');
         }
+    }
+
+    private function getVenueIdForEvent(int $eventId): int
+    {
+        if ($eventId <= 0) {
+            return 0;
+        }
+
+        $result = $this->db->prepare("SELECT venue_id FROM events WHERE event_id = :event_id LIMIT 1");
+        $result->execute(['event_id' => $eventId]);
+
+        return (int)$result->fetchColumn();
     }
 }

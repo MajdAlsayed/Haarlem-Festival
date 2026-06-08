@@ -8,11 +8,19 @@ use App\Exceptions\NotFoundException;
 
 class StoriesService implements StoriesServiceInterface
 {
+    /**
+     * @var IStoriesRepository Repository dependency for data access
+     */
     public function __construct(private IStoriesRepository $repo)
     {
     }
 
 
+    /**
+     * Get stories data for home page display
+     * @param string|null $day Optional day filter (all, thursday, friday, saturday, sunday)
+     * @return array Associative array with 'stories' and 'schedule' keys
+     */
     public function getStoriesHomeData(?string $day = null): array
     {
         $stories = $this->repo->getStories($day);
@@ -23,6 +31,11 @@ class StoriesService implements StoriesServiceInterface
         ];
     }
 
+    /**
+     * @param int $storyId The ID of the story to retrieve
+     * @return array Associative array with 'story' and 'detailPage' keys
+     * @throws NotFoundException If story is not found
+     */
     public function getStoryDetailData(int $storyId): array
     {
         $story = $this->repo->getStoryById($storyId);
@@ -39,37 +52,73 @@ class StoriesService implements StoriesServiceInterface
 
 
 
+    /**
+     * Get all stories for admin listing
+     * @return array Array of all story records
+     */
     public function getAllStoriesForAdmin(): array
     {
         return $this->repo->getAllStoriesForAdmin();
     }
 
+    /**
+     * Get story data for editing
+     * @param int $storyId The ID of the story to retrieve
+     * @return array|null Story record or null if not found
+     */
     public function getStoryForEdit(int $storyId): ?array
     {
         return $this->repo->getStoryById($storyId);
     }
 
+    /**
+     * Create a new story
+     * @param array $data Story data (name, slug, description, image_path, etc.)
+     * @return int The ID of the newly created story
+     */
     public function createStory(array $data): int
     {
         return $this->repo->createStory($data);
     }
 
+    /**
+     * Update an existing story
+     * @param int $storyId The ID of the story to update
+     * @param array $data Story data to update
+     * @return bool True if update successful, false otherwise
+     */
     public function updateStory(int $storyId, array $data): bool
     {
         return $this->repo->updateStory($storyId, $data);
     }
 
+    /**
+     * Delete a story
+     * @param int $storyId The ID of the story to delete
+     * @return bool True if deletion successful, false otherwise
+     */
     public function deleteStory(int $storyId): bool
     {
         return $this->repo->deleteStory($storyId);
     }
 
+    /**
+     * Check if story has a detail page
+     * @param int $storyId The ID of the story to check
+     * @return bool True if detail page exists, false otherwise
+     */
     public function hasDetailPage(int $storyId): bool
     {
         return $this->repo->hasDetailPage($storyId);
     }
 
 
+    /**
+     * Get story detail page for CMS editing
+     * @param string $slug The slug of the story to retrieve
+     * @return array Associative array with 'story' and 'detailPage' keys
+     * @throws NotFoundException If story with slug not found
+     */
     public function getDetailPageForCms(string $slug): array
     {
         $story = $this->repo->getStoryBySlug($slug);
@@ -86,6 +135,12 @@ class StoriesService implements StoriesServiceInterface
         ];
     }
 
+    /**
+     * Save or update story detail page
+     * @param int $storyId The ID of the story
+     * @param array $data Detail page data (hero_image, article_*, highlights, gallery, etc.)
+     * @return bool True if save successful, false otherwise
+     */
     public function saveDetailPage(int $storyId, array $data): bool
     {
         $highlights = isset($data['highlights']) && is_array($data['highlights'])
@@ -114,6 +169,12 @@ class StoriesService implements StoriesServiceInterface
     }
 
 
+    /**
+     * Build schedule structure from stories
+     *
+     * @param array $stories Array of story records with language and event_day fields
+     * @return array Schedule organized by language and day
+     */
     private function buildSchedule(array $stories): array
     {
         $out = ['NL' => [], 'ENG' => []];
