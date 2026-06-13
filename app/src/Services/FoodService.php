@@ -12,6 +12,7 @@ use App\Repositories\CartRepository;
 use App\Repositories\FoodSettingsRepository;
 use App\Repositories\RestaurantRepository;
 use App\Repositories\ReservationRepository;
+use App\Repositories\TicketRepository;
 
 final class FoodService
 {
@@ -204,7 +205,16 @@ final class FoodService
 
     private function addToCart(int $ticketDetailsId): void
     {
-        $cartService = new \App\Services\CartService(new CartRepository());
+        $cartRepository = new CartRepository();
+
+        $cartService = new CartService(
+            $cartRepository,
+            new TicketAvailabilityService(
+                $cartRepository,
+                new TicketRepository()
+            )
+        );
+
         $cartService->addItem($ticketDetailsId, 1);
     }
 }

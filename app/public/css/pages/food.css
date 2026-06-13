@@ -1,0 +1,588 @@
+/* ========== FOOD PAGE ========== */
+
+.food-page main {
+    background:
+            radial-gradient(1200px 600px at 50% 0%, rgba(var(--color-accent-rgb), 0.18), rgba(0, 0, 0, 0) 70%),
+            #000;
+    color: #fff;
+}
+
+.food-intro {
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+
+.food-intro-text {
+    max-width: 920px;
+}
+
+/* Filters */
+.food-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin: 22px 0 18px;
+}
+
+.food-filter-pills {
+    justify-content: flex-start;
+}
+
+/* Restaurant cards grid */
+.food-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px;
+    align-items: start;
+    padding: 8px 0 34px;
+}
+
+.food-card-link {
+    display: block;
+    text-decoration: none;
+}
+
+.food-card-link:hover {
+    transform: translateY(-1px);
+}
+
+.food-card-link:focus {
+    outline: none;
+}
+
+.food-card-link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+    border-radius: 14px;
+}
+
+.food-card {
+    overflow: hidden;
+}
+
+.festival-card--food-restaurant {
+    --festival-card-bg: #212121;
+    --festival-card-border: rgba(255, 255, 255, 0.06);
+}
+
+.food-card-image-wrap {
+    height: 210px;
+    background: #111;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.food-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.food-card-placeholder {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 40px;
+    opacity: 0.7;
+}
+
+.food-card-body {
+    padding: 16px 16px 14px;
+}
+
+.food-card-title {
+    margin: 0 0 10px;
+    color: var(--color-accent);
+}
+
+.food-card-tags {
+    margin: 0 0 10px;
+}
+
+.food-card-stars {
+    margin: 0 0 10px;
+    letter-spacing: 2px;
+    color: var(--color-accent);
+}
+
+.food-card-prices,
+.food-card-seats {
+    margin: 0 0 8px;
+}
+
+.food-card-address {
+    margin: 10px 0 0;
+}
+
+/* Reviews section */
+.food-reviews {
+    padding: 46px 0 70px;
+}
+
+.food-reviews-title {
+    margin: 0 0 22px;
+    text-transform: lowercase;
+}
+
+.food-reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 26px;
+}
+
+.food-review-card {
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.88), rgba(var(--color-accent-rgb), 0.12));
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 18px;
+    min-height: 320px;
+}
+
+.food-review-head {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.food-review-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+.food-review-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.food-review-name {
+    margin: 0;
+    color: #fff;
+}
+
+.food-review-restaurant {
+    margin: 2px 0 6px;
+    font-weight: 700;
+}
+
+.food-review-stars {
+    margin: 0;
+    letter-spacing: 2px;
+    color: #27d3b6;
+}
+
+.food-review-body p {
+    margin: 0;
+}
+
+/* ========== RESTAURANT DETAIL PAGE ========== */
+
+.food-detail-page {
+    background: #000;
+    color: #fff;
+}
+
+/* Hero */
+.restaurant-hero {
+    position: relative;
+    height: 460px;
+    overflow: hidden;
+}
+
+.restaurant-hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.02);
+}
+
+.restaurant-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background:
+            linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.85) 65%, #000 100%);
+}
+
+.restaurant-hero__content {
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    z-index: 2;
+}
+
+.restaurant-hero__grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+}
+
+.restaurant-title {
+    margin: 0 0 10px;
+}
+
+.restaurant-stars {
+    margin-bottom: 10px;
+    letter-spacing: 3px;
+    color: var(--color-accent);
+}
+
+.restaurant-type {
+    max-width: 500px;
+    margin: 0 0 15px;
+}
+
+.restaurant-pill {
+    display: inline-block;
+    width: fit-content;
+    margin-top: 4px;
+    padding: 8px 20px;
+
+    background: var(--color-accent);
+    color: #000;
+    border-radius: var(--radius-pill);
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.restaurant-cta {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Sections */
+.restaurant-section {
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+
+.restaurant-section .section-title {
+    margin-bottom: 24px;
+}
+
+.restaurant-about {
+    max-width: 800px;
+}
+
+/* Photos grid */
+.restaurant-photos {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    grid-auto-rows: 180px;
+    gap: 16px;
+}
+
+.restaurant-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+    transition: transform .3s ease;
+}
+
+.restaurant-photo:hover {
+    transform: scale(1.03);
+}
+
+.restaurant-photo:first-child {
+    grid-row: span 2;
+}
+
+/* Location */
+.restaurant-location {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.restaurant-address {
+    margin: 0 0 10px;
+}
+
+.restaurant-map {
+    overflow: hidden;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.restaurant-map iframe {
+    display: block;
+    width: 100%;
+    height: 280px;
+    border: 0;
+}
+
+.restaurant-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.25);
+    margin: 40px 0;
+}
+
+/* Restaurant reviews */
+.restaurant-reviews {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.review-card {
+    max-width: 820px;
+    padding: 22px 24px;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.75);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    position: relative;
+}
+
+.review-header {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.review-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.review-name {
+    color: #fff;
+}
+
+.review-sub {
+    margin-top: 3px;
+    font-weight: 700;
+}
+
+.review-stars {
+    margin-top: 6px;
+    letter-spacing: 3px;
+    color: #00c6a2;
+}
+
+.review-text {
+    margin: 0;
+}
+
+/* Reservation note */
+.reservation-note {
+    max-width: 820px;
+}
+
+.reservation-note .section-subtitle {
+    margin-bottom: 10px;
+}
+
+.special-request {
+    max-width: 820px;
+    margin-top: 20px;
+}
+
+.special-request textarea {
+    width: 100%;
+    margin-top: 10px;
+    padding: 14px;
+
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+
+    resize: vertical;
+}
+
+.special-request textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(var(--color-accent-rgb), 0.3);
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .food-cards-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .food-reviews-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .restaurant-hero__grid {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .restaurant-location {
+        grid-template-columns: 1fr;
+    }
+
+    .restaurant-photos {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .restaurant-photo:first-child {
+        grid-row: span 1;
+    }
+}
+
+body.food-booking-page {
+    min-height: 100vh;
+}
+.booking-card {
+    max-width: 420px; margin: 0 auto; padding: 40px 24px 60px;
+}
+.booking-title {
+    text-align: center;
+    margin-bottom: 8px;
+}
+.booking-meta {
+    text-align: center; margin-bottom: 32px;
+}
+.booking-restaurant {
+    color: #e8e0d0; margin-bottom: 6px;
+}
+.booking-fee {
+    margin-bottom: 2px;
+}
+.booking-fee--reservation {
+    color: #8a8078; font-size: 0.75rem;
+}
+
+.alert { border-radius: 4px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.875rem; }
+.alert-success { background: #1a3a1a; border: 1px solid #3a7a3a; color: #8fd98f; }
+.alert-danger  { background: #3a1a1a; border: 1px solid #7a3a3a; color: #e08080; }
+.alert ul { padding-left: 18px; }
+
+.form-section { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+.form-section.full { grid-template-columns: 1fr; }
+.mixed-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; align-items: start; }
+.form-group { margin-bottom: 24px; }
+.form-group label {
+    display: block; font-size: 0.75rem; font-weight: 400;
+    letter-spacing: 0.08em; text-transform: uppercase; color: #e8e0d0; margin-bottom: 8px;
+}
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group select,
+.form-group textarea {
+    width: 100%; background: #c8c4bc; border: none; border-radius: 3px;
+    padding: 10px 12px; font-family: inherit; font-size: 0.875rem;
+    color: #3a3530; outline: none; appearance: none; -webkit-appearance: none;
+}
+.form-group input::placeholder, .form-group textarea::placeholder { color: #9a958e; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { background: #d8d4cc; }
+
+.select-wrapper { position: relative; }
+.select-wrapper::after {
+    content: '↓'; position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%); color: #5a5550; pointer-events: none;
+}
+.select-wrapper select { padding-right: 32px; cursor: pointer; }
+.form-group textarea { min-height: 140px; resize: vertical; }
+
+.stepper-group { margin-bottom: 24px; }
+.stepper-label {
+    font-size: 0.75rem; font-weight: 400; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #e8e0d0; margin-bottom: 8px;
+    display: flex; align-items: baseline; gap: 8px;
+}
+.stepper-label .price { font-size: 0.85rem; color: #b0a898; text-transform: none; letter-spacing: 0; }
+.stepper { display: flex; align-items: center; }
+.stepper button {
+    width: 38px; height: 38px; border: none; cursor: pointer;
+    font-size: 1.1rem; font-weight: 700; display: flex;
+    align-items: center; justify-content: center; flex-shrink: 0;
+}
+.stepper button.minus { background: #6b1a2a; color: #f0d0d8; border-radius: 3px 0 0 3px; }
+.stepper button.plus  { background: #2a2a2a; color: #e8e0d0; border-radius: 0 3px 3px 0; }
+.stepper .stepper-val {
+    flex: 1; text-align: center; background: #c8c4bc; height: 38px;
+    line-height: 38px; font-family: inherit; font-size: 0.95rem; color: #3a3530;
+}
+
+.form-actions { margin-top: 32px; display: flex; flex-direction: column; gap: 12px; }
+
+.booking-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 3px;
+
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+}
+
+/* Booking overview */
+.overview-block {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 8px 0;
+    margin-bottom: 32px;
+}
+
+.overview-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 11px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.overview-row:last-child {
+    border-bottom: none;
+}
+
+.overview-label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.overview-value {
+    text-align: right;
+    max-width: 60%;
+}
+
+.overview-divider {
+    height: 1px;
+    background: rgba(var(--color-accent-rgb), 0.25);
+    margin: 4px 20px;
+}
+
+.overview-row--total .overview-label,
+.overview-row--total .overview-value {
+    color: var(--color-accent);
+}
+

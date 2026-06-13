@@ -217,11 +217,6 @@
 
 /* Responsive Start */
 @media (max-width: 1440px) {
-    .history-about-banner-banner{
-        padding-left: 0;
-        padding-right: 0;
-    }
-
     .history-sites-description {
         max-width: 100%;
     }

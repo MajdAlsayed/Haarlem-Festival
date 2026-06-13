@@ -5,22 +5,35 @@
 /** @var bool $paidWithStripe */
 
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+
+// Settings for the page title, styles, body class
+$pageTitle = 'Order confirmed — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/pages/cart.css'];
+$bodyClass = 'cart-page checkout-success-page';
+
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'Cart', 'url' => '/cart'],
+        ['label' => 'Checkout', 'url' => '/checkout'],
+        ['label' => 'Order confirmed', 'url' => null],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Order confirmed — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/tickets.css?v=1">
-</head>
-<body class="tickets-page cart-page">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+
+<body class="<?= $h($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
-<main class="tickets-main container" style="padding-top:2rem;max-width:640px;">
-    <h1 class="tickets-section-title">Thank you</h1>
-    <p class="tickets-card-sub">
+<?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
+
+<main class="cart-main container checkout-success-main">
+    <div class="success-icon">✓</div>
+
+    <h1 class="section-title section-title--accent cart-title">Thank you</h1>
+
+    <p class="copy-text copy-text--sm copy-text--muted checkout-success-summary">
         Order #<?= $h((string) $order['order_id']) ?> — paid €<?= $h(number_format((float) $order['total_amount'], 2)) ?>
         <?php if (!empty($paidWithStripe)): ?>
             <span> (Stripe)</span>
@@ -29,30 +42,36 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
         <?php endif; ?>
     </p>
 
-    <section style="margin-top:1.5rem;">
-        <h2 class="tickets-section-title" style="font-size:1.1rem;">Your tickets</h2>
+    <section class="checkout-section checkout-ticket-section">
+        <h2 class="section-subtitle checkout-section-title">Your tickets</h2>
+
         <?php if ($tickets === []): ?>
-            <p class="tickets-card-sub">No ticket rows (unexpected).</p>
+            <p class="copy-text copy-text--sm copy-text--muted">No ticket rows found.</p>
         <?php else: ?>
-            <ul class="checkout-ticket-list" style="list-style:none;padding:0;margin:0;">
+            <ul class="checkout-ticket-list">
                 <?php foreach ($tickets as $t): ?>
-                    <li class="tickets-card tickets-card--pass" style="margin-bottom:0.5rem;padding:0.75rem;font-family:monospace;font-size:0.9rem;">
-                        <strong><?= $h($t['item_name']) ?></strong><br>
-                        <span><?= $h($t['ticket_code']) ?></span>
+                    <li class="checkout-ticket-item">
+                        <strong class="section-subtitle checkout-ticket-title"><?= $h($t['item_name']) ?></strong>
+                        <span class="copy-text copy-text--sm checkout-ticket-code"><?= $h($t['ticket_code']) ?></span>
                     </li>
                 <?php endforeach; ?>
             </ul>
         <?php endif; ?>
     </section>
 
-    <p class="tickets-card-sub" style="margin-top:1.5rem;">
+    <p class="copy-text copy-text--sm copy-text--muted checkout-success-note">
         <?php if (!empty($paidWithStripe)): ?>
-            Payment was processed by Stripe. A confirmation was sent to your account email (and appended to <code>app/storage/mail/orders.log</code> in local Docker). Use these codes at the entrance.
+            Payment was processed by Stripe. A confirmation was sent to your account email and logged locally.
+            Use these codes at the entrance.
         <?php else: ?>
-            Demo flow: no money was charged. Confirmation is logged under <code>app/storage/mail/orders.log</code> and you can reopen this invoice anytime from <a href="/account/orders">My orders</a>.
+            Demo flow: no money was charged. Confirmation is logged locally and you can reopen this invoice anytime from
+            <a href="/account/orders">My orders</a>.
         <?php endif; ?>
     </p>
-    <p><a href="/tickets" class="tickets-btn-buy" style="display:inline-block;text-decoration:none;">Browse more tickets</a></p>
+
+    <p class="cart-action">
+        <a href="/tickets" class="btn btn--primary">Browse more tickets</a>
+    </p>
 </main>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>

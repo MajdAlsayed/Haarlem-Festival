@@ -1,8 +1,11 @@
-/* ========== AUTH PAGES (login + register) ========== */
+/* ========== AUTH PAGES ========== */
+
+.auth-page {
+    background: #000;
+    color: #fff;
+}
 
 .auth-page main {
-    background: radial-gradient(1200px 600px at 50% 0%, rgba(184, 134, 11, 0.18), rgba(0,0,0,0) 70%),
-                #000;
     min-height: calc(100vh - 88px);
     display: flex;
     align-items: center;
@@ -11,34 +14,30 @@
 .auth-section {
     width: 100%;
     padding: 60px 20px;
+
     display: flex;
     justify-content: center;
 }
 
 .auth-card {
-    background: linear-gradient(145deg, #1a1a1a, #141414);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 18px;
-    padding: 40px 36px;
     width: 100%;
     max-width: 480px;
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+    padding: 40px 36px;
 }
 
 .auth-title {
-    font-size: 28px;
-    font-weight: 800;
-    margin: 0 0 24px;
-    color: #f5b400;
+    margin-bottom: 24px;
 }
 
 /* Error box */
 .auth-error {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+
     background: rgba(220, 53, 69, 0.15);
     border: 1px solid rgba(220, 53, 69, 0.4);
     border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 20px;
+
     color: #ff6b6b;
     font-size: 14px;
 }
@@ -51,35 +50,35 @@
 }
 
 .auth-field label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #ccc;
     margin-bottom: 6px;
-    letter-spacing: 0.03em;
+    color: #ccc;
+    font-weight: 600;
 }
 
 .auth-field input {
+    width: 100%;
+    padding: 10px 14px;
+
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 8px;
     color: #fff;
-    font-size: 15px;
-    padding: 10px 14px;
-    transition: border-color 0.2s ease, background 0.2s ease;
+
     font-family: inherit;
+    font-size: 15px;
+
+    transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 .auth-field input:focus {
     outline: none;
-    border-color: #f5b400;
+    border-color: var(--color-accent);
     background: rgba(255, 255, 255, 0.08);
 }
 
 .auth-hint {
-    margin-top: 6px;
-    font-size: 12px;
-    color: #888;
-    line-height: 1.4;
+    display: block;
+    margin-top: 8px;
 }
 
 /* Side by side first + last name */
@@ -91,7 +90,7 @@
 
 /* Captcha field */
 .auth-captcha label {
-    color: #f5b400;
+    color: var(--color-accent);
     font-weight: 700;
 }
 
@@ -102,23 +101,17 @@
 /* Submit button */
 .auth-btn {
     width: 100%;
-    padding: 12px;
-    font-size: 15px;
-    font-weight: 700;
     margin-top: 6px;
-    border-radius: 8px;
 }
 
 /* Switch link */
 .auth-switch {
     margin-top: 20px;
     text-align: center;
-    font-size: 14px;
-    color: #999;
 }
 
 .auth-switch a {
-    color: #f5b400;
+    color: var(--color-accent);
     text-decoration: none;
     font-weight: 600;
 }
@@ -126,8 +119,8 @@
 .auth-switch a:hover {
     text-decoration: underline;
 }
-/* ========== PASSWORD EYE BUTTON ========== */
 
+/* Password eye button */
 .auth-input-wrap {
     position: relative;
     display: flex;
@@ -135,37 +128,33 @@
 }
 
 .auth-input-wrap input {
-    width: 100%;
-    padding-right: 42px; /* room for the eye button */
+    padding-right: 42px;
 }
 
 .auth-eye-btn {
     position: absolute;
     right: 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
+
+    width: 28px;
+    height: 28px;
     padding: 4px;
-    color: #888;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+
     transition: color 0.2s ease;
 }
 
 .auth-eye-btn:hover {
-    color: #f5b400;
+    color: var(--color-accent);
 }
 
-.eye-icon {
-    width: 1px;
-    height: 1px;
-    pointer-events: none;
-}
-
-.eye-icon.eye-off .eye-slash {
-    display: block;
-}
 .eye-icon {
     width: 14px;
     height: 14px;
@@ -178,24 +167,35 @@
 .auth-eye-btn:hover .eye-icon {
     opacity: 1;
 }
+
+/* Info box, used by password reset/register flows */
 .auth-info-box {
     margin-top: 16px;
     padding: 14px;
-    border-radius: 10px;
+
     background: rgba(255, 255, 255, 0.08);
-    border: 1px solid #d9e2f0;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 10px;
 }
 
 .auth-dummy-link {
     display: block;
     margin-top: 8px;
+    max-width: 100%;
+
     overflow-wrap: anywhere;
     word-break: break-word;
     white-space: normal;
-    max-width: 100%;
 }
 
-.auth-hint {
-    display: block;
-    margin-top: 8px;
+.auth-success {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+
+    background: rgba(80, 180, 100, 0.15);
+    border: 1px solid rgba(80, 180, 100, 0.4);
+    border-radius: 8px;
+
+    color: #8fd98f;
+    font-size: 14px;
 }

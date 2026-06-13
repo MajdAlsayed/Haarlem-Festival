@@ -1,24 +1,32 @@
 <?php
 $app = $viewModel->appSettings;
+
+// Settings for the page title, styles, body class
+$pageTitle = 'Forgot password — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/pages/auth.css'];
+$bodyClass = 'auth-page';
+
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'Forgot password', 'url' => null],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Forgot password — <?= htmlspecialchars($app['site_name']) ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars($app['css_version']) ?>">
-    <link rel="stylesheet" href="/css/auth.css?v=<?= htmlspecialchars($app['css_version']) ?>">
-</head>
-<body class="auth-page">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+
+<body class="<?= htmlspecialchars($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
+<?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
+
 <main>
     <section class="auth-section">
-        <div class="auth-card">
-            <h1 class="auth-title">Forgot password</h1>
+        <div class="festival-card auth-card">
+            <h1 class="section-title section-title--accent auth-title">Forgot password</h1>
 
-            <p class="auth-copy">
+            <p class="copy-text auth-copy">
                 Enter your email address or username. If the account exists, a reset link will be prepared.
                 For this project, the link is shown on screen instead of being emailed.
             </p>
@@ -33,11 +41,13 @@ $app = $viewModel->appSettings;
 
             <?php if ($viewModel->dummyLink !== null): ?>
                 <div class="auth-info-box">
-                    <strong>Dummy reset link</strong>
-                    <a class="auth-dummy-link" href="<?= htmlspecialchars($viewModel->dummyLink) ?>">
+                    <strong class="section-subtitle">Dummy reset link</strong>
+                    <a class="copy-text copy-text--sm auth-dummy-link" href="<?= htmlspecialchars($viewModel->dummyLink) ?>">
                         <?= htmlspecialchars($viewModel->dummyLink) ?>
                     </a>
-                    <small class="auth-hint">This link expires automatically after 60 minutes.</small>
+                    <small class="copy-text copy-text--sm copy-text--muted auth-hint">
+                        This link expires automatically after 60 minutes.
+                    </small>
                 </div>
             <?php endif; ?>
 
@@ -45,21 +55,21 @@ $app = $viewModel->appSettings;
                 <input type="hidden" name="_csrf" value="<?= htmlspecialchars($viewModel->csrf) ?>">
 
                 <div class="auth-field">
-                    <label for="identifier">Email or username</label>
+                    <label class="copy-text copy-text--sm" for="identifier">Email or username</label>
                     <input
-                        type="text"
-                        id="identifier"
-                        name="identifier"
-                        required
-                        autofocus
-                        value="<?= htmlspecialchars($viewModel->identifier) ?>"
+                            type="text"
+                            id="identifier"
+                            name="identifier"
+                            required
+                            autofocus
+                            value="<?= htmlspecialchars($viewModel->identifier) ?>"
                     >
                 </div>
 
-                <button type="submit" class="btn btn-primary auth-btn">Send reset link</button>
+                <button type="submit" class="btn btn--primary auth-btn">Send reset link</button>
             </form>
 
-            <p class="auth-switch">
+            <p class="copy-text copy-text--sm auth-switch">
                 Remembered it? <a href="/login">Back to login</a>
             </p>
         </div>
