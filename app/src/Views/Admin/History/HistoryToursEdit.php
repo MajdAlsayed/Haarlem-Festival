@@ -1,17 +1,18 @@
 <?php /** @var \App\ViewModels\AdminHistoryViewModel $viewModel */ ?>
+
+<?php
+$pageTitle = 'Edit Tours — Haarlem Festival';
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
+?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Tours — Haarlem Festival</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/admin.css">
-</head>
-<body data-upload-csrf="<?= htmlspecialchars(App\Core\Csrf::token('cms_upload')) ?>">
+<?php require __DIR__ . '/../../partials/head.php'; ?>
+<body class="<?= htmlspecialchars($bodyClass) ?>"
+      data-upload-csrf="<?= htmlspecialchars(App\Core\Csrf::token('cms_upload')) ?>">
 <?php require __DIR__ . '/../../partials/header.php'; ?>
 
 <main class="admin-cms-wrap">
-    <?php require __DIR__ . '/../partials/admin_nav.php'; ?>
 
     <h1>Edit Tours page (CMS)</h1>
 
@@ -88,7 +89,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.4/tinymce.min.js" referrerpolicy="origin"></script>
 <script src="/js/admin-cms-editors.js?v=1"></script>
-<?php require __DIR__ . '/../partials/history_media_modal.php'; ?>
+<?php require __DIR__ . '/../History/history_media_modal.php'; ?>
 <script src="/js/admin-history-media.js?v=1"></script>
 
 <?php require __DIR__ . '/../../partials/footer.php'; ?>

@@ -35,7 +35,7 @@ class AdminStoriesController
         }
         unset($story);
 
-        require __DIR__ . '/../Views/Stories/Admin/Index.php';
+        require __DIR__ . '/../Views/Admin/Stories/Index.php';
     }
 
     public function edit(): void
@@ -56,7 +56,7 @@ class AdminStoriesController
         // CSRF token prevents form hacking
         $csrf = Csrf::token('admin_stories_edit');
 
-        require __DIR__ . '/../Views/Stories/Admin/Edit.php';
+        require __DIR__ . '/../Views/Admin/Stories/Edit.php';
     }
 
     public function update(): void
@@ -141,7 +141,7 @@ class AdminStoriesController
         if (!is_array($highlights)) { $highlights = []; }
         if (!is_array($gallery))    { $gallery    = []; }
 
-        require __DIR__ . '/../Views/Stories/Admin/DetailPageForm.php';
+        require __DIR__ . '/../Views/Admin/Stories/DetailPageForm.php';
     }
 
     public function saveDetailPage(): void

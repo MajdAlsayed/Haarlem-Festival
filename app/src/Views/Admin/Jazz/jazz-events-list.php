@@ -1,21 +1,23 @@
 <?php
+/**
+ * Table of every jazz slot on the programme — quick links to edit or delete. AdminJazzController::events().
+ */
 /** @var array $app */
 /** @var list<array<string,mixed>> $events */
 $success = \App\Core\Session::getFlash('admin_success');
 $error = \App\Core\Session::getFlash('admin_error');
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+
+$pageTitle = 'Jazz events — Admin — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Dance events — Admin — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/admin.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-</head>
-<body class="admin-page">
+<?php require __DIR__ . '/../../partials/head.php'; ?>
+<body class="<?= $h($bodyClass) ?>">
 
-<?php require __DIR__ . '/../partials/header.php'; ?>
+<?php require __DIR__ . '/../../partials/header.php'; ?>
 
 <main class="admin-main">
     <div class="admin-container admin-container--wide">
@@ -24,13 +26,13 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
             <span class="admin-breadcrumb-sep">›</span>
             <a href="/admin">Admin</a>
             <span class="admin-breadcrumb-sep">›</span>
-            <a href="/admin/dance">Dance</a>
+            <a href="/admin/jazz">Jazz</a>
             <span class="admin-breadcrumb-sep">›</span>
             <span>Events</span>
         </nav>
 
-        <h1 class="admin-title">Dance events</h1>
-        <p class="admin-hint" style="margin-bottom:1rem;">Dance-only rows in <code>events</code> (event type <strong>dance</strong>). Capacity drives ticket stock when a ticket row points at the event.</p>
+        <h1 class="admin-title">Jazz events</h1>
+        <p class="admin-hint admin-hint--block">These rows power the <strong>schedule</strong> on each artist detail page: the event <strong>title</strong> must match the artist title in <a href="/admin/jazz/settings">Jazz → Layout &amp; artist pages</a> (e.g. “Gare du Nord”). Edit day, time, venue, hall, price, and description here.</p>
 
         <?php if ($success): ?>
             <div class="admin-alert admin-alert-success"><?= $h($success) ?></div>
@@ -40,8 +42,8 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
         <?php endif; ?>
 
         <p>
-            <a href="/admin/dance/events/new" class="admin-btn admin-btn-primary">Add event</a>
-            <a href="/admin/dance" class="admin-btn admin-btn-secondary">Back to Dance CMS</a>
+            <a href="/admin/jazz/events/new" class="admin-btn admin-btn-primary">Add event</a>
+            <a href="/admin/jazz" class="admin-btn admin-btn-secondary">Back to Jazz CMS</a>
         </p>
 
         <div class="admin-table-wrap">
@@ -52,7 +54,6 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                         <th>Time</th>
                         <th>Title</th>
                         <th>Venue</th>
-                        <th>Capacity</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -60,17 +61,16 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                     <?php foreach ($events as $e): ?>
                     <tr>
                         <td><?= $h($e['event_day'] ?? '') ?></td>
-                        <td><?= $h(trim(($e['start_time'] ?? '') . (!empty($e['end_time']) ? '–' . $e['end_time'] : ''))) ?></td>
+                        <td><?= $h(trim(($e['start_time'] ?? '') . ($e['end_time'] ? '–' . $e['end_time'] : ''))) ?></td>
                         <td><?= $h($e['title'] ?? '') ?></td>
                         <td><?= $h(($e['venue_name'] ?? '') . ', ' . ($e['venue_city'] ?? '')) ?></td>
-                        <td class="admin-muted"><?= isset($e['seats']) && $e['seats'] !== null ? $h((string) (int) $e['seats']) : '—' ?></td>
                         <td>
-                            <a href="/admin/dance/events/edit?id=<?= (int) $e['event_id'] ?>" class="admin-btn admin-btn-sm admin-btn-primary">Edit</a>
+                            <a href="/admin/jazz/events/edit?id=<?= (int) $e['event_id'] ?>" class="admin-btn admin-btn-sm admin-btn-primary">Edit</a>
                             <?php
-                            $delForm = 'admin_dance_del_' . (int) $e['event_id'];
+                            $delForm = 'admin_jazz_del_' . (int) $e['event_id'];
                             $delTok = \App\Core\Csrf::token($delForm);
                             ?>
-                            <form method="post" action="/admin/dance/events/delete" style="display:inline;" onsubmit="return confirm('Delete this event?');">
+                            <form method="post" action="/admin/jazz/events/delete" style="display:inline;" onsubmit="return confirm('Delete this event?');">
                                 <input type="hidden" name="_csrf_form" value="<?= $h($delForm) ?>">
                                 <input type="hidden" name="_csrf" value="<?= $h($delTok) ?>">
                                 <input type="hidden" name="event_id" value="<?= (int) $e['event_id'] ?>">
@@ -85,7 +85,7 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
     </div>
 </main>
 
-<?php require __DIR__ . '/../partials/footer.php'; ?>
+<?php require __DIR__ . '/../../partials/footer.php'; ?>
 
 </body>
 </html>

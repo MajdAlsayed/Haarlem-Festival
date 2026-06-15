@@ -1,4 +1,8 @@
 <?php
+/**
+ * Change an existing jazz slot and, if you like, upload the short clip some artist pages play as a teaser.
+ * AdminJazzController::editEvent().
+ */
 /** @var array $app */
 /** @var array<string,mixed> $event */
 /** @var list<array{venue_id:int,name:string,city:string}> $venues */
@@ -6,18 +10,17 @@
 /** @var string $csrf */
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 $days = ['thursday', 'friday', 'saturday', 'sunday'];
+
+$pageTitle = 'Edit jazz event — Admin — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit dance event — Admin — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/admin.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-</head>
-<body class="admin-page">
+<?php require __DIR__ . '/../../partials/head.php'; ?>
+<body class="<?= $h($bodyClass) ?>">
 
-<?php require __DIR__ . '/../partials/header.php'; ?>
+<?php require __DIR__ . '/../../partials/header.php'; ?>
 
 <main class="admin-main">
     <div class="admin-container admin-container--wide">
@@ -26,16 +29,16 @@ $days = ['thursday', 'friday', 'saturday', 'sunday'];
             <span class="admin-breadcrumb-sep">›</span>
             <a href="/admin">Admin</a>
             <span class="admin-breadcrumb-sep">›</span>
-            <a href="/admin/dance">Dance</a>
+            <a href="/admin/jazz">Jazz</a>
             <span class="admin-breadcrumb-sep">›</span>
-            <a href="/admin/dance/events">Events</a>
+            <a href="/admin/jazz/events">Events</a>
             <span class="admin-breadcrumb-sep">›</span>
             <span>Edit</span>
         </nav>
 
-        <h1 class="admin-title">Edit dance event</h1>
+        <h1 class="admin-title">Edit jazz event</h1>
 
-        <form method="post" action="/admin/dance/events/save" class="admin-form admin-form--wide">
+        <form method="post" action="/admin/jazz/events/save" enctype="multipart/form-data" class="admin-form admin-form--wide">
             <input type="hidden" name="_csrf" value="<?= $h($csrf) ?>">
             <input type="hidden" name="event_id" value="<?= (int) $event['event_id'] ?>">
 
@@ -99,9 +102,13 @@ $days = ['thursday', 'friday', 'saturday', 'sunday'];
 
             <fieldset class="admin-fieldset">
                 <legend>Preview audio (optional)</legend>
-                <p class="admin-hint">Path under <code>public/audio/</code>, use forward slashes.</p>
+                <p class="admin-hint">Upload an MP3/WAV/FLAC/OGG/M4A file (max ~50 MB), <strong>or</strong> type a path under <code>public/audio/</code> (e.g. <code>Jazz audio/track.mp3</code>). Upload overrides the path when both are set.</p>
                 <div class="admin-field">
-                    <label for="preview_audio_path">File path</label>
+                    <label for="preview_audio_upload">Upload audio</label>
+                    <input type="file" id="preview_audio_upload" name="preview_audio_upload" class="admin-input" accept="audio/mpeg,audio/wav,audio/flac,audio/ogg,.mp3,.wav,.flac,.ogg,.m4a">
+                </div>
+                <div class="admin-field">
+                    <label for="preview_audio_path">Or file path (relative to <code>public/audio/</code>)</label>
                     <input type="text" id="preview_audio_path" name="preview_audio_path" value="<?= $h($audio['file_path'] ?? '') ?>" class="admin-input">
                 </div>
                 <div class="admin-field">
@@ -120,13 +127,13 @@ $days = ['thursday', 'friday', 'saturday', 'sunday'];
 
             <div class="admin-form-actions">
                 <button type="submit" class="admin-btn admin-btn-primary">Save</button>
-                <a href="/admin/dance/events" class="admin-btn admin-btn-secondary">Back</a>
+                <a href="/admin/jazz/events" class="admin-btn admin-btn-secondary">Back</a>
             </div>
         </form>
     </div>
 </main>
 
-<?php require __DIR__ . '/../partials/footer.php'; ?>
+<?php require __DIR__ . '/../../partials/footer.php'; ?>
 
 </body>
 </html>

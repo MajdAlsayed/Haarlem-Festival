@@ -55,7 +55,7 @@ final class AdminDanceController
         $this->requireAdmin();
         $app = $this->settingsRepository->getAll();
         $events = $this->danceCms->listDanceEventsForAdmin();
-        require __DIR__ . '/../Views/Admin/dance-events-list.php';
+        require __DIR__ . '/../Views/Admin/Dance/dance-events-list.php';
     }
 
     /** Show create form for a new dance event. */
@@ -65,7 +65,7 @@ final class AdminDanceController
         $venues = $this->danceCms->listVenues();
         $app = $this->settingsRepository->getAll();
         $csrf = Csrf::token('admin_dance_event');
-        require __DIR__ . '/../Views/Admin/dance-event-new.php';
+        require __DIR__ . '/../Views/Admin/Dance/dance-event-new.php';
     }
 
     /** Show edit form for an existing dance event. */
@@ -87,7 +87,7 @@ final class AdminDanceController
         $audio = (new JazzCmsRepository())->getEventAudio($id);
         $app = $this->settingsRepository->getAll();
         $csrf = Csrf::token('admin_dance_event');
-        require __DIR__ . '/../Views/Admin/dance-event-edit.php';
+        require __DIR__ . '/../Views/Admin/Dance/dance-event-edit.php';
     }
 
     /** Validate and persist dance event create/update. */
@@ -214,7 +214,7 @@ final class AdminDanceController
         if (!is_array($artists)) {
             $artists = [];
         }
-        require __DIR__ . '/../Views/Admin/dance-artists-list.php';
+        require __DIR__ . '/../Views/Admin/Dance/dance-artists-list.php';
     }
 
     /** Show form for adding a homepage artist card. */
@@ -225,7 +225,7 @@ final class AdminDanceController
         $csrf = Csrf::token('admin_dance_artist');
         $isNew = true;
         $row = ['name' => '', 'slug' => '', 'bio' => '', 'image' => ''];
-        require __DIR__ . '/../Views/Admin/dance-artist-edit.php';
+        require __DIR__ . '/../Views/Admin/Dance/dance-artist-edit.php';
     }
 
     /** Show form for editing a homepage artist card. */
@@ -263,7 +263,7 @@ final class AdminDanceController
         $app = $this->settingsRepository->getAll();
         $csrf = Csrf::token('admin_dance_artist');
         $isNew = false;
-        require __DIR__ . '/../Views/Admin/dance-artist-edit.php';
+        require __DIR__ . '/../Views/Admin/Dance/dance-artist-edit.php';
     }
 
     /** Validate and save homepage artist cards JSON. */
@@ -402,7 +402,7 @@ final class AdminDanceController
         }
 
         $app = $this->settingsRepository->getAll();
-        require __DIR__ . '/../Views/Admin/dance-index.php';
+        require __DIR__ . '/../Views/Admin/Dance/dance-index.php';
     }
 
     /** Render /admin/cms/dance with merged defaults + DB values. */
@@ -517,7 +517,7 @@ final class AdminDanceController
             success: $success
         );
 
-        require __DIR__ . '/../Views/Admin/DanceEdit.php';
+        require __DIR__ . '/../Views/Admin/Dance/DanceEdit.php';
     }
 
     /** Validate and save dance CMS settings (page, event detail, artist detail). */

@@ -5,18 +5,17 @@
 /** @var array{name:string,slug:string,bio:string,image:string} $row */
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 $origSlug = $isNew ? '' : (string) ($row['slug'] ?? '');
+
+$pageTitle = ($isNew ? 'New' : 'Edit') . ' dance artist — Admin — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title><?= $isNew ? 'New' : 'Edit' ?> dance artist — Admin — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/admin.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-</head>
-<body class="admin-page">
+<?php require __DIR__ . '/../../partials/head.php'; ?>
+<body class="<?= $h($bodyClass) ?>">
 
-<?php require __DIR__ . '/../partials/header.php'; ?>
+<?php require __DIR__ . '/../../partials/header.php'; ?>
 
 <main class="admin-main">
     <div class="admin-container admin-container--wide">
@@ -68,7 +67,7 @@ $origSlug = $isNew ? '' : (string) ($row['slug'] ?? '');
     </div>
 </main>
 
-<?php require __DIR__ . '/../partials/footer.php'; ?>
+<?php require __DIR__ . '/../../partials/footer.php'; ?>
 
 </body>
 </html>

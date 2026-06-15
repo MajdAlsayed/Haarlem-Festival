@@ -3,22 +3,22 @@
 /** @var \App\ViewModels\AdminDanceEditViewModel $viewModel */
 $app = $viewModel->appSettings;
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+
+$pageTitle = 'Edit Dance page — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Edit Dance page — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1.0') ?>">
-    <link rel="stylesheet" href="/css/admin.css?v=<?= $h($app['css_version'] ?? '1.0') ?>">
-</head>
-<body class="admin-page" data-upload-csrf="<?= $h($viewModel->uploadCsrf) ?>" data-upload-url="/admin/cms/upload">
-<?php require __DIR__ . '/../partials/header.php'; ?>
+<?php require __DIR__ . '/../../partials/head.php'; ?>
+<body class="<?= $h($bodyClass) ?>"
+      data-upload-csrf="<?= $h($viewModel->uploadCsrf) ?>"
+      data-upload-url="/admin/cms/upload">
+
+<?php require __DIR__ . '/../../partials/header.php'; ?>
 
 <main class="admin-main">
     <div class="admin-container admin-container--wide">
-        <?php require __DIR__ . '/partials/admin_nav.php'; ?>
 
         <nav class="admin-breadcrumb">
             <a href="/"><?= $h($app['site_name'] ?? 'Festival') ?></a>
@@ -297,6 +297,6 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 
 <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.4/tinymce.min.js" referrerpolicy="origin"></script>
 <script src="/js/admin-cms-editors.js?v=1"></script>
-<?php require __DIR__ . '/../partials/footer.php'; ?>
+<?php require __DIR__ . '/../../partials/footer.php'; ?>
 </body>
 </html>

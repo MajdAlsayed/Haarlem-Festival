@@ -1119,3 +1119,10 @@ body.stories-page {
     font-weight: 700;
     line-height: 1;
 }
+
+.error-box {
+    max-width: 600px;
+    margin: 3rem auto;
+    padding: 2rem;
+    text-align: center;
+}

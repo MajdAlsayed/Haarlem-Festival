@@ -2,17 +2,19 @@
 /** @var \App\ViewModels\AdminHomepageEditViewModel $viewModel */
 $app = $viewModel->appSettings;
 $c = $viewModel->cmsHome;
+
+$h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+
+$pageTitle = 'Edit homepage — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Edit homepage — <?= htmlspecialchars((string)($app['site_name'] ?? 'Haarlem Festival')) ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string)($app['css_version'] ?? '1.0')) ?>">
-    <link rel="stylesheet" href="/css/admin.css?v=<?= htmlspecialchars((string)($app['css_version'] ?? '1.0')) ?>">
-</head>
-<body class="admin-page" data-upload-csrf="<?= htmlspecialchars($viewModel->uploadCsrf) ?>" data-upload-url="/admin/cms/upload">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+<body class="<?= $h($bodyClass) ?>"
+      data-upload-csrf="<?= $h($viewModel->uploadCsrf) ?>"
+      data-upload-url="/admin/cms/upload">
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main class="admin-main">
@@ -27,8 +29,6 @@ $c = $viewModel->cmsHome;
 
         <h1 class="admin-title">Edit homepage</h1>
         <p class="admin-lead admin-lead--cms">Title comes from <code class="admin-cms-inline-code">pages</code> (slug <code class="admin-cms-inline-code">home</code>). Other fields are <code class="admin-cms-inline-code">site_settings</code> keys <code class="admin-cms-inline-code">cms_home_*</code>. TinyMCE on selected fields; you can upload the about image. <a href="/" target="_blank" rel="noopener">View site</a></p>
-
-        <?php require __DIR__ . '/partials/admin_nav.php'; ?>
 
     <?php if ($viewModel->success !== null): ?>
         <div class="admin-alert admin-alert-success"><?= htmlspecialchars($viewModel->success) ?></div>

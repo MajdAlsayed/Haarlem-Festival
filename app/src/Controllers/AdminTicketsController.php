@@ -73,7 +73,7 @@ final class AdminTicketsController
         $capacities = $cartRepo->getTicketDetailsCapacitiesForIds($ids);
         $stock = (new TicketAvailabilityService($cartRepo, $ticketRepo))->stockUiByTicketDetailsIds($ids);
         $bulkDeleteCsrf = Csrf::token('admin_tickets_bulk_delete');
-        require __DIR__ . '/../Views/Admin/tickets-list.php';
+        require __DIR__ . '/../Views/Admin/Tickets/tickets-list.php';
     }
 
     /**
@@ -112,7 +112,7 @@ final class AdminTicketsController
         $csrf = Csrf::token('admin_tickets_settings');
         $success = Session::getFlash('admin_success');
         $error = Session::getFlash('admin_error');
-        require __DIR__ . '/../Views/Admin/tickets-settings.php';
+        require __DIR__ . '/../Views/Admin/Tickets/tickets-settings.php';
     }
 
     /**
@@ -142,7 +142,7 @@ final class AdminTicketsController
         $allEvents = $this->tickets->listEventsForTicketForm();
         $eventsMissing = $this->tickets->listEventsWithoutTicket();
         $capacityMeta = $this->buildTicketCapacityMeta($row);
-        require __DIR__ . '/../Views/Admin/tickets-edit.php';
+        require __DIR__ . '/../Views/Admin/Tickets/tickets-edit.php';
     }
 
     /** Same form as edit(), but with an empty row — for creating a new pass or event ticket. */
@@ -155,7 +155,7 @@ final class AdminTicketsController
         $allEvents = $this->tickets->listEventsForTicketForm();
         $eventsMissing = $this->tickets->listEventsWithoutTicket();
         $capacityMeta = null;
-        require __DIR__ . '/../Views/Admin/tickets-edit.php';
+        require __DIR__ . '/../Views/Admin/Tickets/tickets-edit.php';
     }
 
     /**

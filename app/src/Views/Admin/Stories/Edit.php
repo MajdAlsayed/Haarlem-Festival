@@ -4,17 +4,17 @@ if (!function_exists('h')) {
         return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
     }
 }
+
+$pageTitle = 'Edit Story — CMS';
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Story — CMS</title>
-    <link rel="stylesheet" href="/css/admin.css">
-    <link rel="stylesheet" href="/css/Stories/storiescms.css?v=2">
-</head>
-<body>
+<?php require __DIR__ . '/../../partials/head.php'; ?>
+<body class="<?= h($bodyClass) ?>">
+
+<?php require __DIR__ . '/../../partials/header.php'; ?>
 
 <main class="admin-main">
     <div class="admin-container">
@@ -273,6 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
-
+<?php require __DIR__ . '/../../partials/footer.php'; ?>
 </body>
 </html>

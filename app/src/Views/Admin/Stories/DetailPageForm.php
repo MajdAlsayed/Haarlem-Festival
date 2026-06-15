@@ -17,20 +17,19 @@ if (empty($gallery)) {
     $gallery = [['image' => '', 'heading' => '', 'text' => '']];
 }
 
-$isEdit    = !empty($detailPage);
+$isEdit = !empty($detailPage);
 $pageTitle = $isEdit ? 'Edit Detail Page' : 'Add Detail Page';
 $storyName = $story['name'] ?? 'Story';
+
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= h($pageTitle) ?> — CMS</title>
-    <link rel="stylesheet" href="/css/admin.css">
-    <link rel="stylesheet" href="/css/Stories/storiescms.css?v=2">
-</head>
-<body>
+<?php require __DIR__ . '/../../partials/head.php'; ?>
+<body class="<?= h($bodyClass) ?>">
+
+<?php require __DIR__ . '/../../partials/header.php'; ?>
 
 <main class="admin-main">
     <div class="admin-container">
@@ -501,6 +500,6 @@ $storyName = $story['name'] ?? 'Story';
     });
 })();
 </script>
-
+<?php require __DIR__ . '/../../partials/footer.php'; ?>
 </body>
 </html>

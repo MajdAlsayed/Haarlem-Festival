@@ -98,18 +98,21 @@ $isNavLinkActive = function (array $link) use ($currentPath, $app): bool {
                         <span class="nav-user-menu-label"><?= $username ?></span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end nav-user-menu" aria-labelledby="navUserMenuBtn">
-                        <li>
-                            <a class="dropdown-item<?= str_starts_with($currentPath, '/account') ? ' active' : '' ?>"
-                               href="/account/orders">
-                                My orders
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item<?= str_starts_with($currentPath, '/my-program') ? ' active' : '' ?>"
-                               href="/my-program">
-                                My program
-                            </a>
-                        </li>
+                        <?php if (!$isAdmin): ?>
+                            <li>
+                                <a class="dropdown-item<?= str_starts_with($currentPath, '/account') ? ' active' : '' ?>"
+                                   href="/account/orders">
+                                    My orders
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item<?= str_starts_with($currentPath, '/my-program') ? ' active' : '' ?>"
+                                   href="/my-program">
+                                    My program
+                                </a>
+                            </li>
+                        <?php endif; ?>
+
                         <?php if ($isAdmin): ?>
                             <li>
                                 <a class="dropdown-item<?= $adminNavActive ? ' active' : '' ?>" href="/admin">

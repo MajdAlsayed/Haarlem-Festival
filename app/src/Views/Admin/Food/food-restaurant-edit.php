@@ -21,18 +21,17 @@ $numVal = function (string $field, string $default = '') use ($row): string {
     $v = property_exists($row, $field) ? $row->$field : null;
     return $v !== null ? (string) $v : $default;
 };
+
+$pageTitle = ($isNew ? 'New' : 'Edit') . ' restaurant — Admin — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title><?= $isNew ? 'New' : 'Edit' ?> restaurant — Admin — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/admin.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-</head>
-<body class="admin-page">
+<?php require __DIR__ . '/../../partials/head.php'; ?>
+<body class="<?= $h($bodyClass) ?>">
 
-<?php require __DIR__ . '/../partials/header.php'; ?>
+<?php require __DIR__ . '/../../partials/header.php'; ?>
 
 <main class="admin-main">
     <div class="admin-container admin-container--wide">
@@ -235,7 +234,7 @@ $numVal = function (string $field, string $default = '') use ($row): string {
     </div>
 </main>
 
-<?php require __DIR__ . '/../partials/footer.php'; ?>
+<?php require __DIR__ . '/../../partials/footer.php'; ?>
 
 <script>
 /* Auto-generate slug from name when slug is empty */
