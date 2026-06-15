@@ -182,58 +182,58 @@ case '/api/stories':
         }
         break;
         case '/admin/stories':
-    case '/cms/stories':
-    if ($method === 'GET') {
-        (new AdminStoriesController())->index();
-    } else {
-        http_response_code(405);
-    }
-    break;
+        case '/cms/stories':
+        if ($method === 'GET') {
+            (new AdminStoriesController())->index();
+        } else {
+            http_response_code(405);
+        }
+        break;
 
-case '/admin/stories/edit':
-    case '/cms/stories/edit':
-    if ($method === 'GET') {
-        (new AdminStoriesController())->edit();
-    } else {
-        http_response_code(405);
-    }
-    break;
+    case '/admin/stories/edit':
+        case '/cms/stories/edit':
+        if ($method === 'GET') {
+            (new AdminStoriesController())->edit();
+        } else {
+            http_response_code(405);
+        }
+        break;
 
-case '/admin/stories/update':
-    case '/cms/stories/update':
-    if ($method === 'POST') {
-        (new AdminStoriesController())->update();
-    } else {
-        http_response_code(405);
-    }
-    break;
+    case '/admin/stories/update':
+        case '/cms/stories/update':
+        if ($method === 'POST') {
+            (new AdminStoriesController())->update();
+        } else {
+            http_response_code(405);
+        }
+        break;
 
-case '/admin/stories/delete':
-    case '/cms/stories/delete':
-    if ($method === 'GET' || $method === 'POST') {
-        (new AdminStoriesController())->delete();
-    } else {
-        http_response_code(405);
-    }
-    break;
+    case '/admin/stories/delete':
+        case '/cms/stories/delete':
+        if ($method === 'GET' || $method === 'POST') {
+            (new AdminStoriesController())->delete();
+        } else {
+            http_response_code(405);
+        }
+        break;
 
-case '/admin/stories/detail-page':
-    case '/cms/stories/detail-page':
-    if ($method === 'GET') {
-        (new AdminStoriesController())->editDetailPage();
-    } else {
-        http_response_code(405);
-    }
-    break;
+    case '/admin/stories/detail-page':
+        case '/cms/stories/detail-page':
+        if ($method === 'GET') {
+            (new AdminStoriesController())->editDetailPage();
+        } else {
+            http_response_code(405);
+        }
+        break;
 
-case '/admin/stories/detail-page/save':
-    case '/cms/stories/detail-page/save':
-    if ($method === 'POST') {
-        (new AdminStoriesController())->saveDetailPage();
-    } else {
-        http_response_code(405);
-    }
-    break;
+    case '/admin/stories/detail-page/save':
+        case '/cms/stories/detail-page/save':
+        if ($method === 'POST') {
+            (new AdminStoriesController())->saveDetailPage();
+        } else {
+            http_response_code(405);
+        }
+        break;
 
     case '/checkout':
         if ($method === 'GET') {
@@ -455,6 +455,10 @@ case '/admin/stories/detail-page/save':
         }
         break;
 
+    case '/admin/history':
+        (new AdminHistoryController())->index();
+        break;
+
     case '/admin/cms/history':
         $historyCms = new AdminHistoryController();
         if ($method === 'GET') $historyCms->showIndexForm();
@@ -519,19 +523,6 @@ case '/admin/stories/detail-page/save':
 
     case '/admin':
         (new AdminController())->index();
-        break;
-
-    case '/admin/pages':
-        (new AdminController())->pages();
-        break;
-
-    case '/admin/pages/edit':
-        (new AdminController())->editPage();
-        break;
-
-    case '/admin/pages/update':
-        if ($method === 'POST') (new AdminController())->updatePage();
-        else { header('Location: /admin/pages'); exit; }
         break;
 
     case '/admin/jazz':

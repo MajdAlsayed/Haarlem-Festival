@@ -29,39 +29,44 @@ $bottomText  = ($detailPage['article_paragraph_3'] ?? '') ?: 'The Story of Buurd
 $bottomImage = ($gallery[0]['image']               ?? '') ?: $assets['main2'];
 
 $gallery1 = [
-    'image'   => ($gallery[0]['image']   ?? '') ?: $assets['gallery1'],
-    'heading' => ($gallery[0]['heading'] ?? '') ?: 'Local food choices',
-    'text'    => ($gallery[0]['text']    ?? '') ?: 'Fresh products, short supply chains, and meaningful contact between producers and residents.',
+        'image'   => ($gallery[0]['image']   ?? '') ?: $assets['gallery1'],
+        'heading' => ($gallery[0]['heading'] ?? '') ?: 'Local food choices',
+        'text'    => ($gallery[0]['text']    ?? '') ?: 'Fresh products, short supply chains, and meaningful contact between producers and residents.',
 ];
 $gallery2 = [
-    'image'   => ($gallery[1]['image']   ?? '') ?: $assets['gallery2'],
-    'heading' => ($gallery[1]['heading'] ?? '') ?: 'Community gathering',
-    'text'    => ($gallery[1]['text']    ?? '') ?: 'A welcoming space where people meet, exchange ideas, and rediscover the social side of food.',
+        'image'   => ($gallery[1]['image']   ?? '') ?: $assets['gallery2'],
+        'heading' => ($gallery[1]['heading'] ?? '') ?: 'Community gathering',
+        'text'    => ($gallery[1]['text']    ?? '') ?: 'A welcoming space where people meet, exchange ideas, and rediscover the social side of food.',
 ];
 $gallery3 = [
-    'image'   => ($gallery[2]['image']   ?? '') ?: $assets['gallery3'],
-    'heading' => ($gallery[2]['heading'] ?? '') ?: 'Sustainable local culture',
-    'text'    => ($gallery[2]['text']    ?? '') ?: "Buurderij reflects Haarlem's creative, sustainable, and community-focused identity in everyday life.",
+        'image'   => ($gallery[2]['image']   ?? '') ?: $assets['gallery3'],
+        'heading' => ($gallery[2]['heading'] ?? '') ?: 'Sustainable local culture',
+        'text'    => ($gallery[2]['text']    ?? '') ?: "Buurderij reflects Haarlem's creative, sustainable, and community-focused identity in everyday life.",
 ];
 ?>
 
 <section class="buurderij-page">
 
-    <section class="buurderij-hero">
-        <div class="buurderij-hero-image">
-            <img src="<?= h($heroImage) ?>" alt="<?= h($heroTitle) ?>">
-            <div class="buurderij-hero-overlay"></div>
-            <div class="buurderij-hero-copy">
-                <h1 class="buurderij-title"><?= h($heroTitle) ?></h1>
-            </div>
-        </div>
-    </section>
+    <?php
+    $pageHeroTitle = $heroTitle;
+    $pageHeroSubtitle = '';
+    $pageHeroImage = $heroImage;
+    $pageHeroAlt = $heroTitle;
+    $pageHeroClass = 'stories-detail-hero stories-buurderij-detail-hero';
+    $pageHeroContentClass = 'stories-detail-hero__content';
+    ?>
+
+    <?php require __DIR__ . '/../../partials/page-hero.php'; ?>
+
+    <?php require __DIR__ . '/../../partials/breadcrumbs.php'; ?>
 
     <section class="buurderij-content">
 
         <section class="buurderij-intro">
-            <h2><?= h($introTitle) ?></h2>
-            <p><?= nl2br(h($introText)) ?></p>
+            <h2 class="section-title section-title--accent section-title--underlined buurderij-intro-title">
+                <?= h($introTitle) ?>
+            </h2>
+            <p class="copy-text buurderij-intro-text"><?= nl2br(h($introText)) ?></p>
         </section>
 
         <section class="buurderij-main-grid">
@@ -69,9 +74,9 @@ $gallery3 = [
                 <img src="<?= h($mainImage) ?>" alt="Buurderij Haarlem">
             </div>
             <div class="buurderij-main-text">
-                <h3><?= h($mainTitle) ?></h3>
-                <p><?= nl2br(h($mainText1)) ?></p>
-                <p><?= nl2br(h($mainText2)) ?></p>
+                <h3 class="section-subtitle buurderij-main-title"><?= h($mainTitle) ?></h3>
+                <p class="copy-text"><?= nl2br(h($mainText1)) ?></p>
+                <p class="copy-text"><?= nl2br(h($mainText2)) ?></p>
             </div>
         </section>
 
@@ -79,8 +84,8 @@ $gallery3 = [
             <?php foreach ([$gallery1, $gallery2, $gallery3] as $item): ?>
                 <article class="buurderij-gallery-card">
                     <img src="<?= h($item['image']) ?>" alt="<?= h($item['heading']) ?>">
-                    <h4><?= h($item['heading']) ?></h4>
-                    <p><?= nl2br(h($item['text'])) ?></p>
+                    <h4 class="section-subtitle buurderij-gallery-title"><?= h($item['heading']) ?></h4>
+                    <p class="copy-text copy-text--sm"><?= nl2br(h($item['text'])) ?></p>
                 </article>
             <?php endforeach; ?>
         </section>
@@ -88,25 +93,30 @@ $gallery3 = [
         <section class="buurderij-bottom-grid">
 
             <div class="buurderij-contribute-card">
-                <h3>Contribution (pay as you like)</h3>
-                <div class="buurderij-place-name"><?= h($venueText ?: 'Kweekcafé') ?></div>
+                <h3 class="section-subtitle buurderij-contribute-title">Contribution (pay as you like)</h3>
+
+                <div class="section-subtitle buurderij-place-name">
+                    <?= h($venueText ?: 'Kweekcafé') ?>
+                </div>
 
                 <div class="buurderij-age-box">
                     <div class="buurderij-age-top">
                         <span class="buurderij-age-icon">!</span>
-                        <span class="buurderij-age-text">Age requirement</span>
+                        <span class="copy-text copy-text--sm buurderij-age-text">Age requirement</span>
                         <span class="buurderij-age-badge"><?= h($ageText ?: '16+') ?></span>
                     </div>
-                    <p>This session contains spoken-word content and is recommended for ages <?= h($ageText ?: '16+') ?>.</p>
+                    <p class="copy-text copy-text--sm">
+                        This session contains spoken-word content and is recommended for ages <?= h($ageText ?: '16+') ?>.
+                    </p>
                 </div>
 
-                <div class="buurderij-contribute-copy">
+                <div class="copy-text buurderij-contribute-copy">
                     Choose the amount you want to contribute.<br>
                     Your contribution supports the storytellers and future events.<br>
                     €0 is also welcome – just reserve
                 </div>
 
-                <div class="buurderij-amount-label">Suggested amounts</div>
+                <div class="copy-text copy-text--sm buurderij-amount-label">Suggested amounts</div>
                 <div class="buurderij-amount-grid">
                     <button type="button">€0</button>
                     <button type="button">€5</button>
@@ -115,40 +125,44 @@ $gallery3 = [
                     <button type="button">€20</button>
                 </div>
 
-                <div class="buurderij-custom-label">Or enter a custom amount</div>
+                <div class="copy-text copy-text--sm buurderij-custom-label">Or enter a custom amount</div>
                 <div class="buurderij-custom-input-wrap">
                     <input type="text" value="€ 0" placeholder="€ 0">
                 </div>
 
                 <div class="buurderij-total-row">
-                    <span>Your contribution</span>
-                    <strong>€0.00</strong>
+                    <span class="copy-text copy-text--sm">Your contribution</span>
+                    <strong class="copy-text">€0.00</strong>
                 </div>
 
-                <a href="/tickets" class="buurderij-reserve-btn">Reserve ›</a>
+                <a href="/tickets" class="btn btn--primary btn--sm buurderij-reserve-btn">Reserve →</a>
             </div>
 
-            <div class="buurderij-info-card buurderij-info-card--design">
-                <div class="buurderij-info-top">
-                    <div class="buurderij-info-block">
-                        <strong>Venue</strong>
-                        <span><?= h($venueText ?: 'Kweekcafe, Haarlem') ?></span>
-                    </div>
-                    <div class="buurderij-info-block">
-                        <strong>Day</strong>
-                        <div class="buurderij-day-tabs buurderij-day-tabs-large">
-                            <span class="active"><?= h($dayText ?: 'Thursday') ?></span>
+            <div class="buurderij-info-column">
+                <div class="buurderij-info-card buurderij-info-card--design">
+                    <div class="buurderij-info-top">
+                        <div class="buurderij-info-block">
+                            <strong class="section-subtitle buurderij-info-label">Venue</strong>
+                            <span class="copy-text"><?= h($venueText ?: 'Kweekcafe, Haarlem') ?></span>
                         </div>
-                    </div>
-                    <div class="buurderij-info-block">
-                        <strong>Time</strong>
-                        <span><?= h($timeText ?: '20:30 – 21:45') ?></span>
+
+                        <div class="buurderij-info-block">
+                            <strong class="section-subtitle buurderij-info-label">Day</strong>
+                            <div class="buurderij-day-tabs buurderij-day-tabs-large">
+                                <span class="active"><?= h($dayText ?: 'Thursday') ?></span>
+                            </div>
+                        </div>
+
+                        <div class="buurderij-info-block">
+                            <strong class="section-subtitle buurderij-info-label">Time</strong>
+                            <span class="copy-text"><?= h($timeText ?: '20:30 – 21:45') ?></span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="buurderij-reservation-box buurderij-reservation-box-large">
-                    <h4>Reservation</h4>
-                    <ul>
+                    <h4 class="section-subtitle buurderij-reservation-title">Reservation</h4>
+                    <ul class="copy-text copy-text--sm">
                         <li>Reservation is required</li>
                         <li>Even for Pay As You Like events</li>
                         <li>Reservation guarantees entry (limited capacity)</li>
@@ -161,14 +175,11 @@ $gallery3 = [
 
         </section>
 
-        <section class="buurderij-last-grid">
-            <div class="buurderij-last-image">
-                <img src="<?= h($bottomImage) ?>" alt="Buurderij community">
-            </div>
-            <div class="buurderij-last-text">
-                <h3><?= h($bottomTitle) ?></h3>
-                <p><?= nl2br(h($bottomText)) ?></p>
-            </div>
+        <section class="buurderij-last-section">
+            <h2 class="section-title section-title--accent section-title--underlined buurderij-last-title">
+                <?= h($bottomTitle) ?>
+            </h2>
+            <p class="copy-text buurderij-last-copy"><?= nl2br(h($bottomText)) ?></p>
         </section>
 
     </section>

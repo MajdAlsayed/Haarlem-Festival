@@ -3,8 +3,26 @@
 $foodConfig = $viewModel->foodSettings;
 $restaurants = $viewModel->restaurants;
 
-$pageTitle    = 'Food';
-$heroImage    = '/images/food/' . rawurlencode($foodConfig['hero_image'] ?? 'food-hero.jpg');
+// Settings for the page title, styles, body class
+$pageTitle = 'Food — Haarlem Festival';
+$pageStyles = ['/css/pages/food.css'];
+$bodyClass = 'food-page';
+
+// Hero settings
+$heroModifier = 'festival-hero--food';
+$heroImage = '/images/food/' . rawurlencode($foodConfig['hero_image'] ?? 'food-hero.jpg');
+$heroImageAlt = 'Food';
+$heroTitle = 'Taste the Festival Spirit in Haarlem';
+$heroSubtitle = '';
+$heroButtonText = '';
+$heroButtonUrl = '';
+$heroButtonClass = 'btn btn--light';
+
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'Food', 'url' => null],
+];
+
 $introHeading = $foodConfig['intro_heading'] ?? 'Taste the Festival Spirit in Haarlem';
 $introText    = $foodConfig['intro_text'] ?? '';
 $filters      = $foodConfig['filter_labels'] ?? ['All'];
@@ -22,46 +40,33 @@ $renderStars = static function (int $stars): string {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title><?= htmlspecialchars($pageTitle) ?></title>
-    <link rel="stylesheet" href="/css/style.css"></head>
+<?php require __DIR__ . '/../partials/head.php'; ?>
 
-<body class="food-page">
+<body class="<?= htmlspecialchars($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main>
     <!-- Hero -->
-    <section class="food-hero"
-             style="background-image: linear-gradient(120deg, rgba(0,0,0,0.35), rgba(0,0,0,0.65)), url('<?= htmlspecialchars($heroImage) ?>');">
-        <div class="food-hero-content container">
-            <h1><?= htmlspecialchars($pageTitle) ?></h1>
-        </div>
-    </section>
+    <?php require __DIR__ . '/../partials/festival-hero.php'; ?>
+
+    <!-- Breadcrumbs nav -->
+    <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
     <!-- Intro -->
     <section class="food-intro container">
-        <nav class="breadcrumbs food-breadcrumbs">
-            <a href="/">HOME</a>
-            <span class="breadcrumb-sep">›</span>
-            <span class="breadcrumb-current">FOOD</span>
-        </nav>
-
-        <h2 class="food-intro-heading"><?= htmlspecialchars($introHeading) ?></h2>
-        <p class="food-intro-text"><?= nl2br(htmlspecialchars($introText)) ?></p>
+        <p class="copy-text food-intro-text"><?= nl2br(htmlspecialchars($introText)) ?></p>
     </section>
 
     <!-- Filter + Restaurants -->
     <section class="food-restaurants container">
         <div class="food-filter-row">
-            <p class="food-filter-label">Filter by:</p>
-            <div class="food-filter-pills" role="tablist" aria-label="Cuisine filters">
+            <div class="filter-tabs food-filter-pills" role="tablist" aria-label="Cuisine filters">
                 <?php foreach ($filters as $i => $label):
                     $active = ($i === 0) ? 'active' : '';
                 ?>
                     <button type="button"
-                            class="food-filter-btn <?= $active ?>"
+                            class="filter-tab food-filter-btn <?= $active ?>"
                             data-filter="<?= htmlspecialchars($label) ?>"
                             aria-pressed="<?= $i === 0 ? 'true' : 'false' ?>">
                         <?= htmlspecialchars($label) ?>
@@ -80,7 +85,7 @@ $renderStars = static function (int $stars): string {
             <a class="food-card-link"
                href="/food/restaurant/<?= (int) $restaurant->restaurantId ?>"
                aria-label="Open <?= htmlspecialchars($restaurant->name) ?> details">
-                <article class="food-card"
+                <article class="festival-card festival-card--food-restaurant food-card"
                          data-tags="<?= $dataTags ?>"
                          data-name="<?= htmlspecialchars($restaurant->name) ?>">
 
@@ -94,16 +99,16 @@ $renderStars = static function (int $stars): string {
                     </div>
 
                     <div class="food-card-body">
-                        <h3 class="food-card-title"><?= htmlspecialchars($restaurant->name) ?></h3>
-                        <p class="food-card-tags"><?= htmlspecialchars(implode(', ', $tags)) ?></p>
+                        <h3 class="section-subtitle food-card-title"><?= htmlspecialchars($restaurant->name) ?></h3>
+                        <p class="copy-text copy-text--sm food-card-tags"><?= htmlspecialchars(implode(', ', $tags)) ?></p>
                         <p class="food-card-stars"><?= htmlspecialchars($renderStars($restaurant->stars)) ?></p>
-                        <p class="food-card-prices">
+                        <p class="copy-text copy-text--sm food-card-prices">
                             €<?= number_format($restaurant->priceAdult, 2) ?>
                             •
                             Kids&lt;<?= (int) $restaurant->kidAgeMax ?> €<?= number_format($restaurant->priceKid, 2) ?>
                         </p>
-                        <p class="food-card-seats">Seats <?= (int) $restaurant->seats ?></p>
-                        <p class="food-card-address"><?= htmlspecialchars($restaurant->address) ?></p>
+                        <p class="copy-text copy-text--sm food-card-seats">Seats <?= (int) $restaurant->seats ?></p>
+                        <p class="copy-text copy-text--sm food-card-address"><?= htmlspecialchars($restaurant->address) ?></p>
                     </div>
                 </article>
             </a>
@@ -114,7 +119,7 @@ $renderStars = static function (int $stars): string {
     <!-- Locals reviews -->
     <section class="food-reviews">
         <div class="container">
-            <h2 class="food-reviews-title">locals reviews</h2>
+            <h2 class="section-title section-title--accent section-title--underlined food-reviews-title">Locals reviews</h2>
 
             <div class="food-reviews-grid">
                 <?php foreach ($localsReviews as $rev):
@@ -134,14 +139,14 @@ $renderStars = static function (int $stars): string {
                                 <?php endif; ?>
                             </div>
                             <div class="food-review-meta">
-                                <p class="food-review-name"><?= htmlspecialchars($reviewer) ?></p>
-                                <p class="food-review-restaurant"><?= htmlspecialchars($restaurant) ?></p>
+                                <p class="section-subtitle food-review-name"><?= htmlspecialchars($reviewer) ?></p>
+                                <p class="copy-text copy-text--sm text-accent food-review-restaurant"><?= htmlspecialchars($restaurant) ?></p>
                                 <p class="food-review-stars"><?= htmlspecialchars($renderStars($rating)) ?></p>
                             </div>
                         </div>
 
                         <div class="food-review-body">
-                            <p><?= nl2br(htmlspecialchars($text)) ?></p>
+                            <p class="copy-text copy-text--sm"><?= nl2br(htmlspecialchars($text)) ?></p>
                         </div>
                     </article>
                 <?php endforeach; ?>

@@ -48,7 +48,7 @@ final class AdminFoodController
     {
         $this->requireAdmin();
         $app = $this->appSettings->getAll();
-        require __DIR__ . '/../Views/Admin/food-index.php';
+        require __DIR__ . '/../Views/Admin/Food/food-index.php';
     }
 
     // -------------------------------------------------------------------------
@@ -63,7 +63,7 @@ final class AdminFoodController
         $success  = Session::getFlash('admin_food_success');
         $error    = Session::getFlash('admin_food_error');
         $csrf     = Csrf::token('admin_food_settings');
-        require __DIR__ . '/../Views/Admin/food-settings.php';
+        require __DIR__ . '/../Views/Admin/Food/food-settings.php';
     }
 
     public function saveSettings(): void
@@ -99,7 +99,7 @@ final class AdminFoodController
         $restaurants = $this->service->getAllRestaurants();
         $success     = Session::getFlash('admin_food_success');
         $error       = Session::getFlash('admin_food_error');
-        require __DIR__ . '/../Views/Admin/food-restaurants-list.php';
+        require __DIR__ . '/../Views/Admin/Food/food-restaurants-list.php';
     }
 
     // -------------------------------------------------------------------------
@@ -113,7 +113,7 @@ final class AdminFoodController
         $row  = null;
         $csrf = Csrf::token('admin_food_restaurant');
         $error = Session::getFlash('admin_food_error');
-        require __DIR__ . '/../Views/Admin/food-restaurant-edit.php';
+        require __DIR__ . '/../Views/Admin/Food/food-restaurant-edit.php';
     }
 
     // -------------------------------------------------------------------------
@@ -136,7 +136,7 @@ final class AdminFoodController
         $app   = $this->appSettings->getAll();
         $csrf  = Csrf::token('admin_food_restaurant');
         $error = Session::getFlash('admin_food_error');
-        require __DIR__ . '/../Views/Admin/food-restaurant-edit.php';
+        require __DIR__ . '/../Views/Admin/Food/food-restaurant-edit.php';
     }
 
     // -------------------------------------------------------------------------
@@ -164,7 +164,7 @@ final class AdminFoodController
             // Build a temporary Restaurant-like object from POST so the form
             // shows the user's input back
             $row = $this->service->buildRestaurantFromPost($_POST);
-            require __DIR__ . '/../Views/Admin/food-restaurant-edit.php';
+            require __DIR__ . '/../Views/Admin/Food/food-restaurant-edit.php';
             return;
         }
 

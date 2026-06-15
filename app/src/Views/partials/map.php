@@ -38,8 +38,8 @@ $mapLayers = array_unique(array_column($mapLocations, 'layer'));
             </div>
         </div>
         <div class="map-actions">
-            <button type="button" class="btn btn--light map-btn" id="map-center-btn" aria-label="Center map on all venues">Center map</button>
-            <a href="https://www.google.com/maps/search/festival+haarlem" target="_blank" rel="noopener" class="btn btn--light map-btn">View live map →</a>
+            <button type="button" class="btn btn--light" id="map-center-btn" aria-label="Center map on all venues">Center map</button>
+            <a href="https://www.google.com/maps/search/festival+haarlem" target="_blank" rel="noopener" class="btn btn--light">View live map →</a>
         </div>
     </div>
 </section>

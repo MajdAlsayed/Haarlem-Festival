@@ -1,0 +1,1197 @@
+/* =========================
+   JAZZ — Overview page
+   ========================= */
+
+.jazz-intro {
+    text-align: center;
+}
+
+.jazz-lead {
+    margin-bottom: 48px;
+}
+
+.jazz-filterbar {
+    margin-bottom: 36px;
+}
+
+.jazz-events-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(140px, 1fr));
+    gap: 20px;
+    padding: 10px 0 32px;
+    text-align: left;
+    align-items: stretch;
+}
+
+.jazz-filter-day .jazz-events-grid {
+    grid-template-columns: repeat(3, minmax(200px, 1fr));
+}
+
+.jazz-event-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    text-align: left;
+}
+
+.jazz-event-card.is-hidden {
+    display: none;
+}
+
+.festival-card--jazz {
+    background:
+            linear-gradient(
+                    145deg,
+                    rgba(255, 255, 255, 0.08),
+                    rgba(255, 255, 255, 0.035)
+            ),
+            var(--color-surface);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.jazz-event-media {
+    position: relative;
+    height: 190px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.jazz-event-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.jazz-filter-all .jazz-card-day-only {
+    display: none !important;
+}
+
+body.jazz-filter-all .jazz-event-card.jazz-all-events-duplicate {
+    display: none !important;
+}
+
+.jazz-filter-day .jazz-card-compact-only {
+    display: none !important;
+}
+
+.jazz-heart-btn.jazz-card-all-only,
+body.jazz-filter-day .jazz-heart-btn.jazz-card-all-only,
+body.jazz-filter-day .jazz-event-media .jazz-heart-btn.jazz-card-all-only {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only,
+body.jazz-filter-all .jazz-event-media .jazz-heart-btn.jazz-card-all-only {
+    display: grid !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+.jazz-heart-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+
+    display: grid;
+    place-items: center;
+
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+
+    background: rgba(0, 0, 0, 0.4);
+    color: rgba(255, 255, 255, 0.95) !important;
+
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only:not(.is-saved) {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.jazz-heart-btn:hover {
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff !important;
+}
+
+.jazz-heart-btn.is-saved,
+body.jazz-filter-all .jazz-heart-btn.jazz-card-all-only.is-saved {
+    background: rgba(0, 0, 0, 0.55);
+    color: #e63946 !important;
+}
+
+.jazz-heart-btn.is-saved:hover {
+    color: #ff6b7a !important;
+}
+
+.jazz-event-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding: 14px 16px 16px;
+    text-align: left;
+}
+
+.jazz-event-title {
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+}
+
+.jazz-event-whenwhere,
+.jazz-event-whenwhere-compact {
+    text-align: center;
+}
+
+.jazz-event-whenwhere {
+    margin: 0 0 10px;
+}
+
+.jazz-event-whenwhere-compact {
+    margin: 0 0 14px;
+    font-weight: 600;
+}
+
+.jazz-event-whenwhere.jazz-card-day-only {
+    color: #fff;
+    font-weight: 600;
+}
+
+.jazz-event-desc {
+    margin: 0 0 14px;
+    text-align: left;
+}
+
+.jazz-event-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: auto;
+    text-align: left;
+}
+
+.jazz-event-details-btn.is-disabled {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+@media (max-width: 1200px) {
+    .jazz-events-grid {
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
+    }
+
+    .jazz-filter-day .jazz-events-grid {
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .jazz-events-grid,
+    .jazz-filter-day .jazz-events-grid {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .jazz-events-grid,
+    .jazz-filter-day .jazz-events-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================
+   JAZZ — Artist pages base
+   ========================= */
+
+.jazz-artist-body {
+    padding-block: 36px 60px;
+}
+
+.jazz-gumbo-detail-hero .page-hero__background img {
+    object-position: center 20%;
+}
+
+.jazz-gare-detail-hero .page-hero__background img {
+    object-position: center 25%;
+}
+
+.jazz-karsu-detail-hero .page-hero__background img {
+    object-position: center center;
+}
+
+.jazz-artist-subtitle {
+    color: var(--color-text);
+    margin-bottom: var(--space-xl);
+}
+
+.jazz-artist-bio {
+    padding-left: 0;
+    text-align: left;
+}
+
+.jazz-artist-note {
+    margin: 0 0 var(--space-md);
+}
+
+.jazz-muted {
+    color: #aaa;
+    font-size: 14px;
+}
+
+.jazz-plan-section {
+    margin-top: 32px;
+    text-align: left;
+}
+
+.jazz-artist-schedule {
+    margin-top: var(--space-lg);
+}
+
+.jazz-highlights {
+    margin-top: 32px;
+}
+
+.jazz-highlight-text {
+    max-width: none;
+}
+
+.jazz-back {
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-xl);
+    text-align: center;
+}
+
+.jazz-cart-add-form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+}
+
+.jazz-cart-add-form button {
+    font: inherit;
+}
+
+.jazz-cart-flash {
+    margin: 0 auto;
+    padding: 12px 18px;
+    font-size: 14px;
+    line-height: 1.45;
+    text-align: center;
+}
+
+.jazz-cart-flash--success {
+    background: rgba(40, 120, 60, 0.35);
+    border-bottom: 1px solid rgba(120, 200, 140, 0.45);
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.jazz-cart-flash--error {
+    background: rgba(160, 40, 40, 0.35);
+    border-bottom: 1px solid rgba(220, 100, 100, 0.5);
+    color: rgba(255, 220, 220, 0.98);
+}
+
+/* =========================
+   JAZZ — Shared media cards
+   ========================= */
+
+.jazz-media-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    border-radius: var(--radius-card);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.055);
+
+    transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            transform 0.2s ease;
+}
+
+.jazz-media-card:hover {
+    border-color: var(--color-accent);
+    box-shadow:
+            0 0 0 2px var(--color-accent),
+            0 18px 44px rgba(0, 0, 0, 0.42);
+    transform: translateY(-2px);
+}
+
+.jazz-media-card__media {
+    position: relative;
+    width: 100%;
+    height: 150px;
+    min-height: 150px;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.jazz-media-card__poster {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.jazz-media-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.2s ease;
+}
+
+.jazz-media-card:hover .jazz-media-card__img {
+    transform: scale(1.03);
+}
+
+.jazz-media-card__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 5;
+
+    width: 54px;
+    height: 54px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.92);
+    color: #111;
+
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    transform: translate(-50%, -50%);
+
+    transition:
+            transform 0.15s ease,
+            background 0.15s ease;
+}
+
+.jazz-media-card__play:hover,
+.jazz-media-card__play.is-playing {
+    background: #fff;
+    transform: translate(-50%, -50%) scale(1.06);
+}
+
+.jazz-media-card__play-icon {
+    font-size: 20px;
+    line-height: 1;
+    margin-left: 3px;
+}
+
+.jazz-media-card__audio {
+    display: none;
+}
+
+.jazz-media-card__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: var(--space-md);
+    text-align: left;
+}
+
+.jazz-media-card__head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
+}
+
+.jazz-media-card__title {
+    color: var(--color-text);
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.35;
+}
+
+.jazz-media-card__meta {
+    width: 100%;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.8rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.jazz-media-card__desc {
+    flex: 1;
+    margin: 0;
+    max-width: none;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* =========================
+   JAZZ — Gumbo Kings
+   ========================= */
+
+.jazz-gumbo-intro {
+    margin-top: 18px;
+    max-width: none;
+    width: 100%;
+}
+
+.jazz-gumbo-intro .jazz-artist-bio {
+    max-width: none;
+}
+
+.jazz-gumbo-plan {
+    text-align: left;
+}
+
+.jazz-gumbo-discography-outer {
+    margin-bottom: 28px;
+}
+
+.jazz-gumbo-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.jazz-gumbo-experience-outer {
+    max-width: 620px;
+    width: 100%;
+    margin-inline: auto;
+    box-sizing: border-box;
+}
+
+.jazz-gumbo-cards.jazz-gumbo-experience-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin: 0;
+    max-width: 100%;
+    width: 100%;
+    align-items: stretch;
+    box-sizing: border-box;
+}
+
+.jazz-gumbo-highlights {
+    max-width: none;
+    width: 100%;
+    margin-inline: 0;
+}
+
+.jazz-gumbo-highlights > .jazz-highlight-text {
+    padding-left: 0;
+    text-align: justify;
+    hyphens: auto;
+}
+
+.jazz-gumbo-highlights-cms {
+    padding-left: 3.5rem;
+}
+
+@media (max-width: 768px) {
+    .jazz-gumbo-cards:not(.jazz-gumbo-experience-grid) {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .jazz-gumbo-experience-outer {
+        max-width: 100%;
+        padding: 0 8px;
+    }
+}
+
+@media (max-width: 500px) {
+    .jazz-gumbo-cards.jazz-gumbo-experience-grid {
+        grid-template-columns: 1fr;
+        max-width: 340px;
+        margin-inline: auto;
+    }
+}
+
+/* =========================
+   JAZZ — Band members
+   ========================= */
+
+.jazz-band-section {
+    margin-top: var(--space-2xl);
+    padding: var(--space-xl);
+}
+
+.jazz-band-title {
+    text-align: left;
+    margin-bottom: var(--space-xl);
+}
+
+.jazz-band-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    margin: 16px 0 0;
+}
+
+.jazz-band-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: clamp(20px, 5vw, 56px);
+
+    margin-top: 88px;
+    padding: 0 clamp(16px, 4vw, 40px) 26px;
+
+    border-radius: var(--radius-card);
+    border: 1px solid rgba(var(--color-accent-rgb), 0.24);
+    background: rgba(var(--color-accent-rgb), 0.18);
+}
+
+.jazz-band-row--three,
+.jazz-band-row--two {
+    justify-content: center;
+}
+
+.jazz-band-row--two {
+    margin-top: 96px;
+}
+
+.jazz-band-member-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 176px;
+    flex-shrink: 0;
+    text-align: left;
+}
+
+.jazz-band-member-photo {
+    width: 158px;
+    height: 158px;
+    margin-top: -79px;
+    margin-bottom: var(--space-md);
+
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background: rgba(0, 0, 0, 0.35);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.jazz-band-member-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.jazz-band-member-captions {
+    width: 100%;
+    padding: 0 4px;
+}
+
+.jazz-band-member-name {
+    display: block;
+    max-width: none;
+    margin: 0 0 var(--space-xs);
+    color: var(--color-text);
+    line-height: 1.35;
+}
+
+.jazz-band-member-role {
+    display: block;
+    color: rgba(255, 255, 255, 0.82);
+}
+
+@media (max-width: 600px) {
+    .jazz-band-row {
+        gap: 28px 20px;
+        padding-bottom: 22px;
+    }
+
+    .jazz-band-member-card {
+        width: 148px;
+    }
+
+    .jazz-band-member-photo {
+        width: 128px;
+        height: 128px;
+        margin-top: -64px;
+        border-radius: 12px;
+    }
+}
+
+/* =========================
+   JAZZ — Gare du Nord
+   ========================= */
+
+body.jazz-gare-page.jazz-artist-page {
+    background: radial-gradient(circle at 50% 0%, #2a2218 0%, #0a0a0a 50%, #000 100%);
+}
+
+.jazz-gare-intro {
+    margin: 0 0 var(--space-2xl);
+}
+
+.jazz-gare-intro .section-title {
+    text-align: left;
+    margin-bottom: var(--space-sm);
+}
+
+.jazz-gare-plan {
+    text-align: left;
+}
+
+.jazz-gare-media-block {
+    margin: var(--space-2xl) 0 var(--space-xl);
+}
+
+.jazz-gare-media-block .jazz-gare-discography-cards {
+    margin-inline: auto;
+}
+
+.jazz-gare-discography {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.jazz-gare-disc-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    padding: 16px;
+
+    border-radius: 14px;
+    border: 1px solid rgba(var(--color-accent-rgb), 0.3);
+    background: rgba(0, 0, 0, 0.35);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.jazz-gare-disc-row--preview {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.jazz-gare-disc-cover {
+    flex-shrink: 0;
+    width: 96px;
+    height: 96px;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid rgba(var(--color-accent-rgb), 0.25);
+    background: #1a1510;
+}
+
+.jazz-gare-disc-cover--hero {
+    width: 120px;
+    height: 120px;
+}
+
+.jazz-gare-disc-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.jazz-gare-disc-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.jazz-gare-disc-title {
+    margin-bottom: 8px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.jazz-gare-audio {
+    width: 100%;
+    height: 40px;
+    margin: 0;
+}
+
+.jazz-gare-video-block {
+    display: flex;
+    justify-content: center;
+    margin: var(--space-lg) 0 var(--space-xl);
+}
+
+.jazz-gare-video-link {
+    position: relative;
+    display: block;
+    width: min(100%, 640px);
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+
+    border-radius: var(--radius-card);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    text-decoration: none;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
+
+    transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            transform 0.2s ease;
+}
+
+.jazz-gare-video-link:hover {
+    border-color: var(--color-accent);
+    box-shadow:
+            0 0 0 2px var(--color-accent),
+            0 18px 44px rgba(0, 0, 0, 0.42);
+    transform: translateY(-2px);
+}
+
+.jazz-gare-video-poster {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.02);
+}
+
+.jazz-gare-video-glow {
+    display: none;
+}
+
+.jazz-gare-video-play {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.28);
+    transition: background 0.2s ease;
+}
+
+.jazz-gare-video-link:hover .jazz-gare-video-play {
+    background: rgba(0, 0, 0, 0.42);
+}
+
+.jazz-gare-video-play-icon {
+    width: 64px;
+    height: 64px;
+    padding-left: 5px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: #fff;
+    color: #111;
+
+    font-size: 1.4rem;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
+.jazz-gare-highlights {
+    max-width: none;
+    width: 100%;
+    margin-inline: 0;
+}
+
+.jazz-gare-highlights .section-title {
+    text-align: left;
+    margin-bottom: var(--space-lg);
+}
+
+.jazz-gare-highlights .copy-text {
+    max-width: none;
+}
+
+.jazz-gare-highlights .copy-text + .copy-text {
+    margin-top: var(--space-md);
+}
+
+/* =========================
+   JAZZ — CMS career highlights
+   ========================= */
+
+.jazz-gare-highlights-cms,
+.jazz-gumbo-highlights-cms {
+    max-width: none;
+    width: 100%;
+    margin-inline: 0;
+}
+
+.jazz-gare-highlights-cms > p,
+.jazz-gumbo-highlights-cms > p,
+.jazz-gare-highlights-cms p.jazz-highlight-text,
+.jazz-gumbo-highlights-cms p.jazz-highlight-text {
+    margin: 0 0 1.25rem;
+    color: #d0d0d0;
+    font-size: 14px;
+    line-height: 1.75;
+    text-align: justify;
+    hyphens: auto;
+}
+
+.jazz-gare-highlights-cms > p:last-child,
+.jazz-gumbo-highlights-cms > p:last-child,
+.jazz-gare-highlights-cms p.jazz-highlight-text:last-child,
+.jazz-gumbo-highlights-cms p.jazz-highlight-text:last-child {
+    margin-bottom: 0;
+}
+
+.jazz-gare-accent,
+.jazz-gumbo-accent,
+.jazz-gumbo-year,
+.jazz-artist-accent,
+.jazz-gare-highlights-cms strong.jazz-gare-accent,
+.jazz-gare-highlights-cms span.jazz-gare-accent,
+.jazz-gare-highlights-cms b.jazz-gare-accent,
+.jazz-gumbo-highlights-cms strong.jazz-gumbo-year,
+.jazz-gumbo-highlights-cms span.jazz-gumbo-year,
+.jazz-gumbo-highlights-cms b.jazz-gumbo-year,
+.jazz-gare-highlights-cms strong.jazz-artist-accent,
+.jazz-gare-highlights-cms span.jazz-artist-accent,
+.jazz-gumbo-highlights-cms strong.jazz-artist-accent,
+.jazz-gumbo-highlights-cms span.jazz-artist-accent {
+    color: var(--color-accent);
+    font-weight: 700;
+}
+
+/* =========================
+   JAZZ — Karsu
+   ========================= */
+
+.jazz-karsu-page.jazz-artist-page {
+    background: radial-gradient(ellipse 140% 100% at 50% 20%, #1a1510 0%, #0f0c09 50%, #060504 100%);
+}
+
+.jazz-karsu-intro {
+    margin-top: 18px;
+}
+
+.jazz-karsu-intro .jazz-artist-bio + .jazz-artist-bio {
+    margin-top: 14px;
+}
+
+.jazz-karsu-plan-section {
+    text-align: left;
+}
+
+.jazz-karsu-video-card-wrap {
+    display: flex;
+    justify-content: center;
+    margin: var(--space-2xl) 0 var(--space-xl);
+}
+
+.jazz-karsu-media-card {
+    max-width: 620px;
+}
+
+.jazz-karsu-media-card .jazz-media-card__media {
+    height: 220px;
+}
+
+.jazz-karsu-page .jazz-highlights {
+    margin-top: var(--space-2xl);
+}
+
+.jazz-karsu-page .jazz-highlights .section-title {
+    text-align: left;
+    margin-bottom: var(--space-lg);
+}
+
+.jazz-karsu-page .jazz-highlight-text {
+    max-width: none;
+    padding-left: 0;
+    text-align: left;
+}
+
+.jazz-karsu-page .copy-text + .copy-text {
+    margin-top: var(--space-md);
+}
+
+.jazz-karsu-list {
+    max-width: none;
+    margin: 0;
+    padding-left: 1.25rem;
+    list-style: disc;
+}
+
+.jazz-karsu-list li {
+    margin-bottom: var(--space-sm);
+}
+
+.jazz-karsu-list li:last-child {
+    margin-bottom: 0;
+}
+
+.jazz-karsu-list .text-accent {
+    color: var(--color-accent);
+    font-weight: 700;
+}
+
+.jazz-karsu-discography {
+    margin-top: var(--space-2xl);
+}
+
+.jazz-karsu-disco-shell {
+    position: relative;
+    padding: var(--space-xl);
+    overflow: hidden;
+}
+
+.jazz-karsu-disco-empty {
+    max-width: 520px;
+}
+
+.jazz-karsu-disco-empty code {
+    font-size: 0.9em;
+}
+
+.jazz-karsu-disco-stage {
+    position: relative;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.jazz-karsu-disco-orangerow {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    max-width: none;
+    margin: 0;
+}
+
+.jazz-karsu-disco-covers {
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: flex-end;
+
+    gap: clamp(10px, 3.5vw, 32px);
+    margin-bottom: 0;
+    padding: var(--space-sm) var(--space-xs) var(--space-xl);
+}
+
+.jazz-karsu-disco-cover-btn {
+    flex: 0 0 auto;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-card);
+    background: transparent;
+    cursor: pointer;
+    line-height: 0;
+
+    transition:
+            transform 0.2s ease,
+            filter 0.2s ease,
+            opacity 0.2s ease;
+}
+
+.jazz-karsu-disco-cover-btn:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+}
+
+.jazz-karsu-disco-cover-img {
+    width: clamp(96px, 24vw, 148px);
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+    box-sizing: border-box;
+
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.72);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+
+    opacity: 0.88;
+    filter: brightness(0.94);
+}
+
+.jazz-karsu-disco-cover-btn--focus .jazz-karsu-disco-cover-img {
+    width: clamp(148px, 38vw, 220px);
+    border-color: var(--color-accent);
+    box-shadow:
+            0 14px 36px rgba(0, 0, 0, 0.55),
+            0 0 0 2px var(--color-accent);
+    opacity: 1;
+    filter: none;
+    transform: scale(1.06);
+}
+
+.jazz-karsu-disco-panel {
+    position: relative;
+    z-index: 2;
+
+    width: calc(100% + (var(--space-xl) * 2));
+    margin: var(--space-sm) calc(var(--space-xl) * -1) calc(var(--space-xl) * -1);
+    padding: var(--space-xl);
+
+    border-radius: var(--radius-card);
+    border: 1px solid rgba(var(--color-accent-rgb), 0.24);
+    background: rgba(var(--color-accent-rgb), 0.18);
+    box-shadow: none;
+    text-align: center;
+}
+
+.jazz-karsu-disco-detail {
+    max-width: 420px;
+    margin: 0 auto var(--space-md);
+    color: #fff;
+}
+
+.jazz-karsu-disco-title {
+    margin: 0 0 var(--space-sm);
+    color: #fff;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.jazz-karsu-disco-meta,
+.jazz-karsu-disco-plays {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.95rem;
+}
+
+.jazz-karsu-disco-plays {
+    margin-top: var(--space-sm);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.88rem;
+}
+
+.jazz-karsu-disco-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-md);
+}
+
+.jazz-karsu-disco-ctrl {
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    border-radius: 50%;
+    cursor: pointer;
+
+    transition:
+            transform 0.15s ease,
+            background 0.15s ease,
+            box-shadow 0.15s ease;
+}
+
+.jazz-karsu-disco-ctrl--side {
+    width: 46px;
+    height: 46px;
+    border: 2px solid #fff;
+    background: transparent;
+    color: #fff;
+    box-shadow: none;
+}
+
+.jazz-karsu-disco-ctrl--side:hover {
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.18);
+    transform: scale(1.05);
+}
+
+.jazz-karsu-disco-ctrl-svg {
+    display: block;
+}
+
+.jazz-karsu-disco-ctrl--play {
+    position: relative;
+
+    width: 62px;
+    height: 62px;
+
+    border: 2px solid #fff;
+    background: transparent;
+    color: #fff;
+    box-shadow: none;
+}
+
+.jazz-karsu-disco-ctrl--play:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: scale(1.05);
+}
+
+.jazz-karsu-disco-ctrl--play .jazz-karsu-disco-icon-play,
+.jazz-karsu-disco-ctrl--play .jazz-karsu-disco-icon-pause {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    display: block;
+    transform: translate(-50%, -50%);
+}
+
+.jazz-karsu-disco-ctrl--play .jazz-karsu-disco-icon-play[hidden],
+.jazz-karsu-disco-ctrl--play .jazz-karsu-disco-icon-pause[hidden] {
+    display: none;
+}
+
+.jazz-karsu-disco-progress {
+    height: 5px;
+    max-width: 300px;
+    margin: 0 auto var(--space-xs);
+
+    overflow: hidden;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    background: rgba(0, 0, 0, 0.22);
+}
+
+.jazz-karsu-disco-progress-bar {
+    width: 0%;
+    height: 100%;
+    border-radius: 2px;
+    background: #fff;
+    transition: width 0.1s linear;
+}
+
+@media (max-width: 640px) {
+    .jazz-karsu-media-card .jazz-media-card__media {
+        height: 180px;
+    }
+}

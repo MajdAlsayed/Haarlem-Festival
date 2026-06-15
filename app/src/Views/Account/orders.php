@@ -2,41 +2,48 @@
 /** @var array $app */
 /** @var list<array<string, mixed>> $list */
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+
+// Settings for the page title, styles, body class
+$pageTitle = 'My orders — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/account.css'];
+$bodyClass = 'account-page account-orders-page';
+
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'My orders', 'url' => null],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>My orders — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/tickets.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-</head>
-<body class="tickets-page cart-page">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+
+<body class="<?= $h($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
-<main class="tickets-main container" style="padding-top:2rem;max-width:720px;">
-    <nav class="tickets-breadcrumbs" aria-label="Breadcrumb">
-        <a href="/"><?= $h($app['site_name'] ?? 'Festival') ?></a>
-        <span class="tickets-bc-sep">›</span>
-        <span>My orders</span>
-    </nav>
-    <h1 class="tickets-section-title">My orders</h1>
-    <p class="tickets-card-sub">Open an order to see your invoice lines and ticket codes (assessment: receive tickets).</p>
+<?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
+
+<main class="account-main container account-orders">
+    <h1 class="section-title section-title--accent account-title">My orders</h1>
+
+    <p class="copy-text copy-text--sm copy-text--muted account-lead">
+        Open an order to see your invoice lines and ticket codes.
+    </p>
 
     <?php if ($list === []): ?>
-        <p class="tickets-card-sub">No orders yet. <a href="/tickets">Browse tickets</a></p>
+        <p class="copy-text account-empty">
+            No orders yet. <a href="/tickets">Browse tickets</a>
+        </p>
     <?php else: ?>
         <ul class="account-order-list">
             <?php foreach ($list as $row): ?>
                 <?php
                 $oid = (int) ($row['order_id'] ?? 0);
                 ?>
-                <li class="account-order-row">
+                <li class="account-card account-order-row">
                     <a href="/account/order/<?= $oid ?>" class="account-order-link">
-                        <span class="account-order-id">Order #<?= $h((string) $oid) ?></span>
-                        <span class="account-order-meta">
+                        <span class="section-subtitle account-order-id">Order #<?= $h((string) $oid) ?></span>
+                        <span class="copy-text copy-text--sm copy-text--muted account-order-meta">
                             <?= $h((string) ($row['status'] ?? '')) ?> ·
                             €<?= $h((string) ($row['total_amount'] ?? '0')) ?> ·
                             <?= $h((string) ($row['created_at'] ?? '')) ?>

@@ -2,46 +2,40 @@
 $reservationFee = (float)($foodSettings['reservation_fee_per_person'] ?? 10);
 $bookUrl = '/food/restaurant/' . (int)$restaurant->restaurantId . '/booking';
 // $festivalDates is passed from the controller as ['07-28' => 'Thursday 28th July', ...]
+
+
+// Settings for the page title, styles, body class
+$pageTitle = 'Book a table at ' . ($restaurant->name ?? 'Restaurant') . ' — Haarlem Festival';
+$pageStyles = ['/css/pages/food.css'];
+$bodyClass = 'food-booking-page';
+
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'Food', 'url' => '/food'],
+        ['label' => $restaurant->name ?? 'Restaurant', 'url' => '/food/restaurant/' . (int)$restaurant->restaurantId],
+        ['label' => 'Booking', 'url' => null],
+];
 ?>
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Book a table at <?= htmlspecialchars($restaurant->name) ?></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Lato:wght@300;400&display=swap">
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-<body class="food-booking-page">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+<body class="<?= htmlspecialchars($bodyClass) ?>">
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
-    <!-- BREADCRUMB -->
-    <div class="breadcrumb-bar">
-        <div class="container">
-            <nav class="breadcrumbs">
-                <a href="/">HOME</a>
-                <span class="breadcrumb-sep">›</span>
-                <a href="/food">FOOD</a>
-                <span class="breadcrumb-sep">›</span>
-                <a href="/food/restaurant/<?= $restaurant->restaurantId ?>"><?= htmlspecialchars($restaurant->name) ?></a>
-                <span class="breadcrumb-sep">›</span>
-                <span class="breadcrumb-current">Booking</span>
-            </nav>
-        </div>
-    </div>
+<!-- Breadcrumbs nav -->
+<?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
+
 <main class="booking-card">
 
-    <h1 class="booking-title">Book Your Table</h1>
+    <h1 class="section-title section-title--accent booking-title">Book Your Table</h1>
 
     <div class="booking-meta">
-        <p class="booking-restaurant"><?= htmlspecialchars($restaurant->name) ?></p>
-        <p class="booking-fee">
+        <p class="section-subtitle booking-restaurant"><?= htmlspecialchars($restaurant->name) ?></p>
+        <p class="copy-text copy-text--sm booking-fee">
             Adults €<?= number_format($restaurant->priceAdult, 2) ?>
             Children €<?= number_format($restaurant->priceKid, 2) ?>
         </p>
-        <p class="booking-fee booking-fee--reservation">
+        <p class="copy-text copy-text--sm copy-text--muted booking-fee booking-fee--reservation">
             + €<?= number_format($reservationFee, 2) ?> reservation fee per person
         </p>
     </div>
@@ -171,8 +165,8 @@ $bookUrl = '/food/restaurant/' . (int)$restaurant->restaurantId . '/booking';
 
         <!-- Actions -->
         <div class="form-actions">
-            <button class="btn btn--primary" type="submit">Review Booking</button>
-            <a class="btn btn--secondary" href="/food/restaurant/<?= (int)$restaurant->restaurantId ?>">Back to Restaurant</a>
+            <button class="btn btn--primary booking-btn" type="submit">Review Booking</button>
+            <a class="btn btn--light booking-btn" href="/food/restaurant/<?= (int)$restaurant->restaurantId ?>">Back to Restaurant</a>
         </div>
 
     </form>
@@ -201,92 +195,5 @@ $bookUrl = '/food/restaurant/' . (int)$restaurant->restaurantId . '/booking';
     });
 }());
 </script>
-
-<style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body.food-booking-page {
-        background: radial-gradient(ellipse at 50% 0%, #1a0e00 0%, #000000 70%);
-        min-height: 100vh;
-        font-family: 'Lato', sans-serif;
-        font-weight: 300;
-        color: #e8e0d0;
-    }
-    .booking-card { max-width: 420px; margin: 0 auto; padding: 40px 24px 60px; }
-    .booking-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.75rem;
-        color: #d4922a;
-        text-align: center;
-        letter-spacing: 0.04em;
-        margin-bottom: 8px;
-    }
-    .booking-meta { text-align: center; margin-bottom: 32px; }
-    .booking-restaurant { font-family: 'Playfair Display', serif; font-size: 1rem; color: #e8e0d0; margin-bottom: 6px; }
-    .booking-fee { font-size: 0.8rem; color: #b0a898; letter-spacing: 0.04em; margin-bottom: 2px; }
-    .booking-fee--reservation { color: #8a8078; font-size: 0.75rem; }
-
-    .alert { border-radius: 4px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.875rem; }
-    .alert-success { background: #1a3a1a; border: 1px solid #3a7a3a; color: #8fd98f; }
-    .alert-danger  { background: #3a1a1a; border: 1px solid #7a3a3a; color: #e08080; }
-    .alert ul { padding-left: 18px; }
-
-    .form-section { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
-    .form-section.full { grid-template-columns: 1fr; }
-    .mixed-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; align-items: start; }
-    .form-group { margin-bottom: 24px; }
-    .form-group label {
-        display: block; font-size: 0.75rem; font-weight: 400;
-        letter-spacing: 0.08em; text-transform: uppercase; color: #e8e0d0; margin-bottom: 8px;
-    }
-    .form-group input[type="text"],
-    .form-group input[type="email"],
-    .form-group input[type="tel"],
-    .form-group select,
-    .form-group textarea {
-        width: 100%; background: #c8c4bc; border: none; border-radius: 3px;
-        padding: 10px 12px; font-family: 'Lato', sans-serif; font-size: 0.875rem;
-        color: #3a3530; outline: none; appearance: none; -webkit-appearance: none;
-    }
-    .form-group input::placeholder, .form-group textarea::placeholder { color: #9a958e; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { background: #d8d4cc; }
-
-    .select-wrapper { position: relative; }
-    .select-wrapper::after {
-        content: '↓'; position: absolute; right: 12px; top: 50%;
-        transform: translateY(-50%); color: #5a5550; pointer-events: none;
-    }
-    .select-wrapper select { padding-right: 32px; cursor: pointer; }
-    .form-group textarea { min-height: 140px; resize: vertical; }
-
-    .stepper-group { margin-bottom: 24px; }
-    .stepper-label {
-        font-size: 0.75rem; font-weight: 400; letter-spacing: 0.08em;
-        text-transform: uppercase; color: #e8e0d0; margin-bottom: 8px;
-        display: flex; align-items: baseline; gap: 8px;
-    }
-    .stepper-label .price { font-size: 0.85rem; color: #b0a898; text-transform: none; letter-spacing: 0; }
-    .stepper { display: flex; align-items: center; }
-    .stepper button {
-        width: 38px; height: 38px; border: none; cursor: pointer;
-        font-size: 1.1rem; font-weight: 700; display: flex;
-        align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .stepper button.minus { background: #6b1a2a; color: #f0d0d8; border-radius: 3px 0 0 3px; }
-    .stepper button.plus  { background: #2a2a2a; color: #e8e0d0; border-radius: 0 3px 3px 0; }
-    .stepper .stepper-val {
-        flex: 1; text-align: center; background: #c8c4bc; height: 38px;
-        line-height: 38px; font-family: 'Lato', sans-serif; font-size: 0.95rem; color: #3a3530;
-    }
-
-    .form-actions { margin-top: 32px; display: flex; flex-direction: column; gap: 12px; }
-    .btn {
-        display: block; width: 100%; padding: 13px; border: none; border-radius: 3px;
-        font-family: 'Lato', sans-serif; font-size: 0.875rem; letter-spacing: 0.1em;
-        text-transform: uppercase; text-align: center; text-decoration: none; cursor: pointer;
-    }
-    .btn--primary  { background: #d4922a; color: #000; }
-    .btn--secondary { background: #2a2a2a; color: #c8c4bc; }
-</style>
 </body>
 </html>

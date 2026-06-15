@@ -38,7 +38,7 @@ class HistoryHomeBlocksSeeder extends AbstractSeed
                 'page_id' => $pageId,
                 'block_type' => 'hero',
                 'content_json' => json_encode([
-                    'title' => "A STROLL\nTHROUGH HISTORY",
+                    'title' => "A Stroll\nThrough History",
                     'subtitle' => 'Discover 9 Landmarks That Shaped Haarlem',
                     'description' => 'Experience these sites on our guided walking tours',
                     'button_text' => 'EXPLORE TOURS',

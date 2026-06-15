@@ -1,5 +1,8 @@
 :root {
-    --color-bg: #0c0c0c;
+    --container-max: 1280px;
+    --container-padding: 40px;
+
+    --color-bg: #0a0a0a;
     --color-surface: #1a1a1a;
     --color-text: #ffffff;
     --color-muted: rgba(255, 255, 255, 0.7);
@@ -29,6 +32,18 @@
     --font-hero: clamp(2.75rem, 6vw, 4.5rem);
 }
 
+@media (max-width: 768px) {
+    :root {
+        --container-padding: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --container-padding: 16px;
+    }
+}
+
 * {
     box-sizing: border-box;
 }
@@ -45,10 +60,28 @@ html {
     scroll-behavior: smooth;
 }
 
+.text-accent {
+    color: var(--color-accent);
+    font-weight: 700;
+}
+
 .container {
-    max-width: 1200px;
+    width: 100%;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 var(--space-md);
+    padding-inline: var(--container-padding);
+}
+
+.nav-container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    width: 100%;
+    padding: 16px var(--container-padding);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 48px;
 }
 
 /* === Section Start === */
@@ -72,6 +105,10 @@ html {
 
 .section-title--dark {
     color: #292929;
+}
+
+.section-title--shadow {
+    text-shadow: 2px 4px 2px rgba(0, 0, 0, 0.5);
 }
 
 .section-title--underlined::after {
@@ -186,7 +223,13 @@ html {
 
 .festival-hero__panel {
     width: min(100%, 680px);
+    min-height: 320px;
     padding: 40px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
     text-align: center;
 
@@ -196,12 +239,12 @@ html {
     background:
             linear-gradient(
                     135deg,
-                    rgba(255, 255, 255, 0.10),
+                    rgba(255, 255, 255, 0.20),
                     rgba(255, 255, 255, 0.03)
             ),
-            rgba(12, 12, 12, 0.28);
+            rgba(12, 12, 12, 0.32);
 
-    backdrop-filter: blur(1.5px);
+    backdrop-filter: blur(2px);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
 }
 
@@ -261,6 +304,7 @@ html {
     }
 
     .festival-hero__panel {
+        min-height: 220px;
         padding: 28px 22px;
     }
 
@@ -280,7 +324,6 @@ html {
     width: 100%;
     min-height: 420px;
     overflow: hidden;
-    color: var(--color-text);
 }
 
 .page-hero__background {
@@ -339,23 +382,22 @@ html {
 
 .page-hero__title {
     margin: 0;
-
-    color: var(--color-text);
     font-size: clamp(2.2rem, 4.5vw, 3.25rem);
     font-weight: 700;
     line-height: 1.08;
     letter-spacing: -0.02em;
     text-transform: uppercase;
+    color: var(--color-accent);
 }
 
 .page-hero__subtitle {
-    max-width: 640px;
-    margin: 16px 0 0;
+    max-width: 720px;
+    margin: 18px 0 0;
 
-    color: rgba(255, 255, 255, 0.88);
-    font-size: var(--font-md);
-    font-weight: 400;
-    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: clamp(1.2rem, 2vw, var(--font-lg));
+    font-weight: 500;
+    line-height: 1.45;
 }
 
 .page-hero__title + .page-hero__subtitle {
@@ -376,7 +418,7 @@ html {
     }
 
     .page-hero__subtitle {
-        font-size: var(--font-base);
+        font-size: var(--font-md);
     }
 }
 /* === Page Hero End === */
@@ -456,6 +498,8 @@ html {
     background: var(--color-accent);
     color: #111;
     border-color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .btn--primary:hover,
@@ -483,7 +527,7 @@ html {
     font-weight: 700;
     font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.04em;
     text-decoration: none;
 
     border: 1px solid rgba(0, 0, 0, 0.06);
@@ -562,6 +606,14 @@ html {
     min-height: 34px;
     padding: 8px 14px;
     font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.btn--xs {
+    min-height: 28px;
+    padding: 4px 10px;
+
+    font-size: 12px;
     font-weight: 600;
 }
 /* === Button End === */
@@ -685,12 +737,12 @@ html {
 
 /* === Page Themes Start === */
 body.home-page {
-    --color-accent: #e7a90e;
+    --color-accent: #DECCAB;
     --color-accent-rgb: 231, 169, 14;
 }
 
 body.dance-page {
-    --color-accent: #ff9800;
+    --color-accent: #E58708;
     --color-accent-rgb: 255, 152, 0;
 }
 
@@ -702,7 +754,7 @@ body.food-detail-page {
 
 body.jazz-page,
 body.jazz-artist-page {
-    --color-accent: #8b5cf6;
+    --color-accent: #7258DB;
     --color-accent-rgb: 139, 92, 246;
 }
 
@@ -911,3 +963,166 @@ body.stories-page {
     }
 }
 /* === Footer End === */
+
+/* === Festival Table Start === */
+.festival-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: var(--radius-card);
+    background: rgba(0, 0, 0, 0.32);
+}
+
+.festival-table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+}
+
+.festival-table th,
+.festival-table td {
+    height: 52px;
+    padding: 13px 14px;
+    font-size: 13px;
+    line-height: 1.45;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.festival-table th {
+    background: var(--color-accent);
+    color: var(--color-text);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.festival-table td {
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.festival-table-empty {
+    color: var(--color-muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+.festival-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.festival-table tbody tr:nth-child(odd) {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+.festival-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.festival-table th:last-child,
+.festival-table td:last-child {
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .festival-table th,
+    .festival-table td {
+        padding: 9px 8px;
+        font-size: 12px;
+    }
+}
+/* === Festival Table End === */
+
+/* === Map Start === */
+
+.map-section {
+    padding: 80px 0 100px;
+    background: linear-gradient(180deg, #1a1612 0%, #141210 50%, #0f0e0c 100%);
+}
+
+.map-heading {
+    margin: 0 0 12px;
+}
+
+.map-intro {
+    max-width: 680px;
+    margin: 0 0 40px;
+
+    color: var(--color-muted);
+    font-size: 16px;
+    line-height: 1.75;
+}
+
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+
+    overflow: hidden;
+    border-radius: 18px;
+    background: #0f0f0f;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    transition: box-shadow 0.3s ease;
+}
+
+.map-wrapper:hover {
+    box-shadow:
+            0 16px 56px rgba(0, 0, 0, 0.55),
+            0 0 0 1px rgba(var(--color-accent-rgb), 0.15);
+}
+
+.map-iframe,
+#festival-map {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+    border: 0;
+
+    z-index: 0;
+}
+
+.map-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 32px;
+}
+
+/* === Map End === */
+
+.success-icon {
+    width: 42px;
+    height: 42px;
+    margin: 0 auto 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--color-accent);
+    border: 2px solid var(--color-accent);
+    border-radius: 50%;
+
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.error-box {
+    max-width: 600px;
+    margin: 3rem auto;
+    padding: 2rem;
+    text-align: center;
+}

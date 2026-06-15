@@ -62,6 +62,14 @@ final class AdminHistoryController
         $this->showIndexForm(null, 'Saved.');
     }
 
+    public function index(): void
+    {
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
+        require __DIR__ . '/../Views/Admin/History/history-index.php';
+    }
+
     public function showLocationsForm(?string $error = null, ?string $success = null): void
     {
         if (!AdminAuth::requireAdmin()) {

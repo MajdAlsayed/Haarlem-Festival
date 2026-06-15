@@ -3,18 +3,16 @@
 
 $success = \App\Core\Session::getFlash('admin_success');
 $error   = \App\Core\Session::getFlash('admin_error');
+
+$pageTitle = 'Users — Admin — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users — Admin — <?= htmlspecialchars($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/admin.css?v=<?= htmlspecialchars($app['css_version'] ?? '1') ?>">
-</head>
-<body class="admin-page">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+<body class="<?= htmlspecialchars($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 

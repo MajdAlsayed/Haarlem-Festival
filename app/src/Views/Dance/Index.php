@@ -55,8 +55,8 @@ $heroButtonClass = 'btn btn--light';
     <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
     <section class="dance-about container">
-        <h2 class="section-title section-title--accent dance-about-heading"><?= htmlspecialchars((string) ($danceSettings['about_section_heading'] ?? '')) ?></h2>
-        <div class="dance-about-content">
+        <h2 class="section-title section-title--accent section-title--underlined"><?= htmlspecialchars((string) ($danceSettings['about_section_heading'] ?? '')) ?></h2>
+        <div class="copy-text dance-about-content">
             <?php foreach ($aboutParagraphs as $para): ?>
                 <?php if (is_string($para) && !\App\Core\HtmlSanitizer::isEmptyHtml($para)): ?>
                     <div class="cms-html"><?= \App\Core\HtmlSanitizer::purify($para) ?></div>

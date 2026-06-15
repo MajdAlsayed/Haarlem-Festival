@@ -2,3 +2,23 @@
     --festival-card-bg: rgba(255, 255, 255, 0.04);
     --festival-card-border: rgba(255, 255, 255, 0.08);
 }
+
+.festival-hero--home .festival-hero__background img {
+    object-position: center;
+}
+
+.expect-heading {
+    text-align: center;
+}
+
+.expect-heading::after {
+    margin-inline: auto;
+}
+
+.expect-card {
+    padding: 24px 22px;
+}
+
+.expect-list li::before {
+    background: var(--color-accent);
+}

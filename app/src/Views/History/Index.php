@@ -38,7 +38,7 @@ $breadcrumbs = [
     <?php
     $sectionModifier = '';
     $showTitle = true;
-    $textModifier = 'history-about-banner-text--columns';
+    $textModifier = '';
     require __DIR__ . '/../partials/history/history-about-banner.php';
     ?>
 

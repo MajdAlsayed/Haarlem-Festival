@@ -13,7 +13,7 @@ return [
     'all_events_section_title' => 'All events',
     'artists_section_title' => 'Artists',
     'hero_cta_label' => 'See featured events',
-    'hero_subtitle' => '<p>Electronic music across three nights — venues, passes, and headline sets.</p>',
+    'hero_subtitle' => '<p>Electronic music across three nights — venues, passes, and headline sets</p>',
     'about_paragraphs' => [
         '<p>Haarlem Dance brings DJs and live electronic acts to iconic venues. Browse by day, grab tickets or passes, and explore artist profiles.</p>',
     ],

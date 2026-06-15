@@ -2,20 +2,18 @@
 /**
  * Main admin dashboard (/admin): card grid into Pages, Jazz, Dance, Tickets, orders, scanner — each card is a separate CMS or tool area.
  * @var array $app
- * @var list<array{page_id:int,slug:string,title:string,is_published:bool}> $pages
  */
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+$h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+
+$pageTitle = 'Admin — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/admin.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-</head>
-<body class="admin-page">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+<body class="<?= $h($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
@@ -41,12 +39,6 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
             </div>
 
             <section class="admin-cards">
-                <a href="/admin/pages" class="admin-card">
-                    <span class="admin-card-icon">📄</span>
-                    <h2 class="admin-card-title">Pages</h2>
-                    <p class="admin-card-desc">Edit pages, slugs, and publish status.</p>
-                    <span class="admin-card-count"><?= count($pages) ?> page(s)</span>
-                </a>
 
                 <a href="/admin/cms/homepage" class="admin-card">
                     <span class="admin-card-icon">🏠</span>
@@ -72,7 +64,7 @@ $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                     <p class="admin-card-desc">Page copy, events, artist strip, images — Dance CMS hub.</p>
                 </a>
 
-                <a href="/admin/cms/history" class="admin-card">
+                <a href="/admin/history" class="admin-card">
                     <span class="admin-card-icon">🏛️</span>
                     <h2 class="admin-card-title">History</h2>
                     <p class="admin-card-desc">

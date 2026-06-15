@@ -41,17 +41,15 @@ $demoQrCode = '';
 if ($result !== null && !empty($result['ticket_code'])) {
     $demoQrCode = (string) $result['ticket_code'];
 }
+
+$pageTitle = 'Ticket scanner — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ticket scanner — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/admin.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-</head>
-<body class="admin-page">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+<body class="<?= $h($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
@@ -67,10 +65,6 @@ if ($result !== null && !empty($result['ticket_code'])) {
 
         <h1 class="admin-title">Ticket scanner</h1>
         <p class="admin-lead">Use the camera for QR codes, paste one code, or enter up to four codes (one per line) for a group.</p>
-
-        <?php if ($showCmsLinks): ?>
-            <?php require __DIR__ . '/partials/admin_nav.php'; ?>
-        <?php endif; ?>
 
         <?php if ($error !== null && $error !== ''): ?>
             <p class="admin-scan-error" role="alert"><?= $h($error) ?></p>

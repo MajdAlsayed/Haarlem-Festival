@@ -11,10 +11,14 @@ if (!$hasWelcome) {
     return;
 }
 ?>
-<section class="welcome-section container">
-    <div class="welcome-text">
-        <h2><?= htmlspecialchars($welcomeHeading) ?></h2>
-        <div class="cms-html"><?= $welcomeP1 ?></div>
-        <div class="cms-html"><?= $welcomeP2 ?></div>
+<section class="welcome-section">
+    <div class="container">
+        <div class="welcome-text">
+            <h2 class="section-title section-title--accent section-title--underlined">
+                <?= htmlspecialchars($welcomeHeading) ?>
+            </h2>
+            <div class="copy-text cms-html"><?= $welcomeP1 ?></div>
+            <div class="copy-text cms-html"><?= $welcomeP2 ?></div>
+        </div>
     </div>
 </section>

@@ -1,22 +1,30 @@
 <?php
 $app = $viewModel->appSettings;
+
+// Settings for the page title, styles, body class
+$pageTitle = 'Reset password — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/pages/auth.css'];
+$bodyClass = 'auth-page';
+
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'Reset password', 'url' => null],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Reset password — <?= htmlspecialchars($app['site_name']) ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars($app['css_version']) ?>">
-    <link rel="stylesheet" href="/css/auth.css?v=<?= htmlspecialchars($app['css_version']) ?>">
-</head>
-<body class="auth-page">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+
+<body class="<?= htmlspecialchars($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
+<?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
+
 <main>
     <section class="auth-section">
-        <div class="auth-card">
-            <h1 class="auth-title">Reset password</h1>
+        <div class="festival-card auth-card">
+            <h1 class="section-title section-title--accent auth-title">Reset password</h1>
 
             <?php if ($viewModel->error !== null): ?>
                 <div class="auth-error"><?= htmlspecialchars($viewModel->error) ?></div>
@@ -32,30 +40,34 @@ $app = $viewModel->appSettings;
                     <input type="hidden" name="token" value="<?= htmlspecialchars($viewModel->token) ?>">
 
                     <div class="auth-field">
-                        <label for="password">New password</label>
+                        <label class="copy-text copy-text--sm" for="password">New password</label>
                         <div class="auth-input-wrap">
                             <input type="password" id="password" name="password" required>
                             <button type="button" class="auth-eye-btn" data-target="password" aria-label="Toggle password visibility">
-                                <img src="/images/eye.jpg" class="eye-icon" alt="Show password">
+                                <img src="/images/eye.jpg" class="eye-icon" alt="">
                             </button>
                         </div>
-                        <small class="auth-hint">12+ characters with uppercase, lowercase, number and symbol.</small>
+                        <small class="copy-text copy-text--sm copy-text--muted auth-hint">
+                            12+ characters with uppercase, lowercase, number and symbol.
+                        </small>
                     </div>
 
                     <div class="auth-field">
-                        <label for="password_confirm">Confirm new password</label>
+                        <label class="copy-text copy-text--sm" for="password_confirm">Confirm new password</label>
                         <div class="auth-input-wrap">
                             <input type="password" id="password_confirm" name="password_confirm" required>
                             <button type="button" class="auth-eye-btn" data-target="password_confirm" aria-label="Toggle password visibility">
-                                <img src="/images/eye.jpg" class="eye-icon" alt="Show password">
+                                <img src="/images/eye.jpg" class="eye-icon" alt="">
                             </button>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary auth-btn">Save new password</button>
+                    <button type="submit" class="btn btn--primary auth-btn">Save new password</button>
                 </form>
             <?php else: ?>
-                <p class="auth-switch"><a href="/login">Go to login</a></p>
+                <p class="copy-text copy-text--sm auth-switch">
+                    <a href="/login">Go to login</a>
+                </p>
             <?php endif; ?>
         </div>
     </section>
@@ -63,7 +75,20 @@ $app = $viewModel->appSettings;
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
 
+<script>
+    (function () {
+        document.querySelectorAll('.auth-eye-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var targetId = this.getAttribute('data-target');
+                var input = document.getElementById(targetId);
 
+                if (!input) return;
+
+                input.type = input.type === 'password' ? 'text' : 'password';
+            });
+        });
+    })();
+</script>
 
 </body>
 </html>

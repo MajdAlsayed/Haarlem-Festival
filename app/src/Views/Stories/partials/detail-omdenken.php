@@ -34,17 +34,18 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
 
 <section class="omdenken-page">
 
-    <section class="omdenken-hero">
-        <div class="omdenken-hero-image">
-            <img src="<?= h($heroImage) ?>" alt="<?= h($heroHeading) ?>">
-            <div class="omdenken-hero-overlay"></div>
-            <div class="omdenken-hero-copy">
-                <h1 class="omdenken-title"><?= h($heroHeading) ?></h1>
-                <p class="omdenken-subtitle"><?= h($heroSubtitle) ?></p>
-                <p class="omdenken-hero-text"><?= nl2br(h($heroDesc)) ?></p>
-            </div>
-        </div>
-    </section>
+    <?php
+    $pageHeroTitle = $heroHeading;
+    $pageHeroSubtitle = $heroSubtitle;
+    $pageHeroImage = $heroImage;
+    $pageHeroAlt = $heroHeading;
+    $pageHeroClass = 'stories-detail-hero stories-omdenken-detail-hero';
+    $pageHeroContentClass = 'stories-detail-hero__content';
+    ?>
+
+    <?php require __DIR__ . '/../../partials/page-hero.php'; ?>
+
+    <?php require __DIR__ . '/../../partials/breadcrumbs.php'; ?>
 
     <section class="omdenken-content">
 
@@ -52,37 +53,55 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
             <div class="omdenken-poster-card">
                 <img src="<?= h($posterImage) ?>" alt="<?= h($story['name'] ?? 'Story') ?>">
             </div>
+
             <div class="omdenken-event-meta">
                 <?php if ($venueText): ?>
-                    <div class="omdenken-meta-line"><span>Venue :</span> <?= h($venueText) ?></div>
+                    <div class="omdenken-meta-line">
+                        <span class="copy-text omdenken-meta-label">Venue:</span>
+                        <strong class="copy-text omdenken-meta-value"><?= h($venueText) ?></strong>
+                    </div>
                 <?php endif; ?>
+
                 <?php if ($ageText): ?>
-                    <div class="omdenken-meta-line"><span>Age Group :</span> <?= h($ageText) ?></div>
+                    <div class="omdenken-meta-line">
+                        <span class="copy-text omdenken-meta-label">Age Group:</span>
+                        <strong class="copy-text omdenken-meta-value"><?= h($ageText) ?></strong>
+                    </div>
                 <?php endif; ?>
+
                 <?php if ($dayText): ?>
-                    <div class="omdenken-meta-line"><span>Day :</span> <?= h($dayText) ?></div>
+                    <div class="omdenken-meta-line">
+                        <span class="copy-text omdenken-meta-label">Day:</span>
+                        <strong class="copy-text omdenken-meta-value"><?= h($dayText) ?></strong>
+                    </div>
                 <?php endif; ?>
+
                 <?php if ($timeText): ?>
-                    <div class="omdenken-meta-line"><span>Time :</span> <?= h($timeText) ?></div>
+                    <div class="omdenken-meta-line">
+                        <span class="copy-text omdenken-meta-label">Time:</span>
+                        <strong class="copy-text omdenken-meta-value"><?= h($timeText) ?></strong>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
 
         <div class="omdenken-story-grid">
             <div class="omdenken-text-block">
-                <h3><?= h($block1Title) ?></h3>
-                <p><?= nl2br(h($block1Text)) ?></p>
+                <h3 class="section-title section-title--underlined omdenken-text-title"><?= h($block1Title) ?></h3>
+                <p class="copy-text"><?= nl2br(h($block1Text)) ?></p>
             </div>
+
             <div class="omdenken-text-block omdenken-text-block-right">
-                <p class="omdenken-right-copy"><?= nl2br(h($block2Text)) ?></p>
+                <p class="copy-text omdenken-right-copy"><?= nl2br(h($block2Text)) ?></p>
             </div>
         </div>
 
         <div class="omdenken-story-grid omdenken-story-grid-second">
             <div class="omdenken-text-block">
-                <h3><?= h($block3Title) ?></h3>
-                <p><?= nl2br(h($block3Text)) ?></p>
+                <h3 class="section-title section-title--underlined  omdenken-text-title"><?= h($block3Title) ?></h3>
+                <p class="copy-text"><?= nl2br(h($block3Text)) ?></p>
             </div>
+
             <div class="omdenken-host-image-wrap">
                 <img src="<?= h($blockImg1) ?>" alt="Omdenken block image">
             </div>
@@ -92,10 +111,11 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
             <div class="omdenken-player-poster">
                 <img src="<?= h($blockImg2) ?>" alt="Omdenken visual">
                 <div class="omdenken-poster-caption">
-                    <strong><?= h($story['name'] ?? 'Story') ?></strong>
-                    <span><?= h($typeText ?: 'Podcast') ?></span>
+                    <strong class="copy-text"><?= h($story['name'] ?? 'Story') ?></strong>
+                    <span class="copy-text copy-text--muted"><?= h($typeText ?: 'Podcast') ?></span>
                 </div>
             </div>
+
             <div class="omdenken-player-ui">
                 <div class="player-top-row">
                     <button type="button" class="player-mini-btn">×</button>
@@ -104,15 +124,18 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
                     <button type="button" class="player-mini-btn">▶</button>
                     <button type="button" class="player-mini-btn">↻</button>
                 </div>
+
                 <div class="player-time-row">
-                    <span>0:00</span>
-                    <span>4:03</span>
+                    <span class="copy-text copy-text--sm copy-text--muted">0:00</span>
+                    <span class="copy-text copy-text--sm copy-text--muted">4:03</span>
                 </div>
+
                 <div class="player-progress-wrap">
                     <div class="player-progress-bar">
                         <div class="player-progress-fill"></div>
                     </div>
                 </div>
+
                 <div class="player-volume-row">
                     <span>♡</span>
                     <div class="player-volume-bar">
@@ -120,14 +143,16 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
                     </div>
                     <span>🔊</span>
                 </div>
-                <div class="player-recent-title">Recent Podcast</div>
+
+                <div class="copy-text copy-text--muted player-recent-title">Recent Podcast</div>
+
                 <div class="player-tracklist">
                     <div class="track-row active">
                         <div class="track-info">
-                            <strong><?= h($story['name'] ?? 'Story') ?></strong>
-                            <small><?= h($typeText ?: 'Podcast') ?></small>
+                            <strong class="copy-text"><?= h($story['name'] ?? 'Story') ?></strong>
+                            <small class="copy-text copy-text--muted"><?= h($typeText ?: 'Podcast') ?></small>
                         </div>
-                        <span><?= h($timeText ?: '–') ?></span>
+                        <span class="copy-text"><?= h($timeText ?: '–') ?></span>
                     </div>
                 </div>
             </div>
@@ -136,28 +161,30 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
         <div class="omdenken-stats-row">
             <div class="omdenken-stat-card">
                 <div class="omdenken-stat-icon">🕒</div>
-                <div class="omdenken-stat-title">TIME</div>
-                <div class="omdenken-stat-value"><?= h($timeText ?: 'TBA') ?></div>
+                <div class="copy-text omdenken-stat-title">TIME</div>
+                <div class="copy-text omdenken-stat-value"><?= h($timeText ?: 'TBA') ?></div>
             </div>
+
             <div class="omdenken-stat-card">
                 <div class="omdenken-stat-icon">👥</div>
-                <div class="omdenken-stat-title">AGE</div>
-                <div class="omdenken-stat-value"><?= h($ageText ?: '16+') ?></div>
+                <div class="copy-text omdenken-stat-title">AGE</div>
+                <div class="copy-text omdenken-stat-value"><?= h($ageText ?: '16+') ?></div>
             </div>
+
             <div class="omdenken-stat-card">
                 <div class="omdenken-stat-icon">🌐</div>
-                <div class="omdenken-stat-title">LANG</div>
-                <div class="omdenken-stat-value"><?= h($vm->getStoryLanguageText() ?: 'NL') ?></div>
+                <div class="copy-text omdenken-stat-title">LANG</div>
+                <div class="copy-text omdenken-stat-value"><?= h($vm->getStoryLanguageText() ?: 'NL') ?></div>
             </div>
         </div>
 
         <div class="omdenken-note-row">
-            <div class="omdenken-note-label">Note:</div>
-            <div class="omdenken-note-text"><?= nl2br(h($noteText)) ?></div>
+            <div class="section-subtitle omdenken-note-label">Note:</div>
+            <div class="copy-text"><?= nl2br(h($noteText)) ?></div>
         </div>
 
         <div class="omdenken-ticket-row">
-            <a class="omdenken-ticket-btn" href="/tickets">BUY TICKETS</a>
+            <a class="btn btn--primary btn--sm omdenken-ticket-btn" href="/tickets">BUY TICKETS</a>
         </div>
 
     </section>
