@@ -326,6 +326,43 @@ final class OrderRepository
     }
 
     /**
+     * Tickets with their type + event details, for the PDF tickets.
+     *
+     * @return list<array{ticket_code:string,item_name:string,ticket_type:string,event_title:?string,event_day:?string,start_time:?string}>
+     */
+    public function getTicketsWithDetailsForOrder(int $orderId): array
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            'SELECT t.ticket_code,
+                    td.name AS item_name, td.ticket_type,
+                    e.title AS event_title, e.event_day, e.start_time
+             FROM tickets t
+             INNER JOIN order_items oi ON oi.order_item_id = t.order_item_id
+             INNER JOIN ticket_details td ON td.ticket_details_id = oi.ticket_details_id
+             LEFT JOIN events e ON e.event_id = td.event_id
+             WHERE oi.order_id = :oid
+             ORDER BY t.ticket_id ASC'
+        );
+        $stmt->execute(['oid' => $orderId]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $out = [];
+        foreach ($rows as $r) {
+            $out[] = [
+                'ticket_code' => (string) $r['ticket_code'],
+                'item_name' => (string) $r['item_name'],
+                'ticket_type' => (string) ($r['ticket_type'] ?? ''),
+                'event_title' => $r['event_title'] !== null ? (string) $r['event_title'] : null,
+                'event_day' => $r['event_day'] !== null ? (string) $r['event_day'] : null,
+                'start_time' => $r['start_time'] !== null ? (string) $r['start_time'] : null,
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
      * Ticket codes issued for this order (for confirmation page).
      *
      * @return list<array{ticket_code:string, item_name:string}>

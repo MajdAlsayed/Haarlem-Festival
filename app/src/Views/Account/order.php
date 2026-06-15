@@ -48,6 +48,10 @@ $breadcrumbs = [
     <div class="account-page-actions no-print">
         <a href="/account/orders" class="btn btn--outline btn--sm">← My orders</a>
         <button type="button" class="btn btn--outline btn--sm" onclick="window.print()">Print invoice</button>
+        <?php if ($status === 'paid'): ?>
+            <a href="/account/order/<?= $h((string) $oid) ?>/invoice" class="btn btn--outline btn--sm" target="_blank" rel="noopener">Download invoice (PDF)</a>
+            <a href="/account/order/<?= $h((string) $oid) ?>/tickets" class="btn btn--primary btn--sm" target="_blank" rel="noopener">Download tickets (PDF)</a>
+        <?php endif; ?>
     </div>
 
     <div class="account-invoice-header">

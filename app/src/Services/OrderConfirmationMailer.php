@@ -8,51 +8,80 @@ use App\Repositories\OrderRepository;
 use App\Repositories\SettingsRepository;
 use App\Repositories\UserRepository;
 
-/** Paid confirmation, pay-later reservation, and payment reminders; logs to file and attempts PHP mail(). */
+/** Paid confirmation (with PDF invoice + tickets), pay-later reservation, and payment reminders. */
 final class OrderConfirmationMailer
 {
+    private OrderRepository $orders;
+    private UserRepository $users;
+    private SettingsRepository $settings;
+    private InvoicePdfService $invoicePdf;
+    private TicketPdfService $ticketPdf;
+
+    // deps can be injected (for tests), otherwise we build the defaults
+    public function __construct(
+        ?OrderRepository $orders = null,
+        ?UserRepository $users = null,
+        ?SettingsRepository $settings = null,
+        ?InvoicePdfService $invoicePdf = null,
+        ?TicketPdfService $ticketPdf = null
+    ) {
+        $this->orders = $orders ?? new OrderRepository();
+        $this->users = $users ?? new UserRepository();
+        $this->settings = $settings ?? new SettingsRepository();
+        $this->invoicePdf = $invoicePdf ?? new InvoicePdfService();
+        $this->ticketPdf = $ticketPdf ?? new TicketPdfService();
+    }
+
     public function send(int $orderId, int $userId): void
     {
-        $user = (new UserRepository())->findById($userId);
+        $user = $this->users->findById($userId);
         if ($user === null) {
             return;
         }
 
-        $orders = new OrderRepository();
-        $order = $orders->findForCustomer($orderId, $userId);
+        $order = $this->orders->findForCustomer($orderId, $userId);
         if ($order === null || ($order['status'] ?? '') !== 'paid') {
             return;
         }
 
-        $lines = $orders->getOrderLineItemsForInvoice($orderId);
-        $tickets = $orders->getTicketCodesForOrder($orderId);
-        $app = (new SettingsRepository())->getAll();
-        $site = (string) ($app['site_name'] ?? 'Haarlem Festival');
+        $site = $this->siteName();
+        $customerName = trim($user->firstName . ' ' . $user->lastName);
+        $lines = $this->orders->getOrderLineItemsForInvoice($orderId);
+        $tickets = $this->orders->getTicketCodesForOrder($orderId);
 
-        $plain = $this->buildPlainBody($site, $orderId, $order, $lines, $tickets);
         $subject = "{$site} — Order #{$orderId} (tickets)";
+        $plain = $this->buildPlainBody($site, $orderId, $order, $lines, $tickets);
 
-        $this->appendLog($user->email, $subject, $plain);
-        $this->tryPhpMail($user->email, $subject, $plain);
+        // generate the pdf invoice + tickets and attach them to the email
+        $invoicePdf = $this->invoicePdf->render($order, $lines, $customerName, $user->email, $site);
+        $ticketRows = $this->orders->getTicketsWithDetailsForOrder($orderId);
+        $ticketsPdf = $this->ticketPdf->render($ticketRows, $customerName, $site);
+
+        $attachments = [
+            'invoice-' . $orderId . '.pdf' => $invoicePdf,
+            'tickets-' . $orderId . '.pdf' => $ticketsPdf,
+        ];
+
+        $this->savePdfs($attachments);
+        $this->appendLog($user->email, $subject, $plain . "\n\n[attached: invoice + tickets PDF]");
+        $this->sendWithAttachments($user->email, $subject, $plain, $attachments);
     }
 
-    /** After “Pay later” reserve: cart held as pending order (no ticket codes yet). */
+    /** After "Pay later" reserve: cart held as pending order (no ticket codes yet). */
     public function sendPendingReservation(int $orderId, int $userId): void
     {
-        $user = (new UserRepository())->findById($userId);
+        $user = $this->users->findById($userId);
         if ($user === null) {
             return;
         }
 
-        $orders = new OrderRepository();
-        $order = $orders->findForCustomer($orderId, $userId);
+        $order = $this->orders->findForCustomer($orderId, $userId);
         if ($order === null || ($order['status'] ?? '') !== 'pending') {
             return;
         }
 
-        $lines = $orders->getOrderLineItemsForInvoice($orderId);
-        $app = (new SettingsRepository())->getAll();
-        $site = (string) ($app['site_name'] ?? 'Haarlem Festival');
+        $site = $this->siteName();
+        $lines = $this->orders->getOrderLineItemsForInvoice($orderId);
         $expires = (string) ($order['expires_at'] ?? '');
 
         $buf = [];
@@ -69,28 +98,25 @@ final class OrderConfirmationMailer
         $buf[] = '';
         $buf[] = 'Pay from: /account/order/' . $orderId;
 
-        $plain = implode("\n", $buf);
         $subject = "{$site} — Order #{$orderId} reserved (pay within 24h)";
+        $plain = implode("\n", $buf);
         $this->appendLog($user->email, $subject, $plain);
         $this->tryPhpMail($user->email, $subject, $plain);
     }
 
     public function sendPendingPaymentReminder(int $orderId, int $userId, string $totalAmount, string $expiresAt): void
     {
-        $user = (new UserRepository())->findById($userId);
+        $user = $this->users->findById($userId);
         if ($user === null) {
             return;
         }
 
-        $orders = new OrderRepository();
-        $order = $orders->findForCustomer($orderId, $userId);
+        $order = $this->orders->findForCustomer($orderId, $userId);
         if ($order === null || ($order['status'] ?? '') !== 'pending') {
             return;
         }
 
-        $app = (new SettingsRepository())->getAll();
-        $site = (string) ($app['site_name'] ?? 'Haarlem Festival');
-
+        $site = $this->siteName();
         $plain = "Reminder: order #{$orderId} at {$site} is still unpaid.\n"
             . "Total: €{$totalAmount}\n"
             . "Payment deadline: {$expiresAt}\n\n"
@@ -101,18 +127,18 @@ final class OrderConfirmationMailer
         $this->tryPhpMail($user->email, $subject, $plain);
     }
 
+    private function siteName(): string
+    {
+        return (string) ($this->settings->getAll()['site_name'] ?? 'Haarlem Festival');
+    }
+
     /**
      * @param array{order_id?:int,status?:string,total_amount?:string,paid_at?:string,created_at?:string} $order
      * @param list<array{name:string,quantity:int,unit_price:string,line_total:string}> $lines
      * @param list<array{ticket_code:string,item_name:string}> $tickets
      */
-    private function buildPlainBody(
-        string $site,
-        int $orderId,
-        array $order,
-        array $lines,
-        array $tickets
-    ): string {
+    private function buildPlainBody(string $site, int $orderId, array $order, array $lines, array $tickets): string
+    {
         $buf = [];
         $buf[] = "Thank you for your order at {$site}.";
         $buf[] = '';
@@ -123,13 +149,7 @@ final class OrderConfirmationMailer
         $buf[] = '';
         $buf[] = '--- Invoice lines ---';
         foreach ($lines as $l) {
-            $buf[] = sprintf(
-                '%s × %s @ €%s = €%s',
-                $l['name'],
-                (string) $l['quantity'],
-                $l['unit_price'],
-                $l['line_total']
-            );
+            $buf[] = sprintf('%s × %s @ €%s = €%s', $l['name'], (string) $l['quantity'], $l['unit_price'], $l['line_total']);
         }
         $buf[] = '';
         $buf[] = '--- Your ticket codes (show at entrance) ---';
@@ -140,6 +160,45 @@ final class OrderConfirmationMailer
         $buf[] = 'View orders anytime: /account/orders';
 
         return implode("\n", $buf);
+    }
+
+    /** Keep a copy of the generated PDFs so they can be opened/verified locally. */
+    private function savePdfs(array $attachments): void
+    {
+        $base = dirname(__DIR__, 2) . '/storage/mail';
+        if (!is_dir($base) && !@mkdir($base, 0755, true) && !is_dir($base)) {
+            return;
+        }
+        foreach ($attachments as $filename => $bytes) {
+            @file_put_contents($base . '/' . $filename, $bytes);
+        }
+    }
+
+    /** Plain-text email with the PDFs attached (multipart/mixed). */
+    private function sendWithAttachments(string $to, string $subject, string $body, array $attachments): void
+    {
+        $from = getenv('MAIL_FROM') ?: 'noreply@haarlem-festival.local';
+        $boundary = 'hf_' . bin2hex(random_bytes(8));
+        $nl = "\r\n";
+
+        $headers = 'From: ' . $from . $nl
+            . 'MIME-Version: 1.0' . $nl
+            . 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
+
+        $msg = '--' . $boundary . $nl
+            . 'Content-Type: text/plain; charset=UTF-8' . $nl . $nl
+            . $body . $nl . $nl;
+
+        foreach ($attachments as $filename => $bytes) {
+            $msg .= '--' . $boundary . $nl
+                . 'Content-Type: application/pdf; name="' . $filename . '"' . $nl
+                . 'Content-Transfer-Encoding: base64' . $nl
+                . 'Content-Disposition: attachment; filename="' . $filename . '"' . $nl . $nl
+                . chunk_split(base64_encode($bytes)) . $nl;
+        }
+        $msg .= '--' . $boundary . '--';
+
+        @mail($to, $subject, $msg, $headers);
     }
 
     /** Demo-friendly: tail app/storage/mail/orders.log; swap for real SMTP in production. */
