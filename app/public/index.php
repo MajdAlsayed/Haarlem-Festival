@@ -106,6 +106,24 @@ if (preg_match('#^/admin/cms/history/location/([a-z0-9-]+)$#', $uri, $m)) {
     exit;
 }
 
+if (preg_match('#^/account/order/(\d+)/invoice$#', $uri, $m)) {
+    if ($method === 'GET') {
+        (new AccountController())->downloadInvoice((int) $m[1]);
+    } else {
+        http_response_code(405);
+    }
+    exit;
+}
+
+if (preg_match('#^/account/order/(\d+)/tickets$#', $uri, $m)) {
+    if ($method === 'GET') {
+        (new AccountController())->downloadTickets((int) $m[1]);
+    } else {
+        http_response_code(405);
+    }
+    exit;
+}
+
 if (preg_match('#^/account/order/(\d+)$#', $uri, $m)) {
     if ($method === 'GET') {
         (new AccountController())->orderDetail((int) $m[1]);

@@ -16,6 +16,7 @@ final class OrderConfirmationMailer
     private SettingsRepository $settings;
     private InvoicePdfService $invoicePdf;
     private TicketPdfService $ticketPdf;
+    private SmtpMailer $smtp;
 
     // deps can be injected (for tests), otherwise we build the defaults
     public function __construct(
@@ -23,13 +24,15 @@ final class OrderConfirmationMailer
         ?UserRepository $users = null,
         ?SettingsRepository $settings = null,
         ?InvoicePdfService $invoicePdf = null,
-        ?TicketPdfService $ticketPdf = null
+        ?TicketPdfService $ticketPdf = null,
+        ?SmtpMailer $smtp = null
     ) {
         $this->orders = $orders ?? new OrderRepository();
         $this->users = $users ?? new UserRepository();
         $this->settings = $settings ?? new SettingsRepository();
         $this->invoicePdf = $invoicePdf ?? new InvoicePdfService();
         $this->ticketPdf = $ticketPdf ?? new TicketPdfService();
+        $this->smtp = $smtp ?? new SmtpMailer();
     }
 
     public function send(int $orderId, int $userId): void
@@ -174,9 +177,21 @@ final class OrderConfirmationMailer
         }
     }
 
-    /** Plain-text email with the PDFs attached (multipart/mixed). */
+    /** Plain-text email with the PDFs attached — real SMTP when configured, otherwise php mail(). */
     private function sendWithAttachments(string $to, string $subject, string $body, array $attachments): void
     {
+        // real delivery via smtp (gmail etc.) when MAIL_* is set
+        if ($this->smtp->isConfigured()) {
+            $pdfs = [];
+            foreach ($attachments as $filename => $bytes) {
+                $pdfs[] = ['name' => $filename, 'content' => $bytes];
+            }
+            $this->smtp->sendWithPdfs($to, $subject, $body, $pdfs);
+
+            return;
+        }
+
+        // fallback for local dev with no smtp: build the multipart message and hand it to mail()
         $from = getenv('MAIL_FROM') ?: 'noreply@haarlem-festival.local';
         $boundary = 'hf_' . bin2hex(random_bytes(8));
         $nl = "\r\n";

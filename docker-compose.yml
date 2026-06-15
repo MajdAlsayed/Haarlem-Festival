@@ -18,6 +18,15 @@ services:
     environment:
       # Used by Stripe return URLs; set STRIPE_SECRET_KEY for real test payments (see README).
       APP_PUBLIC_URL: http://localhost
+      # Email (PHPMailer SMTP). Defaults point at the local Mailpit catcher — no account needed.
+      # Override MAIL_* in a root .env to use real SMTP (e.g. Gmail) instead.
+      MAIL_HOST: ${MAIL_HOST:-mailpit}
+      MAIL_PORT: ${MAIL_PORT:-1025}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_ENCRYPTION: ${MAIL_ENCRYPTION:-}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-noreply@haarlem-festival.local}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Haarlem Festival}
     volumes:
       - ./app:/app
       # Overrides default 2M/8M limits without rebuilding the image (discography audio uploads).
@@ -45,6 +54,12 @@ services:
       PMA_HOST: mysql
     depends_on:
       - mysql
+
+  # Local mail catcher: SMTP on 1025, web inbox on http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
 
 volumes:
   mysqldata:
