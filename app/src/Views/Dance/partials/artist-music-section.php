@@ -1,13 +1,13 @@
 <?php
-/** @var \App\ViewModels\ArtistDetailViewModel $viewModel */
-if (!isset($viewModel)) {
+/** @var \App\ViewModels\ArtistDetailViewModel $vm */
+if (!isset($vm)) {
     return;
 }
-$artist = $viewModel->artist;
-$artistImg = $viewModel->profileImage;
-$albumCover = $viewModel->albumCoverImage;
-$tracks = $viewModel->musicTracks;
-$extraTracks = $viewModel->musicExtraTracks;
+$artist = $vm->artist;
+$artistImg = $vm->profileImage;
+$albumCover = $vm->albumCoverImage;
+$tracks = $vm->musicTracks;
+$extraTracks = $vm->musicExtraTracks;
 // Normalize extra track cover paths so DB/config can store either
 // full `/images/...` paths or just dance-local filenames.
 foreach ($extraTracks as $i => $t) {
@@ -15,11 +15,11 @@ foreach ($extraTracks as $i => $t) {
         $extraTracks[$i]['cover'] = '/images/dance/' . $t['cover'];
     }
 }
-$displayName = $viewModel->musicDisplayName;
-$realName = $viewModel->musicRealName;
-$location = $viewModel->musicLocation;
-$albumTitle = $viewModel->albumTitle;
-$albumSub = $viewModel->albumSub;
+$displayName = $vm->musicDisplayName;
+$realName = $vm->musicRealName;
+$location = $vm->musicLocation;
+$albumTitle = $vm->albumTitle;
+$albumSub = $vm->albumSub;
 ?>
 <section class="artist-music-section">
     <div class="artist-music-inner">
@@ -35,8 +35,8 @@ $albumSub = $viewModel->albumSub;
                         <span class="artist-music-verified" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                         </span>
-                        <?php if (!empty($viewModel->followUrl)): ?>
-                        <a href="<?= htmlspecialchars($viewModel->followUrl) ?>" class="btn btn--outline btn--sm artist-music-follow" target="_blank" rel="noopener noreferrer">Follow</a>
+                        <?php if (!empty($vm->followUrl)): ?>
+                        <a href="<?= htmlspecialchars($vm->followUrl) ?>" class="btn btn--outline btn--sm artist-music-follow" target="_blank" rel="noopener noreferrer">Follow</a>
                         <?php endif; ?>
                     </div>
                     <p class="copy-text artist-music-real"><?= htmlspecialchars($realName) ?></p>

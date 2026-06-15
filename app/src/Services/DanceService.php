@@ -1,152 +1,197 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
+use App\Contracts\ServiceInterface\DanceServiceInterface;
 use App\Models\Event;
 use App\Repositories\ArtistsRepository;
 use App\Repositories\DanceSettingsRepository;
 use App\Repositories\EventRepository;
+use App\Repositories\SettingsRepository;
+use App\ViewModels\DanceViewModel;
 
-/**
- * Data for /dance: per-day venue order from dance_settings or defaults in dance.php; artist list from the same merged config.
- */
-class DanceService
+// builds all the data the public /dance page needs
+class DanceService implements DanceServiceInterface
 {
     private const CATEGORY_DANCE = 'dance';
+    private const DAYS = ['friday', 'saturday', 'sunday'];
 
     private EventRepository $eventRepository;
     private DanceSettingsRepository $danceSettingsRepository;
+    private ArtistsRepository $artistsRepository;
+    private SettingsRepository $settingsRepository;
 
-    /** Keep service testable by injecting repositories. */
+    // load the settings once and keep them here so we don't fetch them every time
+    private ?array $danceSettings = null;
+
     public function __construct(
         EventRepository $eventRepository,
-        DanceSettingsRepository $danceSettingsRepository
+        DanceSettingsRepository $danceSettingsRepository,
+        ArtistsRepository $artistsRepository,
+        SettingsRepository $settingsRepository
     ) {
         $this->eventRepository = $eventRepository;
         $this->danceSettingsRepository = $danceSettingsRepository;
+        $this->artistsRepository = $artistsRepository;
+        $this->settingsRepository = $settingsRepository;
     }
 
-    /**
-     * Get dance events per day. Each day is sorted by venue order from dance_settings.
-     */
-    public function getEventsGroupedByDay(): array
+    // gather everything for the dance page and hand back one view model
+    public function buildIndexViewModel(): DanceViewModel
     {
-        $settings = $this->danceSettingsRepository->getMergedWithConfig();
-        $venueOrderFriday = $this->getVenueOrder($settings, 'venue_order_friday');
-        $venueOrderSaturday = $this->getVenueOrder($settings, 'venue_order_saturday');
-        $venueOrderSunday = $this->getVenueOrder($settings, 'venue_order_sunday');
+        $grouped = $this->getEventsGroupedByDay();
+        $danceSettings = $this->getDanceSettings();
 
-        $fridayEvents = $this->eventRepository->getByCategoryAndDay(self::CATEGORY_DANCE, 'friday');
-        $saturdayEvents = $this->eventRepository->getByCategoryAndDay(self::CATEGORY_DANCE, 'saturday');
-        $sundayEvents = $this->eventRepository->getByCategoryAndDay(self::CATEGORY_DANCE, 'sunday');
+        return new DanceViewModel(
+            $grouped['all'],
+            $grouped['friday'],
+            $grouped['saturday'],
+            $grouped['sunday'],
+            $this->buildFeaturedEvents($grouped['saturday'], $grouped['sunday']),
+            $this->getArtistsOrdered(),
+            $this->settingsRepository->getAll(),
+            $danceSettings,
+            $this->buildBreadcrumbs($danceSettings),
+            $this->resolvePageTitle($danceSettings)
+        );
+    }
 
-        $fridayEvents = $this->sortEventsByVenueOrder($fridayEvents, $venueOrderFriday);
-        $saturdayEvents = $this->sortEventsByVenueOrder($saturdayEvents, $venueOrderSaturday);
-        $sundayEvents = $this->sortEventsByVenueOrder($sundayEvents, $venueOrderSunday);
+    // featured strip = 1 saturday event + 2 sunday events
+    /** @return Event[] */
+    private function buildFeaturedEvents(array $saturdayEvents, array $sundayEvents): array
+    {
+        return array_merge(
+            array_slice($saturdayEvents, 0, 1),
+            array_slice($sundayEvents, 1, 2)
+        );
+    }
 
-        $all = $this->eventRepository->getByCategory(self::CATEGORY_DANCE);
-
+    private function buildBreadcrumbs(array $danceSettings): array
+    {
         return [
-            'friday' => $fridayEvents,
-            'saturday' => $saturdayEvents,
-            'sunday' => $sundayEvents,
-            'all' => $all,
+            ['label' => $this->settingText($danceSettings, 'breadcrumb_home_label'), 'url' => '/'],
+            ['label' => $this->settingText($danceSettings, 'breadcrumb_dance_label'), 'url' => null],
         ];
     }
 
-    /** Stable sort by configured venue order, then start time inside the same venue bucket. */
+    private function resolvePageTitle(array $danceSettings): string
+    {
+        return $this->settingText($danceSettings, 'dance_page_title');
+    }
+
+    // grab a text setting, or empty string if it's not there
+    private function settingText(array $settings, string $key): string
+    {
+        if (isset($settings[$key]) && is_string($settings[$key])) {
+            return $settings[$key];
+        }
+
+        return '';
+    }
+
+    // split the dance events per day and order each day by venue
+    /** @return array<string, Event[]> */
+    public function getEventsGroupedByDay(): array
+    {
+        $settings = $this->getDanceSettings();
+        $grouped = [];
+
+        foreach (self::DAYS as $day) {
+            $events = $this->eventRepository->getByCategoryAndDay(self::CATEGORY_DANCE, $day);
+            $venueOrder = $this->getVenueOrder($settings, 'venue_order_' . $day);
+            $grouped[$day] = $this->sortEventsByVenueOrder($events, $venueOrder);
+        }
+
+        $grouped['all'] = $this->eventRepository->getByCategory(self::CATEGORY_DANCE);
+
+        return $grouped;
+    }
+
+    // sort by venue order first, then by start time when two events are at the same venue
+    /** @return Event[] */
     private function sortEventsByVenueOrder(array $events, array $venueOrder): array
     {
-        // Venues not listed in CMS/config go to the end, then we sort by start time inside the same slot.
-        $unknownPosition = count($venueOrder);
-        usort($events, function (Event $a, Event $b) use ($venueOrder, $unknownPosition) {
-            $posA = array_search($a->venueId, $venueOrder, true);
-            $posB = array_search($b->venueId, $venueOrder, true);
-            if ($posA === false) {
-                $posA = $unknownPosition;
+        usort($events, function (Event $first, Event $second) use ($venueOrder) {
+            $firstVenue = $this->venuePosition($first->venueId, $venueOrder);
+            $secondVenue = $this->venuePosition($second->venueId, $venueOrder);
+
+            if ($firstVenue !== $secondVenue) {
+                return $firstVenue - $secondVenue;
             }
-            if ($posB === false) {
-                $posB = $unknownPosition;
-            }
-            if ($posA !== $posB) {
-                return $posA <=> $posB;
-            }
-            return strcmp($a->startTime ?? '', $b->startTime ?? '');
+
+            return strcmp((string) $first->startTime, (string) $second->startTime);
         });
+
         return $events;
     }
 
-    /** Read integer venue order list from settings; fallback to empty list. */
+    // where a venue sits in the configured order; venues that aren't listed go to the end
+    private function venuePosition(?int $venueId, array $venueOrder): int
+    {
+        $position = array_search($venueId, $venueOrder, true);
+
+        if ($position === false) {
+            return count($venueOrder);
+        }
+
+        return $position;
+    }
+
+    // read the venue id list for a day, or empty list if it's missing
+    /** @return int[] */
     private function getVenueOrder(array $settings, string $key): array
     {
-        $raw = $settings[$key] ?? null;
-        if (is_array($raw)) {
-            return array_map('intval', $raw);
+        if (isset($settings[$key]) && is_array($settings[$key])) {
+            return array_map('intval', $settings[$key]);
         }
+
         return [];
     }
 
-    /**
-     * Homepage artist strip: non-empty CMS `artists` JSON, else defaults from dance.php, else `artists` table rows
-     * whose slug is listed in `dance_index_artist_slugs` (Hardwell / Tiësto — not Jazz slugs).
-     */
+    // homepage artists: use the cms list if it has entries, otherwise pull them from the db by slug
     public function getArtistsOrdered(): array
     {
-        $settings = $this->danceSettingsRepository->getMergedWithConfig();
-        $artists = $settings['artists'] ?? null;
-        if (is_array($artists) && count($artists) > 0) {
-            return $artists;
-        }
-        $config = require __DIR__ . '/../Config/dance.php';
-        $fromConfig = $config['artists'] ?? [];
-        if (is_array($fromConfig) && count($fromConfig) > 0) {
-            return $fromConfig;
+        $settings = $this->getDanceSettings();
+
+        if (isset($settings['artists']) && is_array($settings['artists']) && count($settings['artists']) > 0) {
+            return $settings['artists'];
         }
 
-        return $this->getDanceArtistsFromDatabase();
+        return $this->getDanceArtistsFromDatabase($settings);
     }
 
-    /**
-     * @return list<array{name: string, slug: string, bio: string, image: string}>
-     */
-    private function getDanceArtistsFromDatabase(): array
+    private function getDanceArtistsFromDatabase(array $settings): array
     {
-        $defaults = require __DIR__ . '/../Config/dance.php';
-        $slugs = $defaults['dance_index_artist_slugs'] ?? [];
-        if (!is_array($slugs)) {
-            $slugs = [];
+        $slugs = [];
+        if (isset($settings['dance_index_artist_slugs']) && is_array($settings['dance_index_artist_slugs'])) {
+            $slugs = $settings['dance_index_artist_slugs'];
         }
 
-        $repo = new ArtistsRepository();
-        $all = $repo->getAllOrdered();
-        $bySlug = [];
-        foreach ($all as $row) {
-            $s = $row['slug'] ?? null;
-            if (is_string($s) && $s !== '') {
-                $bySlug[$s] = $row;
-            }
-        }
+        $allArtists = $this->artistsRepository->getAllOrdered();
+        $artists = [];
 
-        $out = [];
+        // keep only the artists i want on the homepage, in the order the slugs are listed
         foreach ($slugs as $slug) {
-            if (!isset($bySlug[$slug])) {
-                continue;
+            foreach ($allArtists as $artist) {
+                if ($artist['slug'] === $slug) {
+                    $artists[] = $artist;
+                    break;
+                }
             }
-            $r = $bySlug[$slug];
-            $out[] = [
-                'name' => (string) ($r['name'] ?? ''),
-                'slug' => $slug,
-                'bio' => (string) ($r['bio'] ?? ''),
-                'image' => (string) ($r['image'] ?? ''),
-            ];
         }
 
-        return $out;
+        return $artists;
     }
 
-    /** Public accessor so controllers don't read repository/config directly. */
+    // load the merged config + database settings once and reuse them
     public function getDanceSettings(): array
     {
-        return $this->danceSettingsRepository->getMergedWithConfig();
+        if ($this->danceSettings === null) {
+            $this->danceSettings = $this->danceSettingsRepository->getMergedWithConfig();
+        }
+
+        return $this->danceSettings;
     }
 }

@@ -1,14 +1,14 @@
 <?php
 /** Dance event detail page for /dance/event/{id}. */
 
-/** @var \App\ViewModels\EventDetailViewModel $viewModel */
+/** @var \App\ViewModels\EventDetailViewModel $vm */
 
 use App\Core\Csrf;
 
-$breadcrumbs = $viewModel->breadcrumbs;
-$event = $viewModel->event;
-$appSettings = $viewModel->appSettings;
-$dateTimeLine = $viewModel->formattedDate ? ($viewModel->formattedDate . ' • ' . $viewModel->startTime) : $viewModel->startTime;
+$breadcrumbs = $vm->breadcrumbs;
+$event = $vm->event;
+$appSettings = $vm->appSettings;
+$dateTimeLine = $vm->formattedDate ? ($vm->formattedDate . ' • ' . $vm->startTime) : $vm->startTime;
 $h = static fn(string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
 // Return users to this event after adding a ticket from POST /cart/add.
 $cartReturn = '/dance/event/' . (int)$event->id . '#tickets';
@@ -63,9 +63,9 @@ $renderFeatureListTwoCol = static function (string $desc) use ($h): void {
     echo '</div>';
 };
 
-$hasEventTickets = $viewModel->eventTickets !== [];
-$hasDayPass = $viewModel->danceDayPass !== null;
-$hasFestivalPass = $viewModel->danceAllAccessPass !== null;
+$hasEventTickets = $vm->eventTickets !== [];
+$hasDayPass = $vm->danceDayPass !== null;
+$hasFestivalPass = $vm->danceAllAccessPass !== null;
 $hasAnyTicketOption = $hasEventTickets || $hasDayPass || $hasFestivalPass;
 $ticketsFigmaTitle = 'Ticket for ' . $event->title . ' in ' . ($event->venueName ?? '');
 // Grid span flags keep top row balanced when one ticket tier is missing.
@@ -73,14 +73,14 @@ $figmaSpanStandardTop = $hasEventTickets && !$hasDayPass;
 $figmaSpanDayTop = !$hasEventTickets && $hasDayPass;
 
 // Settings for the page title, styles, body class
-$pageTitle = $viewModel->pageTitle;
+$pageTitle = $vm->pageTitle;
 $pageStyles = ['/css/pages/dance.css'];
 $bodyClass = 'dance-page event-detail-page';
 
 // Hero settings
 $pageHeroTitle = $event->venueName ?? $event->title;
-$pageHeroSubtitle = $viewModel->eventSubtitle;
-$pageHeroImage = $viewModel->heroImage;
+$pageHeroSubtitle = $vm->eventSubtitle;
+$pageHeroImage = $vm->heroImage;
 $pageHeroAlt = $event->title;
 $pageHeroClass = 'dance-detail-hero dance-event-detail-hero';
 $pageHeroContentClass = 'dance-detail-hero__content dance-event-detail-hero__content';
@@ -96,10 +96,10 @@ $pageHeroContentClass = 'dance-detail-hero__content dance-event-detail-hero__con
 <?php
 $cartToastMsg = '';
 $cartToastError = false;
-if (!empty($viewModel->cartFlashSuccess)) {
-    $cartToastMsg = (string)$viewModel->cartFlashSuccess;
-} elseif (!empty($viewModel->cartFlashError)) {
-    $cartToastMsg = (string)$viewModel->cartFlashError;
+if (!empty($vm->cartFlashSuccess)) {
+    $cartToastMsg = (string)$vm->cartFlashSuccess;
+} elseif (!empty($vm->cartFlashError)) {
+    $cartToastMsg = (string)$vm->cartFlashError;
     $cartToastError = true;
 }
 ?>
@@ -139,9 +139,9 @@ if (!empty($viewModel->cartFlashSuccess)) {
         <section id="event-info" class="event-detail-section event-detail-section--grouped"
                  aria-labelledby="event-info-heading">
             <div class="event-detail-overview">
-                <?php if (isset($viewModel->galleryImages[0])): ?>
+                <?php if (isset($vm->galleryImages[0])): ?>
                     <div class="event-detail-overview-image">
-                        <img src="/images/dance/<?= htmlspecialchars($viewModel->galleryImages[0]) ?>"
+                        <img src="/images/dance/<?= htmlspecialchars($vm->galleryImages[0]) ?>"
                              alt="<?= htmlspecialchars($event->title) ?>"
                              onerror="this.parentElement.style.display='none'">
                     </div>
@@ -173,7 +173,7 @@ if (!empty($viewModel->cartFlashSuccess)) {
                             <div class="icon-wrap"><img src="/images/icons/artistIcon.png" alt="" class="icon"
                                                         aria-hidden="true"></div>
                             <div class="event-detail-info-item"><span class="label">Artist(s)</span><span
-                                        class="value"><?= htmlspecialchars($viewModel->artistsDisplay) ?></span></div>
+                                        class="value"><?= htmlspecialchars($vm->artistsDisplay) ?></span></div>
                         </li>
                     </ul>
                 </div>
@@ -207,9 +207,9 @@ if (!empty($viewModel->cartFlashSuccess)) {
                         </li>
                     </ul>
                 </div>
-                <?php if (isset($viewModel->galleryImages[1])): ?>
+                <?php if (isset($vm->galleryImages[1])): ?>
                     <div class="event-detail-desc-image">
-                        <img src="/images/dance/<?= htmlspecialchars($viewModel->galleryImages[1]) ?>"
+                        <img src="/images/dance/<?= htmlspecialchars($vm->galleryImages[1]) ?>"
                              alt="<?= htmlspecialchars($event->title) ?>" onerror="this.style.display='none'">
                     </div>
                 <?php endif; ?>
@@ -219,9 +219,9 @@ if (!empty($viewModel->cartFlashSuccess)) {
         <section class="event-detail-section event-detail-section--grouped event-detail-section--group-split"
                  aria-labelledby="about-expect-heading">
             <div class="event-detail-features">
-                <?php if (isset($viewModel->galleryImages[2])): ?>
+                <?php if (isset($vm->galleryImages[2])): ?>
                     <div class="event-detail-desc-image">
-                        <img src="/images/dance/<?= htmlspecialchars($viewModel->galleryImages[2]) ?>"
+                        <img src="/images/dance/<?= htmlspecialchars($vm->galleryImages[2]) ?>"
                              alt="<?= htmlspecialchars($event->title) ?>" onerror="this.style.display='none'">
                     </div>
                 <?php endif; ?>
@@ -256,8 +256,8 @@ if (!empty($viewModel->cartFlashSuccess)) {
                         <?php if ($hasEventTickets): ?>
                             <div class="event-detail-tickets-cell<?= $figmaSpanStandardTop ? ' event-detail-tickets-cell--span-top' : '' ?>">
                                 <?php
-                                $eventCount = count($viewModel->eventTickets);
-                                foreach ($viewModel->eventTickets as $t):
+                                $eventCount = count($vm->eventTickets);
+                                foreach ($vm->eventTickets as $t):
                                     $tdId = (int)($t['ticket_details_id'] ?? 0);
                                     $tName = (string)($t['name'] ?? 'Ticket');
                                     $tDesc = isset($t['description']) && $t['description'] !== null && $t['description'] !== '' ? (string)$t['description'] : '';
@@ -315,7 +315,7 @@ if (!empty($viewModel->cartFlashSuccess)) {
                         <?php endif; ?>
 
                         <?php if ($hasDayPass):
-                            $p = $viewModel->danceDayPass;
+                            $p = $vm->danceDayPass;
                             $tdId = (int)($p['ticket_details_id'] ?? 0);
                             $pName = (string)($p['name'] ?? 'Day Pass');
                             $pDesc = (string)($p['description'] ?? '');
@@ -373,7 +373,7 @@ if (!empty($viewModel->cartFlashSuccess)) {
                         <?php endif; ?>
 
                         <?php if ($hasFestivalPass):
-                            $p = $viewModel->danceAllAccessPass;
+                            $p = $vm->danceAllAccessPass;
                             $tdId = (int)($p['ticket_details_id'] ?? 0);
                             $pName = (string)($p['name'] ?? 'All-Access Pass');
                             $pDesc = (string)($p['description'] ?? '');
@@ -438,14 +438,14 @@ if (!empty($viewModel->cartFlashSuccess)) {
             <div class="event-detail-location-inner">
                 <p class="event-detail-group-label">Location</p>
                 <h2 class="section-title section-title--accent event-detail-group-title event-detail-location__title"
-                    id="location-heading"><?= htmlspecialchars($viewModel->locationDisplay) ?></h2>
+                    id="location-heading"><?= htmlspecialchars($vm->locationDisplay) ?></h2>
                 <p class="copy-text copy-text--sm event-detail-location-hint">Easy to reach by public transport or by car</p>
                 <div class="event-detail-map">
-                    <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=<?= $viewModel->mapLon - 0.02 ?>%2C<?= $viewModel->mapLat - 0.015 ?>%2C<?= $viewModel->mapLon + 0.02 ?>%2C<?= $viewModel->mapLat + 0.015 ?>&layer=mapnik&marker=<?= $viewModel->mapLat ?>%2C<?= $viewModel->mapLon ?>"
+                    <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=<?= $vm->mapLon - 0.02 ?>%2C<?= $vm->mapLat - 0.015 ?>%2C<?= $vm->mapLon + 0.02 ?>%2C<?= $vm->mapLat + 0.015 ?>&layer=mapnik&marker=<?= $vm->mapLat ?>%2C<?= $vm->mapLon ?>"
                             width="100%" height="100%" loading="lazy"
                             title="Map of <?= htmlspecialchars($event->venueName) ?>"></iframe>
                 </div>
-                <a href="https://www.google.com/maps/search/?api=1&query=<?= htmlspecialchars($viewModel->mapQuery) ?>"
+                <a href="https://www.google.com/maps/search/?api=1&query=<?= htmlspecialchars($vm->mapQuery) ?>"
                    target="_blank" rel="noopener" class="btn btn--light">Open in Google Maps</a>
             </div>
         </section>

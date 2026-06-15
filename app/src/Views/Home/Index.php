@@ -1,8 +1,8 @@
 <?php
-/** Public homepage template: $viewModel from HomeController; $cmsHome is merged settings (edited in /admin/cms/homepage). */
-$page = $viewModel->page;
-$categories = $viewModel->categories;
-$cmsHome = $viewModel->cmsHome;
+/** Public homepage template: $vm from HomeController; $cmsHome is merged settings (edited in /admin/cms/homepage). */
+$page = $vm->page;
+$categories = $vm->categories;
+$cmsHome = $vm->cmsHome;
 // shared for header/footer and any partial that needs them
 $app = (new \App\Repositories\SettingsRepository())->getAll();
 $navLinks = (new \App\Repositories\MenuRepository())->getNavLinks();

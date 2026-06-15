@@ -1,9 +1,7 @@
 <?php
-/** @var \App\ViewModels\AdminHomepageEditViewModel $viewModel */
-$app = $viewModel->appSettings;
-$c = $viewModel->cmsHome;
-
-$h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+/** @var \App\ViewModels\AdminHomepageEditViewModel $vm */
+$app = $vm->appSettings;
+$c = $vm->cmsHome;
 
 $pageTitle = 'Edit homepage — ' . ($app['site_name'] ?? 'Haarlem Festival');
 $pageStyles = ['/css/admin.css'];
@@ -12,8 +10,8 @@ $bodyClass = 'admin-page';
 <!DOCTYPE html>
 <html lang="en">
 <?php require __DIR__ . '/../partials/head.php'; ?>
-<body class="<?= $h($bodyClass) ?>"
-      data-upload-csrf="<?= $h($viewModel->uploadCsrf) ?>"
+<body class="<?= $bodyClass ?>"
+      data-upload-csrf="<?= htmlspecialchars($vm->uploadCsrf) ?>"
       data-upload-url="/admin/cms/upload">
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
@@ -30,20 +28,20 @@ $bodyClass = 'admin-page';
         <h1 class="admin-title">Edit homepage</h1>
         <p class="admin-lead admin-lead--cms">Title comes from <code class="admin-cms-inline-code">pages</code> (slug <code class="admin-cms-inline-code">home</code>). Other fields are <code class="admin-cms-inline-code">site_settings</code> keys <code class="admin-cms-inline-code">cms_home_*</code>. TinyMCE on selected fields; you can upload the about image. <a href="/" target="_blank" rel="noopener">View site</a></p>
 
-    <?php if ($viewModel->success !== null): ?>
-        <div class="admin-alert admin-alert-success"><?= htmlspecialchars($viewModel->success) ?></div>
+    <?php if ($vm->success !== null): ?>
+        <div class="admin-alert admin-alert-success"><?= htmlspecialchars($vm->success) ?></div>
     <?php endif; ?>
-    <?php if ($viewModel->error !== null): ?>
-        <div class="admin-alert admin-alert-error"><?= htmlspecialchars($viewModel->error) ?></div>
+    <?php if ($vm->error !== null): ?>
+        <div class="admin-alert admin-alert-error"><?= htmlspecialchars($vm->error) ?></div>
     <?php endif; ?>
 
     <form method="post" action="/admin/cms/homepage" class="admin-cms-home-form">
-        <input type="hidden" name="_csrf" value="<?= htmlspecialchars($viewModel->csrf) ?>">
+        <input type="hidden" name="_csrf" value="<?= htmlspecialchars($vm->csrf) ?>">
 
         <div class="admin-cms-field">
             <label for="page_title">Homepage title (browser tab)</label>
             <input type="text" id="page_title" name="page_title" required maxlength="255"
-                   value="<?= htmlspecialchars($viewModel->pageTitle) ?>">
+                   value="<?= htmlspecialchars($vm->pageTitle) ?>">
         </div>
 
         <div class="admin-cms-section">
