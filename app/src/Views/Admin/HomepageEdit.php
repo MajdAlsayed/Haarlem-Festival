@@ -1,7 +1,7 @@
 <?php
-/** @var \App\ViewModels\AdminHomepageEditViewModel $viewModel */
-$app = $viewModel->appSettings;
-$c = $viewModel->cmsHome;
+/** @var \App\ViewModels\AdminHomepageEditViewModel $vm */
+$app = $vm->appSettings;
+$c = $vm->cmsHome;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +12,7 @@ $c = $viewModel->cmsHome;
     <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string)($app['css_version'] ?? '1.0')) ?>">
     <link rel="stylesheet" href="/css/admin.css?v=<?= htmlspecialchars((string)($app['css_version'] ?? '1.0')) ?>">
 </head>
-<body class="admin-page" data-upload-csrf="<?= htmlspecialchars($viewModel->uploadCsrf) ?>" data-upload-url="/admin/cms/upload">
+<body class="admin-page" data-upload-csrf="<?= htmlspecialchars($vm->uploadCsrf) ?>" data-upload-url="/admin/cms/upload">
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main class="admin-main">
@@ -30,20 +30,20 @@ $c = $viewModel->cmsHome;
 
         <?php require __DIR__ . '/partials/admin_nav.php'; ?>
 
-    <?php if ($viewModel->success !== null): ?>
-        <div class="admin-alert admin-alert-success"><?= htmlspecialchars($viewModel->success) ?></div>
+    <?php if ($vm->success !== null): ?>
+        <div class="admin-alert admin-alert-success"><?= htmlspecialchars($vm->success) ?></div>
     <?php endif; ?>
-    <?php if ($viewModel->error !== null): ?>
-        <div class="admin-alert admin-alert-error"><?= htmlspecialchars($viewModel->error) ?></div>
+    <?php if ($vm->error !== null): ?>
+        <div class="admin-alert admin-alert-error"><?= htmlspecialchars($vm->error) ?></div>
     <?php endif; ?>
 
     <form method="post" action="/admin/cms/homepage" class="admin-cms-home-form">
-        <input type="hidden" name="_csrf" value="<?= htmlspecialchars($viewModel->csrf) ?>">
+        <input type="hidden" name="_csrf" value="<?= htmlspecialchars($vm->csrf) ?>">
 
         <div class="admin-cms-field">
             <label for="page_title">Homepage title (browser tab)</label>
             <input type="text" id="page_title" name="page_title" required maxlength="255"
-                   value="<?= htmlspecialchars($viewModel->pageTitle) ?>">
+                   value="<?= htmlspecialchars($vm->pageTitle) ?>">
         </div>
 
         <div class="admin-cms-section">

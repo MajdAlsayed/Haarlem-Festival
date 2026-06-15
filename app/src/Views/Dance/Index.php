@@ -1,14 +1,14 @@
 <?php
 /** Public Dance index; card images come from merged CMS settings and dance.php defaults. */
-/** @var \App\ViewModels\DanceViewModel $viewModel */
-$fridayEvents = $viewModel->fridayEvents;
-$saturdayEvents = $viewModel->saturdayEvents;
-$sundayEvents = $viewModel->sundayEvents;
-$featuredEvents = $viewModel->featuredEvents;
-$artists = $viewModel->artists;
-$appSettings = $viewModel->appSettings;
-$danceSettings = $viewModel->danceSettings;
-$breadcrumbs = $viewModel->breadcrumbs;
+/** @var \App\ViewModels\DanceViewModel $vm */
+$fridayEvents = $vm->fridayEvents;
+$saturdayEvents = $vm->saturdayEvents;
+$sundayEvents = $vm->sundayEvents;
+$featuredEvents = $vm->featuredEvents;
+$artists = $vm->artists;
+$appSettings = $vm->appSettings;
+$danceSettings = $vm->danceSettings;
+$breadcrumbs = $vm->breadcrumbs;
 
 // CMS settings are optional; each section falls back to safe defaults.
 $danceHeroImage = isset($danceSettings['hero_image']) ? '/images/dance/' . rawurlencode((string) $danceSettings['hero_image']) : '';
@@ -25,7 +25,7 @@ $heroSubtitle = isset($danceSettings['hero_subtitle']) && is_string($danceSettin
 $aboutParagraphs = isset($danceSettings['about_paragraphs']) && is_array($danceSettings['about_paragraphs']) ? $danceSettings['about_paragraphs'] : [];
 
 // Settings for the page title, styles, body class
-$pageTitle = $viewModel->pageTitle;
+$pageTitle = $vm->pageTitle;
 $pageStyles = ['/css/pages/dance.css'];
 $bodyClass = 'dance-page';
 

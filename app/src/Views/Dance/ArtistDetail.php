@@ -1,9 +1,9 @@
 <?php
 /** Dance artist profile for /dance/artist/{slug}. */
-/** @var \App\ViewModels\ArtistDetailViewModel $viewModel */
-$artist = $viewModel->artist;
-$appSettings = $viewModel->appSettings;
-$breadcrumbs = $viewModel->breadcrumbs;
+/** @var \App\ViewModels\ArtistDetailViewModel $vm */
+$artist = $vm->artist;
+$appSettings = $vm->appSettings;
+$breadcrumbs = $vm->breadcrumbs;
 
 // Map DB day keys to UI labels for schedule rendering.
 $dayLabels = ['friday' => 'Friday', 'saturday' => 'Saturday', 'sunday' => 'Sunday'];
@@ -14,10 +14,10 @@ $pageStyles = ['/css/pages/dance.css'];
 $bodyClass = 'dance-page artist-detail-page';
 
 // Hero settings
-$pageHeroTitle = $viewModel->heroTitle;
-$pageHeroSubtitle = $viewModel->heroTagline ?? '';
-$pageHeroImage = $viewModel->heroImage;
-$pageHeroAlt = $viewModel->heroAlt;
+$pageHeroTitle = $vm->heroTitle;
+$pageHeroSubtitle = $vm->heroTagline ?? '';
+$pageHeroImage = $vm->heroImage;
+$pageHeroAlt = $vm->heroAlt;
 $pageHeroClass = 'dance-detail-hero';
 $pageHeroContentClass = 'dance-detail-hero__content';
 ?>
@@ -41,8 +41,8 @@ $pageHeroContentClass = 'dance-detail-hero__content';
         <div class="artist-detail-about">
             <div class="artist-detail-about-text">
                 <!-- Prefer curated paragraph splits from the view model; fallback to legacy bio text. -->
-                <?php if ($viewModel->aboutParagraphs !== null): ?>
-                    <?php foreach ($viewModel->aboutParagraphs as $p): ?>
+                <?php if ($vm->aboutParagraphs !== null): ?>
+                    <?php foreach ($vm->aboutParagraphs as $p): ?>
                         <p class="copy-text artist-detail-about-paragraph"><?= htmlspecialchars($p) ?></p>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -52,31 +52,31 @@ $pageHeroContentClass = 'dance-detail-hero__content';
         </div>
     </section>
 
-    <?php if ($viewModel->careerHighlights !== null && count($viewModel->careerHighlights) > 0): ?>
+    <?php if ($vm->careerHighlights !== null && count($vm->careerHighlights) > 0): ?>
         <section class="artist-detail-section artist-detail-section-alt container">
             <div class="artist-detail-features">
                 <div class="artist-detail-desc-text">
                     <h2 class="section-title section-title--underlined artist-detail-section-title">Career Highlights</h2>
                     <ul class="copy-text artist-detail-highlights">
-                        <?php foreach ($viewModel->careerHighlights as $h): ?>
+                        <?php foreach ($vm->careerHighlights as $h): ?>
                             <li><?= htmlspecialchars($h) ?></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
                 <div class="artist-detail-desc-image">
-                    <img src="/images/dance/<?= htmlspecialchars($viewModel->careerImage) ?>"
+                    <img src="/images/dance/<?= htmlspecialchars($vm->careerImage) ?>"
                          alt="<?= htmlspecialchars($artist['name']) ?>" onerror="this.style.display='none'">
                 </div>
             </div>
         </section>
     <?php endif; ?>
 
-    <?php if (!empty($viewModel->musicTracks) || !empty($viewModel->musicExtraTracks)): ?>
+    <?php if (!empty($vm->musicTracks) || !empty($vm->musicExtraTracks)): ?>
         <!-- Music section is a reusable partial shared by multiple artists. -->
         <?php require __DIR__ . '/partials/artist-music-section.php'; ?>
     <?php endif; ?>
 
-    <?php if (!empty($viewModel->artistEvents)): ?>
+    <?php if (!empty($vm->artistEvents)): ?>
         <section class="artist-detail-section artist-detail-schedule-section">
             <div class="artist-detail-schedule-inner">
             <h2 class="section-title section-title--underlined artist-detail-schedule-title"><span
@@ -84,7 +84,7 @@ $pageHeroContentClass = 'dance-detail-hero__content';
                         class="artist-detail-schedule-title-sub"> — Haarlem Dance 2026</span></h2>
             <div class="artist-detail-schedule-wrap">
                 <div class="artist-detail-schedule-timeline">
-                    <?php foreach ($viewModel->artistEvents as $ev): ?>
+                    <?php foreach ($vm->artistEvents as $ev): ?>
                         <article class="artist-detail-schedule-item">
                             <div class="artist-detail-schedule-dot"></div>
                             <div class="artist-detail-schedule-content">
@@ -106,19 +106,19 @@ $pageHeroContentClass = 'dance-detail-hero__content';
                     <?php endforeach; ?>
                 </div>
                 <div class="artist-detail-schedule-image">
-                    <img src="<?= htmlspecialchars($viewModel->scheduleImage) ?>"
+                    <img src="<?= htmlspecialchars($vm->scheduleImage) ?>"
                          alt="<?= htmlspecialchars($artist['name']) ?> performing" onerror="this.style.display='none'">
                 </div>
             </div>
             </div>
             <div class="artist-detail-schedule-cta">
-                <a href="/dance/event/<?= (int)($viewModel->artistEvents[0]->id ?? 0) ?>"
+                <a href="/dance/event/<?= (int)($vm->artistEvents[0]->id ?? 0) ?>"
                    class="btn btn--light">Tickets <span aria-hidden="true">&#8594;</span></a>
             </div>
         </section>
     <?php endif; ?>
 
-    <?php if (count($viewModel->galleryImages) >= 4): ?>
+    <?php if (count($vm->galleryImages) >= 4): ?>
         <!-- Gallery layout expects at least 4 items; indices 2/3 have safe fallback to index 0. -->
         <section class="artist-detail-section artist-detail-gallery-section">
             <div class="artist-detail-gallery-inner">
@@ -128,24 +128,24 @@ $pageHeroContentClass = 'dance-detail-hero__content';
             </div>
             <div class="artist-detail-gallery">
                 <div class="artist-detail-gallery-item artist-detail-gallery-item-left">
-                    <img src="/images/dance/<?= htmlspecialchars($viewModel->galleryImages[0]) ?>"
+                    <img src="/images/dance/<?= htmlspecialchars($vm->galleryImages[0]) ?>"
                          alt="<?= htmlspecialchars($artist['name']) ?> live" onerror="this.style.display='none'">
                 </div>
                 <div class="artist-detail-gallery-item artist-detail-gallery-item-right">
-                    <img src="/images/dance/<?= htmlspecialchars($viewModel->galleryImages[1]) ?>"
+                    <img src="/images/dance/<?= htmlspecialchars($vm->galleryImages[1]) ?>"
                          alt="<?= htmlspecialchars($artist['name']) ?> backstage" onerror="this.style.display='none'">
                 </div>
                 <div class="artist-detail-gallery-item artist-detail-gallery-item-left">
-                    <img src="/images/dance/<?= htmlspecialchars($viewModel->galleryImages[3] ?? $viewModel->galleryImages[0]) ?>"
+                    <img src="/images/dance/<?= htmlspecialchars($vm->galleryImages[3] ?? $vm->galleryImages[0]) ?>"
                          alt="<?= htmlspecialchars($artist['name']) ?> stage" onerror="this.style.display='none'">
                 </div>
                 <div class="artist-detail-gallery-item artist-detail-gallery-item-right">
-                    <img src="/images/dance/<?= htmlspecialchars($viewModel->galleryImages[2] ?? $viewModel->galleryImages[0]) ?>"
+                    <img src="/images/dance/<?= htmlspecialchars($vm->galleryImages[2] ?? $vm->galleryImages[0]) ?>"
                          alt="<?= htmlspecialchars($artist['name']) ?> portrait" onerror="this.style.display='none'">
                 </div>
             </div>
             <div class="artist-detail-stats">
-                <?php foreach ($viewModel->galleryStats as $stat): ?>
+                <?php foreach ($vm->galleryStats as $stat): ?>
                     <div class="festival-card artist-detail-stat"><span
                                 class="artist-detail-stat-num"><?= htmlspecialchars($stat['num']) ?></span><span
                                 class="artist-detail-stat-label"><?= htmlspecialchars($stat['label']) ?></span></div>
