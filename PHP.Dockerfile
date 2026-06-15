@@ -2,8 +2,9 @@ FROM php:fpm
 
 # Install system dependencies and Composer
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends git unzip libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql \
+    && apt-get install -y --no-install-recommends git unzip libzip-dev libonig-dev libpng-dev libjpeg-dev libfreetype-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql mbstring gd \
     && curl -sS https://getcomposer.org/installer -o composer-setup.php \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
     && rm composer-setup.php \
