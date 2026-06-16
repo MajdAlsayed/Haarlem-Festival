@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\AdminAuth;
 use App\Core\Csrf;
 use App\Exceptions\ValidationException;
 use App\Repositories\OrderRepository;
 use App\Repositories\SettingsRepository;
-use App\Repositories\UserRepository;
 use App\Services\OrderExportService;
 use App\ViewModels\AdminOrderExportViewModel;
 
@@ -16,19 +16,15 @@ use App\ViewModels\AdminOrderExportViewModel;
 final class AdminOrderExportController
 {
     private OrderExportService $exportService;
-    private SettingsRepository $settingsRepository;
-    private UserRepository $userRepository;
 
     public function __construct()
     {
-        $this->exportService = new OrderExportService(new OrderRepository());
-        $this->settingsRepository = new SettingsRepository();
-        $this->userRepository = new UserRepository();
+        $this->exportService = new OrderExportService(new OrderRepository(), new SettingsRepository());
     }
 
     public function handle(): void
     {
-        if (!$this->requireAdmin()) {
+        if (!AdminAuth::requireAdmin()) {
             return;
         }
 
@@ -44,7 +40,7 @@ final class AdminOrderExportController
     {
         $viewModel = new AdminOrderExportViewModel(
             csrf: Csrf::token('admin_order_export'),
-            appSettings: $this->settingsRepository->getAll(),
+            appSettings: $this->exportService->appSettings(),
             columnLabels: $this->exportService->columnLabels(),
             error: $error
         );
@@ -80,24 +76,5 @@ final class AdminOrderExportController
         header('Pragma: no-cache');
         echo $body;
         exit;
-    }
-
-    private function requireAdmin(): bool
-    {
-        $auth = $_SESSION['auth'] ?? null;
-        if (!is_array($auth)) {
-            http_response_code(403);
-            echo 'Access denied. Please log in as an administrator.';
-            return false;
-        }
-
-        $adminRoleId = $this->userRepository->getRoleIdByName('admin');
-        if ($adminRoleId === null || (int) ($auth['role_id'] ?? 0) !== $adminRoleId) {
-            http_response_code(403);
-            echo 'Access denied. Administrators only.';
-            return false;
-        }
-
-        return true;
     }
 }

@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Contracts\ServiceInterface\OrderExportServiceInterface;
 use App\Exceptions\ValidationException;
 use App\Repositories\OrderRepository;
+use App\Repositories\SettingsRepository;
 
 /**
  * Builds a CSV or Excel order export from the admin form (format + chosen columns).
@@ -28,8 +29,16 @@ final class OrderExportService implements OrderExportServiceInterface
     ];
 
     public function __construct(
-        private OrderRepository $orderRepository
+        private OrderRepository $orderRepository,
+        private SettingsRepository $settingsRepository
     ) {
+    }
+
+    // site settings the export page needs (site name, footer etc.) — controller goes through here, not the repo
+    /** @return array<string, mixed> */
+    public function appSettings(): array
+    {
+        return $this->settingsRepository->getAll();
     }
 
     /** The columns the form offers (key => label). */
