@@ -128,9 +128,8 @@ $bodyClass = 'admin-page';
             <p class="admin-scan-label admin-scan-label--tight">Camera (QR)</p>
             <div class="admin-scan-qr-wrap" id="qr-reader-wrap">
                 <div id="qr-reader-idle" class="admin-scan-qr-idle" aria-hidden="false">
-                    <p class="admin-scan-qr-idle-title">No live preview yet</p>
-                    <p class="admin-scan-qr-idle-text">Tap <strong>Start camera</strong> and allow access. The video feed appears here — there was no QR on screen before, only an empty (black) box.</p>
-                    <p class="admin-scan-qr-idle-text">Use <strong>https</strong> or <strong>localhost</strong>; some browsers block the camera on plain <code>http://</code> except localhost.</p>
+                    <p class="admin-scan-qr-idle-title">Camera preview</p>
+                    <p class="admin-scan-qr-idle-text">Tap <strong>Start camera</strong> and allow access — the live feed appears here.</p>
                 </div>
                 <div id="qr-reader" class="admin-scan-qr-reader" aria-label="QR scanner live view"></div>
             </div>

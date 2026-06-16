@@ -6,6 +6,8 @@
 /** @var string $csrf */
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 $days = ['thursday', 'friday', 'saturday', 'sunday'];
+$success = \App\Core\Session::getFlash('admin_success');
+$error = \App\Core\Session::getFlash('admin_error');
 
 $pageTitle = 'Edit dance event — Admin — ' . ($app['site_name'] ?? 'Haarlem Festival');
 $pageStyles = ['/css/admin.css'];
@@ -33,6 +35,13 @@ $bodyClass = 'admin-page';
         </nav>
 
         <h1 class="admin-title">Edit dance event</h1>
+
+        <?php if ($success): ?>
+            <div class="admin-alert admin-alert-success"><?= $h($success) ?></div>
+        <?php endif; ?>
+        <?php if ($error): ?>
+            <div class="admin-alert admin-alert-error"><?= $h($error) ?></div>
+        <?php endif; ?>
 
         <form method="post" action="/admin/dance/events/save" class="admin-form admin-form--wide">
             <input type="hidden" name="_csrf" value="<?= $h($csrf) ?>">
@@ -88,7 +97,7 @@ $bodyClass = 'admin-page';
                 <div class="admin-field">
                     <label for="seats">Capacity (seats)</label>
                     <input type="number" id="seats" name="seats" value="<?= $event['seats'] !== null ? $h((string) $event['seats']) : '' ?>" class="admin-input" min="0" placeholder="e.g. 120">
-                    <small class="admin-hint">Stored on <code>events.seats</code>. Used for ticket stock on the public Tickets page (sold + carts + unpaid holds).</small>
+                    <small class="admin-hint">Total seats for this event — drives ticket availability, so it shows “Only X left” / “Sold out” and never oversells.</small>
                 </div>
                 <div class="admin-field">
                     <label for="price">Price (optional)</label>
@@ -98,7 +107,7 @@ $bodyClass = 'admin-page';
 
             <fieldset class="admin-fieldset">
                 <legend>Preview audio (optional)</legend>
-                <p class="admin-hint">Path under <code>public/audio/</code>, use forward slashes.</p>
+                <p class="admin-hint">Optional short preview clip for this event.</p>
                 <div class="admin-field">
                     <label for="preview_audio_path">File path</label>
                     <input type="text" id="preview_audio_path" name="preview_audio_path" value="<?= $h($audio['file_path'] ?? '') ?>" class="admin-input">

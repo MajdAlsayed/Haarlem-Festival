@@ -45,7 +45,7 @@ $bodyClass = 'admin-page';
             <div class="admin-field">
                 <label for="slug">URL slug</label>
                 <input type="text" id="slug" name="slug" required class="admin-input" maxlength="80" pattern="[a-z0-9-]+" value="<?= $h($row['slug']) ?>">
-                <small class="admin-hint">Lowercase letters, numbers, hyphens only — must match <code>/dance/artist/{slug}</code> and the <code>artists</code> table for detail pages.</small>
+                <small class="admin-hint">Lowercase letters, numbers and hyphens only. Used in the artist’s page address.</small>
             </div>
 
             <div class="admin-field">
@@ -56,7 +56,7 @@ $bodyClass = 'admin-page';
             <div class="admin-field">
                 <label for="image">Image filename</label>
                 <input type="text" id="image" name="image" class="admin-input" maxlength="255" value="<?= $h($row['image']) ?>">
-                <small class="admin-hint">Filename only, under <code>/public/images/dance/</code> (e.g. <code>Artist/hardwell hero.png</code>).</small>
+                <small class="admin-hint">Image filename only (e.g. hardwell-hero.png).</small>
             </div>
 
             <div class="admin-form-actions">

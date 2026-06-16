@@ -29,7 +29,7 @@ $bodyClass = 'admin-page';
         </nav>
 
         <h1 class="admin-title">Dance artists (homepage strip)</h1>
-        <p class="admin-hint" style="margin-bottom:1rem;">Cards on the public Dance page. Stored in <code>dance_settings</code> as JSON. Image filenames live under <code>/public/images/dance/</code>. Detail pages must match an <code>artists</code> table row by slug.</p>
+        <p class="admin-hint" style="margin-bottom:1rem;">Artist cards shown on the public Dance page. Each artist links to its own profile page.</p>
 
         <?php if ($success): ?>
             <div class="admin-alert admin-alert-success"><?= $h($success) ?></div>

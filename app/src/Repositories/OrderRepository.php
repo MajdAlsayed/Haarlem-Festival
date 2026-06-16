@@ -46,6 +46,41 @@ final class OrderRepository
     }
 
     /**
+     * @return ?array<string, mixed>
+     */
+    public function findOrderDetailForAdmin(int $orderId): ?array
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare(
+            'SELECT
+                o.order_id,
+                o.user_id,
+                o.status,
+                o.total_amount,
+                o.created_at,
+                o.paid_at,
+                o.expires_at,
+                o.payment_reminder_sent,
+                u.email AS customer_email,
+                u.first_name AS customer_first_name,
+                u.last_name AS customer_last_name,
+                (
+                    SELECT COUNT(*)
+                    FROM order_items oi
+                    WHERE oi.order_id = o.order_id
+                ) AS line_items_count
+             FROM orders o
+             LEFT JOIN users u ON o.user_id = u.user_id
+             WHERE o.order_id = :id
+             LIMIT 1'
+        );
+        $stmt->execute(['id' => $orderId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ?: null;
+    }
+
+    /**
      * @return ?array{order_id:int,user_id:?int,status:string,total_amount:string,paid_at:?string,created_at:string}
      */
     public function findOrderById(int $orderId): ?array

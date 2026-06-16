@@ -25,8 +25,13 @@ $bodyClass = 'admin-page';
             <span>Homepage CMS</span>
         </nav>
 
-        <h1 class="admin-title">Edit homepage</h1>
-        <p class="admin-lead admin-lead--cms">Title comes from <code class="admin-cms-inline-code">pages</code> (slug <code class="admin-cms-inline-code">home</code>). Other fields are <code class="admin-cms-inline-code">site_settings</code> keys <code class="admin-cms-inline-code">cms_home_*</code>. TinyMCE on selected fields; you can upload the about image. <a href="/" target="_blank" rel="noopener">View site</a></p>
+        <section class="admin-page-header admin-page-header-row">
+            <div>
+                <h1 class="admin-title">Edit homepage</h1>
+                <p class="admin-subtitle">Update hero, welcome, about, and events content for the festival homepage.</p>
+            </div>
+            <a href="/" target="_blank" rel="noopener" class="admin-btn admin-btn-secondary">View site</a>
+        </section>
 
     <?php if ($vm->success !== null): ?>
         <div class="admin-alert admin-alert-success"><?= htmlspecialchars($vm->success) ?></div>
@@ -69,7 +74,7 @@ $bodyClass = 'admin-page';
                 <label for="cms_hero_cta_href">Button link</label>
                 <input type="text" id="cms_hero_cta_href" name="cms[hero_cta_href]" maxlength="500"
                        value="<?= htmlspecialchars($c['hero_cta_href'] ?? '') ?>">
-                <p class="admin-cms-hint">Use <code>#events</code>, <code>/path</code>, or <code>https://…</code></p>
+                <p class="admin-cms-hint">A web link or an on-page section.</p>
             </div>
         </div>
 
@@ -105,10 +110,10 @@ $bodyClass = 'admin-page';
                 <label for="cms_about_image_src">Image URL path</label>
                 <input type="text" id="cms_about_image_src" name="cms[about_image_src]" maxlength="500"
                        value="<?= htmlspecialchars($c['about_image_src'] ?? '') ?>">
-                <p class="admin-cms-hint">Site path, e.g. <code>/images/cms/home/…</code> or upload below.</p>
+                <p class="admin-cms-hint">Image path, or upload below.</p>
             </div>
             <div class="admin-cms-upload admin-cms-upload--home">
-                <strong>Upload about image</strong> (max 5 MB) → <code class="admin-cms-inline-code">/images/cms/home/</code>
+                <strong>Upload about image</strong> (max 5 MB)
                 <div class="admin-cms-upload-row">
                     <input type="file" id="cms-upload-home-file" accept="image/jpeg,image/png,image/gif,image/webp">
                     <button type="button" class="admin-btn admin-btn-primary admin-btn-sm" id="cms-upload-home-btn">Upload &amp; fill path</button>

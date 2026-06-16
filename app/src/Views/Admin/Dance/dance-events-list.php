@@ -29,7 +29,7 @@ $bodyClass = 'admin-page';
         </nav>
 
         <h1 class="admin-title">Dance events</h1>
-        <p class="admin-hint" style="margin-bottom:1rem;">Dance-only rows in <code>events</code> (event type <strong>dance</strong>). Capacity drives ticket stock when a ticket row points at the event.</p>
+        <p class="admin-hint" style="margin-bottom:1rem;">All dance events. Capacity controls ticket availability for each event.</p>
 
         <?php if ($success): ?>
             <div class="admin-alert admin-alert-success"><?= $h($success) ?></div>

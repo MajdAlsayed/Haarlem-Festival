@@ -79,11 +79,11 @@ $heroButtonClass = 'btn btn--light';
                 $venue = $event->venueName . ', ' . $event->venueCity;
                 $desc = $event->description ?? '';
                 ?>
-                <a href="/dance/event/<?= (int) $event->id ?>" class="festival-card festival-card--dance-event dance-card" style="text-decoration: none; color: inherit;">
+                <a href="/dance/event/<?= (int) $event->id ?>" class="festival-card festival-card--dance-event dance-card u-plain-link">
                     <?php if ($imagePath !== ''): ?>
                     <div class="dance-card-image-wrap">
                         <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= htmlspecialchars($title) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="dance-card-placeholder" style="display:none;">&#128247;</div>
+                        <div class="dance-card-placeholder is-hidden">&#128247;</div>
                     </div>
                     <?php endif; ?>
                     <div class="dance-card-body">
@@ -135,11 +135,11 @@ $heroButtonClass = 'btn btn--light';
                     $genre = !empty($dayGenres) ? $dayGenres[$i % count($dayGenres)] : '';
                     $dateTime = $dayLabel . ' • ' . ($event->startTime ?? $defaultEventTime);
                 ?>
-                    <a href="/dance/event/<?= (int) $event->id ?>" class="festival-card festival-card--dance-event dance-card dance-card-vertical" style="text-decoration: none; color: inherit;">
+                    <a href="/dance/event/<?= (int) $event->id ?>" class="festival-card festival-card--dance-event dance-card dance-card-vertical u-plain-link">
                         <?php if ($imagePath !== ''): ?>
                         <div class="dance-card-image-wrap">
                             <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= htmlspecialchars($event->title) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="dance-card-placeholder" style="display:none;">&#128247;</div>
+                            <div class="dance-card-placeholder is-hidden">&#128247;</div>
                         </div>
                         <?php endif; ?>
                         <div class="dance-card-body dance-card-body-stack">
@@ -172,7 +172,7 @@ $heroButtonClass = 'btn btn--light';
                 <?php if ($artistImagePath !== ''): ?>
                 <div class="dance-artist-card-image-wrap">
                     <img src="<?= htmlspecialchars($artistImagePath) ?>" alt="<?= htmlspecialchars($artistName) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="dance-artist-card-placeholder" style="display:none;">&#127908;</div>
+                    <div class="dance-artist-card-placeholder is-hidden">&#127908;</div>
                 </div>
                 <?php endif; ?>
                 <div class="dance-artist-card-body">

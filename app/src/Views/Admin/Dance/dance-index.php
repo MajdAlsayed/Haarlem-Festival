@@ -27,7 +27,7 @@ $bodyClass = 'admin-page';
         </nav>
 
         <h1 class="admin-title">Dance CMS</h1>
-        <p class="admin-lead">Manage the Dance homepage, schedule, artist strip, and preview assets — same structure as Jazz and Food.</p>
+        <p class="admin-lead">Manage the Dance homepage, events, and artists.</p>
 
         <section class="admin-cards">
             <a href="/admin/cms/dance" class="admin-card">
@@ -43,7 +43,7 @@ $bodyClass = 'admin-page';
             <a href="/admin/dance/artists" class="admin-card">
                 <span class="admin-card-icon">🎤</span>
                 <h2 class="admin-card-title">Artists</h2>
-                <p class="admin-card-desc">Homepage strip + public profile URLs: <code>/dance/artist/{slug}</code> (same slug as the <code>artists</code> table).</p>
+                <p class="admin-card-desc">Artists shown on the Dance homepage, each with its own profile page.</p>
             </a>
             <a href="/dance" class="admin-card" target="_blank" rel="noopener">
                 <span class="admin-card-icon">↗</span>

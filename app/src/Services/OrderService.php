@@ -8,6 +8,7 @@ use App\Contracts\ServiceInterface\OrderServiceInterface;
 use App\Repositories\OrderRepository;
 use App\Repositories\SettingsRepository;
 use App\Repositories\UserRepository;
+use App\Views\InvoiceView;
 
 // customer-facing order data: history, one order's details, and the invoice/ticket pdfs
 class OrderService implements OrderServiceInterface
@@ -55,7 +56,9 @@ class OrderService implements OrderServiceInterface
         [$name, $email] = $this->customer($userId);
         $lines = $this->orderRepository->getOrderLineItemsForInvoice($orderId);
 
-        return $this->invoicePdfService->render($order, $lines, $name, $email, $this->siteName());
+        $html = InvoiceView::html($order, $lines, $name, $email, $this->siteName());
+
+        return $this->invoicePdfService->render($html);
     }
 
     // tickets pdf (with qr) for a paid order the customer owns, or null when not allowed

@@ -964,6 +964,17 @@ body.stories-page {
 }
 /* === Footer End === */
 
+/* === Utilities === */
+.is-hidden {
+    display: none;
+}
+
+.u-plain-link {
+    color: inherit;
+    text-decoration: none;
+}
+/* === Utilities End === */
+
 /* === Festival Table Start === */
 .festival-table-wrap {
     width: 100%;

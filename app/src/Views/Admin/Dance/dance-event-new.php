@@ -85,7 +85,7 @@ $bodyClass = 'admin-page';
                 <div class="admin-field">
                     <label for="seats">Capacity (seats)</label>
                     <input type="number" id="seats" name="seats" class="admin-input" min="0" placeholder="e.g. 120">
-                    <small class="admin-hint">Stored on <code>events.seats</code>; used for ticket availability.</small>
+                    <small class="admin-hint">Total seats for this event — drives ticket availability.</small>
                 </div>
                 <div class="admin-field">
                     <label for="price">Price (optional)</label>

@@ -435,6 +435,14 @@ case '/api/stories':
         }
         break;
 
+    case '/admin/orders/view':
+        if ($method === 'GET') {
+            (new AdminOrdersController())->show();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
     case '/admin/orders/tickets':
         if ($method === 'GET') {
             (new AdminOrdersController())->tickets();

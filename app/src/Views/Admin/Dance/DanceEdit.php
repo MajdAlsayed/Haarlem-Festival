@@ -31,7 +31,7 @@ $bodyClass = 'admin-page';
         </nav>
 
         <h1 class="admin-title">Dance page copy</h1>
-        <p class="admin-lead">Data in <code>dance_settings</code>, defaults in <code>dance.php</code>. TinyMCE on hero + about. Upload fills hero filename. <a href="/dance" target="_blank" rel="noopener">View public page</a></p>
+        <p class="admin-lead">Edit the Dance homepage content. Rich-text on the hero and about sections; changes go live on save. <a href="/dance" target="_blank" rel="noopener">View public page</a></p>
 
         <?php if ($vm->success !== null): ?>
             <div class="admin-alert admin-alert-success"><?= $h($vm->success) ?></div>
@@ -77,7 +77,7 @@ $bodyClass = 'admin-page';
                 <label for="hero_image">Hero background image filename</label>
                 <input type="text" id="hero_image" name="hero_image" required maxlength="255"
                        value="<?= $h($vm->heroImage) ?>" class="admin-input">
-                <small class="admin-hint">File under <code>/public/images/dance/</code> (name only), or upload below.</small>
+                <small class="admin-hint">Image filename only, or upload below.</small>
                 <div class="admin-panel" style="margin-top:0.75rem;padding:1rem;">
                     <strong>Upload hero image</strong> (max 5 MB)
                     <div style="margin-top:0.5rem;">
@@ -116,7 +116,7 @@ $bodyClass = 'admin-page';
 
             <fieldset class="admin-fieldset">
                 <legend>Card images (one filename per line)</legend>
-                <p class="admin-hint">Filenames only, as in <code>/public/images/dance/</code>. Leave a block empty to keep config defaults on save.</p>
+                <p class="admin-hint">Image filenames only. Leave a block empty to keep the current images.</p>
                 <div class="admin-field">
                     <label for="featured_images_lines">Featured row (order matches featured events)</label>
                     <textarea id="featured_images_lines" class="admin-input admin-textarea" name="featured_images_lines" maxlength="8000" style="font-family:monospace;font-size:0.9rem;min-height:7rem;"><?= $h($vm->featuredImagesLines) ?></textarea>
@@ -140,8 +140,8 @@ $bodyClass = 'admin-page';
             </fieldset>
 
             <fieldset class="admin-fieldset">
-                <legend>Event detail page (<code>/dance/event/…</code>)</legend>
-                <p class="admin-hint">Stored in <code>dance_settings</code>. Map pin uses venue name → coordinates JSON; unknown venues use default lat/lon.</p>
+                <legend>Event detail page</legend>
+                <p class="admin-hint">Settings for the event detail pages. The map pin uses the venue’s coordinates.</p>
                 <div class="admin-field">
                     <label for="breadcrumb_home_label">Breadcrumb: home label</label>
                     <input type="text" id="breadcrumb_home_label" name="breadcrumb_home_label" required maxlength="40"
@@ -161,10 +161,10 @@ $bodyClass = 'admin-page';
                     <label for="event_detail_photos_context">Photos CMS context key</label>
                     <input type="text" id="event_detail_photos_context" name="event_detail_photos_context" required maxlength="80" pattern="[A-Za-z0-9_]+"
                            value="<?= $h($vm->eventDetailPhotosContext) ?>" class="admin-input">
-                    <small class="admin-hint">Must match <code>photos.context</code> for dance event detail slots.</small>
+                    <small class="admin-hint">Picks the gallery images shown on the event detail page.</small>
                 </div>
                 <div class="admin-field">
-                    <label for="event_detail_hero_fallback">Hero image fallback (relative to <code>/images/dance/</code>)</label>
+                    <label for="event_detail_hero_fallback">Hero image fallback</label>
                     <input type="text" id="event_detail_hero_fallback" name="event_detail_hero_fallback" required maxlength="255"
                            value="<?= $h($vm->eventDetailHeroFallback) ?>" class="admin-input">
                 </div>
@@ -201,8 +201,8 @@ $bodyClass = 'admin-page';
             </fieldset>
 
             <fieldset class="admin-fieldset">
-                <legend>Artist detail (<code>/dance/artist/…</code>)</legend>
-                <p class="admin-hint">Breadcrumbs reuse the event-detail “home / dance / list path” fields above. Narrative + tracks still come from <code>dance.php</code> → <code>artist_music</code> per slug.</p>
+                <legend>Artist detail page</legend>
+                <p class="admin-hint">Settings for the artist detail pages. Breadcrumbs reuse the event-detail path fields above.</p>
                 <div class="admin-field">
                     <label for="dance_images_base_path">Public URL prefix for dance images</label>
                     <input type="text" id="dance_images_base_path" name="dance_images_base_path" required maxlength="120"
@@ -254,7 +254,7 @@ $bodyClass = 'admin-page';
                 </div>
                 <div class="admin-field" style="display:flex;gap:1rem;flex-wrap:wrap;">
                     <div style="flex:1;min-width:10rem;">
-                        <label for="artist_detail_default_location">Default “location” if not in artist_music</label>
+                        <label for="artist_detail_default_location">Default “location” if none set</label>
                         <input type="text" id="artist_detail_default_location" name="artist_detail_default_location" required maxlength="80"
                                value="<?= $h($vm->artistDetailDefaultLocation) ?>" class="admin-input">
                     </div>
