@@ -2040,3 +2040,202 @@
     width: 100%;
     max-width: 420px;
 }
+
+@media (max-width: 900px) {
+    .dance-about,
+    .dance-featured,
+    .dance-all,
+    .dance-artists {
+        padding-inline: 24px;
+    }
+
+    .dance-cards-featured,
+    .dance-cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dance-artists-grid {
+        grid-template-columns: 1fr;
+        max-width: 620px;
+    }
+}
+
+@media (max-width: 600px) {
+    .dance-about {
+        padding-block: 40px 32px;
+    }
+
+    .dance-featured,
+    .dance-all {
+        padding-block: 0 56px;
+    }
+
+    .dance-artists {
+        padding-block: 0 64px;
+    }
+
+    .dance-cards-featured,
+    .dance-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .dance-card-body,
+    .dance-card-body-stack,
+    .dance-artist-card-body {
+        padding: 18px;
+    }
+
+    .dance-card-title {
+        font-size: 17px;
+    }
+
+    .dance-card-image-wrap,
+    .dance-card-vertical .dance-card-image-wrap {
+        padding-bottom: 62%;
+    }
+
+    .dance-artist-card-image-wrap {
+        padding-bottom: 58%;
+    }
+
+    .dance-show-more {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 900px) {
+    .event-detail-page main > .event-detail-group {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .event-detail-group--panel .event-detail-section--grouped,
+    .event-detail-location.event-detail-location--grouped {
+        padding: 36px 24px 40px;
+    }
+
+    .event-detail-overview,
+    .event-detail-features {
+        grid-template-columns: 1fr;
+        gap: 36px;
+    }
+
+    .event-detail-overview-image,
+    .event-detail-desc-image {
+        max-width: none;
+    }
+
+    .event-detail-desc-image {
+        justify-content: center;
+    }
+
+    .event-detail-desc-image img {
+        max-width: 520px;
+    }
+}
+
+@media (max-width: 600px) {
+    .event-detail-page main > .event-detail-group {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .event-detail-page main > .event-detail-group:first-of-type {
+        padding-top: 36px;
+    }
+
+    .event-detail-page main > .event-detail-group + .event-detail-group {
+        margin-top: 24px;
+    }
+
+    .event-detail-group--panel.event-detail-group--info,
+    .event-detail-group--panel.event-detail-group--about {
+        border-radius: 14px;
+    }
+
+    .event-detail-group--panel .event-detail-section--grouped,
+    .event-detail-location.event-detail-location--grouped {
+        padding: 28px 18px 32px;
+        border-radius: 14px;
+    }
+
+    .event-detail-group-title {
+        margin-bottom: 22px;
+    }
+
+    .event-detail-info-list li {
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+
+    .event-detail-info-list .icon-wrap {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+    }
+
+    .event-detail-info-list .icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .event-detail-info-list .value {
+        font-size: 1rem;
+    }
+
+    .event-detail-features {
+        gap: 28px;
+    }
+
+    .event-detail-features li {
+        gap: 12px;
+        margin-bottom: 14px;
+        font-size: 1rem;
+    }
+
+    .event-detail-features li .feat-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .event-detail-desc-image img {
+        max-width: 100%;
+    }
+
+    .event-detail-map {
+        height: 300px;
+        border-radius: 14px;
+    }
+
+    .event-detail-tickets-section--figma .event-detail-ticket-card--figma {
+        padding: 20px 18px;
+    }
+
+    .event-detail-tickets-section--figma .event-detail-ticket-card-head {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .event-detail-tickets-section--figma .event-detail-ticket-card-head .event-detail-ticket-price {
+        text-align: left;
+    }
+
+    .event-detail-tickets-section--figma .event-detail-ticket-card--festival .event-detail-ticket-card-head {
+        padding-right: 0;
+        padding-top: 34px;
+    }
+
+    .event-detail-tickets-section--figma .event-detail-ticket-card.vip .event-detail-ticket-card-head {
+        padding-left: 0;
+        padding-top: 34px;
+    }
+
+    .event-detail-tickets-section--figma .event-detail-ticket-card--festival .event-detail-ticket-badge--best,
+    .event-detail-tickets-section--figma .event-detail-ticket-badge--vip-figma {
+        top: 12px;
+        left: 14px;
+        right: auto;
+    }
+}

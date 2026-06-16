@@ -905,3 +905,315 @@
     border-radius: 12px;
     overflow: hidden;
 }
+
+@media (max-width: 900px) {
+    .history-location-section {
+        padding: 56px 0;
+    }
+
+    .history-location-section .container,
+    .history-location-image-left .container,
+    .history-location-image-right .container {
+        flex-direction: column;
+        gap: 28px;
+    }
+
+    .history-location-image-container {
+        width: 100%;
+        aspect-ratio: 16 / 10;
+    }
+
+    .history-location-content {
+        gap: 16px;
+    }
+
+    .history-location-description {
+        gap: 16px;
+        margin-bottom: 18px;
+    }
+
+    .history-location-nav .container {
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 600px) {
+    .history-location-section {
+        padding: 44px 0;
+    }
+
+    .history-location-image-container {
+        aspect-ratio: 4 / 3;
+        border-radius: 10px;
+    }
+
+    .history-location-title {
+        margin-bottom: 8px;
+    }
+
+    .history-location-description {
+        gap: 14px;
+    }
+
+    .history-read-more-button,
+    .history-section-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .history-back-section {
+        padding: 44px 0;
+    }
+
+    .history-location-nav {
+        padding: 44px 0;
+    }
+
+    .history-location-nav .container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .history-location-nav .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 900px) {
+    .history-stats-banner .container {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 28px 40px;
+    }
+
+    .history-stats-item {
+        flex: 0 1 180px;
+    }
+
+    .history-content-section {
+        padding: 56px 0;
+    }
+
+    .history-content-section .container,
+    .history-image-right .container,
+    .history-image-left .container {
+        flex-direction: column;
+        gap: 36px;
+    }
+
+    .history-content-media {
+        width: 100%;
+        gap: 24px;
+    }
+
+    .history-content-image {
+        max-width: 620px;
+    }
+
+    .history-did-you-know {
+        max-width: 620px;
+    }
+
+    .history-experience-banner {
+        padding: 52px 0;
+    }
+
+    .history-experience-cards,
+    .history-experience-cards .container {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .history-experience-card {
+        padding: 32px 28px;
+    }
+}
+
+@media (max-width: 600px) {
+    .history-about-banner {
+        padding: 28px 0;
+    }
+
+    .history-stats-banner {
+        padding: 28px 0;
+    }
+
+    .history-stats-banner .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px 16px;
+    }
+
+    .history-stats-item {
+        flex: none;
+    }
+
+    .history-stats-label {
+        max-width: none;
+    }
+
+    .history-content-section {
+        padding: 44px 0;
+    }
+
+    .history-content-section .container,
+    .history-image-right .container,
+    .history-image-left .container {
+        gap: 28px;
+    }
+
+    .history-content-text-block {
+        gap: 22px;
+    }
+
+    .history-content-section-item {
+        gap: 12px;
+    }
+
+    .history-content-image {
+        aspect-ratio: 4 / 3;
+        border-radius: 10px;
+    }
+
+    .history-did-you-know {
+        padding: 24px 20px;
+        border-radius: 10px;
+    }
+
+    .history-experience-banner {
+        padding: 44px 0;
+    }
+
+    .history-experience-card {
+        padding: 26px 20px;
+        border-radius: 10px;
+    }
+
+    .history-experience-card-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 420px) {
+    .history-stats-banner .container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1100px) {
+    .history-tours-info-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .history-tours-schedule-wrapper {
+        gap: 48px;
+    }
+
+    .history-tours-slots-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .history-tours-details {
+        width: 320px;
+    }
+}
+
+@media (max-width: 768px) {
+    .history-tours-info {
+        padding: 36px 0;
+    }
+
+    .history-tours-info-cards {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .history-tours-info-card {
+        padding: 20px;
+    }
+
+    .history-tours-schedule-section {
+        padding: 36px 0;
+    }
+
+    .history-tours-schedule-wrapper {
+        flex-direction: column;
+        gap: 36px;
+    }
+
+    .history-tours-schedule,
+    .history-tours-details {
+        width: 100%;
+    }
+
+    .history-tours-slots-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .history-tours-item {
+        gap: 18px;
+        padding: 16px;
+    }
+
+    .history-tours-time-lang {
+        gap: 12px;
+        justify-content: flex-start;
+    }
+
+    .history-tours-lang {
+        text-align: left;
+    }
+
+    .history-tours-details {
+        gap: 22px;
+    }
+
+    .history-tours-details-list {
+        gap: 22px;
+    }
+
+    .history-tours-tickets {
+        padding: 40px 0 36px;
+    }
+
+    .history-tours-map {
+        padding: 48px 0;
+    }
+
+    .history-tours-leaflet-map {
+        height: 380px;
+    }
+}
+
+@media (max-width: 480px) {
+    .history-tours-section-title {
+        margin-bottom: 22px;
+    }
+
+    .history-tours-time-lang {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .history-tours-add-button {
+        width: 100%;
+    }
+
+    .history-tours-detail-icon {
+        width: 42px;
+        height: 42px;
+        padding: 9px;
+    }
+
+    .history-tours-ticket-card {
+        padding: 20px 18px;
+    }
+
+    .history-tours-leaflet-map {
+        height: 320px;
+        border-radius: 10px;
+    }
+}

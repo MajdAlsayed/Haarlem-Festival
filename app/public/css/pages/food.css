@@ -586,3 +586,73 @@ body.food-booking-page {
     color: var(--color-accent);
 }
 
+@media (max-width: 768px) {
+    .food-intro {
+        padding-top: 16px;
+        padding-bottom: 20px;
+    }
+
+    .food-filter-row {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .food-filter-pills {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        width: 100%;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+    }
+
+    .food-filter-pills::-webkit-scrollbar {
+        display: none;
+    }
+
+    .food-cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px;
+    }
+
+    .food-card-image-wrap {
+        height: 190px;
+    }
+
+    .food-reviews-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .food-review-card {
+        min-height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .food-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding-bottom: 28px;
+    }
+
+    .food-card-image-wrap {
+        height: 220px;
+    }
+
+    .food-card-body {
+        padding: 16px 15px 15px;
+    }
+
+    .food-reviews {
+        padding: 36px 0 56px;
+    }
+
+    .food-reviews-title {
+        margin-bottom: 18px;
+    }
+
+    .food-review-head {
+        align-items: flex-start;
+    }
+}
+
