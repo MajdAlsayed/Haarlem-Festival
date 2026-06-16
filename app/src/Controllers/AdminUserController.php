@@ -27,20 +27,25 @@ final class AdminUserController
             return;
         }
 
-        $search = trim((string)($_GET['search'] ?? ''));
-        $sortBy = (string)($_GET['sort'] ?? 'created_at');
-        $sortDir = (string)($_GET['dir'] ?? 'DESC');
+        try {
+            $search  = trim((string)($_GET['search'] ?? ''));
+            $sortBy  = (string)($_GET['sort'] ?? 'created_at');
+            $sortDir = (string)($_GET['dir'] ?? 'DESC');
 
-        $users = $this->userService->getAllUsers($search, $sortBy, $sortDir);
+            $users = $this->userService->getAllUsers($search, $sortBy, $sortDir);
 
-        $viewModel = new AdminUserViewModel(
-            users: $users,
-            search: $search,
-            sortBy: $sortBy,
-            sortDir: $sortDir,
-        );
+            $viewModel = new AdminUserViewModel(
+                users: $users,
+                search: $search,
+                sortBy: $sortBy,
+                sortDir: $sortDir,
+            );
 
-        require __DIR__ . '/../Views/Admin/users-list.php';
+            require __DIR__ . '/../Views/Admin/users-list.php';
+        } catch (\Exception $e) {
+            error_log('AdminUserController::index error: ' . $e->getMessage());
+            require __DIR__ . '/../Views/error.php';
+        }
     }
 
     public function edit(): void
@@ -49,22 +54,27 @@ final class AdminUserController
             return;
         }
 
-        $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-        if ($id <= 0) {
-            header('Location: /admin/users');
-            exit;
+        try {
+            $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+            if ($id <= 0) {
+                header('Location: /admin/users');
+                exit;
+            }
+
+            $user = $this->userService->findById($id);
+            if (!$user) {
+                header('Location: /admin/users');
+                exit;
+            }
+
+            $roles = $this->userService->getAllRoles();
+            $csrf  = Csrf::token('admin_user');
+
+            require __DIR__ . '/../Views/Admin/users-edit.php';
+        } catch (\Exception $e) {
+            error_log('AdminUserController::edit error: ' . $e->getMessage());
+            require __DIR__ . '/../Views/error.php';
         }
-
-        $user = $this->userService->findById($id);
-        if (!$user) {
-            header('Location: /admin/users');
-            exit;
-        }
-
-        $roles = $this->userService->getAllRoles();
-        $csrf = Csrf::token('admin_user');
-
-        require __DIR__ . '/../Views/Admin/users-edit.php';
     }
 
     public function update(): void
@@ -79,24 +89,52 @@ final class AdminUserController
             exit;
         }
 
-        $id = (int)($_POST['user_id'] ?? 0);
-        $roleId = (int)($_POST['role_id'] ?? 0);
-        $firstName = trim((string)($_POST['first_name'] ?? ''));
-        $lastName = trim((string)($_POST['last_name'] ?? ''));
-        $email = trim((string)($_POST['email'] ?? ''));
-        $isActive = !empty($_POST['is_active']);
+        try {
+            $id = (int)($_POST['user_id'] ?? 0);
 
-        // Redirect back if required fields are missing
-        if ($id <= 0 || $firstName === '' || $email === '') {
-            Session::setFlash('admin_error', 'Required fields missing.');
-            header('Location: /admin/users/edit?id=' . $id);
+            // Redirect back if required fields are missing
+            if ($id <= 0) {
+                Session::setFlash('admin_error', 'Required fields missing.');
+                header('Location: /admin/users');
+                exit;
+            }
+
+            // Get existing user and update its fields
+            $user = $this->userService->findById($id);
+            if (!$user) {
+                Session::setFlash('admin_error', 'User not found.');
+                header('Location: /admin/users');
+                exit;
+            }
+
+            $firstName = trim((string)($_POST['first_name'] ?? ''));
+            $email     = trim((string)($_POST['email'] ?? ''));
+
+            if ($firstName === '' || $email === '') {
+                Session::setFlash('admin_error', 'Required fields missing.');
+                header('Location: /admin/users/edit?id=' . $id);
+                exit;
+            }
+
+            // Update User model fields
+            $user->roleId    = (int)($_POST['role_id'] ?? 0);
+            $user->firstName = $firstName;
+            $user->lastName  = trim((string)($_POST['last_name'] ?? ''));
+            $user->email     = $email;
+            $user->isActive  = !empty($_POST['is_active']);
+
+            // Pass the whole User object
+            $this->userService->updateUser($user);
+
+            Session::setFlash('admin_success', 'User updated.');
+            header('Location: /admin/users');
+            exit;
+        } catch (\Exception $e) {
+            error_log('AdminUserController::update error: ' . $e->getMessage());
+            Session::setFlash('admin_error', 'An unexpected error occurred.');
+            header('Location: /admin/users');
             exit;
         }
-
-        $this->userService->updateUser($id, $roleId, $firstName, $lastName, $email, $isActive);
-        Session::setFlash('admin_success', 'User updated.');
-        header('Location: /admin/users');
-        exit;
     }
 
     public function delete(): void
@@ -111,15 +149,22 @@ final class AdminUserController
             exit;
         }
 
-        $id = (int)($_POST['user_id'] ?? 0);
-        if ($id <= 0) {
+        try {
+            $id = (int)($_POST['user_id'] ?? 0);
+            if ($id <= 0) {
+                header('Location: /admin/users');
+                exit;
+            }
+
+            $this->userService->deleteUser($id);
+            Session::setFlash('admin_success', 'User deleted.');
+            header('Location: /admin/users');
+            exit;
+        } catch (\Exception $e) {
+            error_log('AdminUserController::delete error: ' . $e->getMessage());
+            Session::setFlash('admin_error', 'An unexpected error occurred.');
             header('Location: /admin/users');
             exit;
         }
-
-        $this->userService->deleteUser($id);
-        Session::setFlash('admin_success', 'User deleted.');
-        header('Location: /admin/users');
-        exit;
     }
 }

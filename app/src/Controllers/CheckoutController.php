@@ -36,7 +36,7 @@ final class CheckoutController
         $app = (new SettingsRepository())->getAll();
         $error = Session::getFlash('checkout_error');
         $csrf = Csrf::token('checkout');
-        // €0 cart → no Stripe button (class demo still uses “Confirm without payment”).
+        // €0 cart → no Stripe button (class demo still uses "Confirm without payment").
         $stripeOn = StripePaymentService::isConfigured() && $vm->total > 0;
         $demoOn = true;
 
@@ -61,6 +61,7 @@ final class CheckoutController
             header('Location: /checkout/success?order_id=' . $orderId);
             exit;
         } catch (\Throwable $e) {
+            error_log('CheckoutController::pay error: ' . $e->getMessage());
             Session::setFlash('checkout_error', $e->getMessage());
             header('Location: /checkout');
             exit;
@@ -99,6 +100,7 @@ final class CheckoutController
             header('Location: ' . $url);
             exit;
         } catch (\Throwable $e) {
+            error_log('CheckoutController::payStripe error: ' . $e->getMessage());
             Session::setFlash('checkout_error', $e->getMessage());
             header('Location: /checkout');
             exit;
@@ -123,6 +125,7 @@ final class CheckoutController
             header('Location: /account/order/' . $orderId);
             exit;
         } catch (\Throwable $e) {
+            error_log('CheckoutController::payLater error: ' . $e->getMessage());
             Session::setFlash('checkout_error', $e->getMessage());
             header('Location: /checkout');
             exit;
@@ -154,6 +157,7 @@ final class CheckoutController
             header('Location: /checkout/success?order_id=' . $orderId);
             exit;
         } catch (\Throwable $e) {
+            error_log('CheckoutController::payPending error: ' . $e->getMessage());
             Session::setFlash('order_error', $e->getMessage());
             header('Location: /account/order/' . $orderId);
             exit;
@@ -218,6 +222,7 @@ final class CheckoutController
             header('Location: ' . $url);
             exit;
         } catch (\Throwable $e) {
+            error_log('CheckoutController::payPendingStripe error: ' . $e->getMessage());
             Session::setFlash('order_error', $e->getMessage());
             header('Location: /account/order/' . $orderId);
             exit;
@@ -249,6 +254,7 @@ final class CheckoutController
                 header('Location: /checkout/success?order_id=' . $orderId);
                 exit;
             } catch (\Throwable $e) {
+                error_log('CheckoutController::success (Stripe) error: ' . $e->getMessage());
                 Session::setFlash('checkout_error', $e->getMessage());
                 header('Location: /checkout');
                 exit;
@@ -261,19 +267,26 @@ final class CheckoutController
             exit;
         }
 
-        $orders = new OrderRepository();
-        $order = $orders->findForCustomer($orderId, $userId);
-        if ($order === null) {
-            http_response_code(404);
-            echo 'Order not found.';
+        try {
+            $orders = new OrderRepository();
+            $order = $orders->findForCustomer($orderId, $userId);
+            if ($order === null) {
+                http_response_code(404);
+                echo 'Order not found.';
+                exit;
+            }
+
+            $tickets = $orders->getTicketCodesForOrder($orderId);
+            $app = (new SettingsRepository())->getAll();
+            $paidWithStripe = !empty($order['stripe_checkout_session_id']);
+
+            require __DIR__ . '/../Views/Checkout/success.php';
+        } catch (\Throwable $e) {
+            error_log('CheckoutController::success error: ' . $e->getMessage());
+            Session::setFlash('checkout_error', 'Could not load order details.');
+            header('Location: /cart');
             exit;
         }
-
-        $tickets = $orders->getTicketCodesForOrder($orderId);
-        $app = (new SettingsRepository())->getAll();
-        $paidWithStripe = !empty($order['stripe_checkout_session_id']);
-
-        require __DIR__ . '/../Views/Checkout/success.php';
     }
 
     /**
@@ -283,15 +296,15 @@ final class CheckoutController
      */
     private function cartInfrastructure(): array
     {
-        $cartRepo = new CartRepository();
+        $cartRepo   = new CartRepository();
         $ticketRepo = new TicketRepository();
         $availability = new TicketAvailabilityService($cartRepo, $ticketRepo);
 
         return [
-            'cartRepo' => $cartRepo,
-            'ticketRepo' => $ticketRepo,
+            'cartRepo'     => $cartRepo,
+            'ticketRepo'   => $ticketRepo,
             'availability' => $availability,
-            'cartService' => new CartService($cartRepo, $availability),
+            'cartService'  => new CartService($cartRepo, $availability),
         ];
     }
 
