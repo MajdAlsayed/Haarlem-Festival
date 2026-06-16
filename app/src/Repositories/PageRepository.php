@@ -3,17 +3,15 @@
 namespace App\Repositories;
 
 use App\Contracts\PageRepositoryInterface;
-use App\Core\Database;
+use App\Core\Repository;
 use App\Models\Page;
 
 /** pages table lookup by slug. Used by PageService. */
-class PageRepository implements PageRepositoryInterface
+class PageRepository extends Repository implements PageRepositoryInterface
 {
     public function getBySlug(string $slug): ?Page
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT page_id, slug, title
              FROM pages
              WHERE slug = :slug AND is_published = 1'
@@ -32,8 +30,7 @@ class PageRepository implements PageRepositoryInterface
     /** @return list<array{page_id:int,slug:string,title:string,is_published:bool}> All pages for CMS admin. */
     public function getAllForAdmin(): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->query(
+        $stmt = $this->db->query(
             'SELECT page_id, slug, title, is_published
              FROM pages
              ORDER BY title ASC'
@@ -53,8 +50,7 @@ class PageRepository implements PageRepositoryInterface
     /** Get page by id for admin edit. Returns array with page_id, slug, title, is_published or null. */
     public function getById(int $id): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT page_id, slug, title, is_published
              FROM pages
              WHERE page_id = :id'
@@ -76,8 +72,7 @@ class PageRepository implements PageRepositoryInterface
     /** Update page title, slug, is_published. */
     public function update(int $id, string $title, string $slug, bool $isPublished): bool
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'UPDATE pages SET title = :title, slug = :slug, is_published = :pub
              WHERE page_id = :id'
         );
@@ -93,8 +88,7 @@ class PageRepository implements PageRepositoryInterface
 
     public function findBySlugForAdmin(string $slug): ?Page
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT page_id, slug, title FROM pages WHERE slug = :slug LIMIT 1'
         );
         $stmt->execute(['slug' => strtolower(trim($slug))]);
@@ -105,8 +99,7 @@ class PageRepository implements PageRepositoryInterface
 
     public function updateTitleBySlug(string $slug, string $title): bool
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'UPDATE pages SET title = :title WHERE slug = :slug LIMIT 1'
         );
 

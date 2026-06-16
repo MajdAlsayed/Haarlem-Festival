@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Core\Database;
+use App\Core\Repository;
 use PDO;
 
 /**
  * Orders: admin export and listing, plus customer and pay-later persistence for checkout and account pages.
  */
-final class OrderRepository
+final class OrderRepository extends Repository
 {
     /**
      * All orders with customer fields and line item count for export.
@@ -19,7 +19,6 @@ final class OrderRepository
      */
     public function getAllForExport(): array
     {
-        $db = Database::getConnection();
         $sql = '
             SELECT
                 o.order_id,
@@ -40,7 +39,7 @@ final class OrderRepository
             LEFT JOIN users u ON o.user_id = u.user_id
             ORDER BY o.created_at DESC
         ';
-        $stmt = $db->query($sql);
+        $stmt = $this->db->query($sql);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -50,8 +49,7 @@ final class OrderRepository
      */
     public function findOrderDetailForAdmin(int $orderId): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT
                 o.order_id,
                 o.user_id,
@@ -85,8 +83,7 @@ final class OrderRepository
      */
     public function findOrderById(int $orderId): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT order_id, user_id, status, total_amount, paid_at, created_at, expires_at, payment_reminder_sent
              FROM orders WHERE order_id = :id LIMIT 1'
         );
@@ -101,8 +98,7 @@ final class OrderRepository
      */
     public function listOrdersForUser(int $userId): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT order_id, status, total_amount, paid_at, created_at, expires_at
              FROM orders
              WHERE user_id = :uid
@@ -120,8 +116,7 @@ final class OrderRepository
      */
     public function getOrderLineItemsForInvoice(int $orderId): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT td.name, oi.quantity, oi.unit_price, oi.line_total
              FROM order_items oi
              INNER JOIN ticket_details td ON td.ticket_details_id = oi.ticket_details_id
@@ -148,8 +143,7 @@ final class OrderRepository
      */
     public function createPaidOrder(int $userId, float $totalAmount, ?string $stripeCheckoutSessionId = null): int
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'INSERT INTO orders (user_id, status, total_amount, paid_at, stripe_checkout_session_id)
              VALUES (:user_id, \'paid\', :total, NOW(), :sid)'
         );
@@ -159,14 +153,13 @@ final class OrderRepository
             'sid' => $stripeCheckoutSessionId,
         ]);
 
-        return (int) $db->lastInsertId();
+        return (int) $this->db->lastInsertId();
     }
 
     /** Pay-later: no tickets yet, just order_lines + clock for when it auto-dies. */
     public function createPendingOrder(int $userId, float $totalAmount): int
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'INSERT INTO orders (user_id, status, total_amount, paid_at, expires_at, payment_reminder_sent, stripe_checkout_session_id)
              VALUES (:user_id, \'pending\', :total, NULL, DATE_ADD(NOW(), INTERVAL 24 HOUR), 0, NULL)'
         );
@@ -175,14 +168,13 @@ final class OrderRepository
             'total' => number_format($totalAmount, 2, '.', ''),
         ]);
 
-        return (int) $db->lastInsertId();
+        return (int) $this->db->lastInsertId();
     }
 
     /** @return int Number of orders expired */
     public function expireStalePendingOrders(): int
     {
-        $db = Database::getConnection();
-        $stmt = $db->exec(
+        $stmt = $this->db->exec(
             "UPDATE orders SET status = 'canceled'
              WHERE status = 'pending'
                AND expires_at IS NOT NULL
@@ -199,8 +191,7 @@ final class OrderRepository
      */
     public function listPendingOrdersForReminder(): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->query(
+        $stmt = $this->db->query(
             "SELECT order_id, user_id, total_amount, expires_at
              FROM orders
              WHERE status = 'pending'
@@ -225,8 +216,7 @@ final class OrderRepository
 
     public function markPaymentReminderSent(int $orderId): void
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'UPDATE orders SET payment_reminder_sent = 1 WHERE order_id = :id AND status = \'pending\''
         );
         $stmt->execute(['id' => $orderId]);
@@ -237,8 +227,7 @@ final class OrderRepository
      */
     public function getOrderFulfillmentLines(int $orderId): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT order_item_id, ticket_details_id, quantity, unit_price, line_total
              FROM order_items
              WHERE order_id = :oid
@@ -267,8 +256,7 @@ final class OrderRepository
      */
     public function lockPendingOrderForPay(int $orderId, int $userId): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT order_id, user_id, status, total_amount, expires_at
              FROM orders
              WHERE order_id = :id AND user_id = :uid AND status = \'pending\'
@@ -284,16 +272,15 @@ final class OrderRepository
 
     public function markOrderPaidAndClearPendingWindow(int $orderId, ?string $stripeCheckoutSessionId = null): void
     {
-        $db = Database::getConnection();
         if ($stripeCheckoutSessionId !== null && $stripeCheckoutSessionId !== '') {
-            $stmt = $db->prepare(
+            $stmt = $this->db->prepare(
                 'UPDATE orders
                  SET status = \'paid\', paid_at = NOW(), expires_at = NULL, stripe_checkout_session_id = :sid
                  WHERE order_id = :id AND status = \'pending\''
             );
             $stmt->execute(['id' => $orderId, 'sid' => $stripeCheckoutSessionId]);
         } else {
-            $stmt = $db->prepare(
+            $stmt = $this->db->prepare(
                 'UPDATE orders
                  SET status = \'paid\', paid_at = NOW(), expires_at = NULL
                  WHERE order_id = :id AND status = \'pending\''
@@ -309,8 +296,7 @@ final class OrderRepository
 
     public function findOrderIdByStripeSessionId(string $stripeSessionId): ?int
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT order_id FROM orders WHERE stripe_checkout_session_id = :sid LIMIT 1'
         );
         $stmt->execute(['sid' => $stripeSessionId]);
@@ -326,8 +312,7 @@ final class OrderRepository
         float $unitPrice,
         float $lineTotal
     ): int {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'INSERT INTO order_items (order_id, ticket_details_id, quantity, unit_price, line_total)
              VALUES (:oid, :tdid, :qty, :unit, :line)'
         );
@@ -339,7 +324,7 @@ final class OrderRepository
             'line' => number_format($lineTotal, 2, '.', ''),
         ]);
 
-        return (int) $db->lastInsertId();
+        return (int) $this->db->lastInsertId();
     }
 
     /**
@@ -347,8 +332,7 @@ final class OrderRepository
      */
     public function findForCustomer(int $orderId, int $userId): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT order_id, status, total_amount, paid_at, created_at, stripe_checkout_session_id, expires_at, payment_reminder_sent
              FROM orders
              WHERE order_id = :id AND user_id = :uid
@@ -367,8 +351,7 @@ final class OrderRepository
      */
     public function getTicketsWithDetailsForOrder(int $orderId): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT t.ticket_code,
                     td.name AS item_name, td.ticket_type,
                     e.title AS event_title, e.event_day, e.start_time
@@ -404,8 +387,7 @@ final class OrderRepository
      */
     public function getTicketCodesForOrder(int $orderId): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT t.ticket_code, td.name AS item_name
              FROM tickets t
              INNER JOIN order_items oi ON oi.order_item_id = t.order_item_id

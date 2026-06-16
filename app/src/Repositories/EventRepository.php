@@ -3,17 +3,15 @@
 namespace App\Repositories;
 
 use App\Contracts\EventRepositoryInterface;
-use App\Core\Database;
+use App\Core\Repository;
 use App\Models\Event;
 
 /** events + event_types + venues (JOIN). Used by EventService. */
-class EventRepository implements EventRepositoryInterface
+class EventRepository extends Repository implements EventRepositoryInterface
 {
     public function getAll(): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT e.event_id,
                     e.event_type_id,
                     e.venue_id,
@@ -44,9 +42,7 @@ class EventRepository implements EventRepositoryInterface
 
     public function getByCategory(string $eventTypeName): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT e.event_id,
                     e.event_type_id,
                     e.venue_id,
@@ -77,9 +73,7 @@ class EventRepository implements EventRepositoryInterface
 
     public function getByCategoryAndDay(string $eventTypeName, string $eventDay): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT e.event_id,
                     e.event_type_id,
                     e.venue_id,
@@ -114,9 +108,7 @@ class EventRepository implements EventRepositoryInterface
 
     public function getById(int $id): ?Event
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT e.event_id,
                     e.event_type_id,
                     e.venue_id,

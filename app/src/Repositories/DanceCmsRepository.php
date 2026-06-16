@@ -4,22 +4,16 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Core\Database;
+use App\Core\Repository;
 use PDO;
 
 /** Dance event CRUD for admin (event_types.name = dance). Mirrors JazzCmsRepository. */
-final class DanceCmsRepository
+final class DanceCmsRepository extends Repository
 {
-    /** Single PDO accessor keeps SQL calls consistent. */
-    private function db(): PDO
-    {
-        return Database::getConnection();
-    }
-
     /** Resolve event_types id for "dance" once per operation. */
     public function getDanceEventTypeId(): int
     {
-        $stmt = $this->db()->query("SELECT event_type_id FROM event_types WHERE LOWER(name) = 'dance' LIMIT 1");
+        $stmt = $this->db->query("SELECT event_type_id FROM event_types WHERE LOWER(name) = 'dance' LIMIT 1");
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$row) {
             throw new \RuntimeException('Dance event type is missing. Check event_types seed/migrations.');
@@ -31,7 +25,7 @@ final class DanceCmsRepository
     /** @return list<array{venue_id:int,name:string,city:string}> */
     public function listVenues(): array
     {
-        $stmt = $this->db()->query('SELECT venue_id, name, city FROM venues ORDER BY name ASC');
+        $stmt = $this->db->query('SELECT venue_id, name, city FROM venues ORDER BY name ASC');
         /** @var list<array<string,mixed>> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -62,7 +56,7 @@ final class DanceCmsRepository
                 END,
                 COALESCE(e.start_time,\'99:99\') ASC, e.event_id ASC
         ';
-        $stmt = $this->db()->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         $stmt->execute(['tid' => $danceId]);
         /** @var list<array<string,mixed>> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -78,7 +72,7 @@ final class DanceCmsRepository
             return null;
         }
         $danceId = $this->getDanceEventTypeId();
-        $stmt = $this->db()->prepare(
+        $stmt = $this->db->prepare(
             'SELECT e.event_id, e.event_type_id, e.venue_id, e.title, e.description, e.event_day,
                     e.start_time, e.end_time, e.hall, e.seats, e.price,
                     v.name AS venue_name, v.city AS venue_city
@@ -131,7 +125,7 @@ final class DanceCmsRepository
         ?string $price
     ): void {
         $this->assertDanceEvent($eventId);
-        $stmt = $this->db()->prepare(
+        $stmt = $this->db->prepare(
             'UPDATE events SET venue_id = :vid, title = :title, description = :desc, event_day = :day,
              start_time = :st, end_time = :et, hall = :hall, seats = :seats, price = :price
              WHERE event_id = :eid'
@@ -163,7 +157,7 @@ final class DanceCmsRepository
         ?string $price
     ): int {
         $tid = $this->getDanceEventTypeId();
-        $stmt = $this->db()->prepare(
+        $stmt = $this->db->prepare(
             'INSERT INTO events (event_type_id, venue_id, title, description, event_day, start_time, end_time, hall, seats, price)
              VALUES (:tid, :vid, :title, :desc, :day, :st, :et, :hall, :seats, :price)'
         );
@@ -180,14 +174,14 @@ final class DanceCmsRepository
             'price' => $price === null || $price === '' ? null : $price,
         ]);
 
-        return (int) $this->db()->lastInsertId();
+        return (int) $this->db->lastInsertId();
     }
 
     /** Delete event only when it belongs to dance type. */
     public function deleteDanceEvent(int $eventId): void
     {
         $this->assertDanceEvent($eventId);
-        $stmt = $this->db()->prepare('DELETE FROM events WHERE event_id = :id');
+        $stmt = $this->db->prepare('DELETE FROM events WHERE event_id = :id');
         $stmt->execute(['id' => $eventId]);
     }
 

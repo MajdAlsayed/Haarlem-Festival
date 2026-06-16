@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Contracts\ArtistsRepositoryInterface;
-use App\Core\Database;
+use App\Core\Repository;
 
 /** Reads artists + artist_photos; used by ArtistService. */
-class ArtistsRepository implements ArtistsRepositoryInterface
+class ArtistsRepository extends Repository implements ArtistsRepositoryInterface
 {
     /** @return array<int, array{name: string, slug: string|null, bio: string|null, image: string}> */
     public function getAllOrdered(): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->query('SELECT name, slug, bio, image_filename FROM artists ORDER BY sort_order');
+        $stmt = $this->db->query('SELECT name, slug, bio, image_filename FROM artists ORDER BY sort_order');
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return array_map(fn ($r) => [
             'name' => $r['name'],
@@ -27,8 +26,7 @@ class ArtistsRepository implements ArtistsRepositoryInterface
     /** @return array{id: int, name: string, slug: string|null, bio: string|null, image: string}|null */
     public function getBySlug(string $slug): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare('SELECT id, name, slug, bio, image_filename FROM artists WHERE slug = :slug LIMIT 1');
+        $stmt = $this->db->prepare('SELECT id, name, slug, bio, image_filename FROM artists WHERE slug = :slug LIMIT 1');
         $stmt->execute(['slug' => $slug]); // prepared = safe from injection
         $r = $stmt->fetch(\PDO::FETCH_ASSOC);
         if (!$r) {
@@ -46,8 +44,7 @@ class ArtistsRepository implements ArtistsRepositoryInterface
     /** Gallery + career image filenames for one artist. @return list<string> */
     public function getPhotoFilenamesByArtistId(int $artistId): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare('SELECT filename FROM artist_photos WHERE artist_id = :id ORDER BY sort_order');
+        $stmt = $this->db->prepare('SELECT filename FROM artist_photos WHERE artist_id = :id ORDER BY sort_order');
         $stmt->execute(['id' => $artistId]);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return array_map(fn ($r) => $r['filename'], $rows);

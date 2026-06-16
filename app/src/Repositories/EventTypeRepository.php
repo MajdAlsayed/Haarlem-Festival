@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Core\Database;
+use App\Core\Repository;
 use App\Models\EventType;
 
-class EventTypeRepository
+class EventTypeRepository extends Repository
 {
     /**
      * Returns event_type_id values in table order (used for homepage category order).
@@ -16,8 +16,7 @@ class EventTypeRepository
      */
     public function getAllIdsOrdered(): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->query('SELECT event_type_id FROM event_types ORDER BY event_type_id');
+        $stmt = $this->db->query('SELECT event_type_id FROM event_types ORDER BY event_type_id');
         $rows = $stmt->fetchAll(\PDO::FETCH_COLUMN);
         return array_map('intval', $rows);
     }
@@ -29,8 +28,7 @@ class EventTypeRepository
      */
     public function getAllWithDisplay(): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->query(
+        $stmt = $this->db->query(
             'SELECT event_type_id, name, description, card_image, info_path FROM event_types ORDER BY event_type_id'
         );
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);

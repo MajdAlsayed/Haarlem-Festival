@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Core\Database;
+use App\Core\Repository;
 use PDO;
 
 /**
@@ -13,7 +13,7 @@ use PDO;
  * “Special offer” pulls day passes and all-access passes. Under each weekday we list normal event tickets whose
  * event type matches jazz, dance, history, or stories depending on ?cat=. History rows can join session times.
  */
-final class TicketsRepository
+final class TicketsRepository extends Repository
 {
     public const CATEGORIES = ['jazz', 'dance', 'history', 'stories'];
 
@@ -21,8 +21,7 @@ final class TicketsRepository
     public function getIntroText(): string
     {
         try {
-            $db = Database::getConnection();
-            $stmt = $db->prepare('SELECT setting_value FROM site_settings WHERE setting_key = :k LIMIT 1');
+            $stmt = $this->db->prepare('SELECT setting_value FROM site_settings WHERE setting_key = :k LIMIT 1');
             $stmt->execute(['k' => 'tickets_intro']);
             $v = $stmt->fetchColumn();
             if (is_string($v) && trim($v) !== '') {
@@ -47,8 +46,7 @@ final class TicketsRepository
             $category = 'jazz';
         }
 
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "SELECT ticket_details_id, ticket_type, category, pass_day, pass_time, schedule_display,
                     sort_order, is_free, name, description, price
              FROM ticket_details
@@ -74,8 +72,7 @@ final class TicketsRepository
             return null;
         }
 
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "SELECT ticket_details_id, ticket_type, category, pass_day, pass_time, schedule_display,
                     sort_order, is_free, name, description, price
              FROM ticket_details
@@ -97,8 +94,7 @@ final class TicketsRepository
      */
     public function getDanceAllAccessPass(): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->query(
+            $stmt = $this->db->query(
             "SELECT ticket_details_id, ticket_type, category, pass_day, pass_time, schedule_display,
                     sort_order, is_free, name, description, price
              FROM ticket_details
@@ -123,8 +119,7 @@ final class TicketsRepository
             $category = 'jazz';
         }
 
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "SELECT td.ticket_details_id, td.name, td.description, td.price, td.is_free,
                     e.event_id, e.event_day,
                     CASE

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Core\Database;
+use App\Core\Repository;
 use App\Core\SecureToken;
 use PDO;
 
@@ -14,7 +14,7 @@ use PDO;
  * The door app uses this. The shop uses it too, indirectly: we count how many are already sold per catalog item
  * so TicketAvailabilityService can say “sold out” or “only a few left” on /tickets and in the cart.
  */
-final class TicketRepository
+final class TicketRepository extends Repository
 {
     /**
      * Insert a ticket with a new secure code. Returns ticket_id.
@@ -22,21 +22,19 @@ final class TicketRepository
      */
     public function createForOrderItem(int $orderItemId): int
     {
-        $db = Database::getConnection();
-        $code = $this->uniqueTicketCode($db);
-        $stmt = $db->prepare(
+        $code = $this->uniqueTicketCode($this->db);
+        $stmt = $this->db->prepare(
             'INSERT INTO tickets (order_item_id, ticket_code, status) VALUES (:oid, :code, \'valid\')'
         );
         $stmt->execute(['oid' => $orderItemId, 'code' => $code]);
 
-        return (int) $db->lastInsertId();
+        return (int) $this->db->lastInsertId();
     }
 
     /** Minimal lookup by barcode/QR string — door check without joins. */
     public function findByCode(string $ticketCode): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT ticket_id, order_item_id, ticket_code, status, issued_at FROM tickets WHERE ticket_code = :code LIMIT 1'
         );
         $stmt->execute(['code' => $ticketCode]);
@@ -52,8 +50,7 @@ final class TicketRepository
      */
     public function findByCodeWithDetails(string $ticketCode): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT t.ticket_id, t.order_item_id, t.ticket_code, t.status, t.issued_at,
                     td.name AS ticket_name, td.ticket_type,
                     e.title AS event_title, e.event_day
@@ -74,8 +71,7 @@ final class TicketRepository
     /** Tickets issued for paid orders (excludes cancelled ticket rows). */
     public function countSoldForTicketDetails(int $ticketDetailsId): int
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT COUNT(*)
              FROM tickets t
              INNER JOIN order_items oi ON oi.order_item_id = t.order_item_id
@@ -94,8 +90,7 @@ final class TicketRepository
      */
     public function markScannedIfValid(int $ticketId): string
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare('SELECT status FROM tickets WHERE ticket_id = :id LIMIT 1');
+        $stmt = $this->db->prepare('SELECT status FROM tickets WHERE ticket_id = :id LIMIT 1');
         $stmt->execute(['id' => $ticketId]);
         $status = $stmt->fetchColumn();
         if ($status === false) {
@@ -109,7 +104,7 @@ final class TicketRepository
         }
 
         // WHERE status = 'valid' makes the update atomic: two scanners at once → one row updated, other sees already_scanned.
-        $upd = $db->prepare(
+        $upd = $this->db->prepare(
             "UPDATE tickets SET status = 'scanned', scanned_at = NOW() WHERE ticket_id = :id AND status = 'valid'"
         );
         $upd->execute(['id' => $ticketId]);
@@ -122,7 +117,7 @@ final class TicketRepository
     {
         for ($i = 0; $i < 10; $i++) {
             $code = SecureToken::ticketCode();
-            $check = $db->prepare('SELECT 1 FROM tickets WHERE ticket_code = :c LIMIT 1');
+            $check = $this->db->prepare('SELECT 1 FROM tickets WHERE ticket_code = :c LIMIT 1');
             $check->execute(['c' => $code]);
             if (!$check->fetchColumn()) {
                 return $code;

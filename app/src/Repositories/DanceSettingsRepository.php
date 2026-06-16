@@ -2,20 +2,19 @@
 
 namespace App\Repositories;
 
-use App\Core\Database;
+use App\Core\Repository;
 use PDO;
 
 /**
  * Dance CMS key/value store: database overrides dance.php; falls back to the config file if the table is empty or unavailable.
  */
-class DanceSettingsRepository
+class DanceSettingsRepository extends Repository
 {
     /** Raw DB-only settings (or dance.php fallback if DB is unavailable/empty). */
     public function getAll(): array
     {
         try {
-            $db = Database::getConnection();
-            $stmt = $db->query('SELECT setting_key, setting_value FROM dance_settings');
+            $stmt = $this->db->query('SELECT setting_key, setting_value FROM dance_settings');
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Throwable $e) {
             return require __DIR__ . '/../Config/dance.php';
@@ -45,8 +44,7 @@ class DanceSettingsRepository
         $base = require __DIR__ . '/../Config/dance.php';
 
         try {
-            $db = Database::getConnection();
-            $stmt = $db->query('SELECT setting_key, setting_value FROM dance_settings');
+            $stmt = $this->db->query('SELECT setting_key, setting_value FROM dance_settings');
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (\Throwable $e) {
             return $base;
@@ -63,8 +61,7 @@ class DanceSettingsRepository
     /** Insert or update one dance_settings key from admin CMS forms. */
     public function upsertSetting(string $key, string $value): bool
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'INSERT INTO dance_settings (setting_key, setting_value) VALUES (:k, :v)
              ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)'
         );
