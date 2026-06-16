@@ -1137,3 +1137,108 @@ body.stories-page {
     padding: 2rem;
     text-align: center;
 }
+
+@media (max-width: 768px) {
+    .section-title {
+        margin-bottom: 22px;
+        font-size: 1.25rem;
+    }
+
+    .section-title--large {
+        font-size: 1.6rem;
+    }
+
+    .section-lead {
+        font-size: 1rem;
+    }
+
+    .festival-hero__actions {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .festival-hero__actions .btn {
+        width: 100%;
+    }
+
+    .filter-tabs {
+        gap: 10px;
+        margin-bottom: 22px;
+    }
+
+    .filter-tab {
+        padding: 9px 16px;
+        font-size: 13px;
+    }
+
+    .festival-card {
+        border-radius: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-hero {
+        min-height: 320px;
+    }
+
+    .page-hero__inner {
+        padding-top: 40px;
+        padding-bottom: 40px;
+    }
+
+    .page-hero__title {
+        font-size: clamp(1.8rem, 11vw, 2.3rem);
+    }
+
+    .page-hero__subtitle {
+        font-size: 1rem;
+    }
+
+    .festival-hero {
+        min-height: 360px;
+    }
+
+    .festival-hero__inner {
+        padding-top: 40px;
+        padding-bottom: 40px;
+    }
+
+    .festival-hero__panel {
+        min-height: auto;
+        padding: 24px 18px;
+    }
+
+    .festival-hero__title {
+        font-size: clamp(1.8rem, 11vw, 2.3rem);
+    }
+
+    .breadcrumbs {
+        font-size: 11px;
+        line-height: 1.6;
+        letter-spacing: 0.06em;
+    }
+
+    .breadcrumb-separator {
+        margin: 0 6px;
+    }
+
+    .filter-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+    }
+
+    .filter-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .filter-tab {
+        flex: 0 0 auto;
+    }
+
+    .festival-table {
+        min-width: 620px;
+    }
+}
