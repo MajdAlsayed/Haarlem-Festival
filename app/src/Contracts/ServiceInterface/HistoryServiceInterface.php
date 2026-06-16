@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Contracts\ServiceInterface;
 
 use App\Models\HistoryImage;
@@ -15,6 +17,8 @@ interface HistoryServiceInterface
     public function getLocationBySlug(string $slug): ?HistoryLocation;
 
     public function getLocationBySortOrder(int $sortOrder): ?HistoryLocation;
+
+    public function getLocationsWithImages(array $blocks): array;
 
     // IMAGES
     public function getAllImages(): array;

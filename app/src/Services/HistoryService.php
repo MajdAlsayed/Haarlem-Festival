@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Contracts\HistoryRepositoryInterface;
 use App\Contracts\ServiceInterface\HistoryServiceInterface;
 use App\Models\HistoryLocation;
 use App\Models\HistoryImage;
-use App\Models\HistoryTour;
 
 class HistoryService implements HistoryServiceInterface
 {
     public function __construct(
         private HistoryRepositoryInterface $historyRepository
-    ){
+    ) {
     }
 
     // LOCATIONS
@@ -36,7 +37,34 @@ class HistoryService implements HistoryServiceInterface
         return $this->historyRepository->getLocationBySortOrder($sortOrder);
     }
 
-    //IMAGES
+    // Get locations and primary images from blocks
+    public function getLocationsWithImages(array $blocks): array
+    {
+        // Get location id from block content
+        $locationIds = array_column(
+            $blocks['location_cards']['content']['cards'] ?? [],
+            'location_id'
+        );
+
+        // Fetch each location by id, skip nulls
+        $locations = array_filter(array_map(
+            fn($id) => $this->getLocationById($id),
+            $locationIds
+        ));
+
+        // Fetch primary image for each location
+        $primaryImages = [];
+        foreach ($locations as $location) {
+            $primaryImages[$location->id] = $this->getPrimaryImage($location->id);
+        }
+
+        return [
+            'locations'     => $locations,
+            'primaryImages' => $primaryImages,
+        ];
+    }
+
+    // IMAGES
     public function getAllImages(): array
     {
         return $this->historyRepository->getAllImages();
@@ -77,6 +105,7 @@ class HistoryService implements HistoryServiceInterface
     {
         return $this->historyRepository->getPageBlocksList($slug);
     }
+
     public function updatePageBlock(int $blockId, array $content): bool
     {
         return $this->historyRepository->updatePageBlock($blockId, $content);
@@ -86,13 +115,10 @@ class HistoryService implements HistoryServiceInterface
     public function getToursWithDetailsByDate(string $date): array
     {
         return $this->historyRepository->getToursWithDetailsByDate($date);
-
     }
 
     public function getTourDates(): array
     {
         return $this->historyRepository->getTourDates();
     }
-
-
 }

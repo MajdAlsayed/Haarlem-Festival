@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Contracts\HistoryRepositoryInterface;
-use App\Core\Database;
+use App\Core\Repository;
 use App\Models\HistoryTour;
 use App\Models\HistoryLocation;
 use App\Models\HistoryImage;
 
-class HistoryRepository implements HistoryRepositoryInterface
+class HistoryRepository extends Repository implements HistoryRepositoryInterface
 {
     // TOURS
     private function mapToHistoryTours(object $row): HistoryTour
@@ -24,9 +26,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getAllTours(): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT ht.history_tour_id, ht.session_id, ht.language_id, ht.tickets_available, s.start_time
             FROM history_tours ht
             INNER JOIN sessions s ON ht.session_id = s.session_id 
@@ -41,9 +41,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getTourById(int $id): ?HistoryTour
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT ht.history_tour_id, ht.session_id, ht.language_id, ht.tickets_available, s.start_time
             FROM history_tours ht
             INNER JOIN sessions s ON ht.session_id = s.session_id 
@@ -61,9 +59,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getToursByDate(string $date): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT ht.history_tour_id, ht.session_id, ht.language_id, ht.tickets_available, s.start_time
             FROM history_tours ht
             INNER JOIN sessions s ON ht.session_id = s.session_id 
@@ -79,11 +75,9 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getToursWithDetailsByDate(string $date): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT ht.history_tour_id, ht.session_id, ht.language_id, ht.tickets_available, 
-            ht.ticket_details_id, ht.ticket_family_id,s.start_time, l.name AS language_name
+            ht.ticket_details_id, ht.ticket_family_id, s.start_time, l.name AS language_name
             FROM history_tours ht
             INNER JOIN sessions s ON ht.session_id = s.session_id 
             INNER JOIN languages l ON ht.language_id = l.language_id
@@ -92,16 +86,14 @@ class HistoryRepository implements HistoryRepositoryInterface
         );
 
         $stmt->execute(['date' => $date]);
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        return $rows;
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function getTourDates(): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare('SELECT DISTINCT DATE(s.start_time) AS tour_date
+        $stmt = $this->db->prepare(
+            'SELECT DISTINCT DATE(s.start_time) AS tour_date
             FROM history_tours ht
             INNER JOIN sessions s ON ht.session_id = s.session_id 
             INNER JOIN events e ON s.event_id = e.event_id
@@ -138,9 +130,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getAllLocations(): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT history_location_id, name, slug, description_1, description_2, short_description, 
             page_id, sort_order, lat, lng
             FROM history_locations 
@@ -155,9 +145,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getLocationById(int $id): ?HistoryLocation
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT history_location_id, name, slug, description_1, description_2, short_description, 
             page_id, sort_order, lat, lng
             FROM history_locations
@@ -176,9 +164,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getLocationBySlug(string $slug): ?HistoryLocation
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT hl.history_location_id, hl.name, hl.slug, hl.description_1, hl.description_2, 
             hl.short_description, hl.page_id, hl.sort_order, hl.lat, hl.lng, p.slug as page_slug
             FROM history_locations hl
@@ -198,14 +184,12 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getLocationBySortOrder(int $sortOrder): ?HistoryLocation
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT history_location_id, name, slug, description_1, description_2, 
-        short_description, page_id, sort_order, lat, lng
-        FROM history_locations
-        WHERE sort_order = :sort_order
-        LIMIT 1'
+            short_description, page_id, sort_order, lat, lng
+            FROM history_locations
+            WHERE sort_order = :sort_order
+            LIMIT 1'
         );
 
         $stmt->execute(['sort_order' => $sortOrder]);
@@ -236,23 +220,20 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getAllImages(): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT history_image_id, image_url, alt_text, image_type
-        FROM history_images
-        ORDER BY history_image_id'
+            FROM history_images
+            ORDER BY history_image_id'
         );
 
         $stmt->execute();
+
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function getPrimaryImage(int $locationId): ?HistoryImage
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT history_image_id, history_location_id, page_id, event_id,
             image_url, alt_text, image_type, is_primary, sort_order
             FROM history_images
@@ -272,9 +253,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getLocationImages(int $locationId): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT history_image_id, history_location_id, page_id, 
             event_id, image_url, alt_text, image_type, is_primary, sort_order
             FROM history_images
@@ -290,9 +269,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getPageHeroImage(int $pageId): ?HistoryImage
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT history_image_id, history_location_id, page_id, event_id, 
             image_url, alt_text, image_type, is_primary, sort_order
              FROM history_images
@@ -312,9 +289,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getEventHeroImage(int $eventId): ?HistoryImage
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT history_image_id, history_location_id, page_id, event_id, 
             image_url, alt_text, image_type, is_primary, sort_order
             FROM history_images
@@ -334,9 +309,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getLocationGallery(int $locationId): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT history_image_id, history_location_id, page_id, event_id, 
             image_url, alt_text, image_type, is_primary, sort_order
             FROM history_images
@@ -353,9 +326,7 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function getImageById(int $imageId): ?HistoryImage
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT history_image_id, history_location_id, page_id, event_id,
             image_url, alt_text, image_type, is_primary, sort_order
             FROM history_images
@@ -374,25 +345,24 @@ class HistoryRepository implements HistoryRepositoryInterface
 
     public function insertImage(string $imageUrl, string $altText): int
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'INSERT INTO history_images (image_url, alt_text, image_type) 
-        VALUES (:url, :alt, :type)'
+            VALUES (:url, :alt, :type)'
         );
+
         $stmt->execute([
-            'url' => $imageUrl,
-            'alt' => $altText,
+            'url'  => $imageUrl,
+            'alt'  => $altText,
             'type' => 'primary'
         ]);
-        return (int)$db->lastInsertId();
+
+        return (int)$this->db->lastInsertId();
     }
 
     // PAGE BLOCKS
     public function getPageBlocks(string $slug): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT pb.block_id, pb.page_id, pb.block_type, pb.content_json, pb.sort_order
             FROM page_blocks pb
             INNER JOIN pages p ON pb.page_id = p.page_id
@@ -408,22 +378,21 @@ class HistoryRepository implements HistoryRepositoryInterface
         foreach ($rows as $row) {
             $pageId = (int)$row->page_id;
             $blocks[$row->block_type] = [
-                'block_id' => (int)$row->block_id,
-                'content' => json_decode($row->content_json, true),
+                'block_id'   => (int)$row->block_id,
+                'content'    => json_decode($row->content_json, true),
                 'sort_order' => $row->sort_order
             ];
         }
+
         return [
             'page_id' => $pageId,
-            'blocks' => $blocks
+            'blocks'  => $blocks
         ];
     }
 
     public function getPageBlocksList(string $slug): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT pb.block_id, pb.page_id, pb.block_type, pb.content_json, pb.sort_order
             FROM page_blocks pb
             INNER JOIN pages p ON pb.page_id = p.page_id
@@ -436,35 +405,34 @@ class HistoryRepository implements HistoryRepositoryInterface
 
         $pageId = null;
         $blocks = [];
-
         foreach ($rows as $row) {
             $pageId = (int)$row->page_id;
-            // Each block is stored as a numbered element — no overwriting
+            // Each block stored as numbered element — no overwriting
             $blocks[] = [
-                'block_id' => (int)$row->block_id,
+                'block_id'   => (int)$row->block_id,
                 'block_type' => $row->block_type,
-                'content' => json_decode($row->content_json, true),
+                'content'    => json_decode($row->content_json, true),
                 'sort_order' => $row->sort_order,
             ];
         }
+
         return [
             'page_id' => $pageId,
-            'blocks' => $blocks,
+            'blocks'  => $blocks,
         ];
     }
 
     public function updatePageBlock(int $blockId, array $content): bool
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'UPDATE page_blocks 
             SET content_json = :content_json 
             WHERE block_id = :block_id'
         );
 
         return $stmt->execute([
-            'block_id' => $blockId,
-            'content_json' => json_encode($content)]);
+            'block_id'     => $blockId,
+            'content_json' => json_encode($content)
+        ]);
     }
 }

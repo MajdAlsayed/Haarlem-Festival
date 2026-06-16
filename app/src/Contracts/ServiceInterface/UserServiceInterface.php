@@ -12,7 +12,7 @@ interface UserServiceInterface
 
     public function findById(int $id): ?User;
 
-    public function updateUser(int $id, int $roleId, string $firstName, string $lastName, string $email, bool $isActive): void;
+    public function updateUser(User $user): void;
 
     public function deleteUser(int $id): void;
 
