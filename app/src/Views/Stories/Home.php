@@ -61,26 +61,22 @@ $breadcrumbs = [
     </section>
 
     <!-- What You Can Explore Section -->
-    <section class="stories-explore-section" aria-label="What you can explore">
-        <div class="stories-explore-inner">
-            <h2 class="stories-explore-title"><?= h($vm->settings['home_explore_title'] ?? 'What You Can Explore') ?></h2>
-            <div class="stories-explore-list">
-                <?php foreach ($exploreItems as $item): ?>
-                    <div class="explore-item">
-                        <h3><?= h($item['title'] ?? '') ?></h3>
-                        <p><?= h($item['description'] ?? '') ?></p>
-                    </div>
-                <?php endforeach; ?>
-            </div>
+    <section class="container stories-explore-section" aria-label="What you can explore">
+        <h2 class="stories-explore-title"><?= h($vm->settings['home_explore_title'] ?? 'What You Can Explore') ?></h2>
+        <div class="stories-explore-list">
+            <?php foreach ($exploreItems as $item): ?>
+                <div class="explore-item">
+                    <h3><?= h($item['title'] ?? '') ?></h3>
+                    <p><?= h($item['description'] ?? '') ?></p>
+                </div>
+            <?php endforeach; ?>
         </div>
     </section>
 
     <!-- Events Section -->
-    <section class="stories-events-section" aria-label="Events that tell Haarlem's story">
-        <div class="stories-events-inner">
-            <h2 class="stories-events-title"><?= h($vm->settings['home_events_title'] ?? '15 Events That Tell Haarlem\'s Story') ?></h2>
-            <p class="stories-events-subtitle"><?= h($vm->settings['home_events_subtitle'] ?? '') ?></p>
-        </div>
+    <section class="container stories-events-section" aria-label="Events that tell Haarlem's story">
+        <h2 class="stories-events-title"><?= h($vm->settings['home_events_title'] ?? '15 Events That Tell Haarlem\'s Story') ?></h2>
+        <p class="stories-events-subtitle"><?= h($vm->settings['home_events_subtitle'] ?? '') ?></p>
     </section>
 
     <!-- Featured Stories Section -->
@@ -102,22 +98,22 @@ $breadcrumbs = [
                     $type = $story['story_type'] ?? '';
                     $age = $story['age'] ?? '';
                     ?>
-                    <article class="festival-card festival-card--stories story-card">
-                        <div class="story-card-image-wrap">
-                            <img src="<?= h($image) ?>" alt="<?= h($name) ?>" class="story-card-image">
+                    <article class="featured-card">
+                        <div class="featured-card-image">
+                            <img src="<?= h($image) ?>" alt="<?= h($name) ?>">
                         </div>
-                        <div class="story-card-body">
+                        <div class="featured-card-body">
                             <div class="featured-card-info">
-                                <h3 class="story-card-title"><?= h($name) ?></h3>
+                                <h3 class="featured-card-title"><?= h($name) ?></h3>
                                 <?php if ($type): ?>
-                                    <p class="copy-text copy-text--sm story-card-type"><?= h($type) ?></p>
+                                    <p class="featured-card-type"><?= h($type) ?></p>
                                 <?php endif; ?>
-                                <p class="copy-text copy-text--sm story-card-desc"><?= h(substr($desc, 0, 100)) ?>...</p>
+                                <p class="featured-card-desc"><?= h(substr($desc, 0, 100)) ?>...</p>
                                 <?php if ($age): ?>
-                                    <div class="story-card-age">Age <?= h($age) ?></div>
+                                    <div class="featured-card-age">Age <?= h($age) ?></div>
                                 <?php endif; ?>
                             </div>
-                            <a href="/stories/detail?id=<?= $storyId ?>" class="btn btn--sm btn--primary story-card-link">
+                            <a href="/stories/detail?id=<?= $storyId ?>" class="featured-card-link">
                                 Read More →
                             </a>
                         </div>
@@ -129,7 +125,7 @@ $breadcrumbs = [
 
     <!-- Echoes of History Section -->
     <section class="stories-echoes-section" aria-label="Echoes of history stories">
-        <div class="stories-echoes-inner">
+        <div class="container stories-echoes-inner">
             <h2 class="stories-echoes-title"><?= h($vm->settings['home_echoes_title'] ?? 'Echoes of History: Stories of') ?></h2>
             <p class="stories-echoes-subtitle"><?= h($vm->settings['home_echoes_subtitle'] ?? '') ?></p>
             <a href="/stories/events" class="stories-echoes-button"><?= h($vm->settings['home_echoes_button'] ?? 'View our Stories') ?></a>
@@ -137,11 +133,9 @@ $breadcrumbs = [
     </section>
 
     <!-- About Stories Section -->
-    <section class="stories-about-section" aria-label="About Stories">
-        <div class="stories-about-inner">
-            <h2 class="stories-about-title"><?= h($vm->settings['home_about_title'] ?? 'About Stories') ?></h2>
-            <p class="stories-about-text"><?= h($vm->settings['home_about_text'] ?? '') ?></p>
-        </div>
+    <section class="container stories-about-section" aria-label="About Stories">
+        <h2 class="stories-about-title"><?= h($vm->settings['home_about_title'] ?? 'About Stories') ?></h2>
+        <p class="stories-about-text"><?= h($vm->settings['home_about_text'] ?? '') ?></p>
     </section>
 
 </main>

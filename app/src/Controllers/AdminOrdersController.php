@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\AdminAuth;
 use App\Repositories\OrderRepository;
+use App\Repositories\SettingsRepository;
 use App\Services\AdminOrdersService;
 use App\Services\SettingsService;
 use App\ViewModels\AdminOrderDetailViewModel;
