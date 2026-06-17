@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 ob_start();
 
@@ -61,10 +60,6 @@ set_exception_handler(function (Throwable $e): void {
     http_response_code($code);
     require __DIR__ . '/../src/Views/error.php';
 });
-
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri = rtrim((string) $uri, '/');
-if ($uri === '') $uri = '/';
 
 if (preg_match('#^/food/restaurant/(\d+)$#', $uri, $m)) {
     (new FoodController())->restaurant((int) $m[1]);
@@ -780,7 +775,9 @@ case '/api/stories':
 
     default:
         http_response_code(404);
-        echo 'Page not found';
+        $code = 404;
+        $message = 'Page not found';
+        require __DIR__ . '/../src/Views/error.php';
         break;
 
 
