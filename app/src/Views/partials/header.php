@@ -51,7 +51,19 @@ $isNavLinkActive = function (array $link) use ($currentPath, $app): bool {
             </a>
         </div>
 
-        <nav class="nav-menu">
+        <button
+                class="nav-toggle"
+                type="button"
+                aria-label="Toggle navigation"
+                aria-expanded="false"
+                aria-controls="siteNavMenu"
+        >
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav class="nav-menu" id="siteNavMenu">
             <?php foreach ($navLinks as $link): ?>
                 <?php $isActive = $isNavLinkActive($link); ?>
                 <a href="<?= htmlspecialchars($link['path']) ?>"
