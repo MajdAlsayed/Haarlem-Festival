@@ -1217,3 +1217,16 @@
         border-radius: 10px;
     }
 }
+
+.history-tours-ticket-card--selected {
+    background: var(--color-accent);
+    color: #111;
+    border-color: var(--color-accent);
+}
+
+.history-tours-ticket-card--selected .history-tours-ticket-card-title,
+.history-tours-ticket-card--selected .history-tours-ticket-price,
+.history-tours-ticket-card--selected .history-tours-ticket-per,
+.history-tours-ticket-card--selected li {
+    color: #111;
+}
