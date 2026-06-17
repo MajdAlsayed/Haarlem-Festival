@@ -1,38 +1,62 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\ViewModels;
 
-/**
- * View model for the public Dance index.
- * Holds ready-to-render data so the template only loops and prints — no logic in the view.
- */
 class DanceViewModel
 {
     public function __construct(
         public string $pageTitle,
         public array $appSettings,
         public array $breadcrumbs,
-        // hero (read by the festival-hero partial)
         public string $heroTitle,
         public string $heroImage,
         public string $heroSubtitle,
         public string $heroButtonText,
         public string $heroButtonUrl,
-        // about section
         public string $aboutHeading,
         public array $aboutParagraphs,
-        // featured strip
         public string $featuredTitle,
         public array $featuredCards,
-        // all-events tabs
         public string $allEventsTitle,
         public array $dayLabels,
         public array $dayPanels,
-        // artists
         public string $artistsTitle,
         public string $artistInfoLabel,
         public string $showMoreLabel,
         public array $artistCards,
     ) {
+    }
+
+    public static function fromPageData(array $page): self
+    {
+        $hero = $page['hero'];
+        $about = $page['about'];
+        $featured = $page['featured'];
+        $schedule = $page['schedule'];
+        $artists = $page['artists'];
+
+        return new self(
+            pageTitle: (string) $page['pageTitle'],
+            appSettings: $page['appSettings'],
+            breadcrumbs: $page['breadcrumbs'],
+            heroTitle: (string) $hero['title'],
+            heroImage: (string) $hero['image'],
+            heroSubtitle: (string) $hero['subtitle'],
+            heroButtonText: (string) $hero['buttonText'],
+            heroButtonUrl: (string) $hero['buttonUrl'],
+            aboutHeading: (string) $about['heading'],
+            aboutParagraphs: $about['paragraphs'],
+            featuredTitle: (string) $featured['title'],
+            featuredCards: $featured['cards'],
+            allEventsTitle: (string) $schedule['title'],
+            dayLabels: $schedule['dayLabels'],
+            dayPanels: $schedule['panels'],
+            artistsTitle: (string) $artists['title'],
+            artistInfoLabel: (string) $artists['infoLabel'],
+            showMoreLabel: (string) $artists['showMoreLabel'],
+            artistCards: $artists['cards'],
+        );
     }
 }

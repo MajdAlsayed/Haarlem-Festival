@@ -1,13 +1,4 @@
 <?php
-/** @var string $site */
-/** @var string $invoiceNo */
-/** @var string $date */
-/** @var string $customerName */
-/** @var string $customerEmail */
-/** @var list<array{name:string,quantity:int,unit_price:string,line_total:string}> $lines */
-/** @var string $net */
-/** @var string $vat */
-/** @var string $totalStr */
 
 $h = static fn(string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
 ?>

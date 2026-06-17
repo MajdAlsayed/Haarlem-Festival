@@ -1,6 +1,5 @@
 <?php
-/** Dance artist profile for /dance/artist/{slug}. */
-/** @var \App\ViewModels\ArtistDetailViewModel $vm */
+
 $artist = $vm->artist;
 $appSettings = $vm->appSettings;
 $breadcrumbs = $vm->breadcrumbs;

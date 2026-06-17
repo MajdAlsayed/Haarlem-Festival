@@ -7,10 +7,12 @@ namespace App\Controllers;
 use App\Repositories\EventTypeRepository;
 use App\Repositories\PageRepository;
 use App\Repositories\SettingsRepository;
+use App\Services\EventTypeService;
 use App\Services\HomepageService;
 use App\Services\PageService;
+use App\Services\SettingsService;
 
-/** Public site homepage (/). */
+// festival homepage (/)
 final class HomeController
 {
     private HomepageService $homepageService;
@@ -19,8 +21,8 @@ final class HomeController
     {
         $this->homepageService = new HomepageService(
             new PageService(new PageRepository()),
-            new EventTypeRepository(),
-            new SettingsRepository()
+            new EventTypeService(new EventTypeRepository()),
+            new SettingsService(new SettingsRepository()),
         );
     }
 

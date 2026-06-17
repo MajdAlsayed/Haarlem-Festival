@@ -10,8 +10,10 @@ use App\Exceptions\ValidationException;
 use App\Repositories\PageRepository;
 use App\Repositories\SettingsRepository;
 use App\Services\AdminHomepageService;
+use App\Services\PageService;
+use App\Services\SettingsService;
 
-/** CMS: edit the public homepage title and the cms_home_* fields. */
+// admin cms for homepage copy (wysiwyg fields)
 final class AdminHomepageController
 {
     private AdminHomepageService $adminHomepage;
@@ -19,8 +21,8 @@ final class AdminHomepageController
     public function __construct()
     {
         $this->adminHomepage = new AdminHomepageService(
-            new PageRepository(),
-            new SettingsRepository()
+            new PageService(new PageRepository()),
+            new SettingsService(new SettingsRepository()),
         );
     }
 

@@ -1,6 +1,5 @@
 <?php
-/** Public Dance index. All data is prepared in DanceService; this template only displays it. */
-/** @var \App\ViewModels\DanceViewModel $vm */
+
 $appSettings = $vm->appSettings;
 $breadcrumbs = $vm->breadcrumbs;
 
@@ -48,19 +47,19 @@ $heroButtonClass = 'btn btn--light';
         <h2 class="section-title section-title--underlined dance-section-title"><?= htmlspecialchars($vm->featuredTitle) ?></h2>
         <div class="dance-cards dance-cards-featured">
             <?php foreach ($vm->featuredCards as $card): ?>
-                <a href="/dance/event/<?= (int) $card['id'] ?>" class="festival-card festival-card--dance-event dance-card u-plain-link">
-                    <?php if ($card['imagePath'] !== ''): ?>
+                <a href="/dance/event/<?= $card->id ?>" class="festival-card festival-card--dance-event dance-card u-plain-link">
+                    <?php if ($card->imagePath !== ''): ?>
                     <div class="dance-card-image-wrap">
-                        <img src="<?= htmlspecialchars($card['imagePath']) ?>" alt="<?= htmlspecialchars($card['title']) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <img src="<?= htmlspecialchars($card->imagePath) ?>" alt="<?= htmlspecialchars($card->title) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div class="dance-card-placeholder is-hidden">&#128247;</div>
                     </div>
                     <?php endif; ?>
                     <div class="dance-card-body">
-                        <p class="copy-text copy-text--sm dance-card-meta"><span class="dance-meta-icon">&#128197;</span> <?= htmlspecialchars($card['timeLine']) ?></p>
-                        <p class="copy-text copy-text--sm dance-card-meta"><span class="dance-meta-icon">&#128205;</span> <?= htmlspecialchars($card['venue']) ?></p>
-                        <h3 class="dance-card-title"><?= htmlspecialchars($card['title']) ?></h3>
-                        <p class="copy-text copy-text--sm dance-card-desc"><?= htmlspecialchars($card['description']) ?></p>
-                        <span class="dance-genre-badge"><?= htmlspecialchars($card['genre']) ?></span>
+                        <p class="copy-text copy-text--sm dance-card-meta"><span class="dance-meta-icon">&#128197;</span> <?= htmlspecialchars($card->whenLabel) ?></p>
+                        <p class="copy-text copy-text--sm dance-card-meta"><span class="dance-meta-icon">&#128205;</span> <?= htmlspecialchars($card->venueLine) ?></p>
+                        <h3 class="dance-card-title"><?= htmlspecialchars($card->title) ?></h3>
+                        <p class="copy-text copy-text--sm dance-card-desc"><?= htmlspecialchars($card->description) ?></p>
+                        <span class="dance-genre-badge"><?= htmlspecialchars($card->genre) ?></span>
                     </div>
                 </a>
             <?php endforeach; ?>
@@ -76,22 +75,22 @@ $heroButtonClass = 'btn btn--light';
         </div>
 
         <?php foreach ($vm->dayPanels as $day => $panel): ?>
-        <div class="<?= $panel['panelClass'] ?>" data-filter="<?= htmlspecialchars($day) ?>" role="tabpanel">
+        <div class="<?= $panel->panelClass ?>" data-filter="<?= htmlspecialchars($day) ?>" role="tabpanel">
             <div class="dance-cards dance-cards-grid">
-                <?php foreach ($panel['cards'] as $card): ?>
-                    <a href="/dance/event/<?= (int) $card['id'] ?>" class="festival-card festival-card--dance-event dance-card dance-card-vertical u-plain-link">
-                        <?php if ($card['imagePath'] !== ''): ?>
+                <?php foreach ($panel->cards as $card): ?>
+                    <a href="/dance/event/<?= $card->id ?>" class="festival-card festival-card--dance-event dance-card dance-card-vertical u-plain-link">
+                        <?php if ($card->imagePath !== ''): ?>
                         <div class="dance-card-image-wrap">
-                            <img src="<?= htmlspecialchars($card['imagePath']) ?>" alt="<?= htmlspecialchars($card['title']) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <img src="<?= htmlspecialchars($card->imagePath) ?>" alt="<?= htmlspecialchars($card->title) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="dance-card-placeholder is-hidden">&#128247;</div>
                         </div>
                         <?php endif; ?>
                         <div class="dance-card-body dance-card-body-stack">
-                            <p class="copy-text copy-text--sm dance-card-venue"><?= htmlspecialchars($card['venueName']) ?>, <?= htmlspecialchars($card['venueCity']) ?></p>
-                            <h3 class="dance-card-title"><?= htmlspecialchars($card['title']) ?></h3>
-                            <p class="copy-text copy-text--sm dance-card-datetime"><?= htmlspecialchars($card['dateTime']) ?></p>
-                            <p class="copy-text copy-text--sm dance-card-desc"><?= htmlspecialchars($card['description']) ?></p>
-                            <span class="dance-genre-badge"><?= htmlspecialchars($card['genre']) ?></span>
+                            <p class="copy-text copy-text--sm dance-card-venue"><?= htmlspecialchars($card->venueLine) ?></p>
+                            <h3 class="dance-card-title"><?= htmlspecialchars($card->title) ?></h3>
+                            <p class="copy-text copy-text--sm dance-card-datetime"><?= htmlspecialchars($card->whenLabel) ?></p>
+                            <p class="copy-text copy-text--sm dance-card-desc"><?= htmlspecialchars($card->description) ?></p>
+                            <span class="dance-genre-badge"><?= htmlspecialchars($card->genre) ?></span>
                         </div>
                     </a>
                 <?php endforeach; ?>
@@ -105,16 +104,16 @@ $heroButtonClass = 'btn btn--light';
         <div class="dance-artists-grid">
             <?php foreach ($vm->artistCards as $artist): ?>
             <article class="festival-card festival-card--dance-artist dance-artist-card">
-                <?php if ($artist['imagePath'] !== ''): ?>
+                <?php if ($artist->imagePath !== ''): ?>
                 <div class="dance-artist-card-image-wrap">
-                    <img src="<?= htmlspecialchars($artist['imagePath']) ?>" alt="<?= htmlspecialchars($artist['name']) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <img src="<?= htmlspecialchars($artist->imagePath) ?>" alt="<?= htmlspecialchars($artist->name) ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <div class="dance-artist-card-placeholder is-hidden">&#127908;</div>
                 </div>
                 <?php endif; ?>
                 <div class="dance-artist-card-body">
-                    <h3 class="section-subtitle dance-artist-name"><?= htmlspecialchars($artist['name']) ?></h3>
-                    <p class="copy-text copy-text--sm dance-artist-bio"><?= htmlspecialchars($artist['bio']) ?></p>
-                    <a href="<?= htmlspecialchars($artist['url']) ?>" class="btn btn--outline btn--sm dance-artist-info-link"><?= htmlspecialchars($vm->artistInfoLabel) ?></a>
+                    <h3 class="section-subtitle dance-artist-name"><?= htmlspecialchars($artist->name) ?></h3>
+                    <p class="copy-text copy-text--sm dance-artist-bio"><?= htmlspecialchars($artist->bio) ?></p>
+                    <a href="<?= htmlspecialchars($artist->url) ?>" class="btn btn--outline btn--sm dance-artist-info-link"><?= htmlspecialchars($vm->artistInfoLabel) ?></a>
                 </div>
             </article>
             <?php endforeach; ?>

@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\ViewModels;
 
 use App\Models\Event;
 
-/** View model for a single Dance event (map, gallery, breadcrumbs, formatted labels). */
 class EventDetailViewModel
 {
     public Event $event;
@@ -22,20 +23,16 @@ class EventDetailViewModel
     public string $artistsDisplay;
     public string $eventSubtitle;
 
-    /** @var list<array<string,mixed>> */
     public array $eventTickets = [];
 
     public ?string $cartFlashSuccess = null;
 
     public ?string $cartFlashError = null;
 
-    /** Dance day pass for this event's weekday (pass_day), with optional `stock` from controller. */
     public ?array $danceDayPass = null;
 
-    /** Dance all-access weekend pass, with optional `stock` from controller. */
     public ?array $danceAllAccessPass = null;
 
-    // prepared, ready-to-render values (filled by DanceEventService)
     public string $dateTimeLine = '';
     public string $venueLine = '';
     public string $ticketsFigmaTitle = '';
@@ -44,7 +41,7 @@ class EventDetailViewModel
     public string $cartFormCsrf = '';
     public string $standardCellClass = 'event-detail-tickets-cell';
     public string $dayCellClass = 'event-detail-tickets-cell';
-    /** @var list<array<string, mixed>> */
+
     public array $eventTicketCards = [];
     public ?array $dayPassCard = null;
     public ?array $festivalPassCard = null;
@@ -79,5 +76,49 @@ class EventDetailViewModel
         $this->artistsDisplay = $artistsDisplay;
         $this->eventSubtitle = $eventSubtitle;
         $this->pageTitle = ($pageTitle !== '') ? $pageTitle : ($event->venueName . ' — ' . $event->title);
+    }
+
+    public static function fromPageData(array $page): self
+    {
+        $hero = $page['hero'];
+        $eventInfo = $page['eventInfo'];
+        $display = $page['display'];
+        $map = $page['map'];
+        $tickets = $page['tickets'];
+        $cart = $tickets['cart'];
+        $cards = $tickets['cards'];
+
+        $vm = new self(
+            event: $page['event'],
+            heroImage: (string) $hero['image'],
+            galleryImages: $hero['galleryImages'],
+            breadcrumbs: $page['breadcrumbs'],
+            appSettings: $page['appSettings'],
+            formattedDate: (string) $eventInfo['formattedDate'],
+            startTime: (string) $eventInfo['startTime'],
+            locationDisplay: (string) $eventInfo['locationDisplay'],
+            mapLat: (float) $map['lat'],
+            mapLon: (float) $map['lon'],
+            mapQuery: (string) $map['query'],
+            artistsDisplay: (string) $eventInfo['artistsDisplay'],
+            eventSubtitle: (string) $eventInfo['eventSubtitle'],
+        );
+
+        $vm->eventTickets = $tickets['eventTickets'];
+        $vm->danceDayPass = $tickets['danceDayPass'];
+        $vm->danceAllAccessPass = $tickets['danceAllAccessPass'];
+        $vm->dateTimeLine = (string) $display['dateTimeLine'];
+        $vm->venueLine = (string) $display['venueLine'];
+        $vm->pageHeroTitle = (string) $display['pageHeroTitle'];
+        $vm->ticketsFigmaTitle = (string) $display['ticketsFigmaTitle'];
+        $vm->cartReturn = (string) $cart['return'];
+        $vm->cartFormCsrf = (string) $cart['csrf'];
+        $vm->standardCellClass = (string) $cards['standardCellClass'];
+        $vm->dayCellClass = (string) $cards['dayCellClass'];
+        $vm->eventTicketCards = $cards['event'];
+        $vm->dayPassCard = $cards['dayPass'];
+        $vm->festivalPassCard = $cards['festival'];
+
+        return $vm;
     }
 }

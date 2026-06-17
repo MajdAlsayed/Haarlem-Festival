@@ -2,14 +2,12 @@
 
 namespace App\Repositories;
 
+use App\Contracts\SettingsRepositoryInterface;
 use App\Core\Repository;
 
-/**
- * Reads site_settings from the database (css_version, home_path, footer, etc.).
- * If the database fails or has no rows, we use the config file.
- */
-class SettingsRepository extends Repository
+class SettingsRepository extends Repository implements SettingsRepositoryInterface
 {
+    // site name, footer, cms_home merge — whole site uses this
     public function getAll(): array
     {
         try {
@@ -54,11 +52,6 @@ class SettingsRepository extends Repository
         ];
     }
 
-    /**
-     * Homepage CMS: config defaults + site_settings overlay (keys cms_home_*).
-     *
-     * @return array<string, string>
-     */
     public function getMergedCmsHome(): array
     {
         $app = require __DIR__ . '/../Config/app.php';
@@ -86,11 +79,6 @@ class SettingsRepository extends Repository
         return $defaults;
     }
 
-    /**
-     * @param array<string, mixed> $rawRows key => value from site_settings (partial)
-     *
-     * @return array<string, string>
-     */
     private function mergeCmsHomeFromRaw(array $rawRows): array
     {
         $app = require __DIR__ . '/../Config/app.php';

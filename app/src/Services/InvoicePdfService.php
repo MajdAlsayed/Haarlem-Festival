@@ -9,8 +9,10 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use Throwable;
 
+// dompdf wrapper — html comes from InvoiceView
 final class InvoicePdfService
 {
+    // html in, pdf bytes out
     public function render(string $html): string
     {
         if (!class_exists(Dompdf::class) || !class_exists(Options::class)) {

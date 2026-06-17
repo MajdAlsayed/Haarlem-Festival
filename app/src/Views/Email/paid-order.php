@@ -1,9 +1,5 @@
 <?php
-/** @var string $site */
-/** @var int $orderId */
-/** @var array{status?:string,total_amount?:string,paid_at?:string} $order */
-/** @var list<array{name:string,quantity:int,unit_price:string,line_total:string}> $lines */
-/** @var list<array{ticket_code:string,item_name:string}> $tickets */
+
 ?>
 Thank you for your order at <?= $site ?>.
 

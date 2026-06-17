@@ -4,24 +4,20 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Contracts\PhotosRepositoryInterface;
 use App\Core\Repository;
+use PDO;
 
-/** site_photos: hero, schedule, event detail, music section (context + key). */
-class PhotosRepository extends Repository
+final class PhotosRepository extends Repository implements PhotosRepositoryInterface
 {
-    /** @return list<array{key: string|null, filename: string}> */
     public function getByContext(string $context): array
     {
         $stmt = $this->db->prepare('SELECT `key`, filename FROM site_photos WHERE context = :context ORDER BY sort_order');
         $stmt->execute(['context' => $context]);
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return array_map(fn ($r) => [
-            'key' => $r['key'],
-            'filename' => $r['filename'],
-        ], $rows);
+
+        return array_map(fn (array $row): array => $this->mapPhotoRow($row), $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
-    /** key = null → first row for context (by sort_order). */
     public function getFilename(string $context, ?string $key = null): ?string
     {
         if ($key !== null) {
@@ -31,16 +27,28 @@ class PhotosRepository extends Repository
             $stmt = $this->db->prepare('SELECT filename FROM site_photos WHERE context = :context ORDER BY sort_order LIMIT 1');
             $stmt->execute(['context' => $context]);
         }
-        $r = $stmt->fetch(\PDO::FETCH_ASSOC);
-        return $r ? $r['filename'] : null;
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row === false) {
+            return null;
+        }
+
+        return isset($row['filename']) ? (string) $row['filename'] : null;
     }
 
-    /** @return list<string> */
     public function getFilenamesByContext(string $context): array
     {
         $stmt = $this->db->prepare('SELECT filename FROM site_photos WHERE context = :context ORDER BY sort_order');
         $stmt->execute(['context' => $context]);
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return array_map(fn ($r) => $r['filename'], $rows);
+
+        return array_map(fn (array $row): string => (string) $row['filename'], $stmt->fetchAll(PDO::FETCH_ASSOC));
+    }
+
+    private function mapPhotoRow(array $row): array
+    {
+        return [
+            'key' => isset($row['key']) ? (string) $row['key'] : null,
+            'filename' => (string) $row['filename'],
+        ];
     }
 }

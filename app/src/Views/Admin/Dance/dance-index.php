@@ -1,8 +1,5 @@
 <?php
-/**
- * Dance CMS hub (/admin/dance): same card pattern as Jazz / Food — page CMS, events, artists, public link.
- * @var array $app
- */
+
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 
 $pageTitle = 'Dance CMS — Admin — ' . ($app['site_name'] ?? 'Haarlem Festival');

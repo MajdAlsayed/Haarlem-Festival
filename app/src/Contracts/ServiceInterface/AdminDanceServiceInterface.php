@@ -8,10 +8,8 @@ interface AdminDanceServiceInterface
 {
     public function appSettings(): array;
 
-    /** @return array[] */
     public function listEventsForAdmin(): array;
 
-    /** @return array[] */
     public function listVenues(): array;
 
     public function getEventForEdit(int $eventId): ?array;
@@ -22,7 +20,6 @@ interface AdminDanceServiceInterface
 
     public function deleteEvent(int $eventId): void;
 
-    /** @return array[] */
     public function listArtists(): array;
 
     public function getArtistForEdit(string $slug): ?array;

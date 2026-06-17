@@ -1,6 +1,5 @@
 <?php
-/** Admin form to edit Dance page content; submits to AdminDanceController::save. Uses shared admin.css like Jazz/Food. */
-/** @var \App\ViewModels\AdminDanceEditViewModel $vm */
+
 $app = $vm->appSettings;
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 

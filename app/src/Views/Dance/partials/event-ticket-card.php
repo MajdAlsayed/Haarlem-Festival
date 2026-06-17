@@ -1,7 +1,5 @@
 <?php
-/** One ticket card on the dance event page. Data is prepared in DanceEventService. */
-/** @var array<string,mixed> $card */
-/** @var \App\ViewModels\EventDetailViewModel $vm */
+
 $h = static fn($v): string => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 ?>
 <article class="<?= $card['cardClass'] ?>">

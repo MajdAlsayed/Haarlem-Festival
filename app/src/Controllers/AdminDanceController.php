@@ -13,29 +13,31 @@ use App\Repositories\DanceSettingsRepository;
 use App\Repositories\JazzCmsRepository;
 use App\Repositories\SettingsRepository;
 use App\Services\AdminDanceService;
+use App\Services\DanceSettingsService;
+use App\Services\SettingsService;
 
-/** Admin CMS for Dance: page copy, events, and the homepage artists strip. */
+// dance cms + events + artists admin
 final class AdminDanceController
 {
-    private const ADMIN_ROLE_ID = 1;
-
     private AdminDanceService $adminDance;
 
     public function __construct()
     {
         $this->adminDance = new AdminDanceService(
             new DanceCmsRepository(),
-            new DanceSettingsRepository(),
-            new SettingsRepository(),
-            new JazzCmsRepository()
+            new DanceSettingsService(new DanceSettingsRepository()),
+            new SettingsService(new SettingsRepository()),
+            new JazzCmsRepository(),
         );
     }
 
-    // —— dance events ————————————————————————————————————————————————————————
+    // dance events
 
     public function events(): void
     {
-        $this->requireAdmin();
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
         $app = $this->adminDance->appSettings();
         $events = $this->adminDance->listEventsForAdmin();
         require __DIR__ . '/../Views/Admin/Dance/dance-events-list.php';
@@ -43,7 +45,9 @@ final class AdminDanceController
 
     public function newEvent(): void
     {
-        $this->requireAdmin();
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
         $venues = $this->adminDance->listVenues();
         $app = $this->adminDance->appSettings();
         $csrf = Csrf::token('admin_dance_event');
@@ -52,7 +56,9 @@ final class AdminDanceController
 
     public function editEvent(): void
     {
-        $this->requireAdmin();
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
         $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
         if ($id <= 0) {
             header('Location: /admin/dance/events');
@@ -75,7 +81,9 @@ final class AdminDanceController
 
     public function saveEvent(): void
     {
-        $this->requireAdmin();
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /admin/dance/events');
             exit;
@@ -104,7 +112,9 @@ final class AdminDanceController
 
     public function deleteEvent(): void
     {
-        $this->requireAdmin();
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /admin/dance/events');
             exit;
@@ -132,11 +142,13 @@ final class AdminDanceController
         exit;
     }
 
-    // —— homepage artists ————————————————————————————————————————————————————
+    // homepage artists
 
     public function artists(): void
     {
-        $this->requireAdmin();
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
         $app = $this->adminDance->appSettings();
         $artists = $this->adminDance->listArtists();
         require __DIR__ . '/../Views/Admin/Dance/dance-artists-list.php';
@@ -144,7 +156,9 @@ final class AdminDanceController
 
     public function artistsNew(): void
     {
-        $this->requireAdmin();
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
         $app = $this->adminDance->appSettings();
         $csrf = Csrf::token('admin_dance_artist');
         $isNew = true;
@@ -154,7 +168,9 @@ final class AdminDanceController
 
     public function artistsEdit(): void
     {
-        $this->requireAdmin();
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
         $slug = trim((string) ($_GET['slug'] ?? ''));
 
         $row = $slug !== '' ? $this->adminDance->getArtistForEdit($slug) : null;
@@ -172,7 +188,9 @@ final class AdminDanceController
 
     public function saveArtist(): void
     {
-        $this->requireAdmin();
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /admin/dance/artists');
             exit;
@@ -203,7 +221,9 @@ final class AdminDanceController
 
     public function deleteArtist(): void
     {
-        $this->requireAdmin();
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /admin/dance/artists');
             exit;
@@ -226,7 +246,7 @@ final class AdminDanceController
         exit;
     }
 
-    // —— cms settings form ————————————————————————————————————————————————————
+    // cms settings form
 
     public function index(): void
     {
@@ -271,19 +291,4 @@ final class AdminDanceController
         }
     }
 
-    // logged-in admin guard for the event/artist routes
-    private function requireAdmin(): void
-    {
-        $auth = $_SESSION['auth'] ?? null;
-        if (!$auth || empty($auth['user_id'])) {
-            Session::setFlash('login_error', 'Please log in to access the admin area.');
-            header('Location: /login');
-            exit;
-        }
-        if ((int) ($auth['role_id'] ?? 0) !== self::ADMIN_ROLE_ID) {
-            Session::setFlash('login_error', 'You do not have permission to access the admin area.');
-            header('Location: /');
-            exit;
-        }
-    }
 }

@@ -1,8 +1,5 @@
 <?php
-/** @var array $app */
-/** @var string $csrf */
-/** @var bool $isNew */
-/** @var array{name:string,slug:string,bio:string,image:string} $row */
+
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 $origSlug = $isNew ? '' : (string) ($row['slug'] ?? '');
 

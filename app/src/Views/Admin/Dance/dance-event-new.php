@@ -1,7 +1,5 @@
 <?php
-/** @var array $app */
-/** @var list<array{venue_id:int,name:string,city:string}> $venues */
-/** @var string $csrf */
+
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 $days = ['thursday', 'friday', 'saturday', 'sunday'];
 

@@ -1,6 +1,5 @@
 <?php
-/** Dance event detail page for /dance/event/{id}. All data is prepared in DanceEventService. */
-/** @var \App\ViewModels\EventDetailViewModel $vm */
+
 $event = $vm->event;
 $appSettings = $vm->appSettings;
 $breadcrumbs = $vm->breadcrumbs;

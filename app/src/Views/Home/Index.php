@@ -1,5 +1,5 @@
 <?php
-/** Public homepage template: $vm from HomeController; $cmsHome is merged settings (edited in /admin/cms/homepage). */
+
 $page = $vm->page;
 $categories = $vm->categories;
 $cmsHome = $vm->cmsHome;

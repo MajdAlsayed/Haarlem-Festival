@@ -9,10 +9,6 @@ final class InvoiceView
 {
     private const VAT_RATE = 0.09;
 
-    /**
-     * @param array<string, mixed> $order
-     * @param list<array{name:string,quantity:int,unit_price:string,line_total:string}> $lines
-     */
     public static function html(array $order, array $lines, string $customerName, string $customerEmail, string $site): string
     {
         $orderId = (int) ($order['order_id'] ?? 0);

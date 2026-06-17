@@ -7,16 +7,16 @@ namespace App\Services;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use PHPMailer\PHPMailer\PHPMailer;
 
+// order emails via phpmailer env vars
 final class SmtpMailer
 {
+    // skip send when env vars missing
     public function isConfigured(): bool
     {
         return $this->env('MAIL_HOST') !== '' && $this->env('MAIL_FROM_ADDRESS') !== '';
     }
 
-    /**
-     * @param list<array{name:string,content:string}> $pdfAttachments
-     */
+    // optional pdf attachments after checkout
     public function send(string $toEmail, string $subject, string $textBody, array $pdfAttachments = []): void
     {
         if (!$this->isConfigured()) {

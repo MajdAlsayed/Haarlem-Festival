@@ -8,9 +8,13 @@ use App\Repositories\ArtistsRepository;
 use App\Repositories\DanceSettingsRepository;
 use App\Repositories\EventRepository;
 use App\Repositories\SettingsRepository;
+use App\Services\ArtistService;
 use App\Services\DanceService;
+use App\Services\DanceSettingsService;
+use App\Services\EventService;
+use App\Services\SettingsService;
 
-/** Public Dance landing (/dance). */
+// public dance page — logic sits in DanceService
 final class DanceController
 {
     private DanceService $danceService;
@@ -18,13 +22,14 @@ final class DanceController
     public function __construct()
     {
         $this->danceService = new DanceService(
-            new EventRepository(),
-            new DanceSettingsRepository(),
-            new ArtistsRepository(),
-            new SettingsRepository()
+            new EventService(new EventRepository()),
+            new DanceSettingsService(new DanceSettingsRepository()),
+            new ArtistService(new ArtistsRepository()),
+            new SettingsService(new SettingsRepository()),
         );
     }
 
+    // GET /dance
     public function index(): void
     {
         $vm = $this->danceService->buildIndexViewModel();

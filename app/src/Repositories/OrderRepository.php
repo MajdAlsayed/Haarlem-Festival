@@ -7,16 +7,10 @@ namespace App\Repositories;
 use App\Core\Repository;
 use PDO;
 
-/**
- * Orders: admin export and listing, plus customer and pay-later persistence for checkout and account pages.
- */
 final class OrderRepository extends Repository
 {
-    /**
-     * All orders with customer fields and line item count for export.
-     *
-     * @return list<array<string, mixed>>
-     */
+
+    // admin list + csv source
     public function getAllForExport(): array
     {
         $sql = '
@@ -44,9 +38,6 @@ final class OrderRepository extends Repository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * @return ?array<string, mixed>
-     */
     public function findOrderDetailForAdmin(int $orderId): ?array
     {
         $stmt = $this->db->prepare(
@@ -78,9 +69,6 @@ final class OrderRepository extends Repository
         return $row ?: null;
     }
 
-    /**
-     * @return ?array{order_id:int,user_id:?int,status:string,total_amount:string,paid_at:?string,created_at:string}
-     */
     public function findOrderById(int $orderId): ?array
     {
         $stmt = $this->db->prepare(
@@ -93,9 +81,6 @@ final class OrderRepository extends Repository
         return $row ?: null;
     }
 
-    /**
-     * @return list<array{order_id:int,status:string,total_amount:string,paid_at:?string,created_at:string}>
-     */
     public function listOrdersForUser(int $userId): array
     {
         $stmt = $this->db->prepare(
@@ -109,11 +94,6 @@ final class OrderRepository extends Repository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Line items for invoice / confirmation (any order id; caller must enforce access).
-     *
-     * @return list<array{name:string,quantity:int,unit_price:string,line_total:string}>
-     */
     public function getOrderLineItemsForInvoice(int $orderId): array
     {
         $stmt = $this->db->prepare(
@@ -138,9 +118,6 @@ final class OrderRepository extends Repository
         return $out;
     }
 
-    /**
-     * Paid order. Optional Stripe Checkout session id (real payments) or null (demo / local).
-     */
     public function createPaidOrder(int $userId, float $totalAmount, ?string $stripeCheckoutSessionId = null): int
     {
         $stmt = $this->db->prepare(
@@ -156,7 +133,6 @@ final class OrderRepository extends Repository
         return (int) $this->db->lastInsertId();
     }
 
-    /** Pay-later: no tickets yet, just order_lines + clock for when it auto-dies. */
     public function createPendingOrder(int $userId, float $totalAmount): int
     {
         $stmt = $this->db->prepare(
@@ -171,7 +147,6 @@ final class OrderRepository extends Repository
         return (int) $this->db->lastInsertId();
     }
 
-    /** @return int Number of orders expired */
     public function expireStalePendingOrders(): int
     {
         $stmt = $this->db->exec(
@@ -184,11 +159,6 @@ final class OrderRepository extends Repository
         return $stmt !== false ? (int) $stmt : 0;
     }
 
-    /**
-     * One nag per order: still pending, still alive, sitting there half a day, and we haven’t mailed them yet.
-     *
-     * @return list<array{order_id:int,user_id:int,total_amount:string,expires_at:string}>
-     */
     public function listPendingOrdersForReminder(): array
     {
         $stmt = $this->db->query(
@@ -222,9 +192,6 @@ final class OrderRepository extends Repository
         $stmt->execute(['id' => $orderId]);
     }
 
-    /**
-     * @return list<array{order_item_id:int,ticket_details_id:int,quantity:int,unit_price:float,line_total:float}>
-     */
     public function getOrderFulfillmentLines(int $orderId): array
     {
         $stmt = $this->db->prepare(
@@ -249,11 +216,6 @@ final class OrderRepository extends Repository
         return $out;
     }
 
-    /**
-     * Locks this row until the transaction ends — pairs with fulfill so two requests can’t both pass the checks.
-     *
-     * @return ?array<string, mixed>
-     */
     public function lockPendingOrderForPay(int $orderId, int $userId): ?array
     {
         $stmt = $this->db->prepare(
@@ -327,9 +289,7 @@ final class OrderRepository extends Repository
         return (int) $this->db->lastInsertId();
     }
 
-    /**
-     * @return ?array{order_id:int,status:string,total_amount:string,paid_at:?string,created_at:string}
-     */
+    // account pages — order must belong to user
     public function findForCustomer(int $orderId, int $userId): ?array
     {
         $stmt = $this->db->prepare(
@@ -344,11 +304,6 @@ final class OrderRepository extends Repository
         return $row ?: null;
     }
 
-    /**
-     * Tickets with their type + event details, for the PDF tickets.
-     *
-     * @return list<array{ticket_code:string,item_name:string,ticket_type:string,event_title:?string,event_day:?string,start_time:?string}>
-     */
     public function getTicketsWithDetailsForOrder(int $orderId): array
     {
         $stmt = $this->db->prepare(
@@ -380,11 +335,6 @@ final class OrderRepository extends Repository
         return $out;
     }
 
-    /**
-     * Ticket codes issued for this order (for confirmation page).
-     *
-     * @return list<array{ticket_code:string, item_name:string}>
-     */
     public function getTicketCodesForOrder(int $orderId): array
     {
         $stmt = $this->db->prepare(

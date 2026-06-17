@@ -2,10 +2,6 @@
 
 namespace App\ViewModels;
 
-/**
- * Prepared data for the admin order detail page.
- * Takes the raw order/line/ticket rows and works out the display values so the template only prints.
- */
 class AdminOrderDetailViewModel
 {
     public int $orderId;
@@ -23,10 +19,8 @@ class AdminOrderDetailViewModel
     public string $createdAt;
     public string $expiresAt;
 
-    /** @var list<array{name:string,quantity:string,unitPrice:string,lineTotal:string}> */
     public array $lineRows = [];
 
-    /** @var list<array{itemName:string,code:string}> */
     public array $ticketRows = [];
 
     public function __construct(array $order, array $lines, array $tickets, array $app)

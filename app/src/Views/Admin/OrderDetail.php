@@ -1,6 +1,5 @@
 <?php
-/** @var \App\ViewModels\AdminOrderDetailViewModel $vm */
-/** @var array<string, mixed> $app */
+
 $h = static fn($v): string => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 
 $pageTitle = $vm->pageTitle;

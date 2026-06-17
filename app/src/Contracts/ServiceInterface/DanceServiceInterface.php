@@ -9,7 +9,8 @@ interface DanceServiceInterface
 {
     public function buildIndexViewModel(): DanceViewModel;
 
-    /** @return array<string, Event[]> */
+    public function getDancePageData(): array;
+
     public function getEventsGroupedByDay(): array;
 
     public function getArtistsOrdered(): array;

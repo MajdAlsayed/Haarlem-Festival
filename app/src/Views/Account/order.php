@@ -1,11 +1,5 @@
 <?php
-/** @var array $app */
-/** @var array<string, mixed> $order */
-/** @var list<array{name:string,quantity:int,unit_price:string,line_total:string}> $lines */
-/** @var list<array{ticket_code:string,item_name:string}> $tickets */
-/** @var ?string $orderError */
-/** @var string $checkoutCsrf */
-/** @var bool $stripeOn */
+
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 $oid = (int) ($order['order_id'] ?? 0);
 $status = (string) ($order['status'] ?? '');

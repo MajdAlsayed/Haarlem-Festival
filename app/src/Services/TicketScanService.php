@@ -5,38 +5,36 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Contracts\ServiceInterface\TicketScanServiceInterface;
-use App\Repositories\SettingsRepository;
+use App\Contracts\ServiceInterface\SettingsServiceInterface;
 use App\Repositories\TicketRepository;
 
-// the scanning logic for the door scanner (/admin/scan)
-class TicketScanService implements TicketScanServiceInterface
+// gate scanner — lookup qr code and mark scanned
+final class TicketScanService implements TicketScanServiceInterface
 {
-    // staff can paste a few codes at once, but we only scan the first 4
     private const MAX_BATCH = 4;
+    private const CODE_TAIL_LENGTH = 6;
 
     public function __construct(
         private TicketRepository $ticketRepository,
-        private SettingsRepository $settingsRepository
+        private SettingsServiceInterface $settingsService,
     ) {
     }
 
-    // global site settings the scanner page layout needs
+    // header/nav settings for admin layout
     public function appSettings(): array
     {
-        return $this->settingsRepository->getAll();
+        return $this->settingsService->getAll();
     }
 
-    // work out what was submitted (one code or a batch) and return the scan result
-    /** @return array<string, mixed> */
+    // single code or batch from textarea — group box wins
     public function scanInput(array $post): array
     {
-        // the group box wins on purpose: batch mode is explicit, so it takes priority
-        $groupRaw = trim((string) ($post['group_codes'] ?? ''));
+        $groupRaw = trim($this->postString($post, 'group_codes'));
         if ($groupRaw !== '') {
             return $this->scanBatch($groupRaw);
         }
 
-        $code = $this->normalizeCode((string) ($post['ticket_code'] ?? ''));
+        $code = $this->normalizeCode($this->postString($post, 'ticket_code'));
         if ($code === '') {
             return ['type' => 'empty'];
         }
@@ -44,8 +42,6 @@ class TicketScanService implements TicketScanServiceInterface
         return $this->scanOneCode($code);
     }
 
-    // scan up to MAX_BATCH codes pasted into the group box
-    /** @return array<string, mixed> */
     private function scanBatch(string $groupRaw): array
     {
         $codes = $this->parseCodes($groupRaw);
@@ -61,11 +57,13 @@ class TicketScanService implements TicketScanServiceInterface
         return ['type' => 'batch', 'results' => $results];
     }
 
-    // one code per line, cleaned up, de-duplicated, capped at MAX_BATCH
-    /** @return string[] */
     private function parseCodes(string $raw): array
     {
-        $lines = preg_split('/\r\n|\r|\n/', $raw) ?: [];
+        $lines = preg_split('/\r\n|\r|\n/', $raw);
+        if ($lines === false) {
+            $lines = [];
+        }
+
         $codes = [];
         foreach ($lines as $line) {
             $code = $this->normalizeCode($line);
@@ -77,32 +75,58 @@ class TicketScanService implements TicketScanServiceInterface
         return array_slice(array_values(array_unique($codes)), 0, self::MAX_BATCH);
     }
 
-    // codes are lowercase with no spaces
     private function normalizeCode(string $raw): string
     {
         return strtolower((string) preg_replace('/\s+/', '', $raw));
     }
 
-    // look a code up and mark it scanned if it's valid
-    /** @return array<string, mixed> */
+    // lookup + mark scanned in repo
     private function scanOneCode(string $code): array
     {
-        // findByCodeWithDetails only returns tickets tied to a paid order
         $row = $this->ticketRepository->findByCodeWithDetails($code);
         if ($row === null) {
             return ['type' => 'not_found', 'ticket_code' => $code];
         }
 
-        $outcome = $this->ticketRepository->markScannedIfValid((int) $row['ticket_id']);
+        $outcome = $this->ticketRepository->markScannedIfValid($this->rowInt($row, 'ticket_id'));
 
+        return $this->buildScanResult($code, $outcome, $row);
+    }
+
+    private function buildScanResult(string $code, string $outcome, array $row): array
+    {
         return [
             'type' => $outcome,
             'ticket_code' => $code,
-            'ticket_name' => (string) ($row['ticket_name'] ?? ''),
-            'ticket_type' => (string) ($row['ticket_type'] ?? ''),
-            'event_title' => $row['event_title'] !== null ? (string) $row['event_title'] : '',
-            'event_day' => $row['event_day'] !== null ? (string) $row['event_day'] : '',
-            'code_tail' => strlen($code) > 6 ? substr($code, -6) : $code,
+            'ticket_name' => $this->rowText($row, 'ticket_name'),
+            'ticket_type' => $this->rowText($row, 'ticket_type'),
+            'event_title' => $this->rowText($row, 'event_title'),
+            'event_day' => $this->rowText($row, 'event_day'),
+            'code_tail' => $this->codeTail($code),
         ];
+    }
+
+    private function codeTail(string $code): string
+    {
+        if (strlen($code) > self::CODE_TAIL_LENGTH) {
+            return substr($code, -self::CODE_TAIL_LENGTH);
+        }
+
+        return $code;
+    }
+
+    private function postString(array $post, string $key, string $default = ''): string
+    {
+        return isset($post[$key]) ? (string) $post[$key] : $default;
+    }
+
+    private function rowText(array $row, string $key): string
+    {
+        return isset($row[$key]) ? (string) $row[$key] : '';
+    }
+
+    private function rowInt(array $row, string $key): int
+    {
+        return isset($row[$key]) ? (int) $row[$key] : 0;
     }
 }

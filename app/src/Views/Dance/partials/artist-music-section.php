@@ -1,5 +1,5 @@
 <?php
-/** @var \App\ViewModels\ArtistDetailViewModel $vm */
+
 if (!isset($vm)) {
     return;
 }

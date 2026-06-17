@@ -6,20 +6,12 @@ namespace App\Views;
 
 final class EmailView
 {
-    /**
-     * @param array{status?:string,total_amount?:string,paid_at?:string} $order
-     * @param list<array{name:string,quantity:int,unit_price:string,line_total:string}> $lines
-     * @param list<array{ticket_code:string,item_name:string}> $tickets
-     */
+
     public static function paidOrder(string $site, int $orderId, array $order, array $lines, array $tickets): string
     {
         return self::render('paid-order.php', compact('site', 'orderId', 'order', 'lines', 'tickets'));
     }
 
-    /**
-     * @param array{total_amount?:string,expires_at?:string} $order
-     * @param list<array{name:string,quantity:int,unit_price:string,line_total:string}> $lines
-     */
     public static function pendingReservation(string $site, int $orderId, array $order, array $lines): string
     {
         return self::render('pending-reservation.php', compact('site', 'orderId', 'order', 'lines'));

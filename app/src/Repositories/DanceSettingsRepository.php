@@ -2,15 +2,14 @@
 
 namespace App\Repositories;
 
+use App\Contracts\DanceSettingsRepositoryInterface;
 use App\Core\Repository;
 use PDO;
 
-/**
- * Dance CMS key/value store: database overrides dance.php; falls back to the config file if the table is empty or unavailable.
- */
-class DanceSettingsRepository extends Repository
+class DanceSettingsRepository extends Repository implements DanceSettingsRepositoryInterface
 {
-    /** Raw DB-only settings (or dance.php fallback if DB is unavailable/empty). */
+
+    // dance cms merged with config/dance.php defaults
     public function getAll(): array
     {
         try {
@@ -34,11 +33,6 @@ class DanceSettingsRepository extends Repository
         return $out;
     }
 
-    /**
-     * Config defaults + DB overrides (use for public Dance page and CMS form).
-     *
-     * @return array<string, mixed>
-     */
     public function getMergedWithConfig(): array
     {
         $base = require __DIR__ . '/../Config/dance.php';
@@ -58,7 +52,6 @@ class DanceSettingsRepository extends Repository
         return $base;
     }
 
-    /** Insert or update one dance_settings key from admin CMS forms. */
     public function upsertSetting(string $key, string $value): bool
     {
         $stmt = $this->db->prepare(
@@ -69,7 +62,6 @@ class DanceSettingsRepository extends Repository
         return $stmt->execute(['k' => $key, 'v' => $value]);
     }
 
-    /** Decode JSON arrays/objects; keep scalar strings as-is. */
     private function decodeSettingValue(?string $val): mixed
     {
         if ($val === null) {

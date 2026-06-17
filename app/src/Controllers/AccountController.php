@@ -11,10 +11,12 @@ use App\Repositories\SettingsRepository;
 use App\Repositories\UserRepository;
 use App\Services\InvoicePdfService;
 use App\Services\OrderService;
+use App\Services\SettingsService;
 use App\Services\StripePaymentService;
 use App\Services\TicketPdfService;
+use App\Services\UserService;
 
-/** Customer order history, invoice and tickets; pending pay-later orders expose payment actions here. */
+// logged-in customer orders + pdf downloads
 final class AccountController
 {
     private OrderService $orderService;
@@ -23,10 +25,10 @@ final class AccountController
     {
         $this->orderService = new OrderService(
             new OrderRepository(),
-            new UserRepository(),
-            new SettingsRepository(),
+            new UserService(new UserRepository()),
+            new SettingsService(new SettingsRepository()),
             new InvoicePdfService(),
-            new TicketPdfService()
+            new TicketPdfService(),
         );
     }
 

@@ -5,245 +5,270 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Contracts\ServiceInterface\DanceEventServiceInterface;
+use App\Contracts\ServiceInterface\DanceSettingsServiceInterface;
+use App\Contracts\ServiceInterface\EventServiceInterface;
+use App\Contracts\ServiceInterface\PhotosServiceInterface;
+use App\Contracts\ServiceInterface\SettingsServiceInterface;
+use App\Contracts\ServiceInterface\TicketDetailsServiceInterface;
+use App\Contracts\ServiceInterface\TicketsCatalogServiceInterface;
 use App\Core\Csrf;
 use App\Exceptions\NotFoundException;
 use App\Models\Event;
-use App\Repositories\DanceSettingsRepository;
-use App\Repositories\PhotosRepository;
-use App\Repositories\SettingsRepository;
-use App\Repositories\TicketDetailsRepository;
-use App\Repositories\TicketsRepository;
 use App\ViewModels\EventDetailViewModel;
 
-// builds the data for a single dance event page (/dance/event/{id})
+// /dance/{id} — event detail, ticket cards, stock for buy buttons
 class DanceEventService implements DanceEventServiceInterface
 {
-    private EventService $eventService;
-    private PhotosRepository $photosRepository;
-    private SettingsRepository $settingsRepository;
-    private DanceSettingsRepository $danceSettingsRepository;
-    private TicketDetailsRepository $ticketDetailsRepository;
-    private TicketsRepository $ticketsRepository;
-    private TicketAvailabilityService $ticketAvailabilityService;
+    private const IMAGE_BASE_PATH = '/images/dance/';
+    private const DEFAULT_MAP_COORDINATES = [52.3813, 4.6368];
+    private const DEFAULT_GALLERY_IMAGES = ['DetailsPage/2.png', 'DetailsPage/3.png', 'DetailsPage/4.png'];
+    private const TICKET_CARD_CLASS = 'event-detail-ticket-card event-detail-ticket-card--figma event-detail-ticket-card--flex';
 
     public function __construct(
-        EventService $eventService,
-        PhotosRepository $photosRepository,
-        SettingsRepository $settingsRepository,
-        DanceSettingsRepository $danceSettingsRepository,
-        TicketDetailsRepository $ticketDetailsRepository,
-        TicketsRepository $ticketsRepository,
-        TicketAvailabilityService $ticketAvailabilityService
+        private EventServiceInterface $eventService,
+        private PhotosServiceInterface $photosService,
+        private SettingsServiceInterface $settingsService,
+        private DanceSettingsServiceInterface $danceSettingsService,
+        private TicketDetailsServiceInterface $ticketDetailsService,
+        private TicketsCatalogServiceInterface $ticketsCatalogService,
+        private TicketAvailabilityService $ticketAvailabilityService,
     ) {
-        $this->eventService = $eventService;
-        $this->photosRepository = $photosRepository;
-        $this->settingsRepository = $settingsRepository;
-        $this->danceSettingsRepository = $danceSettingsRepository;
-        $this->ticketDetailsRepository = $ticketDetailsRepository;
-        $this->ticketsRepository = $ticketsRepository;
-        $this->ticketAvailabilityService = $ticketAvailabilityService;
     }
 
-    // load the event (404 if it's gone) and pack everything the detail page needs into one view model
+    // used by EventDetailController
     public function buildDetailViewModel(int $eventId): EventDetailViewModel
+    {
+        return EventDetailViewModel::fromPageData($this->getEventDetailData($eventId));
+    }
+
+    // event info + ticket cards + stock for buy buttons
+    public function getEventDetailData(int $eventId): array
+    {
+        $event = $this->loadEvent($eventId);
+        $app = $this->settingsService->getAll();
+        $dance = $this->danceSettingsService->getMergedWithConfig();
+        $venueName = (string) $event->venueName;
+        $eventDay = (string) ($event->eventDay ?? $dance['default_event_day']);
+        $eventInfo = $this->loadEventInfoData($event, $dance, $app, $eventDay, $venueName);
+
+        return [
+            'event' => $event,
+            'appSettings' => $app,
+            'breadcrumbs' => $this->buildBreadcrumbs($venueName, $dance, $app),
+            'hero' => $this->loadHeroData($dance),
+            'eventInfo' => $eventInfo,
+            'display' => $this->loadDisplayData($event, $eventInfo),
+            'map' => $this->loadMapData($event, $venueName, $dance),
+            'tickets' => $this->loadTicketsData($event, $eventDay),
+        ];
+    }
+
+    private function loadEvent(int $eventId): Event
     {
         $event = $this->eventService->getById($eventId);
         if (!$event) {
             throw new NotFoundException('Event not found');
         }
 
-        $app = $this->settingsRepository->getAll();
-        $dance = $this->danceSettingsRepository->getMergedWithConfig();
+        return $event;
+    }
 
-        $venueName = $event->venueName ?? '';
-        $eventDay = $event->eventDay ?? $dance['default_event_day'];
+    private function loadHeroData(array $dance): array
+    {
+        return [
+            'image' => self::IMAGE_BASE_PATH . $this->resolveHeroFile($dance),
+            'galleryImages' => $this->resolveGalleryImages($dance),
+        ];
+    }
 
-        // work everything out first, then hand it to the view model
-        $heroImage = '/images/dance/' . $this->resolveHeroFile($dance);
-        $galleryImages = $this->resolveGalleryImages($dance);
-        $breadcrumbs = $this->buildBreadcrumbs($venueName, $dance, $app);
-        $formattedDate = $this->formatEventDate($eventDay, $dance);
-        $startTime = $event->startTime ?? $app['default_event_time'];
-        $location = $this->buildLocationDisplay($event, $venueName, $dance, $app);
-        $mapQuery = $this->buildMapQuery($event, $venueName);
-        [$mapLat, $mapLon] = $this->mapLatLon($venueName, $dance);
+    private function loadEventInfoData(
+        Event $event,
+        array $dance,
+        array $app,
+        string $eventDay,
+        string $venueName,
+    ): array {
         [$artistsDisplay, $eventSubtitle] = $this->splitEventTitle($event->title);
 
-        // page title is left out on purpose → the view model falls back to venue + event title
-        $vm = new EventDetailViewModel(
-            event: $event,
-            heroImage: $heroImage,
-            galleryImages: $galleryImages,
-            breadcrumbs: $breadcrumbs,
-            appSettings: $app,
-            formattedDate: $formattedDate,
-            startTime: $startTime,
-            locationDisplay: $location,
-            mapLat: $mapLat,
-            mapLon: $mapLon,
-            mapQuery: $mapQuery,
-            artistsDisplay: $artistsDisplay,
-            eventSubtitle: $eventSubtitle
-        );
-
-        $vm->eventTickets = $this->ticketDetailsRepository->listByEventIdForPublic($event->id);
-        $vm->danceDayPass = $this->ticketsRepository->getDanceDayPassForDay((string) $eventDay);
-        $vm->danceAllAccessPass = $this->ticketsRepository->getDanceAllAccessPass();
-
-        $this->attachTicketStock($vm->eventTickets, $vm->danceDayPass, $vm->danceAllAccessPass);
-
-        $this->prepareForView($vm);
-
-        return $vm;
+        return [
+            'formattedDate' => $this->formatEventDate($eventDay, $dance),
+            'startTime' => (string) ($event->startTime ?? $app['default_event_time']),
+            'locationDisplay' => $this->buildLocationDisplay($event, $venueName, $dance, $app),
+            'artistsDisplay' => $artistsDisplay,
+            'eventSubtitle' => $eventSubtitle,
+        ];
     }
 
-    // work out the page labels, cart bits and ticket cards so the template only displays them
-    private function prepareForView(EventDetailViewModel $vm): void
+    private function loadMapData(Event $event, string $venueName, array $dance): array
     {
-        $event = $vm->event;
+        [$mapLat, $mapLon] = $this->mapLatLon($venueName, $dance);
 
-        $vm->dateTimeLine = $vm->startTime;
-        if ($vm->formattedDate !== '') {
-            $vm->dateTimeLine = $vm->formattedDate . ' • ' . $vm->startTime;
-        }
-
-        $vm->venueLine = (string) $event->venueName;
-        if ((string) $event->venueCity !== '') {
-            $vm->venueLine .= ', ' . $event->venueCity;
-        }
-
-        $vm->ticketsFigmaTitle = 'Ticket for ' . $event->title . ' in ' . (string) $event->venueName;
-
-        $vm->pageHeroTitle = (string) $event->title;
-        if ((string) $event->venueName !== '') {
-            $vm->pageHeroTitle = (string) $event->venueName;
-        }
-
-        $vm->cartReturn = '/dance/event/' . (int) $event->id . '#tickets';
-        $csrf = Csrf::peek('cart');
-        if ($csrf === null) {
-            $csrf = Csrf::token('cart');
-        }
-        $vm->cartFormCsrf = $csrf;
-
-        $hasEventTickets = $vm->eventTickets !== [];
-        $hasDayPass = $vm->danceDayPass !== null;
-
-        $vm->standardCellClass = 'event-detail-tickets-cell';
-        if ($hasEventTickets && !$hasDayPass) {
-            $vm->standardCellClass .= ' event-detail-tickets-cell--span-top';
-        }
-        $vm->dayCellClass = 'event-detail-tickets-cell';
-        if (!$hasEventTickets && $hasDayPass) {
-            $vm->dayCellClass .= ' event-detail-tickets-cell--span-top';
-        }
-
-        $vm->eventTicketCards = $this->buildEventTicketCards($vm->eventTickets);
-        if ($vm->danceDayPass !== null) {
-            $vm->dayPassCard = $this->buildPassCard($vm->danceDayPass, 'day');
-        }
-        if ($vm->danceAllAccessPass !== null) {
-            $vm->festivalPassCard = $this->buildPassCard($vm->danceAllAccessPass, 'festival');
-        }
+        return [
+            'lat' => $mapLat,
+            'lon' => $mapLon,
+            'query' => $this->buildMapQuery($event, $venueName),
+        ];
     }
 
-    // event tickets: a single non-VIP ticket reads as "Standard Ticket"
-    /** @return list<array<string, mixed>> */
+    private function loadTicketsData(Event $event, string $eventDay): array
+    {
+        $eventTickets = $this->ticketDetailsService->listByEventIdForPublic($event->id);
+        $danceDayPass = $this->ticketsCatalogService->getDanceDayPassForDay($eventDay);
+        $danceAllAccessPass = $this->ticketsCatalogService->getDanceAllAccessPass();
+
+        $this->attachTicketStock($eventTickets, $danceDayPass, $danceAllAccessPass);
+
+        return [
+            'eventTickets' => $eventTickets,
+            'danceDayPass' => $danceDayPass,
+            'danceAllAccessPass' => $danceAllAccessPass,
+            'cart' => $this->loadCartData($event),
+            'cards' => $this->loadTicketCards($eventTickets, $danceDayPass, $danceAllAccessPass),
+        ];
+    }
+
+    private function loadDisplayData(Event $event, array $eventInfo): array
+    {
+        $formattedDate = (string) $eventInfo['formattedDate'];
+        $startTime = (string) $eventInfo['startTime'];
+        $venueName = (string) $event->venueName;
+        $venueCity = (string) $event->venueCity;
+
+        $dateTimeLine = $startTime;
+        if ($formattedDate !== '') {
+            $dateTimeLine = $formattedDate . ' • ' . $startTime;
+        }
+
+        $venueLine = $venueName;
+        if ($venueCity !== '') {
+            $venueLine .= ', ' . $venueCity;
+        }
+
+        $pageHeroTitle = (string) $event->title;
+        if ($venueName !== '') {
+            $pageHeroTitle = $venueName;
+        }
+
+        return [
+            'dateTimeLine' => $dateTimeLine,
+            'venueLine' => $venueLine,
+            'pageHeroTitle' => $pageHeroTitle,
+            'ticketsFigmaTitle' => 'Ticket for ' . $event->title . ' in ' . $venueName,
+        ];
+    }
+
+    private function loadCartData(Event $event): array
+    {
+        $csrf = Csrf::peek('cart') ?? Csrf::token('cart');
+
+        return [
+            'return' => '/dance/event/' . (int) $event->id . '#tickets',
+            'csrf' => $csrf,
+        ];
+    }
+
+    private function loadTicketCards(array $eventTickets, ?array $dayPass, ?array $festivalPass): array
+    {
+        $hasEventTickets = $eventTickets !== [];
+        $hasDayPass = $dayPass !== null;
+
+        return [
+            'event' => $this->buildEventTicketCards($eventTickets),
+            'dayPass' => $dayPass !== null ? $this->buildDayPassCard($dayPass) : null,
+            'festival' => $festivalPass !== null ? $this->buildFestivalPassCard($festivalPass) : null,
+            'standardCellClass' => $this->ticketCellClass($hasEventTickets && !$hasDayPass),
+            'dayCellClass' => $this->ticketCellClass(!$hasEventTickets && $hasDayPass),
+        ];
+    }
+
+    private function ticketCellClass(bool $spanTop): string
+    {
+        $class = 'event-detail-tickets-cell';
+
+        return $spanTop ? $class . ' event-detail-tickets-cell--span-top' : $class;
+    }
+
     private function buildEventTicketCards(array $tickets): array
     {
-        $count = count($tickets);
+        $total = count($tickets);
         $cards = [];
 
         foreach ($tickets as $ticket) {
-            $name = $this->ticketText($ticket, 'name');
-            if ($name === '') {
-                $name = 'Ticket';
-            }
-            $isVip = stripos($name, 'VIP') !== false;
-
-            $title = $name;
-            if ($count === 1 && !$isVip) {
-                $title = 'Standard Ticket';
-            }
-
-            $cardClass = 'event-detail-ticket-card event-detail-ticket-card--figma event-detail-ticket-card--flex';
-            if ($isVip) {
-                $cardClass .= ' vip';
-            }
-            $badge = '';
-            if ($isVip) {
-                $badge = 'VIP';
-            }
-
-            $card = $this->baseCard($ticket);
-            $card['title'] = $title;
-            $card['cardClass'] = $cardClass;
-            $card['badge'] = $badge;
-            $card['featureColumns'] = $this->featureColumns($this->ticketText($ticket, 'description'), false);
-            $card['featuresWrapped'] = false;
-            $card['fallbackFeature'] = 'Access to this event';
-            $card['meta'] = '';
-            $card['buttonClass'] = 'btn btn--light btn--block';
-            $card['canBuy'] = $card['tdId'] > 0 && $card['stockState'] !== 'soldout';
-
-            $cards[] = $card;
+            $cards[] = $this->buildEventTicketCard($ticket, $total);
         }
 
         return $cards;
     }
 
-    // day pass or all-access festival pass
-    /** @return array<string, mixed> */
-    private function buildPassCard(array $pass, string $tier): array
+    private function buildEventTicketCard(array $ticket, int $totalCount): array
     {
-        $card = $this->baseCard($pass);
-        $name = $this->ticketText($pass, 'name');
-        $desc = $this->ticketText($pass, 'description');
-        $isFree = !empty($pass['is_free']);
+        $name = $this->ticketText($ticket, 'name') ?: 'Ticket';
+        $isVip = $this->isVipTicket($name);
+        $card = $this->baseCard($ticket);
 
-        if ($tier === 'festival') {
-            if ($name === '') {
-                $name = 'All-Access Pass';
-            }
-            $card['cardClass'] = 'event-detail-ticket-card event-detail-ticket-card--figma event-detail-ticket-card--festival event-detail-ticket-card--flex';
-            $card['badge'] = 'BEST VALUE';
-            $card['featureColumns'] = $this->featureColumns($desc, true);
-            $card['featuresWrapped'] = true;
-            $card['meta'] = $this->ticketText($pass, 'schedule_display');
-        } else {
-            if ($name === '') {
-                $name = 'Day Pass';
-            }
-            $card['cardClass'] = 'event-detail-ticket-card event-detail-ticket-card--figma event-detail-ticket-card--pass event-detail-ticket-card--flex';
-            $card['badge'] = '';
-            $card['featureColumns'] = $this->featureColumns($desc, false);
-            $card['featuresWrapped'] = false;
-            $card['meta'] = $this->dayPassMeta($pass);
-        }
-
-        $card['title'] = $name;
-        $card['fallbackFeature'] = '';
-        $card['buttonClass'] = 'btn btn--light';
-        $card['canBuy'] = $card['tdId'] > 0 && $card['stockState'] !== 'soldout' && !$isFree;
+        $card['title'] = ($totalCount === 1 && !$isVip) ? 'Standard Ticket' : $name;
+        $card['cardClass'] = self::TICKET_CARD_CLASS . ($isVip ? ' vip' : '');
+        $card['badge'] = $isVip ? 'VIP' : '';
+        $card['featureColumns'] = $this->featureColumns($this->ticketText($ticket, 'description'), false);
+        $card['featuresWrapped'] = false;
+        $card['fallbackFeature'] = 'Access to this event';
+        $card['meta'] = '';
+        $card['buttonClass'] = 'btn btn--light btn--block';
+        $card['canBuy'] = $card['tdId'] > 0 && $card['stockState'] !== 'soldout';
 
         return $card;
     }
 
-    // the fields every ticket card shares
-    /** @return array<string, mixed> */
+    private function buildDayPassCard(array $pass): array
+    {
+        $card = $this->baseCard($pass);
+        $name = $this->ticketText($pass, 'name') ?: 'Day Pass';
+        $desc = $this->ticketText($pass, 'description');
+
+        $card['title'] = $name;
+        $card['cardClass'] = self::TICKET_CARD_CLASS . ' event-detail-ticket-card--pass';
+        $card['badge'] = '';
+        $card['featureColumns'] = $this->featureColumns($desc, false);
+        $card['featuresWrapped'] = false;
+        $card['fallbackFeature'] = '';
+        $card['meta'] = $this->dayPassMeta($pass);
+        $card['buttonClass'] = 'btn btn--light';
+        $card['canBuy'] = $card['tdId'] > 0 && $card['stockState'] !== 'soldout' && empty($pass['is_free']);
+
+        return $card;
+    }
+
+    private function buildFestivalPassCard(array $pass): array
+    {
+        $card = $this->baseCard($pass);
+        $name = $this->ticketText($pass, 'name') ?: 'All-Access Pass';
+        $desc = $this->ticketText($pass, 'description');
+
+        $card['title'] = $name;
+        $card['cardClass'] = self::TICKET_CARD_CLASS . ' event-detail-ticket-card--festival';
+        $card['badge'] = 'BEST VALUE';
+        $card['featureColumns'] = $this->featureColumns($desc, true);
+        $card['featuresWrapped'] = true;
+        $card['fallbackFeature'] = '';
+        $card['meta'] = $this->ticketText($pass, 'schedule_display');
+        $card['buttonClass'] = 'btn btn--light';
+        $card['canBuy'] = $card['tdId'] > 0 && $card['stockState'] !== 'soldout' && empty($pass['is_free']);
+
+        return $card;
+    }
+
+    private function isVipTicket(string $name): bool
+    {
+        return stripos($name, 'VIP') !== false;
+    }
+
     private function baseCard(array $ticket): array
     {
         $stock = $this->ticketStock($ticket);
         $isFree = !empty($ticket['is_free']);
 
-        $priceRaw = null;
-        if (isset($ticket['price'])) {
-            $priceRaw = $ticket['price'];
-        }
-        $remaining = 0;
-        if (isset($stock['remaining'])) {
-            $remaining = (int) $stock['remaining'];
-        }
+        $priceRaw = isset($ticket['price']) ? $ticket['price'] : null;
+        $remaining = isset($stock['remaining']) ? (int) $stock['remaining'] : 0;
 
         return [
             'tdId' => $this->ticketDetailsId($ticket),
@@ -262,7 +287,6 @@ class DanceEventService implements DanceEventServiceInterface
         return [];
     }
 
-    // one short word for the stock badge, or empty when there's nothing to flag
     private function stockState(array $stock): string
     {
         if (!empty($stock['sold_out'])) {
@@ -283,16 +307,11 @@ class DanceEventService implements DanceEventServiceInterface
         if ($isFree) {
             return 'Free';
         }
-        $amount = 0.0;
-        if (is_numeric($price)) {
-            $amount = (float) $price;
-        }
+        $amount = is_numeric($price) ? (float) $price : 0.0;
 
         return '€ ' . number_format($amount, 2, ',', '.');
     }
 
-    // split a newline description into feature columns (one column normally, two for the festival pass)
-    /** @return list<list<string>> */
     private function featureColumns(string $desc, bool $twoColumns): array
     {
         $lines = preg_split('/\r\n|\r|\n/', trim($desc));
@@ -314,7 +333,6 @@ class DanceEventService implements DanceEventServiceInterface
         return [$first, $second];
     }
 
-    // day pass meta line, like "Friday pass · 22:00"
     private function dayPassMeta(array $pass): string
     {
         $parts = [];
@@ -339,29 +357,26 @@ class DanceEventService implements DanceEventServiceInterface
         return '';
     }
 
-    // hero image filename from the cms photos, or the fallback from the settings
     private function resolveHeroFile(array $dance): string
     {
         $context = $dance['event_detail_photos_context'];
-        $heroFile = $this->photosRepository->getFilename($context, 'hero_default');
+        $heroFile = $this->photosService->getFilename($context, 'hero_default');
 
         return $heroFile ?? $dance['event_detail_hero_fallback'];
     }
 
-    // three gallery image paths from the cms photos, falling back to the shipped assets
-    /** @return string[] */
     private function resolveGalleryImages(array $dance): array
     {
         $context = $dance['event_detail_photos_context'];
         $fallbacks = $dance['event_detail_gallery_fallbacks'];
         if (!is_array($fallbacks)) {
-            $fallbacks = ['DetailsPage/2.png', 'DetailsPage/3.png', 'DetailsPage/4.png'];
+            $fallbacks = self::DEFAULT_GALLERY_IMAGES;
         }
 
         return [
-            $this->photosRepository->getFilename($context, 'gallery_default_1') ?? $fallbacks[0],
-            $this->photosRepository->getFilename($context, 'gallery_default_2') ?? $fallbacks[1],
-            $this->photosRepository->getFilename($context, 'gallery_default_3') ?? $fallbacks[2],
+            $this->photosService->getFilename($context, 'gallery_default_1') ?? $fallbacks[0],
+            $this->photosService->getFilename($context, 'gallery_default_2') ?? $fallbacks[1],
+            $this->photosService->getFilename($context, 'gallery_default_3') ?? $fallbacks[2],
         ];
     }
 
@@ -370,20 +385,16 @@ class DanceEventService implements DanceEventServiceInterface
         return [
             ['label' => $dance['breadcrumb_home_label'], 'url' => $app['home_path']],
             ['label' => $dance['breadcrumb_dance_label'], 'url' => $dance['event_detail_list_path']],
-            // venue crumb is all caps on purpose, that's what the design asks for
             ['label' => strtoupper($venueName), 'url' => null],
         ];
     }
 
-    // day label from the cms (like "Friday 24 May"), or just the capitalised day name
     private function formatEventDate(string $eventDay, array $dance): string
     {
         $dayKey = strtolower($eventDay);
-
-        $dayLabels = [];
-        if (isset($dance['day_labels']) && is_array($dance['day_labels'])) {
-            $dayLabels = $dance['day_labels'];
-        }
+        $dayLabels = isset($dance['day_labels']) && is_array($dance['day_labels'])
+            ? $dance['day_labels']
+            : [];
 
         return $dayLabels[$dayKey] ?? ucfirst($eventDay);
     }
@@ -391,35 +402,24 @@ class DanceEventService implements DanceEventServiceInterface
     private function buildLocationDisplay(Event $event, string $venueName, array $dance, array $app): string
     {
         $country = $dance['event_detail_venue_country'];
+        $city = $event->venueCity ?: $app['default_venue_city'];
 
-        // use the event's city, or the site default when the event has none
-        $city = $event->venueCity;
-        if (!$city) {
-            $city = $app['default_venue_city'];
-        }
-
-        // shows like "Jopenkerk — Haarlem, Netherlands"
         return sprintf('%s — %s, %s', $venueName, $city, $country);
     }
 
-    // build the map search string, like "Jopenkerk, Gedempte Voldersgracht, Haarlem"
     private function buildMapQuery(Event $event, string $venueName): string
     {
-        // drop any empty parts, then join what's left with commas
         $parts = array_filter([$venueName, $event->venueAddress, $event->venueCity]);
 
         return urlencode(implode(', ', $parts));
     }
 
-    // look up the venue coordinates, or fall back to the default ones
-    /** @return float[] */
     private function mapLatLon(string $venueName, array $dance): array
     {
         $byVenue = is_array($dance['venue_coordinates']) ? $dance['venue_coordinates'] : [];
         $fallback = $dance['default_map_coordinates'];
         if (!is_array($fallback)) {
-            // jopenkerk area, same default as dance.php / the migration
-            $fallback = [52.3813, 4.6368];
+            $fallback = self::DEFAULT_MAP_COORDINATES;
         }
 
         $pair = $byVenue[$venueName] ?? $fallback;
@@ -427,27 +427,19 @@ class DanceEventService implements DanceEventServiceInterface
         return [(float) $pair[0], (float) $pair[1]];
     }
 
-    // titles look like "Artist — Venue", so split them into the artists part and the subtitle
-    /** @return string[] */
     private function splitEventTitle(string $title): array
     {
-        // split on the dash (–, — or -) with any spaces around it, max 2 parts
         $parts = preg_split('/\s*[–—-]\s*/u', $title, 2);
-
-        // no dash in the title → just use the whole thing for both
         if ($parts === false || count($parts) < 2) {
             return [$title, $title];
         }
 
-        // the db sometimes lists artists as "A / B", but we want "A, B"
         $names = array_map('trim', explode('/', $parts[0]));
         $artists = implode(', ', $names);
-        $subtitle = trim($parts[1]);
 
-        return [$artists, $subtitle];
+        return [$artists, trim($parts[1])];
     }
 
-    // add a stock status to each ticket so the view can show the "sold out" / "nearly" badges
     private function attachTicketStock(array &$eventTickets, ?array &$danceDayPass, ?array &$danceAllAccessPass): void
     {
         $ids = [];
@@ -477,13 +469,11 @@ class DanceEventService implements DanceEventServiceInterface
         }
     }
 
-    // the ticket_details_id for a ticket row, or 0 when it's not there
     private function ticketDetailsId(array $ticket): int
     {
         return (int) ($ticket['ticket_details_id'] ?? 0);
     }
 
-    // the stock info for a ticket, or a neutral "nothing special" status when we have none
     private function stockFor(array $ticket, array $stock): array
     {
         $ticketId = $this->ticketDetailsId($ticket);

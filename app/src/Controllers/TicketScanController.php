@@ -10,9 +10,10 @@ use App\Core\Session;
 use App\Core\TicketScannerAuth;
 use App\Repositories\SettingsRepository;
 use App\Repositories\TicketRepository;
+use App\Services\SettingsService;
 use App\Services\TicketScanService;
 
-/** Door ticket scanner (/admin/scan): single or batch codes, QR in the view; POST then redirect with flash JSON. */
+// door scanner — staff paste or scan qr
 final class TicketScanController
 {
     private TicketScanService $ticketScanService;
@@ -21,7 +22,7 @@ final class TicketScanController
     {
         $this->ticketScanService = new TicketScanService(
             new TicketRepository(),
-            new SettingsRepository()
+            new SettingsService(new SettingsRepository()),
         );
     }
 

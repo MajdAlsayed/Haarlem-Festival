@@ -14,9 +14,15 @@ use App\Repositories\TicketDetailsRepository;
 use App\Repositories\TicketRepository;
 use App\Repositories\TicketsRepository;
 use App\Services\DanceEventService;
+use App\Services\DanceSettingsService;
 use App\Services\EventService;
+use App\Services\PhotosService;
+use App\Services\SettingsService;
 use App\Services\TicketAvailabilityService;
+use App\Services\TicketDetailsService;
+use App\Services\TicketsCatalogService;
 
+// one dance event + buy tickets — /dance/event/{id}
 final class EventDetailController
 {
     private DanceEventService $danceEventService;
@@ -25,12 +31,12 @@ final class EventDetailController
     {
         $this->danceEventService = new DanceEventService(
             new EventService(new EventRepository()),
-            new PhotosRepository(),
-            new SettingsRepository(),
-            new DanceSettingsRepository(),
-            new TicketDetailsRepository(),
-            new TicketsRepository(),
-            new TicketAvailabilityService(new CartRepository(), new TicketRepository())
+            new PhotosService(new PhotosRepository()),
+            new SettingsService(new SettingsRepository()),
+            new DanceSettingsService(new DanceSettingsRepository()),
+            new TicketDetailsService(new TicketDetailsRepository()),
+            new TicketsCatalogService(new TicketsRepository()),
+            new TicketAvailabilityService(new CartRepository(), new TicketRepository()),
         );
     }
 

@@ -11,9 +11,12 @@ use App\Repositories\PhotosRepository;
 use App\Repositories\SettingsRepository;
 use App\Services\ArtistService;
 use App\Services\DanceArtistService;
+use App\Services\DanceSettingsService;
 use App\Services\EventService;
+use App\Services\PhotosService;
+use App\Services\SettingsService;
 
-/** /dance/artist/{slug} */
+// dance artist detail — /dance/artist/{slug}
 final class ArtistController
 {
     private DanceArtistService $danceArtistService;
@@ -23,9 +26,9 @@ final class ArtistController
         $this->danceArtistService = new DanceArtistService(
             new ArtistService(new ArtistsRepository()),
             new EventService(new EventRepository()),
-            new PhotosRepository(),
-            new SettingsRepository(),
-            new DanceSettingsRepository()
+            new PhotosService(new PhotosRepository()),
+            new SettingsService(new SettingsRepository()),
+            new DanceSettingsService(new DanceSettingsRepository()),
         );
     }
 

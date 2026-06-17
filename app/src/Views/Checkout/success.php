@@ -1,8 +1,4 @@
 <?php
-/** @var array $app */
-/** @var array<string,mixed> $order */
-/** @var list<array<string,string>> $tickets */
-/** @var bool $paidWithStripe */
 
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 

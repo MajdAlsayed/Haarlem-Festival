@@ -8,18 +8,21 @@ use App\Core\AdminAuth;
 use App\Core\Csrf;
 use App\Exceptions\ValidationException;
 use App\Repositories\OrderRepository;
-use App\Repositories\SettingsRepository;
 use App\Services\OrderExportService;
+use App\Services\SettingsService;
 use App\ViewModels\AdminOrderExportViewModel;
 
-/** Administrator: export orders as CSV or Excel (selectable columns, incl. total + paid_at). */
+// csv/excel download for orders
 final class AdminOrderExportController
 {
     private OrderExportService $exportService;
 
     public function __construct()
     {
-        $this->exportService = new OrderExportService(new OrderRepository(), new SettingsRepository());
+        $this->exportService = new OrderExportService(
+            new OrderRepository(),
+            new SettingsService(new SettingsRepository()),
+        );
     }
 
     public function handle(): void
@@ -38,11 +41,10 @@ final class AdminOrderExportController
 
     private function showForm(?string $error): void
     {
-        $viewModel = new AdminOrderExportViewModel(
-            csrf: Csrf::token('admin_order_export'),
-            appSettings: $this->exportService->appSettings(),
-            columnLabels: $this->exportService->columnLabels(),
-            error: $error
+        $viewModel = AdminOrderExportViewModel::fromPageData(
+            $this->exportService->getExportPageData(),
+            Csrf::token('admin_order_export'),
+            $error,
         );
         require __DIR__ . '/../Views/Admin/OrderExport.php';
     }

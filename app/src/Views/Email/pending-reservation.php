@@ -1,8 +1,4 @@
 <?php
-/** @var string $site */
-/** @var int $orderId */
-/** @var array{total_amount?:string,expires_at?:string} $order */
-/** @var list<array{name:string,quantity:int,unit_price:string,line_total:string}> $lines */
 
 $expires = (string) ($order['expires_at'] ?? '');
 $deadline = $expires !== '' ? $expires : '(see your account)';

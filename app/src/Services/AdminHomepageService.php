@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Contracts\ServiceInterface\AdminHomepageServiceInterface;
+use App\Contracts\ServiceInterface\PageServiceInterface;
+use App\Contracts\ServiceInterface\SettingsServiceInterface;
 use App\Core\HtmlSanitizer;
 use App\Exceptions\ValidationException;
-use App\Repositories\PageRepository;
-use App\Repositories\SettingsRepository;
 use App\ViewModels\AdminHomepageEditViewModel;
 
 // load + save the homepage cms (page title + the cms_home_* settings)
@@ -20,23 +20,23 @@ class AdminHomepageService implements AdminHomepageServiceInterface
     private const MAX_HREF = 500;
 
     public function __construct(
-        private PageRepository $pageRepository,
-        private SettingsRepository $settingsRepository
+        private PageServiceInterface $pageService,
+        private SettingsServiceInterface $settingsService,
     ) {
     }
 
     // build the edit form view model from the home page row + merged cms values
     public function buildEditViewModel(string $csrf, string $uploadCsrf, ?string $error, ?string $success): AdminHomepageEditViewModel
     {
-        $page = $this->pageRepository->findBySlugForAdmin('home');
+        $page = $this->pageService->findBySlugForAdmin('home');
         $title = $page !== null ? $page->title : '';
 
         return new AdminHomepageEditViewModel(
             csrf: $csrf,
             pageTitle: $title,
-            cmsHome: $this->settingsRepository->getMergedCmsHome(),
+            cmsHome: $this->settingsService->getMergedCmsHome(),
             uploadCsrf: $uploadCsrf,
-            appSettings: $this->settingsRepository->getAll(),
+            appSettings: $this->settingsService->getAll(),
             error: $error,
             success: $success
         );
@@ -59,7 +59,7 @@ class AdminHomepageService implements AdminHomepageServiceInterface
         if ($this->length($title) > self::MAX_TITLE) {
             throw new ValidationException('Title must be at most 255 characters.');
         }
-        if (!$this->pageRepository->updateTitleBySlug('home', $title)) {
+        if (!$this->pageService->updateTitleBySlug('home', $title)) {
             throw new ValidationException('Could not save title (home page missing in DB?).');
         }
     }
@@ -83,7 +83,7 @@ class AdminHomepageService implements AdminHomepageServiceInterface
 
             $this->validateCmsField($key, $value);
 
-            if (!$this->settingsRepository->upsertSetting('cms_home_' . $key, $value)) {
+            if (!$this->settingsService->upsertSetting('cms_home_' . $key, $value)) {
                 throw new ValidationException('DB save failed.');
             }
         }
@@ -168,7 +168,6 @@ class AdminHomepageService implements AdminHomepageServiceInterface
         }
     }
 
-    /** @return string[] */
     private function hrefFields(): array
     {
         return ['hero_cta_href', 'about_more_href'];

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Contracts\ServiceInterface\AdminDanceServiceInterface;
+use App\Contracts\ServiceInterface\DanceSettingsServiceInterface;
+use App\Contracts\ServiceInterface\SettingsServiceInterface;
 use App\Core\HtmlSanitizer;
 use App\Exceptions\ValidationException;
 use App\Repositories\DanceCmsRepository;
-use App\Repositories\DanceSettingsRepository;
 use App\Repositories\JazzCmsRepository;
-use App\Repositories\SettingsRepository;
 use App\ViewModels\AdminDanceEditViewModel;
 
 // all the brains for the dance admin: events, homepage artists, and the cms settings form
@@ -18,35 +18,39 @@ class AdminDanceService implements AdminDanceServiceInterface
 {
     public function __construct(
         private DanceCmsRepository $danceCms,
-        private DanceSettingsRepository $danceSettingsRepository,
-        private SettingsRepository $settingsRepository,
-        private JazzCmsRepository $jazzCms
+        private DanceSettingsServiceInterface $danceSettingsService,
+        private SettingsServiceInterface $settingsService,
+        private JazzCmsRepository $jazzCms,
     ) {
     }
 
     // global site settings the admin layout needs (header/nav)
     public function appSettings(): array
     {
-        return $this->settingsRepository->getAll();
+        return $this->settingsService->getAll();
     }
 
     // —— dance events ——————————————————————————————————————————————————————
 
+    // rows for the admin events table
     public function listEventsForAdmin(): array
     {
         return $this->danceCms->listDanceEventsForAdmin();
     }
 
+    // venue dropdown on event form
     public function listVenues(): array
     {
         return $this->danceCms->listVenues();
     }
 
+    // one row for edit form or null
     public function getEventForEdit(int $eventId): ?array
     {
         return $this->danceCms->getDanceEventById($eventId);
     }
 
+    // optional preview mp3 on event form
     public function getEventAudio(int $eventId): ?array
     {
         return $this->jazzCms->getEventAudio($eventId);
@@ -123,6 +127,7 @@ class AdminDanceService implements AdminDanceServiceInterface
         }
     }
 
+    // hard delete from admin list
     public function deleteEvent(int $eventId): void
     {
         $this->danceCms->deleteDanceEvent($eventId);
@@ -130,14 +135,16 @@ class AdminDanceService implements AdminDanceServiceInterface
 
     // —— homepage artists (stored as json in dance_settings['artists']) ——————
 
+    // json artist cards on dance homepage
     public function listArtists(): array
     {
-        $merged = $this->danceSettingsRepository->getMergedWithConfig();
+        $merged = $this->danceSettingsService->getMergedWithConfig();
         $artists = $merged['artists'] ?? [];
 
         return is_array($artists) ? $artists : [];
     }
 
+    // one card for edit form or null
     public function getArtistForEdit(string $slug): ?array
     {
         foreach ($this->listArtists() as $artist) {
@@ -198,9 +205,10 @@ class AdminDanceService implements AdminDanceServiceInterface
             'image' => $image,
         ];
 
-        $this->danceSettingsRepository->upsertSetting('artists', json_encode(array_values($list)));
+        $this->danceSettingsService->upsertSetting('artists', json_encode(array_values($list)));
     }
 
+    // remove from json list by slug
     public function deleteArtist(string $slug): void
     {
         if (!$this->isValidArtistSlug($slug)) {
@@ -223,7 +231,7 @@ class AdminDanceService implements AdminDanceServiceInterface
             ];
         }
 
-        $this->danceSettingsRepository->upsertSetting('artists', json_encode(array_values($list)));
+        $this->danceSettingsService->upsertSetting('artists', json_encode(array_values($list)));
     }
 
     // —— cms settings form ————————————————————————————————————————————————
@@ -231,7 +239,7 @@ class AdminDanceService implements AdminDanceServiceInterface
     // build the big edit form view model from merged settings + config defaults
     public function buildEditViewModel(string $csrf, string $uploadCsrf, ?string $error, ?string $success): AdminDanceEditViewModel
     {
-        $merged = $this->danceSettingsRepository->getMergedWithConfig();
+        $merged = $this->danceSettingsService->getMergedWithConfig();
         $defaults = require __DIR__ . '/../Config/dance.php';
 
         $paragraphs = $this->settingArray($merged, 'about_paragraphs', []);
@@ -286,7 +294,7 @@ class AdminDanceService implements AdminDanceServiceInterface
             artistDetailHeroTaglineMaxChars: (string) ($merged['artist_detail_hero_tagline_max_chars'] ?? $defaults['artist_detail_hero_tagline_max_chars'] ?? 160),
             artistDetailGalleryStatsJson: $this->jsonOrDefault($this->settingArray($merged, 'artist_detail_gallery_stats_fallback', $defaults['artist_detail_gallery_stats_fallback'] ?? []), '[]'),
             uploadCsrf: $uploadCsrf,
-            appSettings: $this->settingsRepository->getAll(),
+            appSettings: $this->settingsService->getAll(),
             error: $error,
             success: $success
         );
@@ -304,12 +312,12 @@ class AdminDanceService implements AdminDanceServiceInterface
         );
 
         foreach ($settings as $key => $value) {
-            $this->danceSettingsRepository->upsertSetting($key, $value);
+            $this->danceSettingsService->upsertSetting($key, $value);
         }
     }
 
     // section 1: page title, hero, about text, day images — returns setting_key => value
-    /** @return array<string, string> */
+
     private function validatePageCopy(array $post, array $defaults): array
     {
         $pageTitle = trim((string) ($post['dance_page_title'] ?? ''));
@@ -389,7 +397,7 @@ class AdminDanceService implements AdminDanceServiceInterface
     }
 
     // section 2: breadcrumbs, list path, map + venue coordinates — returns setting_key => value
-    /** @return array<string, string> */
+
     private function validateEventDetail(array $post, array $defaults): array
     {
         $breadcrumbHome = trim((string) ($post['breadcrumb_home_label'] ?? ''));
@@ -465,7 +473,7 @@ class AdminDanceService implements AdminDanceServiceInterface
     }
 
     // section 3: artist detail images, slots, labels — returns setting_key => value
-    /** @return array<string, string> */
+
     private function validateArtistDetail(array $post): array
     {
         $imgBase = trim((string) ($post['dance_images_base_path'] ?? ''));
@@ -534,7 +542,7 @@ class AdminDanceService implements AdminDanceServiceInterface
     }
 
     // decode + check the schedule fallbacks json (slug → path, must include "default")
-    /** @return array<string, string> */
+
     private function validateScheduleFallbacks(string $json): array
     {
         $decoded = json_decode($json, true);
@@ -554,7 +562,7 @@ class AdminDanceService implements AdminDanceServiceInterface
     }
 
     // decode + check a slug → slot-key map (used for both the profile and album rows)
-    /** @return array<string, string> */
+
     private function validateSlotMap(string $json, string $label): array
     {
         $decoded = json_decode($json, true);
@@ -571,7 +579,7 @@ class AdminDanceService implements AdminDanceServiceInterface
     }
 
     // decode + check the gallery stats json (an array of {num, label})
-    /** @return array[] */
+
     private function validateGalleryStats(string $json): array
     {
         $decoded = json_decode($json, true);
@@ -588,7 +596,7 @@ class AdminDanceService implements AdminDanceServiceInterface
     }
 
     // read image lines from the form, falling back to the config defaults when empty
-    /** @return string[] */
+
     private function imagesOrDefault(array $post, string $field, array $defaults, string $defaultKey): array
     {
         $images = $this->linesToStringArray((string) ($post[$field] ?? ''));
@@ -628,7 +636,7 @@ class AdminDanceService implements AdminDanceServiceInterface
     }
 
     // split textarea lines into a clean string array (trim + drop empty)
-    /** @return string[] */
+
     private function linesToStringArray(string $raw): array
     {
         $lines = preg_split('/\r\n|\r|\n/', $raw) ?: [];

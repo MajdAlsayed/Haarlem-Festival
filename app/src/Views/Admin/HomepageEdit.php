@@ -1,5 +1,5 @@
 <?php
-/** @var \App\ViewModels\AdminHomepageEditViewModel $vm */
+
 $app = $vm->appSettings;
 $c = $vm->cmsHome;
 

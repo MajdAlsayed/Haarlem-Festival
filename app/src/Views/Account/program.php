@@ -1,6 +1,4 @@
 <?php
-/** @var array $app */
-/** @var list<array{name:string,event_title:?string,event_day:?string,start_time:?string,ticket_details_id:int}> $items */
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 
 // Settings for the page title, styles, body class

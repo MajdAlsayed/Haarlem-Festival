@@ -1,6 +1,5 @@
 <?php
-/** @var array $app */
-/** @var list<array<string,mixed>> $events */
+
 $success = \App\Core\Session::getFlash('admin_success');
 $error = \App\Core\Session::getFlash('admin_error');
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');

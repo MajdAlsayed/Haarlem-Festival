@@ -1,9 +1,5 @@
 <?php
-/** @var array $app */
-/** @var string $csrf */
-/** @var string|null $error */
-/** @var array<string, mixed>|null $result */
-/** @var bool $showCmsLinks */
+
 if (!isset($showCmsLinks)) {
     $showCmsLinks = true;
 }

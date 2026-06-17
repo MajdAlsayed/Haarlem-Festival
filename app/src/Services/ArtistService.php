@@ -22,14 +22,14 @@ class ArtistService implements ArtistServiceInterface
     }
 
     // gallery photo filenames for an artist
-    /** @return string[] */
+
     public function getPhotoFilenames(int $artistId): array
     {
         return $this->artistsRepository->getPhotoFilenamesByArtistId($artistId);
     }
 
     // every artist row in the repository's order
-    /** @return array[] */
+
     public function getAllOrdered(): array
     {
         return $this->artistsRepository->getAllOrdered();

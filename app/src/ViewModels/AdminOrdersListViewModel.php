@@ -6,7 +6,7 @@ namespace App\ViewModels;
 
 final class AdminOrdersListViewModel
 {
-    /** @param list<array<string, mixed>> $orders */
+
     public function __construct(
         public array $orders,
         public array $appSettings

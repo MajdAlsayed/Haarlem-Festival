@@ -1,5 +1,5 @@
 <?php
-/** @var \App\ViewModels\AdminOrderExportViewModel $viewModel */
+
 $app = $viewModel->appSettings;
 $h = static fn(mixed $v): string => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 
