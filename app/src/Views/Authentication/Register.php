@@ -1,8 +1,7 @@
 <?php
-$app = $viewModel->appSettings;
 
 // Settings for the page title, styles, body class
-$pageTitle = 'Register — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageTitle = 'Register — ' . ('Haarlem Festival');
 $pageStyles = ['/css/pages/auth.css'];
 $bodyClass = 'auth-page';
 
@@ -11,6 +10,8 @@ $breadcrumbs = [
         ['label' => 'Register', 'url' => null],
 ];
 ?>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 <!DOCTYPE html>
 <html lang="en">
 <?php require __DIR__ . '/../partials/head.php'; ?>
@@ -86,9 +87,7 @@ $breadcrumbs = [
                 </div>
 
                 <div class="auth-field auth-captcha">
-                    <label class="copy-text copy-text--sm" for="captcha"><?= htmlspecialchars($viewModel->captchaQuestion) ?></label>
-                    <input type="text" id="captcha" name="captcha" required maxlength="4"
-                           autocomplete="off" inputmode="numeric">
+                    <div class="g-recaptcha" data-sitekey="<?= htmlspecialchars($viewModel->recaptchaSiteKey) ?>"></div>
                 </div>
 
                 <button type="submit" class="btn btn--primary auth-btn">Create account</button>

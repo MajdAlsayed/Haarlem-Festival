@@ -3,7 +3,6 @@
  * /admin/food/settings  — GET shows form, POST saves
  *
  * Expected variables from controller:
- * @var array       $app          Site settings (site_name, css_version, …)
  * @var string      $csrf         CSRF token for 'admin_food_settings'
  * @var array       $settings     Current food_settings rows (key => value, already decoded)
  * @var string|null $success      Flash success message
@@ -52,7 +51,7 @@ if (is_array($settings['locals_reviews'] ?? null)) {
     $localsReviewsJson = (string) $settings['locals_reviews'];
 }
 
-$pageTitle = 'Food settings — Admin — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageTitle = 'Food settings — Admin — ' . ('Haarlem Festival');
 $pageStyles = ['/css/admin.css'];
 $bodyClass = 'admin-page';
 ?>

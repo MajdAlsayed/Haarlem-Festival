@@ -3,49 +3,67 @@
 
 namespace App\Controllers;
 
+use App\Contracts\ServiceInterface\FoodServiceInterface;
 use App\Core\Csrf;
-use App\Repositories\FoodSettingsRepository;
-use App\Repositories\RestaurantRepository;
-use App\Repositories\ReservationRepository;
-use App\Repositories\UserRepository;
+use App\Core\Session;
 use App\Services\FoodService;
 
 class FoodController
 {
-    private FoodService $foodService;
+    private FoodServiceInterface $foodService;
 
     public function __construct()
     {
-        $this->foodService = new FoodService(
-            new RestaurantRepository(),
-            new FoodSettingsRepository(),
-            new ReservationRepository(),
-        );
+        $this->foodService = new FoodService();
     }
 
     public function index(): void
     {
-        $viewModel = $this->foodService->getFoodIndexViewModel();
+        try {
+            $viewModel = $this->foodService->getFoodIndexViewModel();
+        } catch (\Throwable $e) {
+            error_log('[FoodController::index] ' . $e->getMessage());
+            Session::setFlash('error', 'Unable to load the food page. Please try again later.');
+            header('Location: /');
+            exit;
+        }
         require __DIR__ . '/../Views/Food/Index.php';
     }
 
     public function restaurant(int $id): void
     {
-        $restaurant   = $this->foodService->getRestaurantOrFail($id);
-        $foodSettings = $this->foodService->getFoodSettings();
+        try {
+            $restaurant   = $this->foodService->getRestaurantOrFail($id);
+            $foodSettings = $this->foodService->getFoodSettings();
+        } catch (\Throwable $e) {
+            error_log('[FoodController::restaurant] ' . $e->getMessage());
+            header('Location: /food');
+            exit;
+        }
         require __DIR__ . '/../Views/Food/Restaurant.php';
     }
 
     public function booking(int $id): void
     {
-        $restaurant    = $this->foodService->getRestaurantOrFail($id);
-        $foodSettings  = $this->foodService->getFoodSettings();
-        $festivalDates = $this->foodService->getFestivalDates();
-        $errors        = [];
+        try {
+            $restaurant    = $this->foodService->getRestaurantOrFail($id);
+            $foodSettings  = $this->foodService->getFoodSettings();
+            $festivalDates = $this->foodService->getFestivalDates();
+        } catch (\Throwable $e) {
+            error_log('[FoodController::booking] ' . $e->getMessage());
+            header('Location: /food');
+            exit;
+        }
+
+        $errors = [];
 
         $user = null;
         if (!empty($_SESSION['auth']['email'])) {
-            $user = (new UserRepository())->findByEmail($_SESSION['auth']['email']);
+            try {
+                $user = $this->foodService->getUserByEmail($_SESSION['auth']['email']);
+            } catch (\Throwable $e) {
+                $user = null;
+            }
         }
         $input = $this->foodService->getDefaultInput($user);
 
@@ -53,14 +71,19 @@ class FoodController
             if (!Csrf::validate('food_booking', $_POST['_csrf'] ?? null)) {
                 $errors[] = 'Invalid form token. Please refresh and try again.';
             } else {
-                $result = $this->foodService->validateBookingInput($_POST);
-                $input  = $result['input'];
-                $errors = $result['errors'];
+                try {
+                    $result = $this->foodService->validateBookingInput($_POST);
+                    $input  = $result['input'];
+                    $errors = $result['errors'];
 
-                if (empty($errors)) {
-                    $_SESSION['booking_draft'] = $input;
-                    header('Location: /food/restaurant/' . $id . '/booking/overview');
-                    exit;
+                    if (empty($errors)) {
+                        $_SESSION['booking_draft'] = $input;
+                        header('Location: /food/restaurant/' . $id . '/booking/overview');
+                        exit;
+                    }
+                } catch (\Throwable $e) {
+                    error_log('[FoodController::booking POST] ' . $e->getMessage());
+                    $errors[] = 'An unexpected error occurred. Please try again.';
                 }
             }
         }
@@ -70,10 +93,16 @@ class FoodController
 
     public function bookingOverview(int $id): void
     {
-        $restaurant    = $this->foodService->getRestaurantOrFail($id);
-        $foodSettings  = $this->foodService->getFoodSettings();
-        $festivalDates = $this->foodService->getFestivalDates();
-        $feePerPerson  = $this->foodService->getReservationFeePerPerson();
+        try {
+            $restaurant    = $this->foodService->getRestaurantOrFail($id);
+            $foodSettings  = $this->foodService->getFoodSettings();
+            $festivalDates = $this->foodService->getFestivalDates();
+            $feePerPerson  = $this->foodService->getReservationFeePerPerson();
+        } catch (\Throwable $e) {
+            error_log('[FoodController::bookingOverview] ' . $e->getMessage());
+            header('Location: /food');
+            exit;
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
             if (!Csrf::validate('food_booking_confirm', $_POST['_csrf'] ?? null)) {
@@ -87,9 +116,16 @@ class FoodController
                 exit;
             }
 
-            $userId         = $_SESSION['auth']['user_id'] ?? null;
-            $reservationId  = $this->foodService->saveBooking($id, $userId, $input);
-            $reservationFee = $this->foodService->calculateReservationFee($input);
+            try {
+                $userId         = $_SESSION['auth']['user_id'] ?? null;
+                $reservationId  = $this->foodService->saveBooking($id, $userId, $input);
+                $reservationFee = $this->foodService->calculateReservationFee($input);
+            } catch (\Throwable $e) {
+                error_log('[FoodController::bookingOverview confirm] ' . $e->getMessage());
+                Session::setFlash('food_booking_error', 'Could not save your reservation. Please try again.');
+                header('Location: /food/restaurant/' . $id . '/booking');
+                exit;
+            }
 
             setcookie('user_first_name', $input['first_name'], ['expires' => time() + 60*60*24*90, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax']);
             setcookie('user_last_name',  $input['last_name'],  ['expires' => time() + 60*60*24*90, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax']);
@@ -111,7 +147,12 @@ class FoodController
 
         $input          = $_SESSION['booking_draft'];
         $totalGuests    = ($input['adults'] ?? 0) + ($input['children'] ?? 0);
-        $reservationFee = $this->foodService->calculateReservationFee($input);
+        try {
+            $reservationFee = $this->foodService->calculateReservationFee($input);
+        } catch (\Throwable $e) {
+            error_log('[FoodController::bookingOverview fee] ' . $e->getMessage());
+            $reservationFee = 0;
+        }
 
         require __DIR__ . '/../Views/Food/BookingOverview.php';
     }
