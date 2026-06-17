@@ -8,6 +8,7 @@ use App\Core\AdminAuth;
 use App\Core\Csrf;
 use App\Exceptions\ValidationException;
 use App\Repositories\OrderRepository;
+use App\Repositories\SettingsRepository;
 use App\Services\OrderExportService;
 use App\Services\SettingsService;
 use App\ViewModels\AdminOrderExportViewModel;
