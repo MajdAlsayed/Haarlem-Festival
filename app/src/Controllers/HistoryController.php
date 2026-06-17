@@ -176,7 +176,8 @@ class HistoryController
         try {
             $date = $_GET['day'] ?? '';
             $tours = $this->historyService->getToursWithDetailsByDate($date);
-            require __DIR__ . '/../Views/History/tours-schedule.php';
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['tours' => $tours], JSON_THROW_ON_ERROR);
         } catch (\Exception $e) {
             error_log('HistoryController::toursSchedule error: ' . $e->getMessage());
             require __DIR__ . '/../Views/error.php';
