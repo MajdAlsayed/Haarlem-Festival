@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
 use App\Repositories\StoriesRepository;
 use App\Services\StoriesService;
-use App\Validation\StoryValidator;
 use App\Core\AdminAuth;
 use App\Core\Csrf;
 use App\Core\Session;
@@ -26,14 +27,8 @@ class AdminStoriesController
             return;
         }
 
-        $stories = $this->storiesService->getAllStoriesForAdmin();
-
-        foreach ($stories as &$story) {
-            $story['has_detail_page'] = $this->storiesService->hasDetailPage(
-                (int)($story['story_id'] ?? 0)
-            );
-        }
-        unset($story);
+        $stories = $this->storiesService->getAllStoriesForAdminWithDetailStatus();
+        $csrf = Csrf::token('admin_stories_delete');
 
         require __DIR__ . '/../Views/Admin/Stories/Index.php';
     }
@@ -46,7 +41,7 @@ class AdminStoriesController
         }
 
         $storyId = (int)($_GET['id'] ?? 0);
-        $story   = $this->storiesService->getStoryForEdit($storyId);
+        $story = $this->storiesService->getStoryForEdit($storyId);
 
         if (!$story) {
             throw new NotFoundException('Story not found.');
@@ -65,50 +60,30 @@ class AdminStoriesController
             return;
         }
 
+        // Stops another site from submitting this admin form.
         if (!Csrf::validate('admin_stories_edit', $_POST['_csrf'] ?? null)) {
             Session::setFlash('admin_error', 'Invalid request. Please try again.');
             header('Location: /admin/stories');
             exit;
         }
 
-        $validator = new StoryValidator();
-        $storyId   = (int)($_POST['story_id'] ?? 0);
-
-        $data = [
-            'name'        => trim((string)($_POST['name']        ?? '')),
-            'slug'        => trim((string)($_POST['slug']        ?? '')),
-            'description' => trim((string)($_POST['description'] ?? '')),
-            'image_path'  => trim((string)($_POST['image_path']  ?? '')),
-            'story_type'  => trim((string)($_POST['story_type']  ?? '')),
-            'age'         => trim((string)($_POST['age']         ?? '')),
-            'language'    => trim((string)($_POST['language']    ?? '')),
-            'template'    => trim((string)($_POST['template']    ?? 'generic')),
-            'audience'    => trim((string)($_POST['audience']    ?? '')),
-            'event_id'    => (int)($_POST['event_id'] ?? 0),
-        ];
-
-        try {
-            $validator->validateStory($data);
-            $this->storiesService->updateStory($storyId, $data);
-        } catch (ValidationException $e) {
-            $story = array_merge(['story_id' => $storyId], $data);
-            $errors = $e->getErrors();
-            $csrf = Csrf::token('admin_stories_edit');
-            require __DIR__ . '/../Views/Stories/Admin/Edit.php';
-            return;
-        }
-
-        Session::setFlash('admin_success', 'Story updated successfully.');
-        header('Location: /admin/stories');
-        exit;
+        $data = $this->storiesService->prepareStoryData($_POST, $_FILES);
+        $this->validateAndSaveStory($data, 'update', 'admin_stories_edit', 'Story updated successfully.');
     }
-
 
     public function delete(): void
     {
         if (!AdminAuth::requireAdmin()) {
             return;
         }
+
+        // Stops another site from deleting a story for this admin.
+        if (!Csrf::validate('admin_stories_delete', $_POST['_csrf'] ?? null)) {
+            Session::setFlash('error', 'Invalid request token');
+            header('Location: /admin/stories');
+            exit;
+        }
+
         $storyId = (int)($_POST['story_id'] ?? 0);
 
         if ($storyId > 0) {
@@ -126,20 +101,12 @@ class AdminStoriesController
         }
 
         $slug = trim((string)($_GET['slug'] ?? ''));
-        $data = $this->storiesService->getDetailPageForCms($slug);
-
-        if (empty($data['story'])) {
-            throw new NotFoundException('Story not found.');
-        }
+        $data = $this->storiesService->getDetailPageFormData($slug);
 
         $story      = $data['story'];
-        $detailPage = is_array($data['detailPage'] ?? null) ? $data['detailPage'] : [];
-
-        $highlights = json_decode((string)($detailPage['highlights'] ?? '[]'), true);
-        $gallery    = json_decode((string)($detailPage['gallery']    ?? '[]'), true);
-
-        if (!is_array($highlights)) { $highlights = []; }
-        if (!is_array($gallery))    { $gallery    = []; }
+        $detailPage = $data['detailPage'];
+        $highlights = $data['highlights'];
+        $gallery    = $data['gallery'];
 
         require __DIR__ . '/../Views/Admin/Stories/DetailPageForm.php';
     }
@@ -150,24 +117,80 @@ class AdminStoriesController
             return;
         }
         $storyId = (int)($_POST['story_id'] ?? 0);
+        $data = $this->storiesService->prepareDetailPageData($_POST, $_FILES);
 
-        $data = [
-            'hero_image'            => trim((string)($_POST['hero_image']            ?? '')),
-            'hero_heading'          => trim((string)($_POST['hero_heading']          ?? '')),
-            'hero_description'      => trim((string)($_POST['hero_description']      ?? '')),
-            'article_title'         => trim((string)($_POST['article_title']         ?? '')),
-            'article_image'         => trim((string)($_POST['article_image']         ?? '')),
-            'article_image_caption' => trim((string)($_POST['article_image_caption'] ?? '')),
-            'article_paragraph_1'   => trim((string)($_POST['article_paragraph_1']   ?? '')),
-            'article_paragraph_2'   => trim((string)($_POST['article_paragraph_2']   ?? '')),
-            'article_paragraph_3'   => trim((string)($_POST['article_paragraph_3']   ?? '')),
-            'highlights'            => $_POST['highlights'] ?? [],
-            'gallery'               => $_POST['gallery']    ?? [],
-        ];
+        try {
+            $this->storiesService->saveDetailPage($storyId, $data);
+        } catch (\Exception $e) {
+            Session::setFlash('admin_error', 'Error saving detail page: ' . $e->getMessage());
+            header('Location: /cms/stories');
+            exit;
+        }
 
-        $this->storiesService->saveDetailPage($storyId, $data);
-
+        Session::setFlash('admin_success', 'Detail page saved successfully.');
         header('Location: /admin/stories');
+        exit;
+    }
+
+    public function create(): void
+    {
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
+
+        $story = [];
+        $data = [];
+        $errors = [];
+        $csrf = Csrf::token('admin_stories_create');
+
+        require __DIR__ . '/../Views/Stories/Admin/Edit.php';
+    }
+
+    public function store(): void
+    {
+        if (!AdminAuth::requireAdmin()) {
+            return;
+        }
+
+        // Stops another site from submitting this admin form.
+        if (!Csrf::validate('admin_stories_create', $_POST['_csrf'] ?? null)) {
+            Session::setFlash('admin_error', 'Invalid request. Please try again.');
+            header('Location: /cms/stories');
+            exit;
+        }
+
+        $data = $this->storiesService->prepareStoryData($_POST, $_FILES);
+        $this->validateAndSaveStory($data, 'create', 'admin_stories_create', 'Story created successfully.');
+    }
+
+    /**
+     * Validates and saves story data. Handles both create and update operations.
+     *
+     * @param array<string, mixed> $data Story data to validate and save
+     * @param string $operation 'create' or 'update'
+     * @param string $csrfToken CSRF token name for form
+     * @param string $successMessage Message to show on success
+     */
+    private function validateAndSaveStory(array $data, string $operation, string $csrfToken, string $successMessage): void
+    {
+        $storyId = (int)($_POST['story_id'] ?? 0);
+
+        try {
+            $this->storiesService->saveStoryFromForm($storyId, $data, $operation === 'create');
+        } catch (ValidationException $e) {
+            $story = $operation === 'create' ? [] : array_merge(['story_id' => $storyId], $data);
+            $errors = $e->getErrors();
+            $csrf = Csrf::token($csrfToken);
+            require __DIR__ . '/../Views/Stories/Admin/Edit.php';
+            return;
+        } catch (\Exception $e) {
+            Session::setFlash('admin_error', 'Error: ' . $e->getMessage());
+            header('Location: /cms/stories');
+            exit;
+        }
+
+        Session::setFlash('admin_success', $successMessage);
+        header('Location: /cms/stories');
         exit;
     }
 }

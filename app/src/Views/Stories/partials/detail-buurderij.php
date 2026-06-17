@@ -9,10 +9,12 @@ $gallery    = json_decode((string)($detailPage['gallery']    ?? '[]'), true);
 if (!is_array($highlights)) $highlights = [];
 if (!is_array($gallery))    $gallery    = [];
 
-$venueText = $vm->getStoryVenueText();
 $ageText   = $vm->getStoryAgeText();
 $dayText   = $vm->getStoryDayText();
 $timeText  = $vm->getStoryTimeText();
+$endTimeText = $vm->getStoryEndTimeText();
+$venueText = $vm->getStoryVenueText();
+$ticketDetailsId = $vm->getTicketDetailsId();
 
 $assets = $vm->getBuurderijAssets();
 
@@ -63,10 +65,14 @@ $gallery3 = [
     <section class="buurderij-content">
 
         <section class="buurderij-intro">
-            <h2 class="section-title section-title--accent section-title--underlined buurderij-intro-title">
-                <?= h($introTitle) ?>
-            </h2>
-            <p class="copy-text buurderij-intro-text"><?= nl2br(h($introText)) ?></p>
+            <div class="buurderij-intro-inner">
+                <h2 class="section-title section-title--accent section-title--underlined buurderij-intro-title">
+                    <?= h($introTitle) ?>
+                </h2>
+                <p class="copy-text buurderij-intro-text"><?= nl2br(h($introText)) ?></p>
+                <span>SCROLL DOWN</span>
+                <div class="buurderij-scroll-pill"></div>
+            </div>
         </section>
 
         <section class="buurderij-main-grid">
@@ -93,11 +99,7 @@ $gallery3 = [
         <section class="buurderij-bottom-grid">
 
             <div class="buurderij-contribute-card">
-                <h3 class="section-subtitle buurderij-contribute-title">Contribution (pay as you like)</h3>
-
-                <div class="section-subtitle buurderij-place-name">
-                    <?= h($venueText ?: 'Kweekcafé') ?>
-                </div>
+                <h3>Contribution (pay as you like)</h3>
 
                 <div class="buurderij-age-box">
                     <div class="buurderij-age-top">
@@ -113,50 +115,54 @@ $gallery3 = [
                 <div class="copy-text buurderij-contribute-copy">
                     Choose the amount you want to contribute.<br>
                     Your contribution supports the storytellers and future events.<br>
-                    €0 is also welcome – just reserve
+                    EUR 0 is also welcome - just reserve
                 </div>
 
                 <div class="copy-text copy-text--sm buurderij-amount-label">Suggested amounts</div>
                 <div class="buurderij-amount-grid">
-                    <button type="button">€0</button>
-                    <button type="button">€5</button>
-                    <button type="button">€10</button>
-                    <button type="button">€15</button>
-                    <button type="button">€20</button>
+                    <button type="button" class="buurderij-amount-btn active" data-contribution-amount="0">EUR 0</button>
+                    <button type="button" class="buurderij-amount-btn" data-contribution-amount="5">EUR 5</button>
+                    <button type="button" class="buurderij-amount-btn" data-contribution-amount="10">EUR 10</button>
+                    <button type="button" class="buurderij-amount-btn" data-contribution-amount="15">EUR 15</button>
+                    <button type="button" class="buurderij-amount-btn" data-contribution-amount="20">EUR 20</button>
                 </div>
 
                 <div class="copy-text copy-text--sm buurderij-custom-label">Or enter a custom amount</div>
                 <div class="buurderij-custom-input-wrap">
-                    <input type="text" value="€ 0" placeholder="€ 0">
+                    <input type="text" class="buurderij-custom-amount" value="0" placeholder="0">
                 </div>
 
                 <div class="buurderij-total-row">
                     <span class="copy-text copy-text--sm">Your contribution</span>
-                    <strong class="copy-text">€0.00</strong>
+                    <strong class="copy-text">EUR 0.00</strong>
                 </div>
 
-                <a href="/tickets" class="btn btn--primary btn--sm buurderij-reserve-btn">Reserve →</a>
+                <?php if ($ticketDetailsId > 0): ?>
+                    <button type="button" class="buurderij-reserve-btn add-to-cart-button" data-ticket-details-id="<?= $ticketDetailsId ?>" data-contribution-source="buurderij">Reserve &rsaquo;</button>
+                <?php else: ?>
+                    <a href="<?= h($vm->getTicketUrl()) ?>" class="btn btn--primary btn--sm buurderij-reserve-btn">Reserve &rsaquo;</a>
+                <?php endif; ?>
             </div>
 
-            <div class="buurderij-info-column">
-                <div class="buurderij-info-card buurderij-info-card--design">
-                    <div class="buurderij-info-top">
-                        <div class="buurderij-info-block">
-                            <strong class="section-subtitle buurderij-info-label">Venue</strong>
-                            <span class="copy-text"><?= h($venueText ?: 'Kweekcafe, Haarlem') ?></span>
+            <div class="buurderij-info-card buurderij-info-card--design">
+                <div class="buurderij-info-top">
+                    <div class="buurderij-info-block">
+                        <strong>Day</strong>
+                        <div class="buurderij-day-tabs buurderij-day-tabs-large">
+                            <span class="active"><?= h($dayText ?: 'Thursday') ?></span>
                         </div>
-
-                        <div class="buurderij-info-block">
-                            <strong class="section-subtitle buurderij-info-label">Day</strong>
-                            <div class="buurderij-day-tabs buurderij-day-tabs-large">
-                                <span class="active"><?= h($dayText ?: 'Thursday') ?></span>
-                            </div>
-                        </div>
-
-                        <div class="buurderij-info-block">
-                            <strong class="section-subtitle buurderij-info-label">Time</strong>
-                            <span class="copy-text"><?= h($timeText ?: '20:30 – 21:45') ?></span>
-                        </div>
+                    </div>
+                    <div class="buurderij-info-block">
+                        <strong>Time</strong>
+                        <span><?= h($timeText ?: '20:30') ?></span>
+                    </div>
+                    <div class="buurderij-info-block">
+                        <strong>End time</strong>
+                        <span><?= h($endTimeText ?: '21:45') ?></span>
+                    </div>
+                    <div class="buurderij-info-block">
+                        <strong>Location</strong>
+                        <span><?= h($venueText ?: 'Kweekcafe, Haarlem') ?></span>
                     </div>
                 </div>
 
@@ -175,11 +181,14 @@ $gallery3 = [
 
         </section>
 
-        <section class="buurderij-last-section">
-            <h2 class="section-title section-title--accent section-title--underlined buurderij-last-title">
-                <?= h($bottomTitle) ?>
-            </h2>
-            <p class="copy-text buurderij-last-copy"><?= nl2br(h($bottomText)) ?></p>
+        <section class="buurderij-last-grid">
+            <div class="buurderij-last-image">
+                <img src="<?= h($bottomImage) ?>" alt="Buurderij community">
+            </div>
+            <div class="buurderij-last-text">
+                <h3><?= h($bottomTitle) ?></h3>
+                <p><?= nl2br(h($bottomText)) ?></p>
+            </div>
         </section>
 
     </section>

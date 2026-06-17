@@ -1,6 +1,6 @@
 <?php
 /** @var \App\ViewModels\StoriesViewModel $vm */
-$app = (new \App\Repositories\SettingsRepository())->getAll();
+$app = $vm->appSettings;
 
 if (!function_exists('h')) {
     function h($s): string {

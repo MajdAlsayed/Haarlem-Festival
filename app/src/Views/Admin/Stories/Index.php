@@ -34,6 +34,9 @@ $bodyClass = 'admin-page';
                     <span><?= count($stories) ?> stories</span>
                 </div>
             </div>
+            <div>
+                <a href="/cms/stories/create" class="admin-btn admin-btn-primary">✨ Add Story</a>
+            </div>
         </div>
 
         <div class="story-cms-card">
@@ -134,13 +137,15 @@ $bodyClass = 'admin-page';
                                                 </a>
                                             <?php endif; ?>
 
-                                            <a
-                                                class="admin-btn admin-btn-sm admin-btn-danger"
-                                                href="/cms/stories/delete?id=<?= (int)$story['story_id'] ?>"
-                                                onclick="return confirm('Delete “<?= h(addslashes($story['name'] ?? 'this story')) ?>”? This cannot be undone.')"
-                                            >
-                                                🗑 Remove
-                                            </a>
+                                            <form method="POST" action="/cms/stories/delete" style="display:inline;">
+                                                <input type="hidden" name="_csrf" value="<?= h($csrf) ?>">
+                                                <input type="hidden" name="story_id" value="<?= (int)$story['story_id'] ?>">
+                                                <button type="submit" 
+                                                        class="admin-btn admin-btn-sm admin-btn-danger"
+                                                        onclick="return confirm('Delete \"<?= h(addslashes($story['name'] ?? 'this story')) ?>\"? This cannot be undone.')">
+                                                    🗑 Remove
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

@@ -145,11 +145,6 @@ switch ($uri) {
         else http_response_code(405);
         break;
 
-    case '/stories/venue':
-        if ($method === 'GET') (new StoriesController())->venue();
-        else http_response_code(405);
-        break;
-
     case '/stories/detail':
         if ($method === 'GET') (new StoriesController())->detail();
         else http_response_code(405);
@@ -171,9 +166,25 @@ case '/api/stories':
         }
         break;
 
+    case '/api/cart':
+        if ($method === 'GET') {
+            (new CartController())->apiGet();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
     case '/cart/add':
         if ($method === 'POST') {
             (new CartController())->add();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/api/cart/add':
+        if ($method === 'POST') {
+            (new CartController())->apiAdd();
         } else {
             http_response_code(405);
         }
@@ -187,9 +198,17 @@ case '/api/stories':
         }
         break;
 
-    case '/cart/update':
+    case '/api/cart/update':
         if ($method === 'POST') {
-            (new CartController())->update();
+            (new CartController())->apiUpdate();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/api/cart/remove':
+        if ($method === 'POST') {
+            (new CartController())->apiRemove();
         } else {
             http_response_code(405);
         }
@@ -211,6 +230,32 @@ case '/api/stories':
             http_response_code(405);
         }
         break;
+case '/admin/stories/create':
+    case '/cms/stories/create':
+    if ($method === 'GET') {
+        (new AdminStoriesController())->create();
+    } else {
+        http_response_code(405);
+    }
+    break;
+
+case '/admin/stories/store':
+    case '/cms/stories/store':
+    if ($method === 'POST') {
+        (new AdminStoriesController())->store();
+    } else {
+        http_response_code(405);
+    }
+    break;
+
+case '/admin/stories/edit':
+    case '/cms/stories/edit':
+    if ($method === 'GET') {
+        (new AdminStoriesController())->edit();
+    } else {
+        http_response_code(405);
+    }
+    break;
 
     case '/admin/stories/update':
         case '/cms/stories/update':
@@ -229,6 +274,14 @@ case '/api/stories':
             http_response_code(405);
         }
         break;
+case '/admin/stories/delete':
+    case '/cms/stories/delete':
+    if ($method === 'POST') {
+        (new AdminStoriesController())->delete();
+    } else {
+        http_response_code(405);
+    }
+    break;
 
     case '/admin/stories/detail-page':
         case '/cms/stories/detail-page':

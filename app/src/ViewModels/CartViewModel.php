@@ -6,6 +6,7 @@ use App\Models\CartItem;
 
 class CartViewModel
 {
+    // Keeps cart formatting out of the controller and view.
     public ?int $cartId;
     public int $itemCount;
     public float $total;
@@ -43,6 +44,8 @@ class CartViewModel
                     'description' => $item->description,
                     'ticket_type' => $item->ticketType,
                     'price' => round($item->price, 2),
+                    'contribution_total' => $item->contributionTotal !== null ? round($item->contributionTotal, 2) : null,
+                    'is_pay_as_you_like' => $item->isPayAsYouLike(),
                     'quantity' => $item->quantity,
                     'line_total' => round($item->getLineTotal(), 2),
                     'event_id' => $item->eventId,

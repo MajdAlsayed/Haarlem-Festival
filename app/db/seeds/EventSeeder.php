@@ -74,6 +74,12 @@ class EventSeeder extends AbstractSeed
                 'city' => 'Haarlem',
                 'capacity' => 400,
             ],
+            [
+                'name' => 'Kweekcafe',
+                'address' => 'Kleverlaan 9',
+                'city' => 'Haarlem',
+                'capacity' => 200,
+            ],
         ])->saveData();
 
         $this->table('events')->insert([
@@ -249,7 +255,7 @@ class EventSeeder extends AbstractSeed
 ],
 [
     'event_type_id' => 5,
-    'venue_id' => 3,
+    'venue_id' => 10,
     'title' => 'The Story of Buurderij Haarlem',
     'description' => 'Local community story.',
     'event_day' => 'thursday',

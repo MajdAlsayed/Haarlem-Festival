@@ -57,7 +57,7 @@ $bodyClass = 'admin-page';
             <div class="story-cms-badge">📖 <?= h($storyName) ?></div>
         </div>
 
-        <form method="post" action="/cms/stories/detail-page/save" class="admin-form admin-form--wide" id="detailForm">
+        <form method="post" action="/cms/stories/detail-page/save" class="admin-form admin-form--wide" id="detailForm" enctype="multipart/form-data">
             <input type="hidden" name="story_id" value="<?= (int)($story['story_id'] ?? 0) ?>">
 
             <section class="story-cms-card">
@@ -66,6 +66,17 @@ $bodyClass = 'admin-page';
                 </div>
                 <div class="story-cms-card__body">
                     <div class="story-cms-grid-2">
+
+                        <div class="admin-field story-cms-col-full">
+                            <label>Upload Hero Image</label>
+                            <input
+                                class="admin-input"
+                                type="file"
+                                name="hero_image_upload"
+                                accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
+                            >
+                            <span class="story-cms-hint">JPG, PNG, WebP, or GIF — max 10 MB. Leave empty to use path below.</span>
+                        </div>
 
                         <div class="admin-field story-cms-col-full">
                             <label>Hero Image <span class="story-cms-live-badge">live preview</span></label>
@@ -88,7 +99,7 @@ $bodyClass = 'admin-page';
                                 value="<?= h($detailPage['hero_image'] ?? '') ?>"
                                 placeholder="/images/Stories/details/your-hero.jpg"
                             >
-                            <span class="story-cms-hint">Path relative to your public folder.</span>
+                            <span class="story-cms-hint">Path relative to your public folder. Or upload file above.</span>
                         </div>
 
                         <div class="admin-field story-cms-col-full">
@@ -134,6 +145,17 @@ $bodyClass = 'admin-page';
                         </div>
 
                         <div class="admin-field story-cms-col-full">
+                            <label>Upload Article Image</label>
+                            <input
+                                class="admin-input"
+                                type="file"
+                                name="article_image_upload"
+                                accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
+                            >
+                            <span class="story-cms-hint">JPG, PNG, WebP, or GIF — max 10 MB. Leave empty to use path below.</span>
+                        </div>
+
+                        <div class="admin-field story-cms-col-full">
                             <label>Article Image <span class="story-cms-live-badge">live preview</span></label>
                             <div class="story-cms-preview" id="articlePreviewWrap">
                                 <?php if (!empty($detailPage['article_image'])): ?>
@@ -154,6 +176,7 @@ $bodyClass = 'admin-page';
                                 value="<?= h($detailPage['article_image'] ?? '') ?>"
                                 placeholder="/images/Stories/details/article.jpg"
                             >
+                            <span class="story-cms-hint">Or upload file above.</span>
                         </div>
 
                         <div class="admin-field story-cms-col-full">
@@ -329,40 +352,61 @@ $bodyClass = 'admin-page';
 
 <script>
 (function () {
-    document.querySelectorAll('.js-preview').forEach(input => {
-        input.addEventListener('input', () => {
-            const val = input.value.trim();
-            let imgEl = document.getElementById(input.dataset.target);
-            const emptyEl = document.getElementById(input.dataset.empty);
-            const wrap = input.closest('.admin-field')?.querySelector('.story-cms-preview');
+    var previewInputs = document.getElementsByClassName('js-preview');
+    var galleryPreviewInputs = document.getElementsByClassName('js-gallery-preview');
+    var removeButtons = document.getElementsByClassName('js-remove');
 
-            if (!wrap) return;
+    function getItems(list) {
+        return list.getElementsByClassName('repeat-item');
+    }
+
+    function bindNormalPreview(input) {
+        input.addEventListener('input', function () {
+            var val = input.value.trim();
+            var targetId = input.getAttribute('data-target');
+            var emptyId = input.getAttribute('data-empty');
+            var imgEl = document.getElementById(targetId);
+            var emptyEl = document.getElementById(emptyId);
+            var field = input.closest('.admin-field');
+            var wrap = field ? field.querySelector('.story-cms-preview') : null;
+
+            if (!wrap) {
+                return;
+            }
 
             if (val) {
                 if (!imgEl) {
                     imgEl = document.createElement('img');
-                    imgEl.id = input.dataset.target;
+                    imgEl.id = targetId;
                     wrap.appendChild(imgEl);
                 }
                 imgEl.src = val;
                 imgEl.style.display = 'block';
-                if (emptyEl) emptyEl.style.display = 'none';
+                if (emptyEl) {
+                    emptyEl.style.display = 'none';
+                }
             } else {
-                if (imgEl) imgEl.style.display = 'none';
-                if (emptyEl) emptyEl.style.display = 'block';
+                if (imgEl) {
+                    imgEl.style.display = 'none';
+                }
+                if (emptyEl) {
+                    emptyEl.style.display = 'block';
+                }
             }
         });
-    });
+    }
 
     function bindGalleryPreview(input) {
-        input.addEventListener('input', () => {
-            const val = input.value.trim();
-            const wrap = input.closest('.repeat-item');
-            if (!wrap) return;
+        input.addEventListener('input', function () {
+            var val = input.value.trim();
+            var wrap = input.closest('.repeat-item');
+            if (!wrap) {
+                return;
+            }
 
-            let img = wrap.querySelector('.gallery-preview-img');
-            let empty = wrap.querySelector('.gallery-preview-empty');
-            const previewWrap = wrap.querySelector('.gallery-preview-wrap');
+            var img = wrap.querySelector('.gallery-preview-img');
+            var empty = wrap.querySelector('.gallery-preview-empty');
+            var previewWrap = wrap.querySelector('.gallery-preview-wrap');
 
             if (val) {
                 if (!img) {
@@ -372,33 +416,45 @@ $bodyClass = 'admin-page';
                 }
                 img.src = val;
                 img.style.display = 'block';
-                if (empty) empty.style.display = 'none';
+                if (empty) {
+                    empty.style.display = 'none';
+                }
             } else {
-                if (img) img.style.display = 'none';
-                if (empty) empty.style.display = 'block';
+                if (img) {
+                    img.style.display = 'none';
+                }
+                if (empty) {
+                    empty.style.display = 'block';
+                }
             }
         });
     }
 
-    document.querySelectorAll('.js-gallery-preview').forEach(bindGalleryPreview);
-
     function renumber(list) {
-        list.querySelectorAll('.repeat-item').forEach((item, i) => {
-            const num = item.querySelector('.item-num');
-            if (num) num.textContent = i + 1;
+        var items = getItems(list);
 
-            item.querySelectorAll('[name]').forEach(el => {
-                el.name = el.name.replace(/\[\d+\]/, `[${i}]`);
-            });
-        });
+        for (var i = 0; i < items.length; i++) {
+            var num = items[i].querySelector('.item-num');
+            var fields = items[i].getElementsByTagName('*');
+
+            if (num) {
+                num.textContent = i + 1;
+            }
+
+            for (var j = 0; j < fields.length; j++) {
+                if (fields[j].getAttribute('name')) {
+                    fields[j].name = fields[j].name.replace(/\[\d+\]/, '[' + i + ']');
+                }
+            }
+        }
     }
 
     function bindRemove(btn) {
-        btn.addEventListener('click', () => {
-            const item = btn.closest('.repeat-item');
-            const list = item.closest('.story-cms-repeat-list');
+        btn.addEventListener('click', function () {
+            var item = btn.closest('.repeat-item');
+            var list = item.closest('.story-cms-repeat-list');
 
-            if (list.querySelectorAll('.repeat-item').length <= 1) {
+            if (getItems(list).length <= 1) {
                 alert('You need at least one item. Clear the fields instead of removing.');
                 return;
             }
@@ -408,13 +464,23 @@ $bodyClass = 'admin-page';
         });
     }
 
-    document.querySelectorAll('.js-remove').forEach(bindRemove);
+    for (var p = 0; p < previewInputs.length; p++) {
+        bindNormalPreview(previewInputs[p]);
+    }
 
-    document.getElementById('addHighlight').addEventListener('click', () => {
-        const list = document.getElementById('highlightsList');
-        const count = list.querySelectorAll('.repeat-item').length;
+    for (var g = 0; g < galleryPreviewInputs.length; g++) {
+        bindGalleryPreview(galleryPreviewInputs[g]);
+    }
 
-        const html = `
+    for (var r = 0; r < removeButtons.length; r++) {
+        bindRemove(removeButtons[r]);
+    }
+
+    document.getElementById('addHighlight').addEventListener('click', function () {
+        var list = document.getElementById('highlightsList');
+        var count = getItems(list).length;
+
+        var html = `
             <div class="story-cms-repeat-item repeat-item" data-type="highlight">
                 <div class="story-cms-repeat-head">
                     <span class="story-cms-repeat-label">
@@ -441,9 +507,9 @@ $bodyClass = 'admin-page';
                 </div>
             </div>`;
 
-        const temp = document.createElement('div');
+        var temp = document.createElement('div');
         temp.innerHTML = html;
-        const newItem = temp.firstElementChild;
+        var newItem = temp.firstElementChild;
 
         list.appendChild(newItem);
         bindRemove(newItem.querySelector('.js-remove'));
@@ -451,11 +517,11 @@ $bodyClass = 'admin-page';
         renumber(list);
     });
 
-    document.getElementById('addGallery').addEventListener('click', () => {
-        const list = document.getElementById('galleryList');
-        const count = list.querySelectorAll('.repeat-item').length;
+    document.getElementById('addGallery').addEventListener('click', function () {
+        var list = document.getElementById('galleryList');
+        var count = getItems(list).length;
 
-        const html = `
+        var html = `
             <div class="story-cms-repeat-item repeat-item" data-type="gallery">
                 <div class="story-cms-repeat-head">
                     <span class="story-cms-repeat-label">
@@ -488,9 +554,9 @@ $bodyClass = 'admin-page';
                 </div>
             </div>`;
 
-        const temp = document.createElement('div');
+        var temp = document.createElement('div');
         temp.innerHTML = html;
-        const newItem = temp.firstElementChild;
+        var newItem = temp.firstElementChild;
 
         list.appendChild(newItem);
         bindRemove(newItem.querySelector('.js-remove'));

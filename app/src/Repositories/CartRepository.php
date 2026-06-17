@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Core\Database;
+use App\Core\Repository;
 use App\Models\Cart;
 use App\Models\CartItem;
 use PDO;
@@ -11,14 +11,12 @@ use PDO;
  * Everything that touches `carts` and `cart_items` plus helpers the availability service needs (capacity, reserved counts).
  * Higher-level rules (who owns the cart, merge on login) live in CartService.
  */
-class CartRepository
+class CartRepository extends Repository
 {
     /** Latest open cart for this login, if any. */
     public function findActiveCartByUserId(int $userId): ?Cart
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "SELECT cart_id, user_id, status, created_at
              FROM carts
              WHERE user_id = :user_id AND status = 'active'
@@ -35,9 +33,7 @@ class CartRepository
     /** Guest carts use this after we stash `cart_id` in the session. */
     public function findActiveCartById(int $cartId): ?Cart
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "SELECT cart_id, user_id, status, created_at
              FROM carts
              WHERE cart_id = :cart_id AND status = 'active'
@@ -53,9 +49,7 @@ class CartRepository
     /** New empty cart — `user_id` null means “browser session cart”. */
     public function createCart(?int $userId): int
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "INSERT INTO carts (user_id, status, created_at)
              VALUES (:user_id, 'active', NOW())"
         );
@@ -63,15 +57,13 @@ class CartRepository
         $stmt->bindValue(':user_id', $userId, $userId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
         $stmt->execute();
 
-        return (int)$db->lastInsertId();
+        return (int)$this->db->lastInsertId();
     }
 
     /** Called when someone logs in with items still in a guest cart — points the row at their user id. */
     public function attachCartToUser(int $cartId, int $userId): void
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "UPDATE carts
              SET user_id = :user_id
              WHERE cart_id = :cart_id"
@@ -86,10 +78,8 @@ class CartRepository
     /** One line in the basket for this catalog id, if it already exists (used to merge quantities). */
     public function findCartItem(int $cartId, int $ticketDetailsId): ?array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
-            "SELECT cart_item_id, cart_id, ticket_details_id, quantity
+        $stmt = $this->db->prepare(
+            "SELECT cart_item_id, cart_id, ticket_details_id, quantity, contribution_total
              FROM cart_items
              WHERE cart_id = :cart_id AND ticket_details_id = :ticket_details_id
              LIMIT 1"
@@ -106,47 +96,57 @@ class CartRepository
     }
 
     /** Inserts a brand-new cart line (first time this ticket type is added). */
-    public function addCartItem(int $cartId, int $ticketDetailsId, int $quantity): int
+    public function addCartItem(int $cartId, int $ticketDetailsId, int $quantity, ?float $contributionTotal = null): int
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
-            "INSERT INTO cart_items (cart_id, ticket_details_id, quantity)
-             VALUES (:cart_id, :ticket_details_id, :quantity)"
+        // contribution_total stores a chosen amount instead of a fixed price.
+        $stmt = $this->db->prepare(
+            "INSERT INTO cart_items (cart_id, ticket_details_id, quantity, contribution_total)
+             VALUES (:cart_id, :ticket_details_id, :quantity, :contribution_total)"
         );
 
-        $stmt->execute([
-            'cart_id' => $cartId,
-            'ticket_details_id' => $ticketDetailsId,
-            'quantity' => $quantity,
-        ]);
+        $stmt->bindValue(':cart_id', $cartId, PDO::PARAM_INT);
+        $stmt->bindValue(':ticket_details_id', $ticketDetailsId, PDO::PARAM_INT);
+        $stmt->bindValue(':quantity', $quantity, PDO::PARAM_INT);
+        if ($contributionTotal === null) {
+            $stmt->bindValue(':contribution_total', null, PDO::PARAM_NULL);
+        } else {
+            $stmt->bindValue(':contribution_total', number_format($contributionTotal, 2, '.', ''));
+        }
+        $stmt->execute();
 
-        return (int)$db->lastInsertId();
+        return (int)$this->db->lastInsertId();
     }
 
     /** Adds more seats onto an existing line (`quantity + :delta`). */
-    public function incrementCartItem(int $cartItemId, int $quantity): void
+    public function incrementCartItem(int $cartItemId, int $quantity, ?float $contributionTotal = null): void
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        // Pay-as-you-like adds the new chosen amount to the existing line.
+        $stmt = $this->db->prepare(
             "UPDATE cart_items
-             SET quantity = quantity + :quantity
+             SET quantity = quantity + :quantity,
+                 contribution_total = CASE
+                    WHEN :contribution_total_check IS NULL THEN contribution_total
+                    ELSE COALESCE(contribution_total, 0) + :contribution_total
+                 END
              WHERE cart_item_id = :cart_item_id"
         );
 
-        $stmt->execute([
-            'quantity' => $quantity,
-            'cart_item_id' => $cartItemId,
-        ]);
+        $stmt->bindValue(':quantity', $quantity, PDO::PARAM_INT);
+        if ($contributionTotal === null) {
+            $stmt->bindValue(':contribution_total_check', null, PDO::PARAM_NULL);
+            $stmt->bindValue(':contribution_total', null, PDO::PARAM_NULL);
+        } else {
+            $stmt->bindValue(':contribution_total_check', number_format($contributionTotal, 2, '.', ''));
+            $stmt->bindValue(':contribution_total', number_format($contributionTotal, 2, '.', ''));
+        }
+        $stmt->bindValue(':cart_item_id', $cartItemId, PDO::PARAM_INT);
+        $stmt->execute();
     }
 
     /** Sets absolute quantity (used when the user types a number on /cart). */
     public function updateCartItemQuantity(int $cartItemId, int $quantity): void
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "UPDATE cart_items
              SET quantity = :quantity
              WHERE cart_item_id = :cart_item_id"
@@ -161,9 +161,7 @@ class CartRepository
     /** Removes a single line (or whole line when qty hits zero in the service). */
     public function deleteCartItem(int $cartItemId): void
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "DELETE FROM cart_items
              WHERE cart_item_id = :cart_item_id"
         );
@@ -174,9 +172,7 @@ class CartRepository
     /** Quick guard before we insert — stops typos and deleted catalog ids. */
     public function ticketDetailsExists(int $ticketDetailsId): bool
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "SELECT ticket_details_id
              FROM ticket_details
              WHERE ticket_details_id = :ticket_details_id
@@ -224,9 +220,8 @@ class CartRepository
             return [];
         }
 
-        $db = Database::getConnection();
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "SELECT td.ticket_details_id, td.ticket_type, td.session_id, td.event_id,
                     s.tickets_available AS session_cap,
                     e.seats AS event_seats
@@ -252,8 +247,7 @@ class CartRepository
      */
     private function fetchTicketDetailsCapacityRow(int $ticketDetailsId): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "SELECT td.ticket_details_id, td.ticket_type, td.session_id, td.event_id,
                     s.tickets_available AS session_cap,
                     e.seats AS event_seats
@@ -299,8 +293,7 @@ class CartRepository
     /** How many tickets of this type are currently “held” in open carts — counts toward the cap. */
     public function sumActiveCartQuantityForTicketDetails(int $ticketDetailsId): int
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "SELECT COALESCE(SUM(ci.quantity), 0)
              FROM cart_items ci
              INNER JOIN carts c ON c.cart_id = ci.cart_id AND c.status = 'active'
@@ -317,8 +310,7 @@ class CartRepository
      */
     public function sumPendingOrderQuantityForTicketDetails(int $ticketDetailsId): int
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "SELECT COALESCE(SUM(oi.quantity), 0)
              FROM order_items oi
              INNER JOIN orders o ON o.order_id = oi.order_id
@@ -335,13 +327,12 @@ class CartRepository
     /**
      * Looks up one basket line by primary key (update/remove paths).
      *
-     * @return array{cart_item_id: int, cart_id: int, ticket_details_id: int, quantity: int}|null
+     * @return array{cart_item_id: int, cart_id: int, ticket_details_id: int, quantity: int, contribution_total: ?float}|null
      */
     public function findCartItemById(int $cartItemId): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
-            "SELECT cart_item_id, cart_id, ticket_details_id, quantity
+        $stmt = $this->db->prepare(
+            "SELECT cart_item_id, cart_id, ticket_details_id, quantity, contribution_total
              FROM cart_items
              WHERE cart_item_id = :id
              LIMIT 1"
@@ -354,6 +345,7 @@ class CartRepository
             'cart_id' => (int) $row['cart_id'],
             'ticket_details_id' => (int) $row['ticket_details_id'],
             'quantity' => (int) $row['quantity'],
+            'contribution_total' => $row['contribution_total'] !== null ? (float) $row['contribution_total'] : null,
         ] : null;
     }
 
@@ -364,14 +356,13 @@ class CartRepository
      */
     public function getCartItemsDetailed(int $cartId): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "SELECT
                 ci.cart_item_id,
                 ci.cart_id,
                 ci.ticket_details_id,
                 ci.quantity,
+                ci.contribution_total,
                 td.name,
                 td.description,
                 td.ticket_type,
@@ -401,16 +392,14 @@ class CartRepository
     /** Clears every line — used after checkout converts the cart. */
     public function deleteAllItemsForCart(int $cartId): void
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare('DELETE FROM cart_items WHERE cart_id = :cid');
+        $stmt = $this->db->prepare('DELETE FROM cart_items WHERE cart_id = :cid');
         $stmt->execute(['cid' => $cartId]);
     }
 
     /** Stops the old cart from counting toward “reserved” stock once an order is placed. */
     public function markCartConverted(int $cartId): void
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             "UPDATE carts SET status = 'converted' WHERE cart_id = :cid"
         );
         $stmt->execute(['cid' => $cartId]);
@@ -439,7 +428,12 @@ class CartRepository
         $item->name = (string)$row['name'];
         $item->description = (string)$row['description'];
         $item->ticketType = (string)$row['ticket_type'];
-        $item->price = (float)$row['price'];
+        $item->contributionTotal = $row['contribution_total'] !== null ? (float)$row['contribution_total'] : null;
+        if ($item->contributionTotal !== null && $item->quantity > 0) {
+            $item->price = $item->contributionTotal / $item->quantity;
+        } else {
+            $item->price = (float)$row['price'];
+        }
         $item->eventId = isset($row['event_id']) ? (int)$row['event_id'] : null;
         $item->eventTitle = $row['event_title'] ?? null;
         $item->eventDay = $row['event_day'] ?? null;

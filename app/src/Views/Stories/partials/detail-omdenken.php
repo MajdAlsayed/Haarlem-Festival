@@ -9,16 +9,16 @@ $gallery    = json_decode((string)($detailPage['gallery']    ?? '[]'), true);
 if (!is_array($highlights)) $highlights = [];
 if (!is_array($gallery))    $gallery    = [];
 
-$venueText = $vm->getStoryVenueText();
 $ageText   = $vm->getStoryAgeText();
 $dayText   = $vm->getStoryDayText();
 $timeText  = $vm->getStoryTimeText();
 $typeText  = $vm->getStoryTypeText();
+$ticketDetailsId = $vm->getTicketDetailsId();
 
 $assets = $vm->getOmdenkenAssets();
 
 $heroImage   = ($detailPage['hero_image']         ?? '') ?: $assets['hero'];
-$heroHeading = ($detailPage['hero_heading']        ?? '') ?: 'OMDENKEN – LIVE PODCAST SESSION';
+$heroHeading = ($detailPage['hero_heading']        ?? '') ?: 'OMDENKEN - LIVE PODCAST SESSION';
 $heroSubtitle= ($detailPage['article_title']       ?? '') ?: 'Changing perspectives through real stories.';
 $heroDesc    = ($detailPage['hero_description']    ?? '') ?: 'This live podcast session invites visitors to explore how everyday challenges can be transformed into meaningful insights. Through honest conversations and personal experiences, the speakers share stories that inspire reflection, resilience, and new ways of thinking.';
 $posterImage = ($detailPage['article_image']       ?? '') ?: $assets['poster'];
@@ -55,27 +55,18 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
             </div>
 
             <div class="omdenken-event-meta">
-                <?php if ($venueText): ?>
-                    <div class="omdenken-meta-line">
-                        <span class="copy-text omdenken-meta-label">Venue:</span>
-                        <strong class="copy-text omdenken-meta-value"><?= h($venueText) ?></strong>
-                    </div>
-                <?php endif; ?>
-
                 <?php if ($ageText): ?>
                     <div class="omdenken-meta-line">
                         <span class="copy-text omdenken-meta-label">Age Group:</span>
                         <strong class="copy-text omdenken-meta-value"><?= h($ageText) ?></strong>
                     </div>
                 <?php endif; ?>
-
                 <?php if ($dayText): ?>
                     <div class="omdenken-meta-line">
                         <span class="copy-text omdenken-meta-label">Day:</span>
                         <strong class="copy-text omdenken-meta-value"><?= h($dayText) ?></strong>
                     </div>
                 <?php endif; ?>
-
                 <?php if ($timeText): ?>
                     <div class="omdenken-meta-line">
                         <span class="copy-text omdenken-meta-label">Time:</span>
@@ -90,7 +81,6 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
                 <h3 class="section-title section-title--underlined omdenken-text-title"><?= h($block1Title) ?></h3>
                 <p class="copy-text"><?= nl2br(h($block1Text)) ?></p>
             </div>
-
             <div class="omdenken-text-block omdenken-text-block-right">
                 <p class="copy-text omdenken-right-copy"><?= nl2br(h($block2Text)) ?></p>
             </div>
@@ -101,7 +91,6 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
                 <h3 class="section-title section-title--underlined  omdenken-text-title"><?= h($block3Title) ?></h3>
                 <p class="copy-text"><?= nl2br(h($block3Text)) ?></p>
             </div>
-
             <div class="omdenken-host-image-wrap">
                 <img src="<?= h($blockImg1) ?>" alt="Omdenken block image">
             </div>
@@ -115,44 +104,38 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
                     <span class="copy-text copy-text--muted"><?= h($typeText ?: 'Podcast') ?></span>
                 </div>
             </div>
-
             <div class="omdenken-player-ui">
                 <div class="player-top-row">
-                    <button type="button" class="player-mini-btn">×</button>
-                    <button type="button" class="player-mini-btn">◀</button>
-                    <button type="button" class="player-play-btn">▶</button>
-                    <button type="button" class="player-mini-btn">▶</button>
-                    <button type="button" class="player-mini-btn">↻</button>
+                    <button type="button" class="player-mini-btn">x</button>
+                    <button type="button" class="player-mini-btn">&lt;</button>
+                    <button type="button" class="player-play-btn">&gt;</button>
+                    <button type="button" class="player-mini-btn">&gt;</button>
+                    <button type="button" class="player-mini-btn">R</button>
                 </div>
-
                 <div class="player-time-row">
                     <span class="copy-text copy-text--sm copy-text--muted">0:00</span>
                     <span class="copy-text copy-text--sm copy-text--muted">4:03</span>
                 </div>
-
                 <div class="player-progress-wrap">
                     <div class="player-progress-bar">
                         <div class="player-progress-fill"></div>
                     </div>
                 </div>
-
                 <div class="player-volume-row">
                     <span>♡</span>
                     <div class="player-volume-bar">
                         <div class="player-volume-fill"></div>
                     </div>
-                    <span>🔊</span>
+                    <span>VOL</span>
                 </div>
-
                 <div class="copy-text copy-text--muted player-recent-title">Recent Podcast</div>
-
                 <div class="player-tracklist">
                     <div class="track-row active">
                         <div class="track-info">
                             <strong class="copy-text"><?= h($story['name'] ?? 'Story') ?></strong>
                             <small class="copy-text copy-text--muted"><?= h($typeText ?: 'Podcast') ?></small>
                         </div>
-                        <span class="copy-text"><?= h($timeText ?: '–') ?></span>
+                        <span class="copy-text"><?= h($timeText ?: '-') ?></span>
                     </div>
                 </div>
             </div>
@@ -160,19 +143,17 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
 
         <div class="omdenken-stats-row">
             <div class="omdenken-stat-card">
-                <div class="omdenken-stat-icon">🕒</div>
+                <div class="omdenken-stat-icon">TIME</div>
                 <div class="copy-text omdenken-stat-title">TIME</div>
                 <div class="copy-text omdenken-stat-value"><?= h($timeText ?: 'TBA') ?></div>
             </div>
-
             <div class="omdenken-stat-card">
-                <div class="omdenken-stat-icon">👥</div>
+                <div class="omdenken-stat-icon">AGE</div>
                 <div class="copy-text omdenken-stat-title">AGE</div>
                 <div class="copy-text omdenken-stat-value"><?= h($ageText ?: '16+') ?></div>
             </div>
-
             <div class="omdenken-stat-card">
-                <div class="omdenken-stat-icon">🌐</div>
+                <div class="omdenken-stat-icon">LANG</div>
                 <div class="copy-text omdenken-stat-title">LANG</div>
                 <div class="copy-text omdenken-stat-value"><?= h($vm->getStoryLanguageText() ?: 'NL') ?></div>
             </div>
@@ -184,7 +165,11 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
         </div>
 
         <div class="omdenken-ticket-row">
-            <a class="btn btn--primary btn--sm omdenken-ticket-btn" href="/tickets">BUY TICKETS</a>
+            <?php if ($ticketDetailsId > 0): ?>
+                <button type="button" class="omdenken-ticket-btn add-to-cart-button" data-ticket-details-id="<?= $ticketDetailsId ?>">BUY TICKETS</button>
+            <?php else: ?>
+                <a class="omdenken-ticket-btn btn btn--primary btn--sm" href="<?= h($vm->getTicketUrl()) ?>">BUY TICKETS</a>
+            <?php endif; ?>
         </div>
 
     </section>

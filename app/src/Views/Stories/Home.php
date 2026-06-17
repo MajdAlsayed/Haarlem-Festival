@@ -1,12 +1,16 @@
 <?php
 /** @var \App\ViewModels\StoriesViewModel $vm */
-$app = (new \App\Repositories\SettingsRepository())->getAll();
+$app = $vm->appSettings;
 
-function h($s) {
-    return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+if (!function_exists('h')) {
+    function h($s): string {
+        return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+    }
 }
 
 $featured = $vm->featured ?? [];
+$heroImages = $vm->getHomeHeroImages();
+$exploreItems = $vm->getHomeExploreItems();
 
 // Settings for the page title, styles, body class
 $pageTitle = $vm->pageTitle ?? 'Stories in Haarlem';
@@ -47,24 +51,42 @@ $breadcrumbs = [
         <div class="container">
             <div class="stories-about-banner-content">
                 <h2 class="section-title section-title--accent section-title--underlined stories-about-banner-title">
-                    The City That Speaks Through Its People
+                    <?= h($vm->settings['home_intro_heading'] ?? 'The City That Speaks Through Its People') ?>
                 </h2>
-
                 <p class="copy-text">
-                    Haarlem's rich tradition of storytelling lives in every corner of the city — from narrow cobblestone streets
-                    to centuries-old courtyards. During Stories in Haarlem, local residents, historians, and performers bring
-                    hidden tales to life through intimate sessions that reveal the city's humor, heart, and heritage.
+                    <?= h($vm->settings['home_intro_text'] ?? '') ?>
                 </p>
             </div>
+        </div>
+    </section>
+
+    <!-- What You Can Explore Section -->
+    <section class="stories-explore-section" aria-label="What you can explore">
+        <div class="stories-explore-inner">
+            <h2 class="stories-explore-title"><?= h($vm->settings['home_explore_title'] ?? 'What You Can Explore') ?></h2>
+            <div class="stories-explore-list">
+                <?php foreach ($exploreItems as $item): ?>
+                    <div class="explore-item">
+                        <h3><?= h($item['title'] ?? '') ?></h3>
+                        <p><?= h($item['description'] ?? '') ?></p>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section class="stories-events-section" aria-label="Events that tell Haarlem's story">
+        <div class="stories-events-inner">
+            <h2 class="stories-events-title"><?= h($vm->settings['home_events_title'] ?? '15 Events That Tell Haarlem\'s Story') ?></h2>
+            <p class="stories-events-subtitle"><?= h($vm->settings['home_events_subtitle'] ?? '') ?></p>
         </div>
     </section>
 
     <!-- Featured Stories Section -->
     <section class="container stories-featured" aria-label="Featured stories">
         <div class="stories-featured-header">
-            <h2 class="section-title section-title--accent section-title--underlined" >
-                Featured Stories
-            </h2>
+            <h2 class="section-title section-title--accent section-title--underlined" ><?= h($vm->settings['home_featured_heading'] ?? 'Featured Stories') ?></h2>
         </div>
 
         <div class="stories-featured-grid">
@@ -85,14 +107,16 @@ $breadcrumbs = [
                             <img src="<?= h($image) ?>" alt="<?= h($name) ?>" class="story-card-image">
                         </div>
                         <div class="story-card-body">
-                            <h3 class="story-card-title"><?= h($name) ?></h3>
-                            <?php if ($type): ?>
-                                <p class="copy-text copy-text--sm story-card-type"><?= h($type) ?></p>
-                            <?php endif; ?>
-                            <p class="copy-text copy-text--sm story-card-desc"><?= h(substr($desc, 0, 100)) ?>...</p>
-                            <?php if ($age): ?>
-                                <span class="story-card-age">Age <?= h($age) ?></span>
-                            <?php endif; ?>
+                            <div class="featured-card-info">
+                                <h3 class="story-card-title"><?= h($name) ?></h3>
+                                <?php if ($type): ?>
+                                    <p class="copy-text copy-text--sm story-card-type"><?= h($type) ?></p>
+                                <?php endif; ?>
+                                <p class="copy-text copy-text--sm story-card-desc"><?= h(substr($desc, 0, 100)) ?>...</p>
+                                <?php if ($age): ?>
+                                    <div class="story-card-age">Age <?= h($age) ?></div>
+                                <?php endif; ?>
+                            </div>
                             <a href="/stories/detail?id=<?= $storyId ?>" class="btn btn--sm btn--primary story-card-link">
                                 Read More →
                             </a>
@@ -101,9 +125,22 @@ $breadcrumbs = [
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
+    </section>
 
-        <div class="stories-featured-footer">
-            <a href="/stories/events" class="btn btn--sm btn--outline">VIEW ALL EVENTS →</a>
+    <!-- Echoes of History Section -->
+    <section class="stories-echoes-section" aria-label="Echoes of history stories">
+        <div class="stories-echoes-inner">
+            <h2 class="stories-echoes-title"><?= h($vm->settings['home_echoes_title'] ?? 'Echoes of History: Stories of') ?></h2>
+            <p class="stories-echoes-subtitle"><?= h($vm->settings['home_echoes_subtitle'] ?? '') ?></p>
+            <a href="/stories/events" class="stories-echoes-button"><?= h($vm->settings['home_echoes_button'] ?? 'View our Stories') ?></a>
+        </div>
+    </section>
+
+    <!-- About Stories Section -->
+    <section class="stories-about-section" aria-label="About Stories">
+        <div class="stories-about-inner">
+            <h2 class="stories-about-title"><?= h($vm->settings['home_about_title'] ?? 'About Stories') ?></h2>
+            <p class="stories-about-text"><?= h($vm->settings['home_about_text'] ?? '') ?></p>
         </div>
     </section>
 

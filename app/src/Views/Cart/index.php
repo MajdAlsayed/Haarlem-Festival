@@ -1,12 +1,11 @@
 <?php
 /** @var array $app */
-/** @var list<array<string,mixed>> $lines */
-/** @var float $total */
+/** @var \App\ViewModels\CartViewModel $vm */
+/** @var string $cartCsrf */
 /** @var ?string $success */
-use App\Core\Csrf;
+/** @var ?string $error */
 
-$h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
-$cartCsrf = Csrf::peek('cart') ?? Csrf::token('cart');
+$loggedIn = !empty($_SESSION['auth']['user_id'] ?? null);
 
 // Settings for the page title, styles, body class
 $pageTitle = 'Cart — ' . ($app['site_name'] ?? 'Haarlem Festival');
@@ -14,8 +13,8 @@ $pageStyles = ['/css/pages/cart.css'];
 $bodyClass = 'cart-page';
 
 $breadcrumbs = [
-        ['label' => 'Home', 'url' => '/'],
-        ['label' => 'Cart', 'url' => null],
+    ['label' => 'Home', 'url' => '/'],
+    ['label' => 'Cart', 'url' => null],
 ];
 ?>
 <!DOCTYPE html>
@@ -31,32 +30,38 @@ $breadcrumbs = [
 <main class="cart-main container">
     <h1 class="section-title section-title--accent section-title--underlined cart-title">Your cart</h1>
 
-    <?php if (!empty($success)): ?>
-        <p class="copy-text cart-flash-success"><?= $h($success) ?></p>
+    <?php if ($success): ?>
+        <p class="copy-text cart-flash-success"><?= htmlspecialchars((string)$success, ENT_QUOTES, 'UTF-8') ?></p>
     <?php endif; ?>
 
-    <?php if ($lines === []): ?>
+    <?php if ($error): ?>
+        <p class="cart-flash-error"><?= htmlspecialchars((string)$error, ENT_QUOTES, 'UTF-8') ?></p>
+    <?php endif; ?>
+
+    <?php if ($vm->items === []): ?>
         <p class="copy-text cart-empty">No tickets yet. <a href="/tickets">Browse tickets</a></p>
     <?php else: ?>
         <div class="cart-lines">
-            <?php foreach ($lines as $line): ?>
+            <?php foreach ($vm->items as $item): ?>
                 <div class="festival-card cart-line">
-                    <div class="cart-line__content">
+                    <<div class="cart-line__content">
                         <div>
-                            <strong class="section-subtitle cart-line__title"><?= $h($line['name']) ?></strong>
+                            <strong class="section-subtitle cart-line__title"><?= htmlspecialchars((string)$item->name, ENT_QUOTES, 'UTF-8') ?></strong>
                             <p class="copy-text copy-text--sm copy-text--muted cart-line__meta">
-                                Qty <?= (int) $line['qty'] ?> × €<?= $h(number_format((float) $line['unit'], 2)) ?>
+                                Quantity <?= (int)$item->quantity ?>
+                                <?php if ($item->isPayAsYouLike()): ?>
+                                    <br>Pay as you like contribution: EUR <?= htmlspecialchars(number_format($item->getLineTotal(), 2), ENT_QUOTES, 'UTF-8') ?> total
+                                <?php else: ?>
+                                    x EUR <?= htmlspecialchars(number_format($item->price, 2), ENT_QUOTES, 'UTF-8') ?>
+                                <?php endif; ?>
                             </p>
                         </div>
 
                         <div class="cart-line__actions">
-                            <span class="section-subtitle cart-line__price">
-                                €<?= $h(number_format((float) $line['line'], 2)) ?>
-                            </span>
-
+                            <span class="section-subtitle cart-line__price">EUR <?= htmlspecialchars(number_format($item->getLineTotal(), 2), ENT_QUOTES, 'UTF-8') ?></span>
                             <form method="post" action="/cart/remove">
-                                <input type="hidden" name="cart_item_id" value="<?= (int) $line['cart_item_id'] ?>">
-                                <input type="hidden" name="_csrf" value="<?= $h($cartCsrf) ?>">
+                                <input type="hidden" name="cart_item_id" value="<?= (int)$item->cartItemId ?>">
+                                <input type="hidden" name="_csrf" value="<?= htmlspecialchars((string)$cartCsrf, ENT_QUOTES, 'UTF-8') ?>">
                                 <button type="submit" class="btn btn--light btn--sm">Remove</button>
                             </form>
                         </div>
@@ -66,12 +71,8 @@ $breadcrumbs = [
         </div>
 
         <p class="section-subtitle cart-total">
-            Total: €<?= $h(number_format($total, 2)) ?>
+            Total: EUR <?= htmlspecialchars(number_format($vm->total, 2), ENT_QUOTES, 'UTF-8') ?>
         </p>
-
-        <?php
-        $loggedIn = !empty($_SESSION['auth']['user_id'] ?? null);
-        ?>
 
         <?php if ($loggedIn): ?>
             <p class="cart-action">
@@ -82,6 +83,7 @@ $breadcrumbs = [
                 <a href="/login?return=/checkout">Log in</a> to complete your purchase.
             </p>
         <?php endif; ?>
+
 
         <p class="copy-text copy-text--sm cart-continue">
             <a href="/tickets">Continue shopping</a>
