@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
+use App\Exceptions\AppException;
+use App\Exceptions\NotFoundException;
+use App\Repositories\SettingsRepository;
 use App\Repositories\StoriesRepository;
 use App\Repositories\StoriesSettingsRepository;
 use App\Services\StoriesService;
 use App\ViewModels\StoriesViewModel;
-use App\Exceptions\NotFoundException;
 
 class StoriesController
 {
@@ -19,12 +23,16 @@ class StoriesController
      * @var StoriesSettingsRepository Repository for stories settings
      */
     private StoriesSettingsRepository $settingsRepo;
+    private SettingsRepository $appSettingsRepo;
 
-    public function __construct()
-    {
-        // Using a Service to keep business logic separate
-        $this->storiesService = new StoriesService(new StoriesRepository());
-        $this->settingsRepo = new StoriesSettingsRepository();
+    public function __construct(
+        ?StoriesService $storiesService = null,
+        ?StoriesSettingsRepository $settingsRepo = null,
+        ?SettingsRepository $appSettingsRepo = null
+    ) {
+        $this->storiesService = $storiesService ?? new StoriesService(new StoriesRepository());
+        $this->settingsRepo = $settingsRepo ?? new StoriesSettingsRepository();
+        $this->appSettingsRepo = $appSettingsRepo ?? new SettingsRepository();
     }
 
     /**
@@ -33,20 +41,14 @@ class StoriesController
      */
     public function home(): void
     {
-        // Get first 3 stories for featured cards on home page
-        $allStories = $this->storiesService->getStoriesHomeData('all')['stories'] ?? [];
-        $featured = array_slice($allStories, 0, 3);
-        
-        // Fetch settings from database
-        $settings = $this->settingsRepo->getAll();
-        
-        $data = [
-            'featured' => $featured,
-            'pageTitle' => 'Stories in Haarlem',
-            'settings' => $settings,
-        ];
-        $vm = new StoriesViewModel($data, 'all');
-        require __DIR__ . '/../Views/Stories/Home.php';
+        try {
+            $data = $this->addCommonPageData($this->storiesService->getStoriesHomePageData());
+
+            $vm = new StoriesViewModel($data, 'all');
+            require __DIR__ . '/../Views/Stories/Home.php';
+        } catch (\Exception $e) {
+            $this->handleControllerError($e, 'Unable to load stories home page.');
+        }
     }
 
     /**
@@ -55,48 +57,44 @@ class StoriesController
      */
     public function events(): void
     {
-        // Get the day filter from user
-        $day  = $this->normalizeDay($_GET['day'] ?? 'all');
-        
-        // Fetch stories and prepare for display
-        $data = $this->storiesService->getStoriesHomeData($day);
-        $data['pageTitle'] = 'Stories in Haarlem';
-        
-        // Fetch settings from database
-        $settings = $this->settingsRepo->getAll();
-        $data['settings'] = $settings;
-        
-        $vm = new StoriesViewModel($data, $day);
-        require __DIR__ . '/../Views/Stories/Events.php';
+        try {
+            $data = $this->addCommonPageData(
+                $this->storiesService->getStoriesEventsPageData((string)($_GET['day'] ?? 'all'))
+            );
+            $day = $data['selectedDay'];
+            $vm = new StoriesViewModel($data, $day);
+
+            require __DIR__ . '/../Views/Stories/Events.php';
+        } catch (\Exception $e) {
+            $this->handleControllerError($e, 'Unable to load stories events page.');
+        }
     }
 
     /**
      * Display single story detail page
      * @return void
-     * @throws NotFoundException If story ID is invalid or story not found
      */
     public function detail(): void
     {
-        $id = filter_var($_GET['id'] ?? 0, FILTER_VALIDATE_INT, [
-            'options' => ['min_range' => 1],
-        ]);
+        try {
+            $id = $this->getStoryIdFromRequest();
 
-        if ($id === false || $id === 0) {
-            throw new NotFoundException('Invalid or missing story ID.');
+            if ($id === null) {
+                throw new NotFoundException('Invalid or missing story ID.');
+            }
+
+            $data = $this->storiesService->getStoryDetailData($id);
+            $data['pageTitle'] = $data['story']['name'] ?? 'Story Details';
+            $data = $this->addCommonPageData($data);
+            $vm = new StoriesViewModel($data, 'all');
+
+            require __DIR__ . '/../Views/Stories/Detail.php';
+        } catch (NotFoundException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            $this->handleControllerError($e, 'Unable to load story detail page.');
         }
-
-        $data = $this->storiesService->getStoryDetailData((int)$id);
-
-        if (empty($data['story'])) {
-            throw new NotFoundException('Story not found.');
-        }
-
-        $data['pageTitle'] = $data['story']['name'] ?? 'Story Details';
-        $vm = new StoriesViewModel($data, 'all');
-
-        require __DIR__ . '/../Views/Stories/Detail.php';
     }
-
 
     /**
      * Provide stories data as JSON API endpoint
@@ -104,51 +102,62 @@ class StoriesController
      */
     public function apiStories(): void
     {
-        $day  = $this->normalizeDay($_GET['day'] ?? 'all');
-        $data = $this->storiesService->getStoriesHomeData($day);
+        try {
+            $data = $this->storiesService->getStoriesApiData((string)($_GET['day'] ?? 'all'));
 
-        $stories = $data['stories'] ?? [];
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            exit;
+        } catch (\Exception $e) {
+            $this->handleApiError($e, 'Unable to load stories.');
+        }
+    }
 
-        $output = array_map(function (array $s): array {
-            return [
-                'story_id'    => (int)($s['story_id']   ?? 0),
-                'ticket_details_id' => (int)($s['ticket_details_id'] ?? 0),
-                'name'        => $s['story_name']  ?? $s['name']       ?? '',
-                'description' => $s['description'] ?? '',
-                'image_path'  => $s['image_path']  ?? '',
-                'story_type'  => $s['story_type']  ?? '',
-                'age'         => $s['age']         ?? '',
-                'language'    => $s['language']    ?? '',
-                'template'    => $s['template']    ?? 'generic',
-                'audience'    => $s['audience']    ?? '',
-                'event_day'   => $s['event_day']   ?? '',
-                'start_time'  => $s['start_time']  ?? '',
-            ];
-        }, $stories);
+    private function addCommonPageData(array $data): array
+    {
+        $data['pageTitle'] = $data['pageTitle'] ?? 'Stories in Haarlem';
+        $data['settings'] = $data['settings'] ?? $this->settingsRepo->getAll();
+        $data['appSettings'] = $data['appSettings'] ?? $this->appSettingsRepo->getAll();
 
+        return $data;
+    }
+
+    private function getStoryIdFromRequest(): ?int
+    {
+        $id = filter_var($_GET['id'] ?? 0, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+
+        return $id === false || $id === 0 ? null : (int)$id;
+    }
+
+    private function handleControllerError(\Exception $e, string $message): void
+    {
+        error_log($message . ' ' . $e->getMessage());
+
+        throw new AppException($message, 0, $e);
+    }
+
+    private function handleApiError(\Exception $e, string $message): void
+    {
+        error_log($message . ' ' . $e->getMessage());
+        $this->clearOutputBuffer();
+
+        http_response_code(500);
         header('Content-Type: application/json; charset=utf-8');
-        
+
         echo json_encode([
-            'success' => true,
-            'day'     => $day,
-            'count'   => count($output),
-            'stories' => $output,
+            'success' => false,
+            'message' => $message,
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
 
-     /**
-     * @var array Allowed day values for filtering
-     */
-    private const ALLOWED_DAYS = ['all', 'thursday', 'friday', 'saturday', 'sunday'];
-
-
-    /**
-     * Normalize and validate day input
-     */
-    private function normalizeDay(string $input): string
+    private function clearOutputBuffer(): void
     {
-        $day = strtolower(trim($input));
-        return in_array($day, self::ALLOWED_DAYS, true) ? $day : 'all';
+        if (ob_get_length() !== false && ob_get_length() > 0) {
+            ob_clean();
+        }
     }
+
 }

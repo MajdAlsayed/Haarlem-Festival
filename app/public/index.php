@@ -153,9 +153,25 @@ case '/api/stories':
         }
         break;
 
+    case '/api/cart':
+        if ($method === 'GET') {
+            (new CartController())->apiGet();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
     case '/cart/add':
         if ($method === 'POST') {
             (new CartController())->add();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/api/cart/add':
+        if ($method === 'POST') {
+            (new CartController())->apiAdd();
         } else {
             http_response_code(405);
         }
@@ -169,9 +185,17 @@ case '/api/stories':
         }
         break;
 
-    case '/cart/update':
+    case '/api/cart/update':
         if ($method === 'POST') {
-            (new CartController())->update();
+            (new CartController())->apiUpdate();
+        } else {
+            http_response_code(405);
+        }
+        break;
+
+    case '/api/cart/remove':
+        if ($method === 'POST') {
+            (new CartController())->apiRemove();
         } else {
             http_response_code(405);
         }

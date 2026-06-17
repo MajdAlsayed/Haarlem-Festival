@@ -16,6 +16,7 @@ class CartItem
     public string $description;
     public string $ticketType;
     public float $price;
+    public ?float $contributionTotal = null;
 
     public ?int $eventId = null;
     public ?string $eventTitle = null;
@@ -25,6 +26,16 @@ class CartItem
     /** Unit price × quantity — what this line adds to the cart total. */
     public function getLineTotal(): float
     {
+        // Pay-as-you-like stores the chosen total instead of using a fixed ticket price.
+        if ($this->contributionTotal !== null) {
+            return $this->contributionTotal;
+        }
+
         return $this->price * $this->quantity;
+    }
+
+    public function isPayAsYouLike(): bool
+    {
+        return $this->contributionTotal !== null;
     }
 }

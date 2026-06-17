@@ -1,6 +1,6 @@
 <?php
 /** @var \App\ViewModels\StoriesViewModel $vm */
-$app = (new \App\Repositories\SettingsRepository())->getAll();
+$app = $vm->appSettings;
 
 if (!function_exists('h')) {
     function h($s): string {
@@ -27,6 +27,7 @@ $template   = $vm->getTemplate(); // 'omdenken' | 'buurderij' | 'generic'
 
 <main class="detail-page">
 
+    <?php if ($template === 'generic'): ?>
     <nav class="stories-breadcrumb" aria-label="Breadcrumb">
         <div class="stories-breadcrumb-inner">
             <a href="/" class="stories-breadcrumb-link">HOME</a>
@@ -41,6 +42,7 @@ $template   = $vm->getTemplate(); // 'omdenken' | 'buurderij' | 'generic'
             </span>
         </div>
     </nav>
+    <?php endif; ?>
 
     <?php if (!$story): ?>
 

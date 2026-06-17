@@ -1,28 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\ViewModels;
 
 class StoriesViewModel
 {
+    // Keeps story display formatting out of the controller and view.
     /**
      * @var string Currently selected day filter (all, thursday, friday, saturday, sunday)
      */
     public string $selectedDay     = 'all';
 
     /**
-     * @var array Array of story records with metadata
-     */
-    public array  $stories         = [];
-
-    /**
      * @var array Featured/highlighted stories for display
      */
     public array  $featured        = [];
-
-    /**
-     * @var array Schedule grouped by language (NL, ENG) and day
-     */
-    public array  $schedule        = ['NL' => [], 'ENG' => []];
 
     /**
      * @var string Page title for the current view
@@ -45,6 +38,11 @@ class StoriesViewModel
     public array  $settings        = [];
 
     /**
+     * @var array Global app settings from site_settings/config
+     */
+    public array $appSettings = [];
+
+    /**
      * Constructor for StoriesViewModel
      * Uses isset() and empty() for explicit data validation.
      * @param array $data The data array containing story information
@@ -55,14 +53,97 @@ class StoriesViewModel
         // Validate and assign selectedDay
         $this->selectedDay     = !empty($selectedDay) ? $selectedDay : 'all';
         
-        // Validate and assign stories data using isset
-        $this->stories         = isset($data['stories']) && is_array($data['stories']) ? $data['stories'] : [];
         $this->featured        = isset($data['featured']) && is_array($data['featured']) ? $data['featured'] : [];
-        $this->schedule        = isset($data['schedule']) && is_array($data['schedule']) ? $data['schedule'] : ['NL' => [], 'ENG' => []];
         $this->pageTitle       = isset($data['pageTitle']) && !empty($data['pageTitle']) ? $data['pageTitle'] : 'Stories';
         $this->story           = isset($data['story']) && is_array($data['story']) ? $data['story'] : null;
         $this->detailPage      = isset($data['detailPage']) && is_array($data['detailPage']) ? $data['detailPage'] : null;
         $this->settings        = isset($data['settings']) && is_array($data['settings']) ? $data['settings'] : [];
+        $this->appSettings     = isset($data['appSettings']) && is_array($data['appSettings']) ? $data['appSettings'] : [];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getHomeHeroImages(): array
+    {
+        return array_values(array_filter([
+            $this->normalizeStoryImagePath($this->settings['hero_image_1'] ?? ''),
+            $this->normalizeStoryImagePath($this->settings['hero_image_2'] ?? ''),
+            $this->normalizeStoryImagePath($this->settings['hero_image_3'] ?? ''),
+            $this->normalizeStoryImagePath($this->settings['hero_image_4'] ?? ''),
+        ]));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getEventsHeroImages(): array
+    {
+        return array_values(array_filter([
+            $this->normalizeStoryImagePath($this->settings['events_hero_image_1'] ?? ''),
+            $this->normalizeStoryImagePath($this->settings['events_hero_image_2'] ?? ''),
+        ]));
+    }
+
+    /**
+     * @return array<int, array<string, string>>
+     */
+    public function getHomeExploreItems(): array
+    {
+        $decoded = json_decode((string)($this->settings['home_explore_items'] ?? '[]'), true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    public function getDetailHighlights(): array
+    {
+        return $this->decodeDetailJson('highlights');
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    public function getDetailGallery(): array
+    {
+        return $this->decodeDetailJson('gallery');
+    }
+
+    /**
+     * @return array<int, array{name:string,lat:float,lng:float,label:string}>
+     */
+    public function getEventsMapLocations(): array
+    {
+        $decoded = json_decode((string)($this->settings['events_map_locations'] ?? '[]'), true);
+
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        $locations = [];
+        foreach ($decoded as $location) {
+            if (!is_array($location)) {
+                continue;
+            }
+
+            $name = trim((string)($location['name'] ?? ''));
+            $label = trim((string)($location['label'] ?? ''));
+
+            if ($name === '' || !is_numeric($location['lat'] ?? null) || !is_numeric($location['lng'] ?? null)) {
+                continue;
+            }
+
+            $locations[] = [
+                'name' => $name,
+                'lat' => (float)$location['lat'],
+                'lng' => (float)$location['lng'],
+                'label' => $label,
+            ];
+        }
+
+        return $locations;
     }
 
     /**
@@ -76,13 +157,23 @@ class StoriesViewModel
         }
         
         $template = strtolower(trim((string)$this->story['template']));
+
+        if ($template === '' || $template === 'generic') {
+            $slug = strtolower(trim((string)($this->story['slug'] ?? '')));
+
+            if ($slug === 'omdenken-podcast') {
+                return 'omdenken';
+            }
+
+            if ($slug === 'the-story-of-buurderij-haarlem') {
+                return 'buurderij';
+            }
+        }
         
         return in_array($template, ['omdenken', 'buurderij', 'generic'], true)
             ? $template
             : 'generic';
     }
-
-
 
     /**
      * Check if a specific day is currently active
@@ -93,21 +184,6 @@ class StoriesViewModel
     {
         return strtolower($this->selectedDay) === strtolower($day);
     }
-
-
-    /**
-     * Get hero images for stories landing page
-     * @return array Array of hero image paths
-     */
-    public function getStoriesHeroImages(): array
-    {
-        return [
-            '/images/Stories/stories-home-image-main1.png',
-            '/images/Stories/stories-home-image-main2.jpg',
-            '/images/Stories/stories-home-image-main3.jpg',
-        ];
-    }
-
 
     /**
      * Get capitalized event day text
@@ -140,7 +216,21 @@ class StoriesViewModel
             return '';
         }
         
-        return (string)$this->story['start_time'];
+        return $this->formatTime((string)$this->story['start_time']);
+    }
+
+    /**
+     * Get story end time text
+     *
+     * @return string End time or empty string
+     */
+    public function getStoryEndTimeText(): string
+    {
+        if (!isset($this->story) || empty($this->story) || !isset($this->story['end_time'])) {
+            return '';
+        }
+
+        return $this->formatTime((string)$this->story['end_time']);
     }
 
     /**
@@ -178,6 +268,68 @@ class StoriesViewModel
     }
 
     /**
+     * Get venue display text for the story
+     *
+     * @return string Venue name and city or empty string
+     */
+    public function getStoryVenueText(): string
+    {
+        if (!isset($this->story) || empty($this->story)) {
+            return '';
+        }
+
+        $venue = trim((string)($this->story['venue_name'] ?? ''));
+        $city = trim((string)($this->story['venue_city'] ?? ''));
+
+        if ($venue === '') {
+            return '';
+        }
+
+        return $city !== '' ? $venue . ', ' . $city : $venue;
+    }
+
+    /**
+     * Get venue address from the linked database venue.
+     *
+     * @return string Venue address and city or empty string
+     */
+    public function getStoryVenueAddressText(): string
+    {
+        if (!isset($this->story) || empty($this->story)) {
+            return '';
+        }
+
+        $address = trim((string)($this->story['venue_address'] ?? ''));
+        $city = trim((string)($this->story['venue_city'] ?? ''));
+
+        if ($address === '') {
+            return $city;
+        }
+
+        return $city !== '' ? $address . ', ' . $city : $address;
+    }
+
+    /**
+     * Google Maps embed URL based on database venue data.
+     *
+     * @return string Map embed URL or empty string
+     */
+    public function getStoryVenueMapUrl(): string
+    {
+        $query = $this->getStoryVenueAddressText();
+
+        if ($query === '') {
+            $query = $this->getStoryVenueText();
+        }
+
+        if ($query === '') {
+            return '';
+        }
+
+        return 'https://www.google.com/maps?q=' . rawurlencode($query) . '&output=embed';
+    }
+
+    /**
      * Get story type/category text
      * 
      * Returns the type/category of this story.
@@ -195,80 +347,6 @@ class StoriesViewModel
     }
 
     /**
-     * Get target audience text for the story
-     * 
-     * Returns the target audience category for this story.
-     * Uses isset() and empty() validation.
-     *
-     * @return string Audience or empty string
-     */
-    public function getStoryAudienceText(): string
-    {
-        if (!isset($this->story) || empty($this->story) || !isset($this->story['audience'])) {
-            return '';
-        }
-        
-        return (string)$this->story['audience'];
-    }
-
-    /**
-     * Get story description text
-
-     * @return string Story description or empty string
-     */
-    public function getStoryDescriptionText(): string
-    {
-        if (!isset($this->story) || empty($this->story) || !isset($this->story['description'])) 
-        {
-            return '';
-        }
-        
-        return (string)$this->story['description'];
-    }
-
-    /**
-     * Get hero image path for the story
-     * @return string Story hero image path
-     */
-    public function getStoryHeroImage(): string
-    {
-        if (!isset($this->story) || empty($this->story) || !isset($this->story['image_path'])) {
-            return '/images/Stories/cards/default.jpg';
-        }
-        
-        return (string)$this->story['image_path'];
-    }
-
-    /**
-     * Get assets for "Omdenken" template story
-     * @return array Associative array of Omdenken template images
-     */
-    public function getOmdenkenAssets(): array
-    {
-        return [
-            'hero'   => '/images/Stories/details/omdenken-hero.jpg',
-            'block1' => '/images/Stories/details/omdenken2.jpg',
-            'block2' => '/images/Stories/details/omdenken3.jpg',
-            'poster' => '/images/Stories/details/omdenken1.jpg',
-        ];
-    }
-
-    /**
-     * Get assets for "Buurderij" template story
-     * @return array Associative array of Buurderij template images
-     */
-    public function getBuurderijAssets(): array
-    {
-        return [
-            'hero'     => '/images/Stories/details/Kweekcafehero.jpg',
-            'main'     => '/images/Stories/details/Kweekcafe1.jpg',
-            'main2'    => '/images/Stories/details/Kweekcafe2.jpg',
-            'gallery1' => '/images/Stories/details/Kweekcafeg1.jpg',
-            'gallery2' => '/images/Stories/details/Kweekcafeg2.jpg',
-            'gallery3' => '/images/Stories/details/Kweekcafeg3.jpg',
-        ];
-    }
-        /**
      * Get ticket purchase URL with event context
      * 
      * Generates ticket page URL with event_id parameter if available.
@@ -292,5 +370,82 @@ class StoriesViewModel
         }
         
         return '/tickets';
+    }
+
+    public function getTicketDetailsId(): int
+    {
+        if (!isset($this->story) || empty($this->story)) {
+            return 0;
+        }
+
+        return (int)($this->story['ticket_details_id'] ?? 0);
+    }
+
+    /**
+     * Get assets for the Omdenken detail template.
+     *
+     * @return array<string, string>
+     */
+    public function getOmdenkenAssets(): array
+    {
+        return [
+            'hero'   => '/images/Stories/details/omdenken-hero.jpg',
+            'block1' => '/images/Stories/details/omdenken2.jpg',
+            'block2' => '/images/Stories/details/omdenken3.jpg',
+            'poster' => '/images/Stories/details/omdenken1.jpg',
+        ];
+    }
+
+    /**
+     * Get assets for the Buurderij detail template.
+     *
+     * @return array<string, string>
+     */
+    public function getBuurderijAssets(): array
+    {
+        return [
+            'hero'     => '/images/Stories/details/Kweekcafehero.jpg',
+            'main'     => '/images/Stories/details/Kweekcafe1.jpg',
+            'main2'    => '/images/Stories/details/Kweekcafe2.jpg',
+            'gallery1' => '/images/Stories/details/Kweekcafeg1.jpg',
+            'gallery2' => '/images/Stories/details/Kweekcafeg2.jpg',
+            'gallery3' => '/images/Stories/details/Kweekcafeg3.jpg',
+        ];
+    }
+
+    private function formatTime(string $time): string
+    {
+        $time = trim($time);
+
+        if (preg_match('/^\d{2}:\d{2}/', $time, $matches)) {
+            return $matches[0];
+        }
+
+        return $time;
+    }
+
+    private function normalizeStoryImagePath(string $path): string
+    {
+        $path = trim($path);
+
+        if ($path === '') {
+            return '';
+        }
+
+        return str_starts_with($path, '/') ? $path : '/images/Stories/' . $path;
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    private function decodeDetailJson(string $key): array
+    {
+        if (!is_array($this->detailPage)) {
+            return [];
+        }
+
+        $decoded = json_decode((string)($this->detailPage[$key] ?? '[]'), true);
+
+        return is_array($decoded) ? $decoded : [];
     }
 }

@@ -15,7 +15,7 @@ final class StoriesSeeder extends AbstractSeed
     {
         // Get all events from database
         $events = $this->fetchAll("
-            SELECT event_id, venue_id, title, event_day
+            SELECT event_id, venue_id, title, event_day, start_time, end_time
             FROM events
             WHERE event_type_id = 5
         ");
@@ -272,10 +272,13 @@ final class StoriesSeeder extends AbstractSeed
             $eventId  = (int)$event['event_id'];
             $venueId  = (int)$event['venue_id'];
             $template = $pdo->quote((string)($r['template'] ?? 'generic'));
+            $eventDay = $pdo->quote((string)($event['event_day'] ?? ''));
+            $startTime = $pdo->quote((string)($event['start_time'] ?? ''));
+            $endTime = $pdo->quote((string)($event['end_time'] ?? ''));
 
             $this->execute("
                 INSERT INTO stories
-                    (name, slug, description, image_path, story_type, age, language, template, venue_id, event_id)
+                    (name, slug, description, image_path, story_type, age, language, template, venue_id, event_id, event_day, start_time, end_time)
                 VALUES (
                     " . $pdo->quote(trim((string)$r['name'])) . ",
                     " . $pdo->quote($slug) . ",
@@ -286,7 +289,10 @@ final class StoriesSeeder extends AbstractSeed
                     " . $pdo->quote((string)$r['language']) . ",
                     {$template},
                     {$venueId},
-                    {$eventId}
+                    {$eventId},
+                    {$eventDay},
+                    {$startTime},
+                    {$endTime}
                 )
             ");
 

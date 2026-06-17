@@ -1,27 +1,16 @@
 <?php
 /** @var \App\ViewModels\StoriesViewModel $vm */
-$app = (new \App\Repositories\SettingsRepository())->getAll();
+$app = $vm->appSettings;
 
-function h($s) {
-    return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+if (!function_exists('h')) {
+    function h($s): string {
+        return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+    }
 }
 
 $featured = $vm->featured ?? [];
-$heroImages = [
-    $vm->settings['hero_image_1'] ?? '/images/Stories/stories-home-image-main1.png',
-    $vm->settings['hero_image_2'] ?? '/images/Stories/stories-home-image-main2.jpg',
-    $vm->settings['hero_image_3'] ?? '/images/Stories/stories-home-image-main3.jpg',
-    $vm->settings['hero_image_4'] ?? '/images/Stories/stories-home-image-main4.jpeg',
-];
-
-$heroImages = array_map(static function ($path): string {
-    $path = trim((string)$path);
-    if ($path === '') {
-        return '/images/Stories/stories-home-image-main1.png';
-    }
-
-    return str_starts_with($path, '/') ? $path : '/images/Stories/' . $path;
-}, $heroImages);
+$heroImages = $vm->getHomeHeroImages();
+$exploreItems = $vm->getHomeExploreItems();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,7 +36,7 @@ $heroImages = array_map(static function ($path): string {
         <?php endforeach; ?>
         <div class="hero-overlay">
             <h1><?= h($vm->settings['home_hero_heading'] ?? 'Welcome to Stories In Haarlem') ?></h1>
-            <p><?= h($vm->settings['home_hero_tagline'] ?? 'Experience Haarlem Through Stories – Past, Present & Future.') ?></p>
+            <p><?= h($vm->settings['home_hero_tagline'] ?? '') ?></p>
         </div>
     </section>
 
@@ -65,7 +54,7 @@ $heroImages = array_map(static function ($path): string {
         <div class="stories-heading-inner">
             <h2 class="stories-heading-title"><?= h($vm->settings['home_intro_heading'] ?? 'The City That Speaks Through Its People') ?></h2>
             <p class="stories-heading-text">
-                <?= h($vm->settings['home_intro_text'] ?? 'Haarlem\'s rich tradition of storytelling lives in every corner of the city — from narrow cobblestone streets to centuries-old courtyards. During Stories in Haarlem, local residents, historians, and performers bring hidden tales to life through intimate sessions that reveal the city\'s humor, heart, and heritage.') ?>
+                <?= h($vm->settings['home_intro_text'] ?? '') ?>
             </p>
         </div>
     </section>
@@ -75,10 +64,6 @@ $heroImages = array_map(static function ($path): string {
         <div class="stories-explore-inner">
             <h2 class="stories-explore-title"><?= h($vm->settings['home_explore_title'] ?? 'What You Can Explore') ?></h2>
             <div class="stories-explore-list">
-                <?php
-                $exploreItems = !empty($vm->settings['home_explore_items']) ? json_decode($vm->settings['home_explore_items'], true) : [];
-                if (!is_array($exploreItems)) $exploreItems = [];
-                ?>
                 <?php foreach ($exploreItems as $item): ?>
                     <div class="explore-item">
                         <h3><?= h($item['title'] ?? '') ?></h3>
@@ -93,7 +78,7 @@ $heroImages = array_map(static function ($path): string {
     <section class="stories-events-section" aria-label="Events that tell Haarlem's story">
         <div class="stories-events-inner">
             <h2 class="stories-events-title"><?= h($vm->settings['home_events_title'] ?? '15 Events That Tell Haarlem\'s Story') ?></h2>
-            <p class="stories-events-subtitle"><?= h($vm->settings['home_events_subtitle'] ?? 'From grand churches to hidden courtyards, each landmark showcases Haarlem\'s transformation from medieval town to cultural treasure.') ?></p>
+            <p class="stories-events-subtitle"><?= h($vm->settings['home_events_subtitle'] ?? '') ?></p>
         </div>
     </section>
 
@@ -145,7 +130,7 @@ $heroImages = array_map(static function ($path): string {
     <section class="stories-echoes-section" aria-label="Echoes of history stories">
         <div class="stories-echoes-inner">
             <h2 class="stories-echoes-title"><?= h($vm->settings['home_echoes_title'] ?? 'Echoes of History: Stories of') ?></h2>
-            <p class="stories-echoes-subtitle"><?= h($vm->settings['home_echoes_subtitle'] ?? 'Explore the rich narratives woven into Haarlem\'s historic streets. This guided experience introduces you to significant sites and the stories behind their importance in the city\'s history.') ?></p>
+            <p class="stories-echoes-subtitle"><?= h($vm->settings['home_echoes_subtitle'] ?? '') ?></p>
             <a href="/stories/events" class="stories-echoes-button"><?= h($vm->settings['home_echoes_button'] ?? 'View our Stories') ?></a>
         </div>
     </section>
@@ -154,7 +139,7 @@ $heroImages = array_map(static function ($path): string {
     <section class="stories-about-section" aria-label="About Stories">
         <div class="stories-about-inner">
             <h2 class="stories-about-title"><?= h($vm->settings['home_about_title'] ?? 'About Stories') ?></h2>
-            <p class="stories-about-text"><?= h($vm->settings['home_about_text'] ?? 'Stories in Haarlem brings together voices, memories, and imagination from across the city. Through live performances, family-friendly tales, podcasts, and historical storytelling, visitors can lose themselves in a new and meaningful way. Each event takes place in a unique venue, creating a special interaction between the storyteller, the place, and the audience. Immersive and enchanting, the Stories Invites everyone to experience the city through storytelling.') ?></p>
+            <p class="stories-about-text"><?= h($vm->settings['home_about_text'] ?? '') ?></p>
         </div>
     </section>
 

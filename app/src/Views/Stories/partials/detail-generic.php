@@ -8,10 +8,8 @@
  * No payment/contribution widget.
  */
 
-$highlights = json_decode((string)($detailPage['highlights'] ?? '[]'), true);
-$gallery    = json_decode((string)($detailPage['gallery']    ?? '[]'), true);
-if (!is_array($highlights)) $highlights = [];
-if (!is_array($gallery))    $gallery    = [];
+$highlights = $vm->getDetailHighlights();
+$gallery = $vm->getDetailGallery();
 
 // Story table data — always available
 $storyName  = $story['name']        ?? '';
@@ -21,8 +19,11 @@ $storyImage = $story['image_path']  ?? '/images/Stories/cards/default.jpg';
 $ageText   = $vm->getStoryAgeText();
 $dayText   = $vm->getStoryDayText();
 $timeText  = $vm->getStoryTimeText();
+$endTimeText = $vm->getStoryEndTimeText();
 $typeText  = $vm->getStoryTypeText();
 $langText  = $vm->getStoryLanguageText();
+$venueText = $vm->getStoryVenueText();
+$ticketDetailsId = $vm->getTicketDetailsId();
 
 // CMS overrides — fall back to story data only, no hardcoded strings
 $heroImage   = ($detailPage['hero_image']         ?? '') ?: $storyImage;
@@ -36,7 +37,9 @@ $mainText3   = ($detailPage['article_paragraph_3'] ?? '');
 
 $galleryItems = array_values(array_filter(
     $gallery,
-    fn($item) => !empty($item['image'])
+    function ($item) {
+        return !empty($item['image']);
+    }
 ));
 
 $tags = array_filter([
@@ -103,7 +106,9 @@ $tags = array_filter([
             <?php
             $validHighlights = array_filter(
                 $highlights,
-                fn($h) => !empty($h['title']) || !empty($h['description'])
+                function ($h) {
+                    return !empty($h['title']) || !empty($h['description']);
+                }
             );
             ?>
             <?php if (!empty($validHighlights)): ?>
@@ -169,10 +174,22 @@ $tags = array_filter([
                             <dd><?= h($timeText) ?></dd>
                         </div>
                     <?php endif; ?>
+                    <?php if ($endTimeText): ?>
+                        <div class="generic-info-row">
+                            <dt>End Time</dt>
+                            <dd><?= h($endTimeText) ?></dd>
+                        </div>
+                    <?php endif; ?>
                     <?php if ($langText): ?>
                         <div class="generic-info-row">
                             <dt>🌐 Language</dt>
                             <dd><?= h($langText) ?></dd>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($venueText): ?>
+                        <div class="generic-info-row">
+                            <dt>Venue</dt>
+                            <dd><?= h($venueText) ?></dd>
                         </div>
                     <?php endif; ?>
                     <?php if ($ageText): ?>
@@ -193,9 +210,15 @@ $tags = array_filter([
                     <p class="generic-ticket-note">
                         Reservation is required to guarantee entry. Seats are limited.
                     </p>
-                    <a href="<?= h($vm->getTicketUrl()) ?>" class="generic-ticket-btn">
-                        Buy Tickets &rsaquo;
-                    </a>
+                    <?php if ($ticketDetailsId > 0): ?>
+                        <button type="button" class="generic-ticket-btn add-to-cart-button" data-ticket-details-id="<?= $ticketDetailsId ?>">
+                            Buy Tickets &rsaquo;
+                        </button>
+                    <?php else: ?>
+                        <a href="<?= h($vm->getTicketUrl()) ?>" class="generic-ticket-btn">
+                            Buy Tickets &rsaquo;
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
 

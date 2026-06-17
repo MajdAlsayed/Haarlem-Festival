@@ -272,6 +272,58 @@ $formNote = $isCreate ? 'All fields with * are required.' : 'All changes are sav
                         <?php endif; ?>
                     </div>
 
+                    <div class="story-cms-grid-3">
+                        <div class="admin-field">
+                            <label for="event_day">Story Day <?php if ($isCreate): ?>*<?php endif; ?></label>
+                            <select
+                                class="admin-input <?= !empty($errors['event_day']) ? 'has-error' : '' ?>"
+                                id="event_day"
+                                name="event_day"
+                                <?php if ($isCreate): ?>required<?php endif; ?>
+                            >
+                                <option value="">— Select Day —</option>
+                                <?php foreach (['thursday', 'friday', 'saturday', 'sunday'] as $day): ?>
+                                    <option value="<?= h($day) ?>" <?= ($story['event_day'] ?? '') === $day ? 'selected' : '' ?>>
+                                        <?= h(ucfirst($day)) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <?php if (!empty($errors['event_day'])): ?>
+                                <span class="field-error"><?= h($errors['event_day']) ?></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="admin-field">
+                            <label for="start_time">Start Time <?php if ($isCreate): ?>*<?php endif; ?></label>
+                            <input
+                                class="admin-input <?= !empty($errors['start_time']) ? 'has-error' : '' ?>"
+                                type="time"
+                                id="start_time"
+                                name="start_time"
+                                value="<?= h($story['start_time'] ?? '') ?>"
+                                <?php if ($isCreate): ?>required<?php endif; ?>
+                            >
+                            <?php if (!empty($errors['start_time'])): ?>
+                                <span class="field-error"><?= h($errors['start_time']) ?></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="admin-field">
+                            <label for="end_time">End Time <?php if ($isCreate): ?>*<?php endif; ?></label>
+                            <input
+                                class="admin-input <?= !empty($errors['end_time']) ? 'has-error' : '' ?>"
+                                type="time"
+                                id="end_time"
+                                name="end_time"
+                                value="<?= h($story['end_time'] ?? '') ?>"
+                                <?php if ($isCreate): ?>required<?php endif; ?>
+                            >
+                            <?php if (!empty($errors['end_time'])): ?>
+                                <span class="field-error"><?= h($errors['end_time']) ?></span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
                 </div>
             </section>
 
@@ -287,21 +339,25 @@ $formNote = $isCreate ? 'All fields with * are required.' : 'All changes are sav
 
 <script>
 function previewImg(path) {
-    const wrap = document.getElementById('imgPreview');
-    const img  = document.getElementById('imgPreviewImg');
+    var wrap = document.getElementById('imgPreview');
+    var img  = document.getElementById('imgPreviewImg');
 
     if (path && path.trim()) {
         img.src = path.trim();
         wrap.style.display = 'flex';
-        img.onerror = () => { wrap.style.display = 'none'; };
-        img.onload  = () => { wrap.style.display = 'flex'; };
+        img.onerror = function () {
+            wrap.style.display = 'none';
+        };
+        img.onload = function () {
+            wrap.style.display = 'flex';
+        };
     } else {
         wrap.style.display = 'none';
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const pathInput = document.getElementById('image_path');
+document.addEventListener('DOMContentLoaded', function () {
+    var pathInput = document.getElementById('image_path');
     if (pathInput && pathInput.value.trim()) {
         previewImg(pathInput.value.trim());
     }

@@ -5,22 +5,20 @@ namespace App\Services;
 use App\Repositories\CartRepository;
 use App\ViewModels\CartViewModel;
 
-/**
- * The brain between HTTP and the database: figures out which cart id applies to this request,
- * then adds/updates/removes lines while TicketAvailabilityService enforces seat limits.
- */
 class CartService
 {
-    public function __construct(
-        private CartRepository $cartRepository,
-        private TicketAvailabilityService $availability
-    ) {
+    private CartRepository $cartRepository;
+    private TicketAvailabilityService $availability;
+
+    public function __construct(CartRepository $cartRepository, TicketAvailabilityService $availability)
+    {
+        $this->cartRepository = $cartRepository;
+        $this->availability = $availability;
     }
 
-    /** Current basket for the session/user, or an empty view-model if nothing is open yet. */
     public function getCurrentCart(): CartViewModel
     {
-        $cartId = $this->resolveCurrentCartId(createIfMissing: false);
+        $cartId = $this->resolveCurrentCartId(false); // false = do not create a new cart.
 
         if ($cartId === null) {
             return new CartViewModel(null, []);
@@ -31,33 +29,35 @@ class CartService
         return new CartViewModel($cartId, $items);
     }
 
-    /** Adds or merges a line after checking the catalog id exists and there is enough capacity left. */
-    public function addItem(int $ticketDetailsId, int $quantity = 1): CartViewModel
+    public function addItem(int $ticketDetailsId, int $quantity = 1, ?float $contributionTotal = null): CartViewModel
     {
         if ($quantity < 1) {
             $quantity = 1;
         }
 
+        if ($contributionTotal !== null && $contributionTotal < 0) {
+            throw new \InvalidArgumentException('Contribution cannot be negative.');
+        }
+
         if (!$this->cartRepository->ticketDetailsExists($ticketDetailsId)) {
-            throw new \InvalidArgumentException('Invalid ticket_details_id.');
+            throw new \InvalidArgumentException('Invalid ticket.');
         }
 
         $this->availability->assertDeltaAllowed($ticketDetailsId, $quantity);
 
-        $cartId = $this->resolveCurrentCartId(createIfMissing: true);
+        $cartId = $this->resolveCurrentCartId(true); // true = create a cart if missing.
 
         $existingItem = $this->cartRepository->findCartItem($cartId, $ticketDetailsId);
 
         if ($existingItem) {
-            $this->cartRepository->incrementCartItem((int)$existingItem['cart_item_id'], $quantity);
+            $this->cartRepository->incrementCartItem((int)$existingItem['cart_item_id'], $quantity, $contributionTotal);
         } else {
-            $this->cartRepository->addCartItem($cartId, $ticketDetailsId, $quantity);
+            $this->cartRepository->addCartItem($cartId, $ticketDetailsId, $quantity, $contributionTotal);
         }
 
         return $this->getCurrentCart();
     }
 
-    /** Sets a new quantity, or deletes the line when quantity is 0 (after releasing capacity). */
     public function updateItem(int $cartItemId, int $quantity): CartViewModel
     {
         $existing = $this->cartRepository->findCartItemById($cartItemId);
@@ -78,7 +78,6 @@ class CartService
         return $this->getCurrentCart();
     }
 
-    /** Hard delete one line — treats it like lowering qty to zero for availability. */
     public function removeItem(int $cartItemId): CartViewModel
     {
         $existing = $this->cartRepository->findCartItemById($cartItemId);
@@ -90,12 +89,9 @@ class CartService
         return $this->getCurrentCart();
     }
 
-    /**
-     * Picks the cart id: logged-in users reuse their row; guests use `$_SESSION['cart_id']`;
-     * logging in may merge a guest cart into the account.
-     */
     private function resolveCurrentCartId(bool $createIfMissing): ?int
     {
+        // NOTE: not in course slides (sessions keep the visitor's cart between requests).
         $userId = isset($_SESSION['auth']['user_id']) ? (int)$_SESSION['auth']['user_id'] : null;
 
         if ($userId !== null) {
@@ -104,7 +100,7 @@ class CartService
                 return $userCart->cartId;
             }
 
-            // Logged in after browsing as guest: merge session cart into the user row so items are not lost.
+            // After login, keep the guest cart by attaching it to the user.
             $sessionCartId = isset($_SESSION['cart_id']) ? (int)$_SESSION['cart_id'] : null;
             if ($sessionCartId) {
                 $sessionCart = $this->cartRepository->findActiveCartById($sessionCartId);
@@ -122,7 +118,7 @@ class CartService
             return $this->cartRepository->createCart($userId);
         }
 
-        // Guest: cart id lives in session until login attaches it to a user.
+        // This is the guest cart before the user logs in.
         $sessionCartId = isset($_SESSION['cart_id']) ? (int)$_SESSION['cart_id'] : null;
         if ($sessionCartId) {
             $sessionCart = $this->cartRepository->findActiveCartById($sessionCartId);

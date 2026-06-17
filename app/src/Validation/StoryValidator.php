@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Validation;
 
 use App\Exceptions\ValidationException;
@@ -10,6 +12,7 @@ class StoryValidator
     private const ALLOWED_STORY_TYPES = ['historical', 'fictional', 'cultural', 'interactive', 'podcast', 'story', 'kids'];
     private const ALLOWED_TEMPLATES = ['generic', 'omdenken', 'buurderij'];
     private const ALLOWED_AUDIENCES = ['all-ages', 'kids', 'teens', 'adults', 'families'];
+    private const ALLOWED_DAYS = ['thursday', 'friday', 'saturday', 'sunday'];
 
     public function validateStory(array $data): void
     {
@@ -73,6 +76,22 @@ class StoryValidator
 
         if ((int)($data['event_id'] ?? 0) <= 0) {
             $errors['event_id'] = 'Event ID is required.';
+        }
+
+        $eventDay = strtolower(trim((string)($data['event_day'] ?? '')));
+        if ($eventDay === '') {
+            $errors['event_day'] = 'Event day is required.';
+        } elseif (!in_array($eventDay, self::ALLOWED_DAYS, true)) {
+            $errors['event_day'] = 'Invalid event day.';
+        }
+
+        foreach (['start_time' => 'Start time', 'end_time' => 'End time'] as $key => $label) {
+            $time = trim((string)($data[$key] ?? ''));
+            if ($time === '') {
+                $errors[$key] = $label . ' is required.';
+            } elseif (!preg_match('/^\d{2}:\d{2}$/', $time)) {
+                $errors[$key] = $label . ' must use HH:MM format.';
+            }
         }
 
         if (!empty($errors)) {

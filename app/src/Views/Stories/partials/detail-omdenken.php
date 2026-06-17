@@ -13,11 +13,12 @@ $ageText   = $vm->getStoryAgeText();
 $dayText   = $vm->getStoryDayText();
 $timeText  = $vm->getStoryTimeText();
 $typeText  = $vm->getStoryTypeText();
+$ticketDetailsId = $vm->getTicketDetailsId();
 
 $assets = $vm->getOmdenkenAssets();
 
 $heroImage   = ($detailPage['hero_image']         ?? '') ?: $assets['hero'];
-$heroHeading = ($detailPage['hero_heading']        ?? '') ?: 'OMDENKEN – LIVE PODCAST SESSION';
+$heroHeading = ($detailPage['hero_heading']        ?? '') ?: 'OMDENKEN - LIVE PODCAST SESSION';
 $heroSubtitle= ($detailPage['article_title']       ?? '') ?: 'Changing perspectives through real stories.';
 $heroDesc    = ($detailPage['hero_description']    ?? '') ?: 'This live podcast session invites visitors to explore how everyday challenges can be transformed into meaningful insights. Through honest conversations and personal experiences, the speakers share stories that inspire reflection, resilience, and new ways of thinking.';
 $posterImage = ($detailPage['article_image']       ?? '') ?: $assets['poster'];
@@ -38,10 +39,33 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
             <img src="<?= h($heroImage) ?>" alt="<?= h($heroHeading) ?>">
             <div class="omdenken-hero-overlay"></div>
             <div class="omdenken-hero-copy">
+                <div class="omdenken-hero-kicker">The - Live Podcast Session</div>
                 <h1 class="omdenken-title"><?= h($heroHeading) ?></h1>
-                <p class="omdenken-subtitle"><?= h($heroSubtitle) ?></p>
-                <p class="omdenken-hero-text"><?= nl2br(h($heroDesc)) ?></p>
+                <?php if ($ticketDetailsId > 0): ?>
+                    <button type="button" class="omdenken-hero-btn add-to-cart-button" data-ticket-details-id="<?= $ticketDetailsId ?>">Book Now &rsaquo;</button>
+                <?php else: ?>
+                    <a class="omdenken-hero-btn" href="<?= h($vm->getTicketUrl()) ?>">Book Now &rsaquo;</a>
+                <?php endif; ?>
             </div>
+        </div>
+    </section>
+
+    <nav class="stories-breadcrumb" aria-label="Breadcrumb">
+        <div class="stories-breadcrumb-inner">
+            <a href="/" class="stories-breadcrumb-link">HOME</a>
+            <span class="stories-breadcrumb-separator" aria-hidden="true">&rarr;</span>
+            <a href="/stories" class="stories-breadcrumb-link">STORIES</a>
+            <span class="stories-breadcrumb-separator" aria-hidden="true">&rarr;</span>
+            <span class="stories-breadcrumb-link active" aria-current="page"><?= h($story['name'] ?? 'Omdenken Podcast') ?></span>
+        </div>
+    </nav>
+
+    <section class="omdenken-about-section">
+        <div class="omdenken-about-inner">
+            <h2>What is "<?= h($heroHeading) ?>" about?</h2>
+            <p><?= nl2br(h($heroDesc)) ?></p>
+            <span>SCROLL DOWN</span>
+            <div class="omdenken-scroll-pill"></div>
         </div>
     </section>
 
@@ -94,11 +118,11 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
             </div>
             <div class="omdenken-player-ui">
                 <div class="player-top-row">
-                    <button type="button" class="player-mini-btn">×</button>
-                    <button type="button" class="player-mini-btn">◀</button>
-                    <button type="button" class="player-play-btn">▶</button>
-                    <button type="button" class="player-mini-btn">▶</button>
-                    <button type="button" class="player-mini-btn">↻</button>
+                    <button type="button" class="player-mini-btn">x</button>
+                    <button type="button" class="player-mini-btn">&lt;</button>
+                    <button type="button" class="player-play-btn">&gt;</button>
+                    <button type="button" class="player-mini-btn">&gt;</button>
+                    <button type="button" class="player-mini-btn">R</button>
                 </div>
                 <div class="player-time-row">
                     <span>0:00</span>
@@ -114,7 +138,7 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
                     <div class="player-volume-bar">
                         <div class="player-volume-fill"></div>
                     </div>
-                    <span>🔊</span>
+                    <span>VOL</span>
                 </div>
                 <div class="player-recent-title">Recent Podcast</div>
                 <div class="player-tracklist">
@@ -123,7 +147,7 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
                             <strong><?= h($story['name'] ?? 'Story') ?></strong>
                             <small><?= h($typeText ?: 'Podcast') ?></small>
                         </div>
-                        <span><?= h($timeText ?: '–') ?></span>
+                        <span><?= h($timeText ?: '-') ?></span>
                     </div>
                 </div>
             </div>
@@ -131,17 +155,17 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
 
         <div class="omdenken-stats-row">
             <div class="omdenken-stat-card">
-                <div class="omdenken-stat-icon">🕒</div>
+                <div class="omdenken-stat-icon">TIME</div>
                 <div class="omdenken-stat-title">TIME</div>
                 <div class="omdenken-stat-value"><?= h($timeText ?: 'TBA') ?></div>
             </div>
             <div class="omdenken-stat-card">
-                <div class="omdenken-stat-icon">👥</div>
+                <div class="omdenken-stat-icon">AGE</div>
                 <div class="omdenken-stat-title">AGE</div>
                 <div class="omdenken-stat-value"><?= h($ageText ?: '16+') ?></div>
             </div>
             <div class="omdenken-stat-card">
-                <div class="omdenken-stat-icon">🌐</div>
+                <div class="omdenken-stat-icon">LANG</div>
                 <div class="omdenken-stat-title">LANG</div>
                 <div class="omdenken-stat-value"><?= h($vm->getStoryLanguageText() ?: 'NL') ?></div>
             </div>
@@ -153,7 +177,11 @@ $noteText    = ($detailPage['article_paragraph_3'] ?? '') ?: 'This is a live pod
         </div>
 
         <div class="omdenken-ticket-row">
-            <a class="omdenken-ticket-btn" href="<?= h($vm->getTicketUrl()) ?>">BUY TICKETS</a>
+            <?php if ($ticketDetailsId > 0): ?>
+                <button type="button" class="omdenken-ticket-btn add-to-cart-button" data-ticket-details-id="<?= $ticketDetailsId ?>">BUY TICKETS</button>
+            <?php else: ?>
+                <a class="omdenken-ticket-btn" href="<?= h($vm->getTicketUrl()) ?>">BUY TICKETS</a>
+            <?php endif; ?>
         </div>
 
     </section>

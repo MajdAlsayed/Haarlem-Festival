@@ -73,6 +73,13 @@ final class StoriesSettingsSeeder extends AbstractSeed
             ['setting_key' => 'events_schedule_label', 'setting_value' => 'Select the Day:'],
             ['setting_key' => 'events_map_title', 'setting_value' => 'Places To Visit For Events'],
             ['setting_key' => 'events_map_subtitle', 'setting_value' => 'Location: Haarlem, Netherlands'],
+            ['setting_key' => 'events_map_locations', 'setting_value' => json_encode([
+                ['name' => 'Verhalenhuis Haarlem', 'lat' => 52.3946, 'lng' => 4.6377, 'label' => 'Storytelling venue'],
+                ['name' => 'De Schuur', 'lat' => 52.3818, 'lng' => 4.63931, 'label' => 'Omdenken / Podcast'],
+                ['name' => 'Kweekcafe', 'lat' => 52.39613, 'lng' => 4.63569, 'label' => 'Buurderij Haarlem'],
+                ['name' => 'Ten Boom Museum', 'lat' => 52.3824, 'lng' => 4.6348, 'label' => 'Ten Boom stories'],
+                ['name' => 'Elswout Theater', 'lat' => 52.3879, 'lng' => 4.5978, 'label' => 'Outdoor storytelling'],
+            ])],
         ];
 
         $this->table('stories_settings')->insert($data)->saveData();
