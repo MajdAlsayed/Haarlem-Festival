@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\AdminAuth;
 use App\Repositories\OrderRepository;
 use App\Repositories\SettingsRepository;
+use App\ViewModels\AdminOrderDetailViewModel;
 use App\ViewModels\AdminOrdersListViewModel;
 
 /**
@@ -53,6 +54,8 @@ final class AdminOrdersController
         $lines = $orderRepository->getOrderLineItemsForInvoice($orderId);
         $tickets = $orderRepository->getTicketCodesForOrder($orderId);
         $app = (new SettingsRepository())->getAll();
+
+        $vm = new AdminOrderDetailViewModel($order, $lines, $tickets, $app);
 
         require __DIR__ . '/../Views/Admin/OrderDetail.php';
     }

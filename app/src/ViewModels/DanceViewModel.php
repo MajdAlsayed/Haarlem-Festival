@@ -2,43 +2,37 @@
 
 namespace App\ViewModels;
 
-use App\Models\Event;
-
-/** View model for the Dance index: keeps the template thin by passing structured data only. */
+/**
+ * View model for the public Dance index.
+ * Holds ready-to-render data so the template only loops and prints — no logic in the view.
+ */
 class DanceViewModel
 {
-    public array $events;
-    public array $fridayEvents;
-    public array $saturdayEvents;
-    public array $sundayEvents;
-    public array $featuredEvents;
-    public array $artists;
-    public array $appSettings;
-    public array $danceSettings;
-    public array $breadcrumbs;
-    public string $pageTitle;
-
     public function __construct(
-        array $events,
-        array $fridayEvents,
-        array $saturdayEvents,
-        array $sundayEvents,
-        array $featuredEvents,
-        array $artists,
-        array $appSettings,
-        array $danceSettings,
-        array $breadcrumbs,
-        string $pageTitle = 'Dance Festival'
+        public string $pageTitle,
+        public array $appSettings,
+        public array $breadcrumbs,
+        // hero (read by the festival-hero partial)
+        public string $heroTitle,
+        public string $heroImage,
+        public string $heroSubtitle,
+        public string $heroButtonText,
+        public string $heroButtonUrl,
+        // about section
+        public string $aboutHeading,
+        public array $aboutParagraphs,
+        // featured strip
+        public string $featuredTitle,
+        public array $featuredCards,
+        // all-events tabs
+        public string $allEventsTitle,
+        public array $dayLabels,
+        public array $dayPanels,
+        // artists
+        public string $artistsTitle,
+        public string $artistInfoLabel,
+        public string $showMoreLabel,
+        public array $artistCards,
     ) {
-        $this->events = $events;
-        $this->fridayEvents = $fridayEvents;
-        $this->saturdayEvents = $saturdayEvents;
-        $this->sundayEvents = $sundayEvents;
-        $this->featuredEvents = $featuredEvents;
-        $this->artists = $artists;
-        $this->appSettings = $appSettings;
-        $this->danceSettings = $danceSettings;
-        $this->breadcrumbs = $breadcrumbs;
-        $this->pageTitle = $pageTitle;
     }
 }

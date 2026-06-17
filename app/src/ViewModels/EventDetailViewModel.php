@@ -35,6 +35,20 @@ class EventDetailViewModel
     /** Dance all-access weekend pass, with optional `stock` from controller. */
     public ?array $danceAllAccessPass = null;
 
+    // prepared, ready-to-render values (filled by DanceEventService)
+    public string $dateTimeLine = '';
+    public string $venueLine = '';
+    public string $ticketsFigmaTitle = '';
+    public string $pageHeroTitle = '';
+    public string $cartReturn = '';
+    public string $cartFormCsrf = '';
+    public string $standardCellClass = 'event-detail-tickets-cell';
+    public string $dayCellClass = 'event-detail-tickets-cell';
+    /** @var list<array<string, mixed>> */
+    public array $eventTicketCards = [];
+    public ?array $dayPassCard = null;
+    public ?array $festivalPassCard = null;
+
     public function __construct(
         Event $event,
         string $heroImage,
