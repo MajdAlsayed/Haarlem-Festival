@@ -8,13 +8,15 @@ final class AddTemplateToStories extends AbstractMigration
 {
     public function change(): void
     {
-        $this->table('stories')
-            ->addColumn('template', 'string', [
+        $table = $this->table('stories');
+
+        if (!$table->hasColumn('template')) {
+            $table->addColumn('template', 'string', [
                 'limit'   => 50,
                 'default' => 'generic',
                 'null'    => false,
                 'after'   => 'language',
-            ])
-            ->update();
+            ])->update();
+        }
     }
 }
