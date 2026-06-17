@@ -8,22 +8,42 @@ use App\Core\Csrf;
 $breadcrumbs = $vm->breadcrumbs;
 $event = $vm->event;
 $appSettings = $vm->appSettings;
-$dateTimeLine = $vm->formattedDate ? ($vm->formattedDate . ' • ' . $vm->startTime) : $vm->startTime;
+
 $h = static fn(string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
-// Return users to this event after adding a ticket from POST /cart/add.
-$cartReturn = '/dance/event/' . (int)$event->id . '#tickets';
-$cartFormCsrf = Csrf::peek('cart') ?? Csrf::token('cart');
-// Keep ticket price formatting centralized (including free tickets).
+
+// small readers so we don't repeat isset checks for every ticket field
+$text = static function (array $row, string $key): string {
+    if (isset($row[$key]) && $row[$key] !== null) {
+        return (string) $row[$key];
+    }
+    return '';
+};
+$intVal = static function (array $row, string $key): int {
+    if (isset($row[$key])) {
+        return (int) $row[$key];
+    }
+    return 0;
+};
+$stockOf = static function (array $row): array {
+    if (isset($row['stock']) && is_array($row['stock'])) {
+        return $row['stock'];
+    }
+    return [];
+};
+
+// price label, including free tickets
 $formatTicketEur = static function (mixed $price, bool $isFree): string {
     if ($isFree) {
         return 'Free';
     }
-    $n = is_numeric($price) ? (float)$price : 0.0;
-
-    return '€ ' . number_format($n, 2, ',', '.');
+    $amount = 0.0;
+    if (is_numeric($price)) {
+        $amount = (float) $price;
+    }
+    return '€ ' . number_format($amount, 2, ',', '.');
 };
 
-// Ticket descriptions are stored as newline-separated bullets; render as list.
+// ticket descriptions are newline-separated bullets; render as a list
 $renderFeatureList = static function (string $desc) use ($h): void {
     $lines = preg_split('/\r\n|\r|\n/', trim($desc));
     $lines = array_values(array_filter(array_map('trim', $lines), static fn($l) => $l !== ''));
@@ -37,14 +57,14 @@ $renderFeatureList = static function (string $desc) use ($h): void {
     echo '</ul>';
 };
 
-// Festival pass uses a denser two-column feature layout.
+// festival pass uses a denser two-column feature layout
 $renderFeatureListTwoCol = static function (string $desc) use ($h): void {
     $lines = preg_split('/\r\n|\r|\n/', trim($desc));
     $lines = array_values(array_filter(array_map('trim', $lines), static fn($l) => $l !== ''));
     if ($lines === []) {
         return;
     }
-    $mid = (int)ceil(count($lines) / 2);
+    $mid = (int) ceil(count($lines) / 2);
     $col1 = array_slice($lines, 0, $mid);
     $col2 = array_slice($lines, $mid);
     echo '<div class="event-detail-ticket-features-cols">';
@@ -63,22 +83,51 @@ $renderFeatureListTwoCol = static function (string $desc) use ($h): void {
     echo '</div>';
 };
 
+// date line falls back to just the start time when there's no formatted date
+$dateTimeLine = $vm->startTime;
+if (!empty($vm->formattedDate)) {
+    $dateTimeLine = $vm->formattedDate . ' • ' . $vm->startTime;
+}
+
+// send users back to this event after they add a ticket from POST /cart/add
+$cartReturn = '/dance/event/' . (int) $event->id . '#tickets';
+$cartFormCsrf = Csrf::peek('cart');
+if ($cartFormCsrf === null) {
+    $cartFormCsrf = Csrf::token('cart');
+}
+
+// location line for the info list (city is optional)
+$venueLine = $event->venueName;
+if ((string) $event->venueCity !== '') {
+    $venueLine .= ', ' . $event->venueCity;
+}
+
 $hasEventTickets = $vm->eventTickets !== [];
 $hasDayPass = $vm->danceDayPass !== null;
 $hasFestivalPass = $vm->danceAllAccessPass !== null;
 $hasAnyTicketOption = $hasEventTickets || $hasDayPass || $hasFestivalPass;
-$ticketsFigmaTitle = 'Ticket for ' . $event->title . ' in ' . ($event->venueName ?? '');
-// Grid span flags keep top row balanced when one ticket tier is missing.
-$figmaSpanStandardTop = $hasEventTickets && !$hasDayPass;
-$figmaSpanDayTop = !$hasEventTickets && $hasDayPass;
+$ticketsFigmaTitle = 'Ticket for ' . $event->title . ' in ' . (string) $event->venueName;
 
-// Settings for the page title, styles, body class
+// keep the top row balanced when one ticket tier is missing
+$standardCellClass = 'event-detail-tickets-cell';
+if ($hasEventTickets && !$hasDayPass) {
+    $standardCellClass .= ' event-detail-tickets-cell--span-top';
+}
+$dayCellClass = 'event-detail-tickets-cell';
+if (!$hasEventTickets && $hasDayPass) {
+    $dayCellClass .= ' event-detail-tickets-cell--span-top';
+}
+
+// page title, styles, body class
 $pageTitle = $vm->pageTitle;
 $pageStyles = ['/css/pages/dance.css'];
 $bodyClass = 'dance-page event-detail-page';
 
-// Hero settings
-$pageHeroTitle = $event->venueName ?? $event->title;
+// hero values read by the page-hero partial
+$pageHeroTitle = $event->title;
+if ((string) $event->venueName !== '') {
+    $pageHeroTitle = $event->venueName;
+}
 $pageHeroSubtitle = $vm->eventSubtitle;
 $pageHeroImage = $vm->heroImage;
 $pageHeroAlt = $event->title;
@@ -94,20 +143,27 @@ $pageHeroContentClass = 'dance-detail-hero__content dance-event-detail-hero__con
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <?php
+// show one cart toast: success first, otherwise an error
 $cartToastMsg = '';
 $cartToastError = false;
 if (!empty($vm->cartFlashSuccess)) {
-    $cartToastMsg = (string)$vm->cartFlashSuccess;
+    $cartToastMsg = (string) $vm->cartFlashSuccess;
 } elseif (!empty($vm->cartFlashError)) {
-    $cartToastMsg = (string)$vm->cartFlashError;
+    $cartToastMsg = (string) $vm->cartFlashError;
     $cartToastError = true;
+}
+$cartToastClass = 'event-detail-cart-toast';
+$cartToastIcon = '✓';
+if ($cartToastError) {
+    $cartToastClass .= ' event-detail-cart-toast--error';
+    $cartToastIcon = '!';
 }
 ?>
 <?php if ($cartToastMsg !== ''): ?>
     <div id="cartAddToast"
-         class="event-detail-cart-toast<?= $cartToastError ? ' event-detail-cart-toast--error' : '' ?>" role="status"
+         class="<?= $cartToastClass ?>" role="status"
          aria-live="polite" aria-atomic="true">
-        <span class="event-detail-cart-toast-icon" aria-hidden="true"><?= $cartToastError ? '!' : '✓' ?></span>
+        <span class="event-detail-cart-toast-icon" aria-hidden="true"><?= $cartToastIcon ?></span>
         <span class="event-detail-cart-toast-msg"><?= $h($cartToastMsg) ?></span>
         <a href="/cart" class="event-detail-cart-toast-link">View cart</a>
         <button type="button" class="event-detail-cart-toast-close" aria-label="Dismiss notification">&times;</button>
@@ -160,7 +216,7 @@ if (!empty($vm->cartFlashSuccess)) {
                             <div class="icon-wrap"><img src="/images/icons/locationIcon.png" alt="" class="icon"
                                                         aria-hidden="true"></div>
                             <div class="event-detail-info-item"><span class="label">Location</span><span
-                                        class="value"><?= htmlspecialchars($event->venueName . ($event->venueCity ? ', ' . $event->venueCity : '')) ?></span>
+                                        class="value"><?= htmlspecialchars($venueLine) ?></span>
                             </div>
                         </li>
                         <li>
@@ -187,7 +243,7 @@ if (!empty($vm->cartFlashSuccess)) {
                 <div class="event-detail-desc-text">
                     <p class="event-detail-group-label">About</p>
                     <h2 class="section-title section-title--accent event-detail-group-title" id="about-desc-heading">Description</h2>
-                    <div class="copy-text event-detail-desc-paragraphs"><?= nl2br(htmlspecialchars($event->description ?? '')) ?></div>
+                    <div class="copy-text event-detail-desc-paragraphs"><?= nl2br(htmlspecialchars((string) $event->description)) ?></div>
                     <h3 class="event-detail-features-heading">This event features</h3>
                     <ul>
                         <li><img src="/images/icons/musicIcon.png" alt="" class="feat-icon" aria-hidden="true">
@@ -254,38 +310,55 @@ if (!empty($vm->cartFlashSuccess)) {
                 <?php else: ?>
                     <div class="event-detail-tickets-grid event-detail-tickets-grid--figma">
                         <?php if ($hasEventTickets): ?>
-                            <div class="event-detail-tickets-cell<?= $figmaSpanStandardTop ? ' event-detail-tickets-cell--span-top' : '' ?>">
+                            <div class="<?= $standardCellClass ?>">
                                 <?php
                                 $eventCount = count($vm->eventTickets);
-                                foreach ($vm->eventTickets as $t):
-                                    $tdId = (int)($t['ticket_details_id'] ?? 0);
-                                    $tName = (string)($t['name'] ?? 'Ticket');
-                                    $tDesc = isset($t['description']) && $t['description'] !== null && $t['description'] !== '' ? (string)$t['description'] : '';
-                                    $isFree = !empty($t['is_free']);
-                                    // VIP naming controls both visual accent and badge rendering.
-                                    $vipClass = (stripos($tName, 'VIP') !== false) ? ' vip' : '';
-                                    $pst = $t['stock'] ?? null;
-                                    // If only one non-VIP ticket exists, present as "Standard Ticket".
-                                    $cardTitle = ($eventCount === 1 && stripos($tName, 'VIP') === false) ? 'Standard Ticket' : $tName;
+                                foreach ($vm->eventTickets as $ticket):
+                                    $tdId = $intVal($ticket, 'ticket_details_id');
+                                    $tName = $text($ticket, 'name');
+                                    if ($tName === '') {
+                                        $tName = 'Ticket';
+                                    }
+                                    $tDesc = $text($ticket, 'description');
+                                    $isFree = !empty($ticket['is_free']);
+                                    $isVip = stripos($tName, 'VIP') !== false;
+                                    $stock = $stockOf($ticket);
+                                    $remaining = $intVal($stock, 'remaining');
+                                    $soldOut = !empty($stock['sold_out']);
+                                    $priceRaw = 0;
+                                    if (isset($ticket['price'])) {
+                                        $priceRaw = $ticket['price'];
+                                    }
+                                    $price = $formatTicketEur($priceRaw, $isFree);
+
+                                    // a single non-VIP ticket reads better as "Standard Ticket"
+                                    $cardTitle = $tName;
+                                    if ($eventCount === 1 && !$isVip) {
+                                        $cardTitle = 'Standard Ticket';
+                                    }
+                                    $cardClass = 'event-detail-ticket-card event-detail-ticket-card--figma event-detail-ticket-card--flex';
+                                    if ($isVip) {
+                                        $cardClass .= ' vip';
+                                    }
+                                    $canBuy = $tdId > 0 && !$soldOut;
                                     ?>
-                                    <article
-                                            class="event-detail-ticket-card event-detail-ticket-card--figma event-detail-ticket-card--flex<?= $vipClass ?>">
-                                        <?php if (stripos($tName, 'VIP') !== false): ?>
+                                    <article class="<?= $cardClass ?>">
+                                        <?php if ($isVip): ?>
                                             <span class="event-detail-ticket-badge event-detail-ticket-badge--vip-figma">VIP</span>
                                         <?php endif; ?>
                                         <div class="event-detail-ticket-card-head">
                                             <h3 class="event-detail-ticket-title"><?= $h($cardTitle) ?></h3>
-                                            <p class="event-detail-ticket-price"><?= $h($formatTicketEur($t['price'] ?? 0, $isFree)) ?></p>
+                                            <p class="event-detail-ticket-price"><?= $h($price) ?></p>
                                         </div>
-                                        <?php if (is_array($pst) && !empty($pst['sold_out'])): ?>
+                                        <?php if ($soldOut): ?>
                                             <p class="event-detail-stock-badge event-detail-stock-badge--soldout">Sold
                                                 out</p>
-                                        <?php elseif (is_array($pst) && !empty($pst['nearly'])): ?>
+                                        <?php elseif (!empty($stock['nearly'])): ?>
                                             <p class="event-detail-stock-badge event-detail-stock-badge--nearly">Almost
                                                 sold out</p>
-                                        <?php elseif (is_array($pst) && !empty($pst['low_stock'])): ?>
+                                        <?php elseif (!empty($stock['low_stock'])): ?>
                                             <p class="event-detail-stock-badge event-detail-stock-badge--low">
-                                                Only <?= $h((string)(int)($pst['remaining'] ?? 0)) ?> left</p>
+                                                Only <?= $h((string) $remaining) ?> left</p>
                                         <?php endif; ?>
                                         <?php if ($tDesc !== ''): ?>
                                             <?php $renderFeatureList($tDesc); ?>
@@ -293,8 +366,8 @@ if (!empty($vm->cartFlashSuccess)) {
                                             <p class="event-detail-ticket-features event-detail-ticket-features--figma">
                                                 Access to this event</p>
                                         <?php endif; ?>
-                                        <?php if ($tdId > 0 && (!is_array($pst) || empty($pst['sold_out']))): ?>
-                                            <!-- Submit to cart with fixed quantity=1; cart page handles edits. -->
+                                        <?php if ($canBuy): ?>
+                                            <!-- add to cart with quantity 1; the cart page handles edits -->
                                             <form method="post" action="/cart/add" class="event-detail-cart-form">
                                                 <input type="hidden" name="_csrf" value="<?= $h($cartFormCsrf) ?>">
                                                 <input type="hidden" name="ticket_details_id" value="<?= $tdId ?>">
@@ -304,7 +377,7 @@ if (!empty($vm->cartFlashSuccess)) {
                                                     tickets
                                                 </button>
                                             </form>
-                                        <?php elseif ($tdId > 0 && is_array($pst) && !empty($pst['sold_out'])): ?>
+                                        <?php elseif ($tdId > 0 && $soldOut): ?>
                                             <p class="event-detail-cart-form"><span
                                                         class="btn btn--light btn--block is-disabled"
                                                         aria-disabled="true">Sold out</span></p>
@@ -315,46 +388,59 @@ if (!empty($vm->cartFlashSuccess)) {
                         <?php endif; ?>
 
                         <?php if ($hasDayPass):
-                            $p = $vm->danceDayPass;
-                            $tdId = (int)($p['ticket_details_id'] ?? 0);
-                            $pName = (string)($p['name'] ?? 'Day Pass');
-                            $pDesc = (string)($p['description'] ?? '');
-                            $isFree = !empty($p['is_free']);
-                            $pst = $p['stock'] ?? null;
+                            $pass = $vm->danceDayPass;
+                            $tdId = $intVal($pass, 'ticket_details_id');
+                            $pName = $text($pass, 'name');
+                            if ($pName === '') {
+                                $pName = 'Day Pass';
+                            }
+                            $pDesc = $text($pass, 'description');
+                            $isFree = !empty($pass['is_free']);
+                            $stock = $stockOf($pass);
+                            $remaining = $intVal($stock, 'remaining');
+                            $soldOut = !empty($stock['sold_out']);
+                            $priceRaw = 0;
+                            if (isset($pass['price'])) {
+                                $priceRaw = $pass['price'];
+                            }
+                            $price = $formatTicketEur($priceRaw, $isFree);
+                            $passDay = $text($pass, 'pass_day');
+                            $passTime = $text($pass, 'pass_time');
+                            $canBuy = $tdId > 0 && !$soldOut && !$isFree;
                             ?>
-                            <div class="event-detail-tickets-cell<?= $figmaSpanDayTop ? ' event-detail-tickets-cell--span-top' : '' ?>">
+                            <div class="<?= $dayCellClass ?>">
                                 <article
                                         class="event-detail-ticket-card event-detail-ticket-card--figma event-detail-ticket-card--pass event-detail-ticket-card--flex">
                                     <div class="event-detail-ticket-card-head">
                                         <h3 class="event-detail-ticket-title"><?= $h($pName) ?></h3>
-                                        <p class="event-detail-ticket-price"><?= $h($formatTicketEur($p['price'] ?? 0, $isFree)) ?></p>
+                                        <p class="event-detail-ticket-price"><?= $h($price) ?></p>
                                     </div>
-                                    <?php if (is_array($pst) && !empty($pst['sold_out'])): ?>
+                                    <?php if ($soldOut): ?>
                                         <p class="event-detail-stock-badge event-detail-stock-badge--soldout">Sold
                                             out</p>
-                                    <?php elseif (is_array($pst) && !empty($pst['nearly'])): ?>
+                                    <?php elseif (!empty($stock['nearly'])): ?>
                                         <p class="event-detail-stock-badge event-detail-stock-badge--nearly">Almost sold
                                             out</p>
-                                    <?php elseif (is_array($pst) && !empty($pst['low_stock'])): ?>
+                                    <?php elseif (!empty($stock['low_stock'])): ?>
                                         <p class="event-detail-stock-badge event-detail-stock-badge--low">
-                                            Only <?= $h((string)(int)($pst['remaining'] ?? 0)) ?> left</p>
+                                            Only <?= $h((string) $remaining) ?> left</p>
                                     <?php endif; ?>
                                     <?php if ($pDesc !== ''): ?>
                                         <?php $renderFeatureList($pDesc); ?>
                                     <?php endif; ?>
-                                    <?php if (($p['pass_day'] ?? '') !== '' || ($p['pass_time'] ?? '') !== ''): ?>
-                                        <!-- Optional schedule metadata for day pass, shown only when configured. -->
+                                    <?php if ($passDay !== '' || $passTime !== ''): ?>
+                                        <!-- optional day-pass schedule, shown only when set -->
                                         <p class="event-detail-pass-meta event-detail-pass-meta--figma">
-                                            <?php if (($p['pass_day'] ?? '') !== ''): ?>
-                                                <span><?= $h(ucfirst((string)$p['pass_day'])) ?> pass</span>
+                                            <?php if ($passDay !== ''): ?>
+                                                <span><?= $h(ucfirst($passDay)) ?> pass</span>
                                             <?php endif; ?>
-                                            <?php if (($p['pass_time'] ?? '') !== ''): ?>
+                                            <?php if ($passTime !== ''): ?>
                                                 <span class="event-detail-pass-meta-sep"> · </span>
-                                                <span><?= $h((string)$p['pass_time']) ?></span>
+                                                <span><?= $h($passTime) ?></span>
                                             <?php endif; ?>
                                         </p>
                                     <?php endif; ?>
-                                    <?php if ($tdId > 0 && (!is_array($pst) || empty($pst['sold_out'])) && !$isFree): ?>
+                                    <?php if ($canBuy): ?>
                                         <form method="post" action="/cart/add" class="event-detail-cart-form">
                                             <input type="hidden" name="_csrf" value="<?= $h($cartFormCsrf) ?>">
                                             <input type="hidden" name="ticket_details_id" value="<?= $tdId ?>">
@@ -363,7 +449,7 @@ if (!empty($vm->cartFlashSuccess)) {
                                             <button type="submit" class="btn btn--light">Buy tickets
                                             </button>
                                         </form>
-                                    <?php elseif ($tdId > 0 && is_array($pst) && !empty($pst['sold_out'])): ?>
+                                    <?php elseif ($tdId > 0 && $soldOut): ?>
                                         <p class="event-detail-cart-form"><span
                                                     class="btn btn--light btn--block is-disabled"
                                                     aria-disabled="true">Sold out</span></p>
@@ -373,12 +459,24 @@ if (!empty($vm->cartFlashSuccess)) {
                         <?php endif; ?>
 
                         <?php if ($hasFestivalPass):
-                            $p = $vm->danceAllAccessPass;
-                            $tdId = (int)($p['ticket_details_id'] ?? 0);
-                            $pName = (string)($p['name'] ?? 'All-Access Pass');
-                            $pDesc = (string)($p['description'] ?? '');
-                            $isFree = !empty($p['is_free']);
-                            $pst = $p['stock'] ?? null;
+                            $pass = $vm->danceAllAccessPass;
+                            $tdId = $intVal($pass, 'ticket_details_id');
+                            $pName = $text($pass, 'name');
+                            if ($pName === '') {
+                                $pName = 'All-Access Pass';
+                            }
+                            $pDesc = $text($pass, 'description');
+                            $isFree = !empty($pass['is_free']);
+                            $stock = $stockOf($pass);
+                            $remaining = $intVal($stock, 'remaining');
+                            $soldOut = !empty($stock['sold_out']);
+                            $priceRaw = 0;
+                            if (isset($pass['price'])) {
+                                $priceRaw = $pass['price'];
+                            }
+                            $price = $formatTicketEur($priceRaw, $isFree);
+                            $scheduleDisplay = $text($pass, 'schedule_display');
+                            $canBuy = $tdId > 0 && !$soldOut && !$isFree;
                             ?>
                             <div class="event-detail-tickets-cell event-detail-tickets-cell--full">
                                 <article
@@ -386,26 +484,26 @@ if (!empty($vm->cartFlashSuccess)) {
                                     <span class="event-detail-ticket-badge event-detail-ticket-badge--best">BEST VALUE</span>
                                     <div class="event-detail-ticket-card-head">
                                         <h3 class="event-detail-ticket-title"><?= $h($pName) ?></h3>
-                                        <p class="event-detail-ticket-price"><?= $h($formatTicketEur($p['price'] ?? 0, $isFree)) ?></p>
+                                        <p class="event-detail-ticket-price"><?= $h($price) ?></p>
                                     </div>
-                                    <?php if (is_array($pst) && !empty($pst['sold_out'])): ?>
+                                    <?php if ($soldOut): ?>
                                         <p class="event-detail-stock-badge event-detail-stock-badge--soldout">Sold
                                             out</p>
-                                    <?php elseif (is_array($pst) && !empty($pst['nearly'])): ?>
+                                    <?php elseif (!empty($stock['nearly'])): ?>
                                         <p class="event-detail-stock-badge event-detail-stock-badge--nearly">Almost sold
                                             out</p>
-                                    <?php elseif (is_array($pst) && !empty($pst['low_stock'])): ?>
+                                    <?php elseif (!empty($stock['low_stock'])): ?>
                                         <p class="event-detail-stock-badge event-detail-stock-badge--low">
-                                            Only <?= $h((string)(int)($pst['remaining'] ?? 0)) ?> left</p>
+                                            Only <?= $h((string) $remaining) ?> left</p>
                                     <?php endif; ?>
                                     <?php if ($pDesc !== ''): ?>
                                         <?php $renderFeatureListTwoCol($pDesc); ?>
                                     <?php endif; ?>
-                                    <?php if (($p['schedule_display'] ?? '') !== ''): ?>
-                                        <!-- CMS-provided schedule string for all-access pass. -->
-                                        <p class="event-detail-pass-meta event-detail-pass-meta--figma"><?= $h((string)$p['schedule_display']) ?></p>
+                                    <?php if ($scheduleDisplay !== ''): ?>
+                                        <!-- schedule string set in the CMS for the all-access pass -->
+                                        <p class="event-detail-pass-meta event-detail-pass-meta--figma"><?= $h($scheduleDisplay) ?></p>
                                     <?php endif; ?>
-                                    <?php if ($tdId > 0 && (!is_array($pst) || empty($pst['sold_out'])) && !$isFree): ?>
+                                    <?php if ($canBuy): ?>
                                         <form method="post" action="/cart/add" class="event-detail-cart-form">
                                             <input type="hidden" name="_csrf" value="<?= $h($cartFormCsrf) ?>">
                                             <input type="hidden" name="ticket_details_id" value="<?= $tdId ?>">
@@ -414,7 +512,7 @@ if (!empty($vm->cartFlashSuccess)) {
                                             <button type="submit" class="btn btn--light">Buy tickets
                                             </button>
                                         </form>
-                                    <?php elseif ($tdId > 0 && is_array($pst) && !empty($pst['sold_out'])): ?>
+                                    <?php elseif ($tdId > 0 && $soldOut): ?>
                                         <p class="event-detail-cart-form"><span
                                                     class="btn btn--light btn--block is-disabled"
                                                     aria-disabled="true">Sold out</span></p>
