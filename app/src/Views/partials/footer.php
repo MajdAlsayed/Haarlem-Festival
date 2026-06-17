@@ -81,3 +81,4 @@ window.__CSRF_CART__ = <?= json_encode($cartCsrf, JSON_HEX_TAG | JSON_HEX_AMP | 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/cartDrawer.js?v=2" defer></script>
+<script src="/js/navMenu.js?v=1" defer></script>

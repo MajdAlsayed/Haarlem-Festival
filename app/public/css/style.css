@@ -1065,3 +1065,136 @@ a.nav-username--dashboard.is-active {
         width: 100%;
     }
 }
+
+.nav-toggle {
+    display: none;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+
+    background: transparent;
+    border: 1px solid rgba(245, 180, 0, 0.65);
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.nav-toggle span {
+    width: 20px;
+    height: 2px;
+
+    background: #f5b400;
+    border-radius: 999px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.nav-toggle.is-open span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.nav-toggle.is-open span:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle.is-open span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+@media (max-width: 900px) {
+    header {
+        min-height: auto;
+    }
+
+    .nav-container {
+        position: relative;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 12px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .logo-img {
+        height: 58px;
+    }
+
+    .nav-toggle {
+        display: inline-flex;
+        justify-self: end;
+    }
+
+    .nav-actions {
+        justify-self: end;
+        gap: 10px;
+    }
+
+    .nav-menu {
+        grid-column: 1 / -1;
+        display: none;
+        width: 100%;
+
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 0;
+
+        padding: 10px 0 4px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-menu.is-open {
+        display: flex;
+    }
+
+    .nav-link {
+        padding: 12px 4px;
+        font-size: 14px;
+        letter-spacing: 0.08em;
+    }
+
+    .nav-link::after {
+        bottom: 6px;
+    }
+
+    .language-selector {
+        padding: 7px 10px;
+    }
+
+    .nav-auth-btn {
+        padding: 7px 12px;
+    }
+}
+
+@media (max-width: 520px) {
+    .nav-container {
+        grid-template-columns: auto auto auto;
+    }
+
+    .logo-img {
+        height: 52px;
+    }
+
+    .search-btn,
+    .language-selector {
+        display: none;
+    }
+
+    .nav-user-menu-label {
+        display: none;
+    }
+
+    .nav-actions {
+        gap: 8px;
+    }
+
+    .nav-auth-btn {
+        min-height: 38px;
+        padding: 7px 10px;
+    }
+}
