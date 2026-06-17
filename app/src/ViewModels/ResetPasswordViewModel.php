@@ -11,6 +11,5 @@ final class ResetPasswordViewModel
         public string $token,
         public ?string $error = null,
         public ?string $success = null,
-        public array $appSettings = [],
     ) {}
 }

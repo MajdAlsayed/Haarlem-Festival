@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\ServiceInterface\AuthServiceInterface;
 use App\Models\User;
 use App\Repositories\PasswordResetTokenRepository;
 use App\Repositories\UserRepository;
 
-final class AuthService
+final class AuthService implements AuthServiceInterface
 {
     private const PASSWORD_RESET_TTL_SECONDS = 3600;
 
-    public function __construct(
-        private UserRepository $users,
-        private PasswordResetTokenRepository $passwordResetTokens
-    ) {}
+    private UserRepository $users;
+    private PasswordResetTokenRepository $passwordResetTokens;
+
+    public function __construct()
+    {
+        $this->users = new UserRepository();
+        $this->passwordResetTokens = new PasswordResetTokenRepository();
+    }
 
     public function hashPassword(string $password): string
     {
@@ -186,29 +191,4 @@ final class AuthService
         return ['ok' => true, 'message' => 'Your password has been reset. Please log in with your new password.'];
     }
 
-    public function newCaptchaQuestion(): string
-    {
-        $a = random_int(1, 9);
-        $b = random_int(1, 9);
-
-        $_SESSION['_captcha'] = [
-            'answer' => (string)($a + $b),
-            'ts'     => time(),
-        ];
-
-        return "What is {$a} + {$b}?";
-    }
-
-    public function validateCaptcha(mixed $input): bool
-    {
-        $data = $_SESSION['_captcha'] ?? null;
-        unset($_SESSION['_captcha']);
-
-        if (!is_array($data) || !isset($data['answer'], $data['ts'])) return false;
-        if (time() - (int)$data['ts'] > 600) return false;
-
-        $given = trim((string)$input);
-
-        return $given !== '' && hash_equals((string)$data['answer'], $given);
-    }
 }

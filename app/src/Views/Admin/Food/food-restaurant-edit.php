@@ -3,7 +3,6 @@
  * /admin/food/restaurants/new  — create
  * /admin/food/restaurants/edit — edit (GET ?id=N, POST to /save)
  *
- * @var array                         $app   Site settings
  * @var \App\Models\Restaurant|null   $row   null = new, object = existing
  * @var string                        $csrf  CSRF token for 'admin_food_restaurant'
  * @var string|null                   $error Inline validation error (re-render)
@@ -22,7 +21,7 @@ $numVal = function (string $field, string $default = '') use ($row): string {
     return $v !== null ? (string) $v : $default;
 };
 
-$pageTitle = ($isNew ? 'New' : 'Edit') . ' restaurant — Admin — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageTitle = ($isNew ? 'New' : 'Edit') . ' restaurant — Admin — ' . ('Haarlem Festival');
 $pageStyles = ['/css/admin.css'];
 $bodyClass = 'admin-page';
 ?>
@@ -37,7 +36,7 @@ $bodyClass = 'admin-page';
     <div class="admin-container admin-container--wide">
 
         <nav class="admin-breadcrumb">
-            <a href="/"><?= $h($app['site_name'] ?? 'Festival') ?></a>
+            <a href="/"><?= $h('Haarlem Festival') ?></a>
             <span class="admin-breadcrumb-sep">›</span>
             <a href="/admin">Admin</a>
             <span class="admin-breadcrumb-sep">›</span>

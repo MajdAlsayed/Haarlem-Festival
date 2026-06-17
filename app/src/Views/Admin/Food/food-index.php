@@ -1,8 +1,7 @@
 ﻿<?php
-/** @var array $app */
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 
-$pageTitle = 'Food CMS — Admin — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageTitle = 'Food CMS — Admin — ' . ('Haarlem Festival');
 $pageStyles = ['/css/admin.css'];
 $bodyClass = 'admin-page';
 ?>
@@ -16,7 +15,7 @@ $bodyClass = 'admin-page';
 <main class="admin-main">
     <div class="admin-container">
         <nav class="admin-breadcrumb">
-            <a href="/"><?= $h($app['site_name'] ?? 'Festival') ?></a>
+            <a href="/"><?= $h('Haarlem Festival') ?></a>
             <span class="admin-breadcrumb-sep">›</span>
             <a href="/admin">Admin</a>
             <span class="admin-breadcrumb-sep">›</span>
