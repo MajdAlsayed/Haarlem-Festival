@@ -70,7 +70,7 @@ class HistoryController
                 primaryImages: $locationsData['primaryImages']
             );
 
-            require __DIR__ . '/../Views/History/Locations.php';
+            require __DIR__ . '/../Views/History/locations.php';
         } catch (\Exception $e) {
             error_log('HistoryController::locations error: ' . $e->getMessage());
             require __DIR__ . '/../Views/error.php';
@@ -124,7 +124,7 @@ class HistoryController
                 nextLocation: $nextLocation,
             );
 
-            require __DIR__ . '/../Views/History/Location.php';
+            require __DIR__ . '/../Views/History/location.php';
         } catch (NotFoundException $e) {
             // Location not found — show 404
             error_log('HistoryController::show not found: ' . $e->getMessage());
@@ -164,7 +164,7 @@ class HistoryController
                 locations: $locations,
             );
 
-            require __DIR__ . '/../Views/History/Tours.php';
+            require __DIR__ . '/../Views/History/tours.php';
         } catch (\Exception $e) {
             error_log('HistoryController::tours error: ' . $e->getMessage());
             require __DIR__ . '/../Views/error.php';
@@ -176,7 +176,7 @@ class HistoryController
         try {
             $date = $_GET['day'] ?? '';
             $tours = $this->historyService->getToursWithDetailsByDate($date);
-            require __DIR__ . '/../Views/History/ToursSchedule.php';
+            require __DIR__ . '/../Views/History/tours-schedule.php';
         } catch (\Exception $e) {
             error_log('HistoryController::toursSchedule error: ' . $e->getMessage());
             require __DIR__ . '/../Views/error.php';

@@ -148,7 +148,7 @@ $breadcrumbs = [
                                         </div>
                                         <button
                                                 type="button"
-                                                class="btn btn--light btn--sm btn--block history-tours-add-button"
+                                                class="btn btn--light btn--sm btn--block history-tours-add-button add-to-cart-button"
                                                 data-ticket-details-id="<?= (int) $tour['ticket_details_id'] ?>"
                                                 data-ticket-family-id="<?= (int) $tour['ticket_family_id'] ?>"
                                         >

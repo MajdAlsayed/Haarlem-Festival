@@ -6,21 +6,16 @@ use Phinx\Seed\AbstractSeed;
 
 /**
  * Catalog for /tickets: day / all-access passes for **jazz & dance only** + event_ticket per jazz/dance/history/stories event.
- * Safe to re-run: refreshes passes; upserts event tickets by event_id.
+ * Safe to re-run: upserts passes by type/category/day/time; upserts event tickets by event_id.
  */
 final class TicketDetailsSeeder extends AbstractSeed
 {
     public function run(): void
     {
-        try {
-            $this->execute("DELETE FROM ticket_details WHERE ticket_type IN ('day_pass', 'all_access_pass')");
-        } catch (\Throwable $e) {
-            echo '[WARN] TicketDetailsSeeder: could not clear passes (orders may reference rows): ' . $e->getMessage() . "\n";
-        }
+        $this->pruneUnreferencedPassDuplicates();
 
-        $passes = $this->passRows();
-        if ($passes !== []) {
-            $this->table('ticket_details')->insert($passes)->saveData();
+        foreach ($this->passRows() as $pass) {
+            $this->upsertPass($pass);
         }
 
         $rows = $this->fetchAll(
@@ -172,5 +167,142 @@ final class TicketDetailsSeeder extends AbstractSeed
             'stories' => 10.0,
             default => 20.0,
         };
+    }
+
+    /**
+     * @param array<string,mixed> $pass
+     */
+    private function upsertPass(array $pass): void
+    {
+        $ticketType = (string) $pass['ticket_type'];
+        $category = (string) $pass['category'];
+        $passDay = $pass['pass_day'];
+        $passTime = $pass['pass_time'];
+
+        $existing = $this->findPassRow($ticketType, $category, $passDay, $passTime);
+        if ($existing !== null) {
+            $tid = (int) $existing['ticket_details_id'];
+            $this->execute(
+                "UPDATE ticket_details SET
+                    event_id = NULL,
+                    session_id = NULL,
+                    ticket_type = '{$this->esc($ticketType)}',
+                    category = '{$this->esc($category)}',
+                    pass_day = " . $this->sqlNullableString($passDay) . ",
+                    pass_time = " . $this->sqlNullableString($passTime) . ",
+                    schedule_display = " . $this->sqlNullableString($pass['schedule_display'] ?? null) . ",
+                    sort_order = " . (int) ($pass['sort_order'] ?? 0) . ",
+                    is_free = " . (int) ($pass['is_free'] ?? 0) . ",
+                    name = '{$this->esc((string) $pass['name'])}',
+                    description = '{$this->esc((string) $pass['description'])}',
+                    price = '{$this->esc((string) $pass['price'])}'
+                 WHERE ticket_details_id = {$tid}"
+            );
+
+            return;
+        }
+
+        $this->table('ticket_details')->insert($pass)->saveData();
+    }
+
+    /**
+     * @return array{ticket_details_id: int}|null
+     */
+    private function findPassRow(string $ticketType, string $category, mixed $passDay, mixed $passTime): ?array
+    {
+        $sql = "SELECT ticket_details_id
+                FROM ticket_details
+                WHERE ticket_type = '{$this->esc($ticketType)}'
+                  AND category = '{$this->esc($category)}'
+                  AND " . $this->sqlEqualsNullable('pass_day', $passDay) . "
+                  AND " . $this->sqlEqualsNullable('pass_time', $passTime) . "
+                ORDER BY ticket_details_id ASC
+                LIMIT 1";
+
+        $row = $this->fetchRow($sql);
+
+        return $row !== false && $row !== null ? $row : null;
+    }
+
+    private function pruneUnreferencedPassDuplicates(): void
+    {
+        $groups = $this->fetchAll(
+            "SELECT ticket_type, category, pass_day, pass_time, COUNT(*) AS c
+             FROM ticket_details
+             WHERE ticket_type IN ('day_pass', 'all_access_pass')
+             GROUP BY ticket_type, category, pass_day, pass_time
+             HAVING c > 1"
+        );
+
+        foreach ($groups as $group) {
+            $rows = $this->fetchAll(
+                "SELECT ticket_details_id
+                 FROM ticket_details
+                 WHERE ticket_type = '{$this->esc((string) $group['ticket_type'])}'
+                   AND category = '{$this->esc((string) $group['category'])}'
+                   AND " . $this->sqlEqualsNullable('pass_day', $group['pass_day']) . "
+                   AND " . $this->sqlEqualsNullable('pass_time', $group['pass_time']) . "
+                 ORDER BY ticket_details_id ASC"
+            );
+
+            $keepId = $this->choosePassRowToKeep($rows);
+            foreach ($rows as $row) {
+                $id = (int) $row['ticket_details_id'];
+                if ($id === $keepId || $this->passRowIsReferenced($id)) {
+                    continue;
+                }
+
+                $this->execute("DELETE FROM ticket_details WHERE ticket_details_id = {$id}");
+            }
+        }
+    }
+
+    /**
+     * @param list<array{ticket_details_id: int|string}> $rows
+     */
+    private function choosePassRowToKeep(array $rows): int
+    {
+        foreach ($rows as $row) {
+            $id = (int) $row['ticket_details_id'];
+            if ($this->passRowIsReferenced($id)) {
+                return $id;
+            }
+        }
+
+        return (int) $rows[0]['ticket_details_id'];
+    }
+
+    private function passRowIsReferenced(int $ticketDetailsId): bool
+    {
+        $orderRef = $this->fetchRow(
+            "SELECT order_item_id FROM order_items WHERE ticket_details_id = {$ticketDetailsId} LIMIT 1"
+        );
+        if ($orderRef !== false && $orderRef !== null) {
+            return true;
+        }
+
+        $cartRef = $this->fetchRow(
+            "SELECT cart_item_id FROM cart_items WHERE ticket_details_id = {$ticketDetailsId} LIMIT 1"
+        );
+
+        return $cartRef !== false && $cartRef !== null;
+    }
+
+    private function sqlEqualsNullable(string $column, mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return "({$column} IS NULL OR {$column} = '')";
+        }
+
+        return "{$column} = '{$this->esc((string) $value)}'";
+    }
+
+    private function sqlNullableString(mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return 'NULL';
+        }
+
+        return "'" . $this->esc((string) $value) . "'";
     }
 }
