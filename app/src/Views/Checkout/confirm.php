@@ -4,7 +4,6 @@
 /** @var ?string $error */
 /** @var string $csrf */
 /** @var bool $stripeOn */
-/** @var bool $demoOn */
 
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 
@@ -70,12 +69,12 @@ $breadcrumbs = [
             <form method="post" action="/checkout/pay-stripe" class="checkout-form">
                 <input type="hidden" name="_csrf" value="<?= $h($csrf) ?>">
                 <button type="submit" class="btn btn--primary btn--block">
-                    Pay with card or iDEAL (Stripe — test mode)
+                    Pay with card or iDEAL
                 </button>
             </form>
 
             <p class="copy-text copy-text--sm copy-text--muted checkout-note">
-                You will leave this site to complete payment on Stripe’s secure page.
+                You will leave this site to complete payment on Stripe's secure page.
             </p>
         <?php endif; ?>
 
@@ -89,27 +88,6 @@ $breadcrumbs = [
                 Reserves your cart as an unpaid order. You will receive email and must pay within 24 hours or the reservation is cancelled.
             </p>
         </form>
-
-        <?php if ($demoOn): ?>
-            <div class="checkout-demo">
-                <?php if ($stripeOn): ?>
-                    <p class="copy-text copy-text--sm copy-text--muted checkout-note">
-                        Optional — class demo (no real charge):
-                    </p>
-                <?php else: ?>
-                    <p class="copy-text copy-text--sm copy-text--muted checkout-note">
-                        Add <code>STRIPE_SECRET_KEY</code> and <code>APP_PUBLIC_URL</code> in the environment for real card/iDEAL (Stripe test keys).
-                    </p>
-                <?php endif; ?>
-
-                <form method="post" action="/checkout/pay" class="checkout-form">
-                    <input type="hidden" name="_csrf" value="<?= $h($csrf) ?>">
-                    <button type="submit" class="btn btn--light btn--block">
-                        Confirm without payment (demo)
-                    </button>
-                </form>
-            </div>
-        <?php endif; ?>
     </section>
 
     <p class="copy-text copy-text--sm cart-continue">

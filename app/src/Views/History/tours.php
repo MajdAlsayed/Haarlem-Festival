@@ -73,8 +73,11 @@ $breadcrumbs = [
                 <?= htmlspecialchars($viewModel->ticketOptions['title'] ?? '') ?>
             </h2>
             <div class="history-tours-tickets-cards">
+                <?php $ticketIndex = 0; ?>
                 <?php foreach ($viewModel->ticketOptions['tickets'] ?? [] as $ticket): ?>
-                    <div class="festival-card festival-card--history history-tours-ticket-card">
+                    <div class="festival-card festival-card--history history-tours-ticket-card <?= $ticketIndex === 0 ? 'history-tours-ticket-card--selected' : '' ?>"
+                         data-ticket-type="<?= $ticketIndex === 0 ? 'regular' : 'family' ?>"
+                         style="cursor: pointer;">
                         <h3 class="section-subtitle history-tours-ticket-card-title">
                             <?= htmlspecialchars($ticket['name']) ?>
                         </h3>
@@ -94,6 +97,7 @@ $breadcrumbs = [
                             <?php endforeach; ?>
                         </ul>
                     </div>
+                    <?php $ticketIndex++; ?>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -131,26 +135,27 @@ $breadcrumbs = [
                                 Available Times for <?= htmlspecialchars(date('l', strtotime($date))) ?>
                             </p>
                             <div class="history-tours-slots-grid">
-                            <?php foreach ($tours as $tour): ?>
-                                <div class="festival-card festival-card--history history-tours-item">
-                                    <div class="history-tours-time-lang">
+                                <?php foreach ($tours as $tour): ?>
+                                    <div class="festival-card festival-card--history history-tours-item">
+                                        <div class="history-tours-time-lang">
                                         <span class="section-subtitle history-tours-time">
                                             <?= htmlspecialchars(date('H:i', strtotime($tour['start_time']))) ?>
                                         </span>
-                                        <span class="copy-text copy-text--sm history-tours-lang">
+                                            <span class="copy-text copy-text--sm history-tours-lang">
                                             <?= htmlspecialchars($tour['flag']) ?>
                                             <?= htmlspecialchars($tour['language_name']) ?>
                                         </span>
+                                        </div>
+                                        <button
+                                                type="button"
+                                                class="btn btn--light btn--sm btn--block history-tours-add-button"
+                                                data-ticket-details-id="<?= (int) $tour['ticket_details_id'] ?>"
+                                                data-ticket-family-id="<?= (int) $tour['ticket_family_id'] ?>"
+                                        >
+                                            ADD TO CART
+                                        </button>
                                     </div>
-                                    <button
-                                        type="button"
-                                        class="btn btn--light btn--sm btn--block history-tours-add-button"
-                                        data-ticket-details-id="<?= (int) $tour['ticket_details_id'] ?>"
-                                    >
-                                        ADD TO CART
-                                    </button>
-                                </div>
-                            <?php endforeach; ?>
+                                <?php endforeach; ?>
                             </div>
                         </div>
                         <?php $first = false; ?>
@@ -235,6 +240,44 @@ $breadcrumbs = [
                 });
             });
         });
+    })();
+
+    // Ticket type selection — remember which card (Regular or Family) the user clicked
+    (function () {
+        var selectedType = 'regular'; // default — first card is selected on load
+
+        // Handle ticket card click — highlight selected card
+        document.querySelectorAll('.history-tours-ticket-card').forEach(function (card) {
+            card.addEventListener('click', function () {
+                // Remove selected state from all cards
+                document.querySelectorAll('.history-tours-ticket-card').forEach(function (c) {
+                    c.classList.remove('history-tours-ticket-card--selected');
+                });
+
+                // Mark this card as selected
+                this.classList.add('history-tours-ticket-card--selected');
+
+                // Remember the selected type (regular or family)
+                selectedType = this.getAttribute('data-ticket-type');
+            });
+        });
+
+        // Intercept ADD TO CART click BEFORE cartDrawer.js reads the ID
+        // We use capture phase (true) so our listener fires first
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.history-tours-add-button');
+            if (!btn) return;
+
+            var regularId = btn.getAttribute('data-ticket-details-id');
+            var familyId  = btn.getAttribute('data-ticket-family-id');
+
+            // Swap the ID to the correct one before cartDrawer.js reads it
+            if (selectedType === 'family' && familyId && familyId !== '0') {
+                btn.setAttribute('data-ticket-details-id', familyId);
+            } else {
+                btn.setAttribute('data-ticket-details-id', regularId);
+            }
+        }, true); // true = capture phase — fires before cartDrawer.js bubble listener
     })();
 </script>
 </body>

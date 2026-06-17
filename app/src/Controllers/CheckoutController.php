@@ -17,7 +17,7 @@ use App\Services\StripePaymentService;
 use App\Services\TicketAvailabilityService;
 
 /**
- * Checkout: confirmation page, demo and Stripe payment, pay-later reserve, and completing pending orders from account.
+ * Checkout: confirmation page, Stripe payment, pay-later reserve, and completing pending orders from account.
  */
 final class CheckoutController
 {
@@ -36,36 +36,10 @@ final class CheckoutController
         $app = (new SettingsRepository())->getAll();
         $error = Session::getFlash('checkout_error');
         $csrf = Csrf::token('checkout');
-        // €0 cart → no Stripe button (class demo still uses "Confirm without payment").
+        // Show Stripe button only when configured and cart total is above €0
         $stripeOn = StripePaymentService::isConfigured() && $vm->total > 0;
-        $demoOn = true;
 
         require __DIR__ . '/../Views/Checkout/confirm.php';
-    }
-
-    /** Demo / free-only: instant paid order (no Stripe). */
-    public function pay(): void
-    {
-        $userId = $this->requireLoginOrRedirect();
-
-        if (!Csrf::validate('checkout', $_POST['_csrf'] ?? null)) {
-            Session::setFlash('checkout_error', 'Invalid security token. Try again.');
-            header('Location: /checkout');
-            exit;
-        }
-
-        $checkout = $this->makeCheckoutService();
-
-        try {
-            $orderId = $checkout->completePurchase($userId);
-            header('Location: /checkout/success?order_id=' . $orderId);
-            exit;
-        } catch (\Throwable $e) {
-            error_log('CheckoutController::pay error: ' . $e->getMessage());
-            Session::setFlash('checkout_error', $e->getMessage());
-            header('Location: /checkout');
-            exit;
-        }
     }
 
     /** Real payment: redirect to Stripe Checkout (card + iDEAL). */
@@ -132,7 +106,7 @@ final class CheckoutController
         }
     }
 
-    /** Demo: complete a pay-later order without Stripe. */
+    /** Complete a pay-later order — used from account page. */
     public function payPending(): void
     {
         $userId = $this->requireLoginOrRedirect();
@@ -241,7 +215,7 @@ final class CheckoutController
     {
         $userId = $this->requireLoginOrRedirect();
 
-        // Stripe redirect: ?session_id=… → we finalize the order then redirect again with ?order_id= for a clean URL.
+        // Stripe redirect: ?session_id=… → finalize the order then redirect with ?order_id= for a clean URL.
         $stripeSessionId = trim((string) ($_GET['session_id'] ?? ''));
         if ($stripeSessionId !== '') {
             if (!StripePaymentService::isConfigured()) {
