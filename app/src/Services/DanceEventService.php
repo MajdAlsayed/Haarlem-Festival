@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Contracts\ServiceInterface\DanceEventServiceInterface;
+use App\Core\Csrf;
 use App\Exceptions\NotFoundException;
 use App\Models\Event;
 use App\Repositories\DanceSettingsRepository;
@@ -91,7 +92,251 @@ class DanceEventService implements DanceEventServiceInterface
 
         $this->attachTicketStock($vm->eventTickets, $vm->danceDayPass, $vm->danceAllAccessPass);
 
+        $this->prepareForView($vm);
+
         return $vm;
+    }
+
+    // work out the page labels, cart bits and ticket cards so the template only displays them
+    private function prepareForView(EventDetailViewModel $vm): void
+    {
+        $event = $vm->event;
+
+        $vm->dateTimeLine = $vm->startTime;
+        if ($vm->formattedDate !== '') {
+            $vm->dateTimeLine = $vm->formattedDate . ' • ' . $vm->startTime;
+        }
+
+        $vm->venueLine = (string) $event->venueName;
+        if ((string) $event->venueCity !== '') {
+            $vm->venueLine .= ', ' . $event->venueCity;
+        }
+
+        $vm->ticketsFigmaTitle = 'Ticket for ' . $event->title . ' in ' . (string) $event->venueName;
+
+        $vm->pageHeroTitle = (string) $event->title;
+        if ((string) $event->venueName !== '') {
+            $vm->pageHeroTitle = (string) $event->venueName;
+        }
+
+        $vm->cartReturn = '/dance/event/' . (int) $event->id . '#tickets';
+        $csrf = Csrf::peek('cart');
+        if ($csrf === null) {
+            $csrf = Csrf::token('cart');
+        }
+        $vm->cartFormCsrf = $csrf;
+
+        $hasEventTickets = $vm->eventTickets !== [];
+        $hasDayPass = $vm->danceDayPass !== null;
+
+        $vm->standardCellClass = 'event-detail-tickets-cell';
+        if ($hasEventTickets && !$hasDayPass) {
+            $vm->standardCellClass .= ' event-detail-tickets-cell--span-top';
+        }
+        $vm->dayCellClass = 'event-detail-tickets-cell';
+        if (!$hasEventTickets && $hasDayPass) {
+            $vm->dayCellClass .= ' event-detail-tickets-cell--span-top';
+        }
+
+        $vm->eventTicketCards = $this->buildEventTicketCards($vm->eventTickets);
+        if ($vm->danceDayPass !== null) {
+            $vm->dayPassCard = $this->buildPassCard($vm->danceDayPass, 'day');
+        }
+        if ($vm->danceAllAccessPass !== null) {
+            $vm->festivalPassCard = $this->buildPassCard($vm->danceAllAccessPass, 'festival');
+        }
+    }
+
+    // event tickets: a single non-VIP ticket reads as "Standard Ticket"
+    /** @return list<array<string, mixed>> */
+    private function buildEventTicketCards(array $tickets): array
+    {
+        $count = count($tickets);
+        $cards = [];
+
+        foreach ($tickets as $ticket) {
+            $name = $this->ticketText($ticket, 'name');
+            if ($name === '') {
+                $name = 'Ticket';
+            }
+            $isVip = stripos($name, 'VIP') !== false;
+
+            $title = $name;
+            if ($count === 1 && !$isVip) {
+                $title = 'Standard Ticket';
+            }
+
+            $cardClass = 'event-detail-ticket-card event-detail-ticket-card--figma event-detail-ticket-card--flex';
+            if ($isVip) {
+                $cardClass .= ' vip';
+            }
+            $badge = '';
+            if ($isVip) {
+                $badge = 'VIP';
+            }
+
+            $card = $this->baseCard($ticket);
+            $card['title'] = $title;
+            $card['cardClass'] = $cardClass;
+            $card['badge'] = $badge;
+            $card['featureColumns'] = $this->featureColumns($this->ticketText($ticket, 'description'), false);
+            $card['featuresWrapped'] = false;
+            $card['fallbackFeature'] = 'Access to this event';
+            $card['meta'] = '';
+            $card['buttonClass'] = 'btn btn--light btn--block';
+            $card['canBuy'] = $card['tdId'] > 0 && $card['stockState'] !== 'soldout';
+
+            $cards[] = $card;
+        }
+
+        return $cards;
+    }
+
+    // day pass or all-access festival pass
+    /** @return array<string, mixed> */
+    private function buildPassCard(array $pass, string $tier): array
+    {
+        $card = $this->baseCard($pass);
+        $name = $this->ticketText($pass, 'name');
+        $desc = $this->ticketText($pass, 'description');
+        $isFree = !empty($pass['is_free']);
+
+        if ($tier === 'festival') {
+            if ($name === '') {
+                $name = 'All-Access Pass';
+            }
+            $card['cardClass'] = 'event-detail-ticket-card event-detail-ticket-card--figma event-detail-ticket-card--festival event-detail-ticket-card--flex';
+            $card['badge'] = 'BEST VALUE';
+            $card['featureColumns'] = $this->featureColumns($desc, true);
+            $card['featuresWrapped'] = true;
+            $card['meta'] = $this->ticketText($pass, 'schedule_display');
+        } else {
+            if ($name === '') {
+                $name = 'Day Pass';
+            }
+            $card['cardClass'] = 'event-detail-ticket-card event-detail-ticket-card--figma event-detail-ticket-card--pass event-detail-ticket-card--flex';
+            $card['badge'] = '';
+            $card['featureColumns'] = $this->featureColumns($desc, false);
+            $card['featuresWrapped'] = false;
+            $card['meta'] = $this->dayPassMeta($pass);
+        }
+
+        $card['title'] = $name;
+        $card['fallbackFeature'] = '';
+        $card['buttonClass'] = 'btn btn--light';
+        $card['canBuy'] = $card['tdId'] > 0 && $card['stockState'] !== 'soldout' && !$isFree;
+
+        return $card;
+    }
+
+    // the fields every ticket card shares
+    /** @return array<string, mixed> */
+    private function baseCard(array $ticket): array
+    {
+        $stock = $this->ticketStock($ticket);
+        $isFree = !empty($ticket['is_free']);
+
+        $priceRaw = null;
+        if (isset($ticket['price'])) {
+            $priceRaw = $ticket['price'];
+        }
+        $remaining = 0;
+        if (isset($stock['remaining'])) {
+            $remaining = (int) $stock['remaining'];
+        }
+
+        return [
+            'tdId' => $this->ticketDetailsId($ticket),
+            'priceLabel' => $this->priceLabel($priceRaw, $isFree),
+            'stockState' => $this->stockState($stock),
+            'remaining' => $remaining,
+        ];
+    }
+
+    private function ticketStock(array $ticket): array
+    {
+        if (isset($ticket['stock']) && is_array($ticket['stock'])) {
+            return $ticket['stock'];
+        }
+
+        return [];
+    }
+
+    // one short word for the stock badge, or empty when there's nothing to flag
+    private function stockState(array $stock): string
+    {
+        if (!empty($stock['sold_out'])) {
+            return 'soldout';
+        }
+        if (!empty($stock['nearly'])) {
+            return 'nearly';
+        }
+        if (!empty($stock['low_stock'])) {
+            return 'low';
+        }
+
+        return '';
+    }
+
+    private function priceLabel(mixed $price, bool $isFree): string
+    {
+        if ($isFree) {
+            return 'Free';
+        }
+        $amount = 0.0;
+        if (is_numeric($price)) {
+            $amount = (float) $price;
+        }
+
+        return '€ ' . number_format($amount, 2, ',', '.');
+    }
+
+    // split a newline description into feature columns (one column normally, two for the festival pass)
+    /** @return list<list<string>> */
+    private function featureColumns(string $desc, bool $twoColumns): array
+    {
+        $lines = preg_split('/\r\n|\r|\n/', trim($desc));
+        $lines = array_values(array_filter(array_map('trim', $lines), static fn ($line) => $line !== ''));
+        if ($lines === []) {
+            return [];
+        }
+        if (!$twoColumns) {
+            return [$lines];
+        }
+
+        $mid = (int) ceil(count($lines) / 2);
+        $first = array_slice($lines, 0, $mid);
+        $second = array_slice($lines, $mid);
+        if ($second === []) {
+            return [$first];
+        }
+
+        return [$first, $second];
+    }
+
+    // day pass meta line, like "Friday pass · 22:00"
+    private function dayPassMeta(array $pass): string
+    {
+        $parts = [];
+        $day = $this->ticketText($pass, 'pass_day');
+        if ($day !== '') {
+            $parts[] = ucfirst($day) . ' pass';
+        }
+        $time = $this->ticketText($pass, 'pass_time');
+        if ($time !== '') {
+            $parts[] = $time;
+        }
+
+        return implode(' · ', $parts);
+    }
+
+    private function ticketText(array $ticket, string $key): string
+    {
+        if (isset($ticket[$key]) && $ticket[$key] !== null) {
+            return (string) $ticket[$key];
+        }
+
+        return '';
     }
 
     // hero image filename from the cms photos, or the fallback from the settings
