@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Contracts\RestaurantRepositoryInterface;
 use App\Core\Database;
 use App\Models\Restaurant;
 use PDO;
 
-final class RestaurantRepository
+final class RestaurantRepository implements RestaurantRepositoryInterface
 {
     /** @return Restaurant[] */
     public function getAll(): array

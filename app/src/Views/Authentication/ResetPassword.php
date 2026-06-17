@@ -1,8 +1,7 @@
 <?php
-$app = $viewModel->appSettings;
 
 // Settings for the page title, styles, body class
-$pageTitle = 'Reset password — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageTitle = 'Reset password — ' . ('Haarlem Festival');
 $pageStyles = ['/css/pages/auth.css'];
 $bodyClass = 'auth-page';
 

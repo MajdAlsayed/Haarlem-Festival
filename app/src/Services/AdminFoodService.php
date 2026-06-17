@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\RestaurantRepositoryInterface;
+use App\Contracts\ServiceInterface\AdminFoodServiceInterface;
 use App\Models\Restaurant;
 use App\Repositories\FoodSettingsRepository;
 use App\Repositories\RestaurantRepository;
+use App\Repositories\SettingsRepository;
 
 /**
  * Business logic for the food admin CMS.
@@ -20,13 +23,17 @@ use App\Repositories\RestaurantRepository;
  *    (filter_labels: one label per line → JSON array of strings)
  *    (locals_reviews: raw JSON textarea → validated JSON)
  */
-final class AdminFoodService
+final class AdminFoodService implements AdminFoodServiceInterface
 {
-    public function __construct(
-        private RestaurantRepository   $restaurantRepo,
-        private FoodSettingsRepository $foodSettingsRepo
-    ) {
-    }
+            private SettingsRepository $settingsRepo;
+            private FoodSettingsRepository $foodSettingsRepo;
+            private RestaurantRepositoryInterface $restaurantRepo;
+
+    public function __construct() {
+    $this->restaurantRepo   = new RestaurantRepository();
+    $this->foodSettingsRepo = new FoodSettingsRepository();
+    $this->settingsRepo     = new SettingsRepository();    }
+
 
     // =========================================================================
     // Restaurants

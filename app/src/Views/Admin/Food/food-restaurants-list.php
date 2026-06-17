@@ -2,7 +2,6 @@
 /**
  * /admin/food/restaurants  — Restaurant list with delete action
  *
- * @var array                          $app         Site settings
  * @var \App\Models\Restaurant[]       $restaurants All restaurant rows
  * @var string|null                    $success     Flash success message
  * @var string|null                    $error       Flash error message
@@ -13,7 +12,7 @@ $renderStars = static function (int $n): string {
     return str_repeat('★', $n) . str_repeat('☆', 5 - $n);
 };
 
-$pageTitle = 'Restaurants — Admin — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageTitle = 'Restaurants — Admin — ' . ('Haarlem Festival');
 $pageStyles = ['/css/admin.css'];
 $bodyClass = 'admin-page';
 ?>
@@ -28,7 +27,7 @@ $bodyClass = 'admin-page';
     <div class="admin-container admin-container--wide">
 
         <nav class="admin-breadcrumb">
-            <a href="/"><?= $h($app['site_name'] ?? 'Festival') ?></a>
+            <a href="/"><?= $h('Haarlem Festival') ?></a>
             <span class="admin-breadcrumb-sep">›</span>
             <a href="/admin">Admin</a>
             <span class="admin-breadcrumb-sep">›</span>
