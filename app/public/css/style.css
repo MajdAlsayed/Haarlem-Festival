@@ -1112,30 +1112,34 @@ a.nav-username--dashboard.is-active {
 
     .nav-container {
         position: relative;
-        display: grid;
-        grid-template-columns: auto 1fr auto;
+        display: flex;
+        flex-wrap: wrap;
         align-items: center;
         gap: 12px;
         padding-top: 10px;
         padding-bottom: 10px;
     }
 
+    .logo {
+        margin-right: auto;
+    }
+
     .logo-img {
         height: 58px;
     }
 
-    .nav-toggle {
-        display: inline-flex;
-        justify-self: end;
-    }
-
     .nav-actions {
-        justify-self: end;
+        order: 1;
         gap: 10px;
     }
 
+    .nav-toggle {
+        display: inline-flex;
+        order: 2;
+    }
+
     .nav-menu {
-        grid-column: 1 / -1;
+        order: 3;
         display: none;
         width: 100%;
 
@@ -1172,17 +1176,8 @@ a.nav-username--dashboard.is-active {
 }
 
 @media (max-width: 520px) {
-    .nav-container {
-        grid-template-columns: auto auto auto;
-    }
-
     .logo-img {
         height: 52px;
-    }
-
-    .search-btn,
-    .language-selector {
-        display: none;
     }
 
     .nav-user-menu-label {
