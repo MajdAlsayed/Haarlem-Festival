@@ -441,7 +441,63 @@
 
 /* Stories map */
 .stories-map-section {
-    padding-top: 40px;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 36px 16px 48px;
+    text-align: center;
+}
+
+.stories-map-title {
+    margin: 0;
+    padding: 12px 18px 4px;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+    text-transform: capitalize;
+}
+
+.stories-map-subtitle {
+    margin: 0 0 8px;
+    padding: 0 18px 8px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.map-venue-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 0 14px;
+}
+
+.map-venue-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 22px;
+    padding: 4px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: var(--radius-pill);
+    background: #fff;
+    color: #222;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.map-venue-btn.active,
+.map-venue-btn:hover,
+.map-venue-btn:focus-visible {
+    border-color: #f7c94b;
+    background: #f7c94b;
+    color: #111;
 }
 
 .stories-map-wrapper {
@@ -451,8 +507,78 @@
     margin-bottom: 16px;
 }
 
+.stories-map-frame {
+    height: 425px;
+    min-height: 0;
+    margin: 0 auto 34px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    background: #d8c3a3;
+}
+
 .stories-map {
     height: 100%;
+}
+
+.stories-events-map {
+    width: 100%;
+    height: 100%;
+    min-height: 360px;
+}
+
+.btn-map {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0;
+    padding: 8px 22px;
+    border-radius: var(--radius-pill);
+    background: #fff;
+    color: #111;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.btn-map:hover,
+.btn-map:focus-visible {
+    color: #111;
+    text-decoration: none;
+}
+
+.generic-ticket-btn,
+.omdenken-ticket-btn,
+.buurderij-reserve-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    min-height: 38px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: #fff;
+    color: #111;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.generic-ticket-btn:hover,
+.generic-ticket-btn:focus-visible,
+.omdenken-ticket-btn:hover,
+.omdenken-ticket-btn:focus-visible,
+.buurderij-reserve-btn:hover,
+.buurderij-reserve-btn:focus-visible {
+    background: #fff;
+    color: #111;
+    text-decoration: none;
 }
 
 .stories-map-section .map-actions {
@@ -1092,21 +1218,43 @@
             var(--color-surface);
 }
 
+.buurderij-intro-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
 .buurderij-intro h2,
 .buurderij-intro p {
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0 16px;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0;
 }
 
 .buurderij-intro-title {
     margin-bottom: 16px;
 }
 
+.buurderij-intro-inner > span {
+    display: block;
+    width: fit-content;
+    margin-top: 22px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.buurderij-scroll-pill {
+    margin-top: 10px;
+}
+
 .buurderij-main-grid {
     display: grid;
-    grid-template-columns: 370px 1fr;
+    grid-template-columns: 370px minmax(0, 1fr);
     gap: 24px;
     align-items: start;
     margin-bottom: 26px;
@@ -1114,7 +1262,7 @@
 
 .buurderij-main-image img {
     width: 100%;
-    height: 230px;
+    height: 170px;
     margin-top: 15px;
 
     object-fit: cover;
@@ -1124,7 +1272,8 @@
 
 .buurderij-main-text {
     margin-top: 15px;
-    padding: 20px 22px;
+    min-height: 170px;
+    padding: 18px 22px;
 
     background:
             linear-gradient(
@@ -1138,12 +1287,20 @@
 }
 
 .buurderij-main-title {
-    margin-bottom: 8px;
+    margin: 0 0 10px;
     color: var(--color-accent);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1.3;
+    text-transform: uppercase;
 }
 
 .buurderij-main-text p {
-    margin-bottom: 10px;
+    margin: 0 0 12px;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 15px;
+    line-height: 1.65;
 }
 
 .buurderij-main-text p:last-child {
@@ -1434,6 +1591,53 @@
     margin: 34px 0 0;
 }
 
+.buurderij-last-grid {
+    display: grid;
+    grid-template-columns: 370px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+    margin-top: 34px;
+}
+
+.buurderij-last-image img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    display: block;
+    border-radius: 12px;
+}
+
+.buurderij-last-text {
+    min-height: 170px;
+    padding: 18px 22px;
+    background:
+            linear-gradient(
+                    145deg,
+                    rgba(255, 255, 255, 0.08),
+                    rgba(255, 255, 255, 0.035)
+            ),
+            var(--color-surface);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+}
+
+.buurderij-last-text h3 {
+    margin: 0 0 10px;
+    color: var(--color-accent);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1.3;
+    text-transform: uppercase;
+}
+
+.buurderij-last-text p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 15px;
+    line-height: 1.65;
+}
+
 .buurderij-last-title {
     margin-bottom: 16px;
 }
@@ -1529,7 +1733,8 @@
         padding: 18px;
     }
 
-    .stories-map-wrapper {
+    .stories-map-wrapper,
+    .stories-map-frame {
         height: 420px;
     }
 }
@@ -1605,7 +1810,8 @@
         padding: 11px 14px;
     }
 
-    .stories-map-wrapper {
+    .stories-map-wrapper,
+    .stories-map-frame {
         height: 340px;
     }
 
