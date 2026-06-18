@@ -1,5 +1,4 @@
 <?php
-// app/src/Services/FoodService.php
 
 declare(strict_types=1);
 
@@ -20,11 +19,12 @@ use App\Repositories\UserRepository;
 final class FoodService implements FoodServiceInterface
 {
     private RestaurantRepositoryInterface $restaurantRepo;
-    private FoodSettingsRepository $foodSettingsRepo;
-    private ReservationRepository  $reservationRepo;
-    private UserRepository         $userRepo;
-    private TicketDetailsRepository $ticketDetailsRepo;
-    private CartService            $cartService;
+    private FoodSettingsRepository        $foodSettingsRepo;
+    private ReservationRepository         $reservationRepo;
+    private UserRepository                $userRepo;
+    private TicketDetailsRepository       $ticketDetailsRepo;
+    private CartService                   $cartService;
+    private ?array                        $settings = null;
 
     public function __construct()
     {
@@ -33,11 +33,16 @@ final class FoodService implements FoodServiceInterface
         $this->reservationRepo   = new ReservationRepository();
         $this->userRepo          = new UserRepository();
         $this->ticketDetailsRepo = new TicketDetailsRepository();
-        $cartRepo = new CartRepository();
-        $this->cartService = new CartService(
+        $cartRepo                = new CartRepository();
+        $this->cartService       = new CartService(
             $cartRepo,
             new TicketAvailabilityService($cartRepo, new TicketRepository())
         );
+    }
+
+    private function settings(): array
+    {
+        return $this->settings ??= $this->foodSettingsRepo->getAll();
     }
 
     // ── Index ─────────────────────────────────────────────────────────────────
@@ -45,7 +50,7 @@ final class FoodService implements FoodServiceInterface
     public function getFoodIndexViewModel(): \App\ViewModels\FoodViewModel
     {
         return new \App\ViewModels\FoodViewModel(
-            foodSettings: $this->foodSettingsRepo->getAll(),
+            foodSettings: $this->settings(),
             restaurants:  $this->restaurantRepo->getAll(),
         );
     }
@@ -54,14 +59,13 @@ final class FoodService implements FoodServiceInterface
 
     public function getFoodSettings(): array
     {
-        return $this->foodSettingsRepo->getAll();
+        return $this->settings();
     }
 
     public function getFestivalDates(): array
     {
-        $raw = $this->foodSettingsRepo->getAll()['festival_dates'] ?? [];
         $out = [];
-        foreach ($raw as $entry) {
+        foreach ($this->settings()['festival_dates'] ?? [] as $entry) {
             $out[$entry['value']] = $entry['label'];
         }
         return $out;
@@ -69,7 +73,7 @@ final class FoodService implements FoodServiceInterface
 
     public function getReservationFeePerPerson(): float
     {
-        return (float)($this->foodSettingsRepo->getAll()['reservation_fee_per_person'] ?? 10);
+        return (float)($this->settings()['reservation_fee_per_person'] ?? 10);
     }
 
     // ── Restaurant ────────────────────────────────────────────────────────────
@@ -81,6 +85,16 @@ final class FoodService implements FoodServiceInterface
             throw new NotFoundException('Restaurant not found');
         }
         return $restaurant;
+    }
+
+    public function getBookingOverviewData(int $id): array
+    {
+        return [
+            $this->getRestaurantOrFail($id),
+            $this->getFoodSettings(),
+            $this->getFestivalDates(),
+            $this->getReservationFeePerPerson(),
+        ];
     }
 
     // ── Booking form ──────────────────────────────────────────────────────────
@@ -107,7 +121,37 @@ final class FoodService implements FoodServiceInterface
 
     public function validateBookingInput(array $post): array
     {
-        $input = [
+        $input = $this->sanitizeBookingInput($post);
+        return ['errors' => $this->getValidationErrors($input), 'input' => $input];
+    }
+
+    // ── Reservation ───────────────────────────────────────────────────────────
+
+    public function calculateReservationFee(array $input): float
+    {
+        $totalGuests = ($input['adults'] ?? 0) + ($input['children'] ?? 0);
+        return $this->getReservationFeePerPerson() * $totalGuests;
+    }
+
+    public function saveBooking(int $restaurantId, ?int $userId, array $input): int
+    {
+        $totalGuests     = ($input['adults'] ?? 0) + ($input['children'] ?? 0);
+        $reservationFee  = $this->getReservationFeePerPerson() * $totalGuests;
+        $restaurant      = $this->getRestaurantOrFail($restaurantId);
+
+        $reservationId   = $this->createReservationRecord($restaurantId, $userId, $input, $reservationFee, $totalGuests);
+        $ticketDetailsId = $this->createTicketDetailsForReservation($restaurant, $input, $reservationFee, $reservationId);
+
+        $this->cartService->addItem($ticketDetailsId, 1);
+
+        return $reservationId;
+    }
+
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    private function sanitizeBookingInput(array $post): array
+    {
+        return [
             'session_time'    => trim((string)($post['session_time']    ?? '')),
             'booking_date'    => trim((string)($post['booking_date']    ?? '')),
             'adults'          => max(0, (int)($post['adults']           ?? 0)),
@@ -118,7 +162,10 @@ final class FoodService implements FoodServiceInterface
             'phone'           => trim((string)($post['phone']           ?? '')),
             'special_request' => trim((string)($post['special_request'] ?? '')),
         ];
+    }
 
+    private function getValidationErrors(array $input): array
+    {
         $errors = [];
 
         if ($input['session_time'] === '') $errors[] = 'Session time is required.';
@@ -135,53 +182,25 @@ final class FoodService implements FoodServiceInterface
             $errors[] = 'A valid email address is required.';
         }
 
-        return ['errors' => $errors, 'input' => $input];
+        return $errors;
     }
 
-    // ── Reservation ───────────────────────────────────────────────────────────
-
-    public function calculateReservationFee(array $input): float
+    private function createReservationRecord(int $restaurantId, ?int $userId, array $input, float $fee, int $guests): int
     {
-        $totalGuests = ($input['adults'] ?? 0) + ($input['children'] ?? 0);
-        return $this->getReservationFeePerPerson() * $totalGuests;
+        return $this->reservationRepo->create([
+            'restaurant_id'   => $restaurantId,
+            'user_id'         => $userId,
+            'session_time'    => $input['session_time'],
+            'guests'          => $guests,
+            'first_name'      => $input['first_name'],
+            'last_name'       => $input['last_name'],
+            'email'           => $input['email'],
+            'phone'           => $input['phone'] ?: null,
+            'special_request' => $input['special_request'] ?: null,
+            'status'          => 'pending',
+            'reservation_fee' => $fee,
+        ]);
     }
-
-    public function saveBooking(int $restaurantId, ?int $userId, array $input): int
-    {
-        $totalGuests    = ($input['adults'] ?? 0) + ($input['children'] ?? 0);
-        $reservationFee = $this->calculateReservationFee($input);
-        $restaurant     = $this->getRestaurantOrFail($restaurantId);
-
-        // 1. Save reservation
-        $reservationId = $this->reservationRepo->create([
-    'restaurant_id'   => $restaurantId,
-    'user_id'         => $userId,
-    'session_time'    => $input['session_time'],
-    'guests'          => $totalGuests,
-    'first_name'      => $input['first_name'],
-    'last_name'       => $input['last_name'],
-    'email'           => $input['email'],
-    'phone'           => $input['phone'] ?: null,
-    'special_request' => $input['special_request'] ?: null,
-    'status'          => 'pending',
-    'reservation_fee' => $reservationFee,
-]);
-
-        // 2. Create a ticket_details row for this reservation
-        $ticketDetailsId = $this->createTicketDetailsForReservation(
-            $restaurant,
-            $input,
-            $reservationFee,
-            $reservationId
-        );
-
-        // 3. Add to cart
-        $this->addToCart($ticketDetailsId);
-
-        return $reservationId;
-    }
-
-    // ── Private helpers ───────────────────────────────────────────────────────
 
     private function createTicketDetailsForReservation(
         Restaurant $restaurant,
@@ -189,23 +208,18 @@ final class FoodService implements FoodServiceInterface
         float      $reservationFee,
         int        $reservationId
     ): int {
-        $adults   = (int) ($input['adults']   ?? 0);
-        $children = (int) ($input['children'] ?? 0);
-        $date     = $input['booking_date']    ?? '';
+        $adults   = (int)($input['adults']   ?? 0);
+        $children = (int)($input['children'] ?? 0);
+        $date     = $input['booking_date']   ?? '';
         $time     = substr($input['session_time'], 0, 5);
 
         $guestParts = [];
-        if ($adults > 0)   $guestParts[] = $adults   . ' adult'   . ($adults   !== 1 ? 's' : '');
-        if ($children > 0) $guestParts[] = $children . ' child'   . ($children !== 1 ? 'ren' : '');
+        if ($adults > 0)   $guestParts[] = $adults   . ' adult'  . ($adults   !== 1 ? 's' : '');
+        if ($children > 0) $guestParts[] = $children . ' child'  . ($children !== 1 ? 'ren' : '');
 
         $name        = $restaurant->name . ' — Table Reservation';
         $description = sprintf('%s · %s at %s · %s', $restaurant->name, $date, $time, implode(', ', $guestParts));
 
         return $this->ticketDetailsRepo->createForReservation($reservationId, $name, $description, $reservationFee);
-    }
-
-    private function addToCart(int $ticketDetailsId): void
-    {
-        $this->cartService->addItem($ticketDetailsId, 1);
     }
 }

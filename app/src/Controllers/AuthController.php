@@ -21,10 +21,9 @@ final class AuthController
         $this->auth = new AuthService();
     }
 
-
     public function showLogin(): void
     {
-        $returnTo = isset($_GET['return']) ? trim((string) $_GET['return']) : '';
+        $returnTo = isset($_GET['return']) ? trim((string)$_GET['return']) : '';
         if ($returnTo === '' || !str_starts_with($returnTo, '/')) {
             $returnTo = null;
         }
@@ -41,44 +40,26 @@ final class AuthController
     public function login(): void
     {
         if (!Csrf::validate('login', $_POST['_csrf'] ?? null)) {
-            Session::setFlash('login_error', 'Invalid credentials.');
-            header('Location: /login');
-            exit;
+            $this->redirectToLoginWithError('Invalid credentials.');
         }
 
         $identifier = trim((string)($_POST['identifier'] ?? ''));
-        $password = (string)($_POST['password'] ?? '');
+        $password   = (string)($_POST['password'] ?? '');
 
         try {
             $user = $this->auth->attemptLogin($identifier, $password);
-        } catch (\Throwable $e) {
-            Session::setFlash('login_error', 'An error occurred. Please try again.');
-            header('Location: /login');
-            exit;
+        } catch (\Throwable) {
+            $this->redirectToLoginWithError('An error occurred. Please try again.');
         }
 
         if ($user === null) {
-            Session::setFlash('login_error', 'Invalid credentials.');
-            header('Location: /login');
-            exit;
+            $this->redirectToLoginWithError('Invalid credentials.');
         }
 
-        Session::regenerate();
+        $this->startAuthSession($user->id, $user->email, $user->roleId, $user->username);
 
-        $_SESSION['auth'] = [
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'role_id' => $user->roleId,
-            'username' => $user->username,
-        ];
-
-        $return = trim((string) ($_POST['return'] ?? ''));
-        if ($return !== '' && str_starts_with($return, '/')) {
-            header('Location: ' . $return);
-            exit;
-        }
-
-        header('Location: /');
+        $return = trim((string)($_POST['return'] ?? ''));
+        header('Location: ' . ($return !== '' && str_starts_with($return, '/') ? $return : '/'));
         exit;
     }
 
@@ -93,7 +74,7 @@ final class AuthController
 
     public function showRegister(): void
     {
-        $old = json_decode(Session::getFlash('register_old') ?? '{}', true) ?? [];
+        $old       = json_decode(Session::getFlash('register_old') ?? '{}', true) ?? [];
         $appConfig = require __DIR__ . '/../Config/app.php';
 
         $viewModel = new RegisterViewModel(
@@ -117,58 +98,31 @@ final class AuthController
             exit;
         }
 
-        $username = trim((string)($_POST['username'] ?? ''));
-        $email = trim((string)($_POST['email'] ?? ''));
-        $password = (string)($_POST['password'] ?? '');
-        $passwordConfirm = (string)($_POST['password_confirm'] ?? '');
-        $firstName = trim((string)($_POST['first_name'] ?? ''));
-        $lastName = trim((string)($_POST['last_name'] ?? ''));
-
-        $old = json_encode([
-            'username' => $username,
-            'email' => $email,
-            'firstName' => $firstName,
-            'lastName' => $lastName,
-        ]);
+        $input = $this->extractRegisterInput();
+        $old   = $this->buildOldPayload($input);
 
         if (!$this->verifyRecaptcha((string)($_POST['g-recaptcha-response'] ?? ''))) {
-            Session::setFlash('register_error', 'Please complete the CAPTCHA.');
-            Session::setFlash('register_old', $old);
-            header('Location: /register');
-            exit;
+            $this->redirectToRegisterWithError('Please complete the CAPTCHA.', $old);
         }
 
         try {
             $result = $this->auth->register(
-                username: $username,
-                email: $email,
-                password: $password,
-                passwordConfirm: $passwordConfirm,
-                firstName: $firstName,
-                lastName: $lastName,
+                username:        $input['username'],
+                email:           $input['email'],
+                password:        $input['password'],
+                passwordConfirm: $input['passwordConfirm'],
+                firstName:       $input['firstName'],
+                lastName:        $input['lastName'],
             );
-        } catch (\Throwable $e) {
-            Session::setFlash('register_error', 'An error occurred. Please try again.');
-            Session::setFlash('register_old', $old);
-            header('Location: /register');
-            exit;
+        } catch (\Throwable) {
+            $this->redirectToRegisterWithError('An error occurred. Please try again.', $old);
         }
 
         if (!$result['ok']) {
-            Session::setFlash('register_error', $result['error']);
-            Session::setFlash('register_old', $old);
-            header('Location: /register');
-            exit;
+            $this->redirectToRegisterWithError($result['error'], $old);
         }
 
-        Session::regenerate();
-
-        $_SESSION['auth'] = [
-            'user_id' => $result['user_id'],
-            'email' => $email,
-            'role_id' => $result['role_id'],
-            'username' => $username,
-        ];
+        $this->startAuthSession($result['user_id'], $input['email'], $result['role_id'], $input['username']);
 
         header('Location: /');
         exit;
@@ -190,9 +144,7 @@ final class AuthController
     public function forgotPassword(): void
     {
         if (!Csrf::validate('forgot_password', $_POST['_csrf'] ?? null)) {
-            Session::setFlash('forgot_password_error', 'Something went wrong. Please try again.');
-            header('Location: /forgot-password');
-            exit;
+            $this->redirectToForgotPasswordWithError('Something went wrong. Please try again.');
         }
 
         $identifier = trim((string)($_POST['identifier'] ?? ''));
@@ -200,36 +152,31 @@ final class AuthController
 
         try {
             $result = $this->auth->createPasswordResetRequest($identifier);
-        } catch (\Throwable $e) {
-            Session::setFlash('forgot_password_error', 'An error occurred. Please try again.');
-            header('Location: /forgot-password');
-            exit;
+        } catch (\Throwable) {
+            $this->redirectToForgotPasswordWithError('An error occurred. Please try again.');
         }
 
         if (!$result['ok']) {
-            Session::setFlash('forgot_password_error', $result['error']);
-            header('Location: /forgot-password');
-            exit;
+            $this->redirectToForgotPasswordWithError($result['error']);
         }
 
         Session::setFlash('forgot_password_success', $result['message']);
         Session::setFlash('forgot_password_dummy_link', $result['dummy_link']);
-
         header('Location: /forgot-password');
         exit;
     }
 
     public function showResetPassword(): void
     {
-        $token = trim((string)($_GET['token'] ?? ''));
-        $error = Session::getFlash('reset_password_error');
+        $token   = trim((string)($_GET['token'] ?? ''));
+        $error   = Session::getFlash('reset_password_error');
         $success = Session::getFlash('reset_password_success');
 
         try {
             if ($success === null && !$this->auth->validatePasswordResetToken($token)) {
                 $error = $error ?? 'Invalid or expired reset link.';
             }
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             $error = 'An error occurred. Please try again.';
         }
 
@@ -241,32 +188,6 @@ final class AuthController
         );
 
         require __DIR__ . '/../Views/Authentication/ResetPassword.php';
-    }
-
-    private function verifyRecaptcha(string $token): bool
-    {
-        if ($token === '') return false;
-
-        $appConfig = require __DIR__ . '/../Config/app.php';
-        $url = 'https://www.google.com/recaptcha/api/siteverify';
-        $body = http_build_query([
-            'secret'   => $appConfig['recaptcha_secret_key'],
-            'response' => $token,
-            'remoteip' => $_SERVER['REMOTE_ADDR'] ?? '',
-        ]);
-
-        $ctx = stream_context_create(['http' => [
-            'method'  => 'POST',
-            'header'  => 'Content-Type: application/x-www-form-urlencoded',
-            'content' => $body,
-            'timeout' => 5,
-        ]]);
-
-        $raw = @file_get_contents($url, false, $ctx);
-        if ($raw === false) return false;
-
-        $data = json_decode($raw, true);
-        return isset($data['success']) && $data['success'] === true;
     }
 
     public function resetPassword(): void
@@ -285,20 +206,105 @@ final class AuthController
                 (string)($_POST['password'] ?? ''),
                 (string)($_POST['password_confirm'] ?? ''),
             );
-        } catch (\Throwable $e) {
-            Session::setFlash('reset_password_error', 'An error occurred. Please try again.');
-            header('Location: /reset-password?token=' . urlencode($token));
-            exit;
+        } catch (\Throwable) {
+            $this->redirectToResetPasswordWithError('An error occurred. Please try again.', $token);
         }
 
         if (!$result['ok']) {
-            Session::setFlash('reset_password_error', $result['error']);
-            header('Location: /reset-password?token=' . urlencode($token));
-            exit;
+            $this->redirectToResetPasswordWithError($result['error'], $token);
         }
 
         Session::setFlash('reset_password_success', $result['message']);
         header('Location: /reset-password?token=' . urlencode($token));
         exit;
+    }
+
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    private function extractRegisterInput(): array
+    {
+        return [
+            'username'        => trim((string)($_POST['username'] ?? '')),
+            'email'           => trim((string)($_POST['email'] ?? '')),
+            'password'        => (string)($_POST['password'] ?? ''),
+            'passwordConfirm' => (string)($_POST['password_confirm'] ?? ''),
+            'firstName'       => trim((string)($_POST['first_name'] ?? '')),
+            'lastName'        => trim((string)($_POST['last_name'] ?? '')),
+        ];
+    }
+
+    private function buildOldPayload(array $input): string
+    {
+        return (string)json_encode([
+            'username'  => $input['username'],
+            'email'     => $input['email'],
+            'firstName' => $input['firstName'],
+            'lastName'  => $input['lastName'],
+        ]);
+    }
+
+    private function startAuthSession(mixed $userId, string $email, mixed $roleId, string $username): void
+    {
+        Session::regenerate();
+        $_SESSION['auth'] = [
+            'user_id'  => $userId,
+            'email'    => $email,
+            'role_id'  => $roleId,
+            'username' => $username,
+        ];
+    }
+
+    private function redirectToLoginWithError(string $error): never
+    {
+        Session::setFlash('login_error', $error);
+        header('Location: /login');
+        exit;
+    }
+
+    private function redirectToRegisterWithError(string $error, string $old): never
+    {
+        Session::setFlash('register_error', $error);
+        Session::setFlash('register_old', $old);
+        header('Location: /register');
+        exit;
+    }
+
+    private function redirectToForgotPasswordWithError(string $error): never
+    {
+        Session::setFlash('forgot_password_error', $error);
+        header('Location: /forgot-password');
+        exit;
+    }
+
+    private function redirectToResetPasswordWithError(string $error, string $token): never
+    {
+        Session::setFlash('reset_password_error', $error);
+        header('Location: /reset-password?token=' . urlencode($token));
+        exit;
+    }
+
+    private function verifyRecaptcha(string $token): bool
+    {
+        if ($token === '') return false;
+
+        $appConfig = require __DIR__ . '/../Config/app.php';
+        $body = http_build_query([
+            'secret'   => $appConfig['recaptcha_secret_key'],
+            'response' => $token,
+            'remoteip' => $_SERVER['REMOTE_ADDR'] ?? '',
+        ]);
+
+        $ctx = stream_context_create(['http' => [
+            'method'  => 'POST',
+            'header'  => 'Content-Type: application/x-www-form-urlencoded',
+            'content' => $body,
+            'timeout' => 5,
+        ]]);
+
+        $raw = @file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $ctx);
+        if ($raw === false) return false;
+
+        $data = json_decode($raw, true);
+        return isset($data['success']) && $data['success'] === true;
     }
 }

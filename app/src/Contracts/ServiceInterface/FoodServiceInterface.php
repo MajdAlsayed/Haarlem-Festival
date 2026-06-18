@@ -20,6 +20,9 @@ interface FoodServiceInterface
 
     public function getRestaurantOrFail(int $id): Restaurant;
 
+    /** @return array{0: Restaurant, 1: array, 2: array, 3: float} */
+    public function getBookingOverviewData(int $id): array;
+
     public function getUserByEmail(string $email): ?User;
 
     /** @param object|null $user */

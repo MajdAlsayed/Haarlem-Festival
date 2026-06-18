@@ -55,14 +55,9 @@ final class AuthService implements AuthServiceInterface
         $identifier = trim($emailOrUsername);
         if ($identifier === '') return null;
 
-        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
-            $user = $this->users->findByEmail(strtolower($identifier));
-        } else {
-            $user = $this->users->findByUsername($identifier);
-        }
+        $user = $this->findUserByIdentifier($identifier);
 
-        if ($user === null) return null;
-        if (!$user->isActive) return null;
+        if ($user === null || !$user->isActive) return null;
         if (!$this->verifyPassword($password, $user->passwordHash)) return null;
 
         return $user;
@@ -76,20 +71,9 @@ final class AuthService implements AuthServiceInterface
         string $firstName,
         string $lastName
     ): array {
-        if ($username === '' || $email === '' || $password === '' || $firstName === '' || $lastName === '') {
-            return ['ok' => false, 'error' => 'Please fill in all fields.'];
-        }
-
-        if ($password !== $passwordConfirm) {
-            return ['ok' => false, 'error' => 'Passwords do not match.'];
-        }
-
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return ['ok' => false, 'error' => 'Please use a valid email.'];
-        }
-
-        if (!$this->passwordStrongEnough($password)) {
-            return ['ok' => false, 'error' => 'Password must be 12+ chars with upper, lower, number, symbol.'];
+        $error = $this->validateRegistrationInput($username, $email, $password, $passwordConfirm, $firstName, $lastName);
+        if ($error !== null) {
+            return ['ok' => false, 'error' => $error];
         }
 
         if ($this->users->existsEmail($email)) {
@@ -101,8 +85,7 @@ final class AuthService implements AuthServiceInterface
         }
 
         $roleId = $this->users->getRoleIdByName('customer') ?? 2;
-        $hash   = $this->hashPassword($password);
-        $userId = $this->users->createUser($roleId, $username, $email, $hash, $firstName, $lastName);
+        $userId = $this->users->createUser($roleId, $username, $email, $this->hashPassword($password), $firstName, $lastName);
 
         return ['ok' => true, 'user_id' => $userId, 'role_id' => $roleId];
     }
@@ -112,83 +95,105 @@ final class AuthService implements AuthServiceInterface
         $identifier = trim($identifier);
 
         if ($identifier === '') {
-            return [
-                'ok' => false,
-                'error' => 'Please enter your email or username.'
-            ];
+            return ['ok' => false, 'error' => 'Please enter your email or username.'];
         }
 
-        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
-            $user = $this->users->findByEmail(strtolower($identifier));
-        } else {
-            $user = $this->users->findByUsername($identifier);
-        }
+        $user = $this->findUserByIdentifier($identifier);
 
         if ($user === null || !$user->isActive) {
-            return [
-                'ok' => false,
-                'error' => 'No active account was found with that email or username.'
-            ];
+            return ['ok' => false, 'error' => 'No active account was found with that email or username.'];
         }
 
-        $token = bin2hex(random_bytes(32));
-        $tokenHash = hash('sha256', $token);
-        $expiresAt = gmdate('Y-m-d H:i:s', time() + self::PASSWORD_RESET_TTL_SECONDS);
-
-        $this->passwordResetTokens->invalidateAllForUser($user->id);
-        $this->passwordResetTokens->create($user->id, $tokenHash, $expiresAt);
-
-        $dummyLink = '/reset-password?token=' . urlencode($token);
+        $token = $this->issuePasswordResetToken($user->id);
 
         return [
-            'ok' => true,
-            'message' => 'Reset link created successfully.',
-            'dummy_link' => $dummyLink,
+            'ok'         => true,
+            'message'    => 'Reset link created successfully.',
+            'dummy_link' => '/reset-password?token=' . urlencode($token),
         ];
     }
 
     public function validatePasswordResetToken(string $token): bool
     {
-        $token = trim($token);
-        if ($token === '') {
-            return false;
-        }
-
-        $reset = $this->passwordResetTokens->findValidByTokenHash(hash('sha256', $token));
-
-        return $reset !== null && (bool)$reset['is_active'];
+        return $this->findValidResetByToken(trim($token)) !== null;
     }
 
     public function resetPassword(string $token, string $password, string $passwordConfirm): array
     {
-        $token = trim($token);
-
-        if ($token === '') {
+        $reset = $this->findValidResetByToken(trim($token));
+        if ($reset === null) {
             return ['ok' => false, 'error' => 'Invalid or expired reset link.'];
         }
 
-        $reset = $this->passwordResetTokens->findValidByTokenHash(hash('sha256', $token));
-        if ($reset === null || !(bool)$reset['is_active']) {
-            return ['ok' => false, 'error' => 'Invalid or expired reset link.'];
+        $passwordError = $this->validateNewPassword($password, $passwordConfirm);
+        if ($passwordError !== null) {
+            return ['ok' => false, 'error' => $passwordError];
         }
 
-        if ($password !== $passwordConfirm) {
-            return ['ok' => false, 'error' => 'Passwords do not match.'];
-        }
-
-        if (!$this->passwordStrongEnough($password)) {
-            return ['ok' => false, 'error' => 'Password must be 12+ chars with upper, lower, number, symbol.'];
-        }
-
-        $passwordHash = $this->hashPassword($password);
-        $userId = (int)$reset['user_id'];
-        $resetId = (int)$reset['reset_id'];
-
-        $this->users->updatePasswordHash($userId, $passwordHash);
-        $this->passwordResetTokens->markUsed($resetId);
-        $this->passwordResetTokens->invalidateAllForUser($userId);
+        $this->applyPasswordReset((int)$reset['user_id'], (int)$reset['reset_id'], $this->hashPassword($password));
 
         return ['ok' => true, 'message' => 'Your password has been reset. Please log in with your new password.'];
     }
 
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    private function findUserByIdentifier(string $identifier): ?User
+    {
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            return $this->users->findByEmail(strtolower($identifier));
+        }
+        return $this->users->findByUsername($identifier);
+    }
+
+    private function findValidResetByToken(string $token): ?array
+    {
+        $reset = $this->passwordResetTokens->findValidByTokenHash(hash('sha256', $token));
+        return ($reset !== null && (bool)$reset['is_active']) ? $reset : null;
+    }
+
+    private function validateRegistrationInput(
+        string $username,
+        string $email,
+        string $password,
+        string $passwordConfirm,
+        string $firstName,
+        string $lastName
+    ): ?string {
+        if ($username === '' || $email === '' || $password === '' || $firstName === '' || $lastName === '') {
+            return 'Please fill in all fields.';
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return 'Please use a valid email.';
+        }
+        return $this->validateNewPassword($password, $passwordConfirm);
+    }
+
+    private function validateNewPassword(string $password, string $passwordConfirm): ?string
+    {
+        if ($password !== $passwordConfirm) {
+            return 'Passwords do not match.';
+        }
+        if (!$this->passwordStrongEnough($password)) {
+            return 'Password must be 12+ chars with upper, lower, number, symbol.';
+        }
+        return null;
+    }
+
+    private function issuePasswordResetToken(int $userId): string
+    {
+        $token     = bin2hex(random_bytes(32));
+        $expiresAt = gmdate('Y-m-d H:i:s', time() + self::PASSWORD_RESET_TTL_SECONDS);
+
+        $this->passwordResetTokens->invalidateAllForUser($userId);
+        $this->passwordResetTokens->create($userId, hash('sha256', $token), $expiresAt);
+
+        return $token;
+    }
+
+    private function applyPasswordReset(int $userId, int $resetId, string $passwordHash): void
+    {
+        $this->users->updatePasswordHash($userId, $passwordHash);
+        $this->passwordResetTokens->markUsed($resetId);
+        $this->passwordResetTokens->invalidateAllForUser($userId);
+    }
 }

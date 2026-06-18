@@ -71,16 +71,23 @@ if (preg_match('#^/food/restaurant/(\d+)$#', $uri, $m)) {
     exit;
 }
 if (preg_match('#^/food/restaurant/(\d+)/booking$#', $uri, $m)) {
-    if ($method !== 'GET' && $method !== 'POST') {
+    if ($method === 'GET') {
+        (new FoodController())->booking((int) $m[1]);
+    } elseif ($method === 'POST') {
+        (new FoodController())->submitBooking((int) $m[1]);
+    } else {
         http_response_code(405);
-        exit;
     }
-    (new FoodController())->booking((int) $m[1]);
     exit;
 }
 if (preg_match('#^/food/restaurant/(\d+)/booking/overview$#', $uri, $m)) {
-    if ($method !== 'GET' && $method !== 'POST') { http_response_code(405); exit; }
-    (new FoodController())->bookingOverview((int) $m[1]);
+    if ($method === 'GET') {
+        (new FoodController())->bookingOverview((int) $m[1]);
+    } elseif ($method === 'POST') {
+        (new FoodController())->confirmBooking((int) $m[1]);
+    } else {
+        http_response_code(405);
+    }
     exit;
 }
 // Dance: event and artist detail URLs (index is /dance via DanceController).
