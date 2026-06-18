@@ -574,10 +574,6 @@ case '/admin/stories/delete':
         (new HistoryController())->tours();
         break;
 
-    case '/history/tours/schedule':
-        (new HistoryController())->toursSchedule();
-        break;
-
     case '/jazz':
     case '/jazz/':
         (new JazzController())->index();

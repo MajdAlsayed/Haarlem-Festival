@@ -262,7 +262,6 @@ $breadcrumbs = [
             });
         });
 
-        // Intercept ADD TO CART click BEFORE cartDrawer.js reads the ID
         // We use capture phase (true) so our listener fires first
         document.addEventListener('click', function (e) {
             var btn = e.target.closest('.history-tours-add-button');
@@ -271,13 +270,13 @@ $breadcrumbs = [
             var regularId = btn.getAttribute('data-ticket-details-id');
             var familyId  = btn.getAttribute('data-ticket-family-id');
 
-            // Swap the ID to the correct one before cartDrawer.js reads it
+            // Swap the ID to the correct one before cart.js reads it
             if (selectedType === 'family' && familyId && familyId !== '0') {
                 btn.setAttribute('data-ticket-details-id', familyId);
             } else {
                 btn.setAttribute('data-ticket-details-id', regularId);
             }
-        }, true); // true = capture phase — fires before cartDrawer.js bubble listener
+        }, true); // true = capture phase — fires before cart.js bubble listener
     })();
 </script>
 </body>
