@@ -5,6 +5,7 @@
 /** @var ?string $success */
 /** @var ?string $error */
 
+$h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 $loggedIn = !empty($_SESSION['auth']['user_id'] ?? null);
 
 // Settings for the page title, styles, body class
@@ -44,7 +45,7 @@ $breadcrumbs = [
         <div class="cart-lines">
             <?php foreach ($vm->items as $item): ?>
                 <div class="festival-card cart-line">
-                    <<div class="cart-line__content">
+                    <div class="cart-line__content">
                         <div>
                             <strong class="section-subtitle cart-line__title"><?= htmlspecialchars((string)$item->name, ENT_QUOTES, 'UTF-8') ?></strong>
                             <p class="copy-text copy-text--sm copy-text--muted cart-line__meta">

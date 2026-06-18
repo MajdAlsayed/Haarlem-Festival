@@ -48,20 +48,47 @@ final class OrderConfirmationMailer
 
         $subject = "{$site} — Order #{$orderId} (tickets)";
         $body = EmailView::paidOrder($site, $orderId, $order, $lines, $tickets);
-        $attachments = [
-            [
-                'name' => 'invoice-' . $orderId . '.pdf',
-                'content' => $this->invoicePdfService->render(
-                    InvoiceView::html($order, $lines, $name, $user->email, $site),
-                ),
-            ],
-            [
-                'name' => 'tickets-' . $orderId . '.pdf',
-                'content' => $this->buildTicketsPdf($orderId, $name, $site),
-            ],
-        ];
+        $attachments = $this->buildPaidOrderAttachments($orderId, $order, $lines, $name, $user->email, $site);
 
         $this->deliverEmail($user->email, $subject, $body, $attachments);
+    }
+
+    /**
+     * @param array<string, mixed> $order
+     * @param list<array<string, mixed>> $lines
+     * @return list<array{name: string, content: string}>
+     */
+    private function buildPaidOrderAttachments(
+        int $orderId,
+        array $order,
+        array $lines,
+        string $name,
+        string $email,
+        string $site,
+    ): array {
+        $attachments = [];
+
+        try {
+            $attachments[] = [
+                'name' => 'invoice-' . $orderId . '.pdf',
+                'content' => $this->invoicePdfService->render(
+                    InvoiceView::html($order, $lines, $name, $email, $site),
+                ),
+            ];
+        } catch (\Throwable $e) {
+            error_log('OrderConfirmationMailer: invoice PDF skipped for order #' . $orderId . ': ' . $e->getMessage());
+        }
+
+        try {
+            $attachments[] = [
+                'name' => 'tickets-' . $orderId . '.pdf',
+                'content' => $this->buildTicketsPdf($orderId, $name, $site),
+            ];
+        } catch (\Throwable $e) {
+            error_log('OrderConfirmationMailer: tickets PDF skipped for order #' . $orderId . ': ' . $e->getMessage());
+        }
+
+        return $attachments;
     }
 
     // pay-later: email only, no pdfs yet
