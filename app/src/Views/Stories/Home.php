@@ -11,81 +11,78 @@ if (!function_exists('h')) {
 $featured = $vm->featured ?? [];
 $heroImages = $vm->getHomeHeroImages();
 $exploreItems = $vm->getHomeExploreItems();
+
+// Settings for the page title, styles, body class
+$pageTitle = $vm->pageTitle ?? 'Stories in Haarlem';
+$pageStyles = ['/css/pages/stories.css'];
+$bodyClass = 'stories-page';
+
+// Hero settings
+$heroModifier = 'festival-hero--stories';
+$heroImage = '/images/Stories/stories-home-hero.jpg';
+$heroImageAlt = 'Stories in Haarlem';
+$heroTitle = "Welcome to Stories In Haarlem";
+$heroSubtitle = 'Experience Haarlem Through Stories – Past, Present & Future';
+
+// Breadcrumbs
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'Stories', 'url' => null],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= h($vm->pageTitle ?? 'Stories in Haarlem') ?></title>
+<?php require __DIR__ . '/../partials/head.php'; ?>
 
-    <link rel="stylesheet" href="/css/style.css?v=<?= h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/Stories/home-featured.css?v=<?= h($app['css_version'] ?? '1') ?>-hero4">
-</head>
-
-<body class="stories-home">
+<body class="<?= htmlspecialchars($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main>
 
     <!-- Hero banner -->
-    <section class="stories-hero-banner" aria-label="Hero images">
-        <?php foreach ($heroImages as $i => $heroImage): ?>
-            <div class="hero-img hero-img-<?= $i + 1 ?>" style="background-image: url('<?= h($heroImage) ?>');" role="img" aria-label="Stories banner image <?= $i + 1 ?>"></div>
-        <?php endforeach; ?>
-        <div class="hero-overlay">
-            <h1><?= h($vm->settings['home_hero_heading'] ?? 'Welcome to Stories In Haarlem') ?></h1>
-            <p><?= h($vm->settings['home_hero_tagline'] ?? '') ?></p>
-        </div>
-    </section>
+    <?php require __DIR__ . '/../partials/festival-hero.php'; ?>
 
     <!-- Breadcrumb -->
-    <nav class="stories-breadcrumb" aria-label="Breadcrumb">
-        <div class="stories-breadcrumb-inner">
-            <a href="/" class="stories-breadcrumb-link">HOME</a>
-            <span class="stories-breadcrumb-separator" aria-hidden="true">→</span>
-            <span class="stories-breadcrumb-link active" aria-current="page">STORIES</span>
-        </div>
-    </nav>
+    <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
     <!-- Intro section -->
-    <section class="stories-heading-section">
-        <div class="stories-heading-inner">
-            <h2 class="stories-heading-title"><?= h($vm->settings['home_intro_heading'] ?? 'The City That Speaks Through Its People') ?></h2>
-            <p class="stories-heading-text">
-                <?= h($vm->settings['home_intro_text'] ?? '') ?>
-            </p>
-        </div>
-    </section>
-
-    <!-- What You Can Explore Section -->
-    <section class="stories-explore-section" aria-label="What you can explore">
-        <div class="stories-explore-inner">
-            <h2 class="stories-explore-title"><?= h($vm->settings['home_explore_title'] ?? 'What You Can Explore') ?></h2>
-            <div class="stories-explore-list">
-                <?php foreach ($exploreItems as $item): ?>
-                    <div class="explore-item">
-                        <h3><?= h($item['title'] ?? '') ?></h3>
-                        <p><?= h($item['description'] ?? '') ?></p>
-                    </div>
-                <?php endforeach; ?>
+    <section class="stories-about-banner">
+        <div class="container">
+            <div class="stories-about-banner-content">
+                <h2 class="section-title section-title--accent section-title--underlined stories-about-banner-title">
+                    <?= h($vm->settings['home_intro_heading'] ?? 'The City That Speaks Through Its People') ?>
+                </h2>
+                <p class="copy-text">
+                    <?= h($vm->settings['home_intro_text'] ?? '') ?>
+                </p>
             </div>
         </div>
     </section>
 
-    <!-- Events Section -->
-    <section class="stories-events-section" aria-label="Events that tell Haarlem's story">
-        <div class="stories-events-inner">
-            <h2 class="stories-events-title"><?= h($vm->settings['home_events_title'] ?? '15 Events That Tell Haarlem\'s Story') ?></h2>
-            <p class="stories-events-subtitle"><?= h($vm->settings['home_events_subtitle'] ?? '') ?></p>
+    <!-- What You Can Explore Section -->
+    <section class="container stories-explore-section" aria-label="What you can explore">
+        <h2 class="stories-explore-title"><?= h($vm->settings['home_explore_title'] ?? 'What You Can Explore') ?></h2>
+        <div class="stories-explore-list">
+            <?php foreach ($exploreItems as $item): ?>
+                <div class="explore-item">
+                    <h3><?= h($item['title'] ?? '') ?></h3>
+                    <p><?= h($item['description'] ?? '') ?></p>
+                </div>
+            <?php endforeach; ?>
         </div>
     </section>
 
+    <!-- Events Section -->
+    <section class="container stories-events-section" aria-label="Events that tell Haarlem's story">
+        <h2 class="stories-events-title"><?= h($vm->settings['home_events_title'] ?? '15 Events That Tell Haarlem\'s Story') ?></h2>
+        <p class="stories-events-subtitle"><?= h($vm->settings['home_events_subtitle'] ?? '') ?></p>
+    </section>
+
     <!-- Featured Stories Section -->
-    <section class="stories-featured" aria-label="Featured stories">
+    <section class="container stories-featured" aria-label="Featured stories">
         <div class="stories-featured-header">
-            <h2><?= h($vm->settings['home_featured_heading'] ?? 'Featured Stories') ?></h2>
+            <h2 class="section-title section-title--accent section-title--underlined" ><?= h($vm->settings['home_featured_heading'] ?? 'Featured Stories') ?></h2>
         </div>
 
         <div class="stories-featured-grid">
@@ -128,7 +125,7 @@ $exploreItems = $vm->getHomeExploreItems();
 
     <!-- Echoes of History Section -->
     <section class="stories-echoes-section" aria-label="Echoes of history stories">
-        <div class="stories-echoes-inner">
+        <div class="container stories-echoes-inner">
             <h2 class="stories-echoes-title"><?= h($vm->settings['home_echoes_title'] ?? 'Echoes of History: Stories of') ?></h2>
             <p class="stories-echoes-subtitle"><?= h($vm->settings['home_echoes_subtitle'] ?? '') ?></p>
             <a href="/stories/events" class="stories-echoes-button"><?= h($vm->settings['home_echoes_button'] ?? 'View our Stories') ?></a>
@@ -136,11 +133,9 @@ $exploreItems = $vm->getHomeExploreItems();
     </section>
 
     <!-- About Stories Section -->
-    <section class="stories-about-section" aria-label="About Stories">
-        <div class="stories-about-inner">
-            <h2 class="stories-about-title"><?= h($vm->settings['home_about_title'] ?? 'About Stories') ?></h2>
-            <p class="stories-about-text"><?= h($vm->settings['home_about_text'] ?? '') ?></p>
-        </div>
+    <section class="container stories-about-section" aria-label="About Stories">
+        <h2 class="stories-about-title"><?= h($vm->settings['home_about_title'] ?? 'About Stories') ?></h2>
+        <p class="stories-about-text"><?= h($vm->settings['home_about_text'] ?? '') ?></p>
     </section>
 
 </main>

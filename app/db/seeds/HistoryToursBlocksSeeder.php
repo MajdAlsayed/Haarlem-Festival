@@ -90,7 +90,7 @@ class HistoryToursBlocksSeeder extends AbstractSeed
                 'page_id' => $pageId,
                 'block_type' => 'ticket_options',
                 'content_json' => json_encode([
-                    'title' => 'WHAT\'S INCLUDED',
+                    'title' => 'Select your ticket',
                     'tickets' => [
                         [
                             'name' => 'Regular Ticket',

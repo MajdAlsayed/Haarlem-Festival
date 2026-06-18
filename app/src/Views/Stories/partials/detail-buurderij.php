@@ -31,56 +31,45 @@ $bottomText  = ($detailPage['article_paragraph_3'] ?? '') ?: 'The Story of Buurd
 $bottomImage = ($gallery[0]['image']               ?? '') ?: $assets['main2'];
 
 $gallery1 = [
-    'image'   => ($gallery[0]['image']   ?? '') ?: $assets['gallery1'],
-    'heading' => ($gallery[0]['heading'] ?? '') ?: 'Local food choices',
-    'text'    => ($gallery[0]['text']    ?? '') ?: 'Fresh products, short supply chains, and meaningful contact between producers and residents.',
+        'image'   => ($gallery[0]['image']   ?? '') ?: $assets['gallery1'],
+        'heading' => ($gallery[0]['heading'] ?? '') ?: 'Local food choices',
+        'text'    => ($gallery[0]['text']    ?? '') ?: 'Fresh products, short supply chains, and meaningful contact between producers and residents.',
 ];
 $gallery2 = [
-    'image'   => ($gallery[1]['image']   ?? '') ?: $assets['gallery2'],
-    'heading' => ($gallery[1]['heading'] ?? '') ?: 'Community gathering',
-    'text'    => ($gallery[1]['text']    ?? '') ?: 'A welcoming space where people meet, exchange ideas, and rediscover the social side of food.',
+        'image'   => ($gallery[1]['image']   ?? '') ?: $assets['gallery2'],
+        'heading' => ($gallery[1]['heading'] ?? '') ?: 'Community gathering',
+        'text'    => ($gallery[1]['text']    ?? '') ?: 'A welcoming space where people meet, exchange ideas, and rediscover the social side of food.',
 ];
 $gallery3 = [
-    'image'   => ($gallery[2]['image']   ?? '') ?: $assets['gallery3'],
-    'heading' => ($gallery[2]['heading'] ?? '') ?: 'Sustainable local culture',
-    'text'    => ($gallery[2]['text']    ?? '') ?: "Buurderij reflects Haarlem's creative, sustainable, and community-focused identity in everyday life.",
+        'image'   => ($gallery[2]['image']   ?? '') ?: $assets['gallery3'],
+        'heading' => ($gallery[2]['heading'] ?? '') ?: 'Sustainable local culture',
+        'text'    => ($gallery[2]['text']    ?? '') ?: "Buurderij reflects Haarlem's creative, sustainable, and community-focused identity in everyday life.",
 ];
 ?>
 
 <section class="buurderij-page">
 
-    <section class="buurderij-hero">
-        <div class="buurderij-hero-image">
-            <img src="<?= h($heroImage) ?>" alt="<?= h($heroTitle) ?>">
-            <div class="buurderij-hero-overlay"></div>
-            <div class="buurderij-hero-copy">
-                <h1 class="buurderij-title"><?= h($heroTitle) ?></h1>
-                <p class="buurderij-hero-subtitle">Haarlem</p>
-                <?php if ($ticketDetailsId > 0): ?>
-                    <button type="button" class="buurderij-hero-btn add-to-cart-button" data-ticket-details-id="<?= $ticketDetailsId ?>" data-contribution-total="0">Book Now &rsaquo;</button>
-                <?php else: ?>
-                    <a class="buurderij-hero-btn" href="<?= h($vm->getTicketUrl()) ?>">Book Now &rsaquo;</a>
-                <?php endif; ?>
-            </div>
-        </div>
-    </section>
+    <?php
+    $pageHeroTitle = $heroTitle;
+    $pageHeroSubtitle = '';
+    $pageHeroImage = $heroImage;
+    $pageHeroAlt = $heroTitle;
+    $pageHeroClass = 'stories-detail-hero stories-buurderij-detail-hero';
+    $pageHeroContentClass = 'stories-detail-hero__content';
+    ?>
 
-    <nav class="stories-breadcrumb" aria-label="Breadcrumb">
-        <div class="stories-breadcrumb-inner">
-            <a href="/" class="stories-breadcrumb-link">HOME</a>
-            <span class="stories-breadcrumb-separator" aria-hidden="true">&rarr;</span>
-            <a href="/stories" class="stories-breadcrumb-link">STORIES</a>
-            <span class="stories-breadcrumb-separator" aria-hidden="true">&rarr;</span>
-            <span class="stories-breadcrumb-link active" aria-current="page"><?= h($story['name'] ?? 'Buurderij Haarlem') ?></span>
-        </div>
-    </nav>
+    <?php require __DIR__ . '/../../partials/page-hero.php'; ?>
+
+    <?php require __DIR__ . '/../../partials/breadcrumbs.php'; ?>
 
     <section class="buurderij-content">
 
         <section class="buurderij-intro">
             <div class="buurderij-intro-inner">
-                <h2><?= h($introTitle) ?></h2>
-                <p><?= nl2br(h($introText)) ?></p>
+                <h2 class="section-title section-title--accent section-title--underlined buurderij-intro-title">
+                    <?= h($introTitle) ?>
+                </h2>
+                <p class="copy-text buurderij-intro-text"><?= nl2br(h($introText)) ?></p>
                 <span>SCROLL DOWN</span>
                 <div class="buurderij-scroll-pill"></div>
             </div>
@@ -91,9 +80,9 @@ $gallery3 = [
                 <img src="<?= h($mainImage) ?>" alt="Buurderij Haarlem">
             </div>
             <div class="buurderij-main-text">
-                <h3><?= h($mainTitle) ?></h3>
-                <p><?= nl2br(h($mainText1)) ?></p>
-                <p><?= nl2br(h($mainText2)) ?></p>
+                <h3 class="section-subtitle buurderij-main-title"><?= h($mainTitle) ?></h3>
+                <p class="copy-text"><?= nl2br(h($mainText1)) ?></p>
+                <p class="copy-text"><?= nl2br(h($mainText2)) ?></p>
             </div>
         </section>
 
@@ -101,8 +90,8 @@ $gallery3 = [
             <?php foreach ([$gallery1, $gallery2, $gallery3] as $item): ?>
                 <article class="buurderij-gallery-card">
                     <img src="<?= h($item['image']) ?>" alt="<?= h($item['heading']) ?>">
-                    <h4><?= h($item['heading']) ?></h4>
-                    <p><?= nl2br(h($item['text'])) ?></p>
+                    <h4 class="section-subtitle buurderij-gallery-title"><?= h($item['heading']) ?></h4>
+                    <p class="copy-text copy-text--sm"><?= nl2br(h($item['text'])) ?></p>
                 </article>
             <?php endforeach; ?>
         </section>
@@ -115,19 +104,21 @@ $gallery3 = [
                 <div class="buurderij-age-box">
                     <div class="buurderij-age-top">
                         <span class="buurderij-age-icon">!</span>
-                        <span class="buurderij-age-text">Age requirement</span>
+                        <span class="copy-text copy-text--sm buurderij-age-text">Age requirement</span>
                         <span class="buurderij-age-badge"><?= h($ageText ?: '16+') ?></span>
                     </div>
-                    <p>This session contains spoken-word content and is recommended for ages <?= h($ageText ?: '16+') ?>.</p>
+                    <p class="copy-text copy-text--sm">
+                        This session contains spoken-word content and is recommended for ages <?= h($ageText ?: '16+') ?>.
+                    </p>
                 </div>
 
-                <div class="buurderij-contribute-copy">
+                <div class="copy-text buurderij-contribute-copy">
                     Choose the amount you want to contribute.<br>
                     Your contribution supports the storytellers and future events.<br>
                     EUR 0 is also welcome - just reserve
                 </div>
 
-                <div class="buurderij-amount-label">Suggested amounts</div>
+                <div class="copy-text copy-text--sm buurderij-amount-label">Suggested amounts</div>
                 <div class="buurderij-amount-grid">
                     <button type="button" class="buurderij-amount-btn active" data-contribution-amount="0">EUR 0</button>
                     <button type="button" class="buurderij-amount-btn" data-contribution-amount="5">EUR 5</button>
@@ -136,20 +127,20 @@ $gallery3 = [
                     <button type="button" class="buurderij-amount-btn" data-contribution-amount="20">EUR 20</button>
                 </div>
 
-                <div class="buurderij-custom-label">Or enter a custom amount</div>
+                <div class="copy-text copy-text--sm buurderij-custom-label">Or enter a custom amount</div>
                 <div class="buurderij-custom-input-wrap">
                     <input type="text" class="buurderij-custom-amount" value="0" placeholder="0">
                 </div>
 
                 <div class="buurderij-total-row">
-                    <span>Your contribution</span>
-                    <strong class="buurderij-contribution-total">EUR 0.00</strong>
+                    <span class="copy-text copy-text--sm">Your contribution</span>
+                    <strong class="copy-text">EUR 0.00</strong>
                 </div>
 
                 <?php if ($ticketDetailsId > 0): ?>
                     <button type="button" class="buurderij-reserve-btn add-to-cart-button" data-ticket-details-id="<?= $ticketDetailsId ?>" data-contribution-source="buurderij">Reserve &rsaquo;</button>
                 <?php else: ?>
-                    <a href="<?= h($vm->getTicketUrl()) ?>" class="buurderij-reserve-btn">Reserve &rsaquo;</a>
+                    <a href="<?= h($vm->getTicketUrl()) ?>" class="btn btn--primary btn--sm buurderij-reserve-btn">Reserve &rsaquo;</a>
                 <?php endif; ?>
             </div>
 
@@ -176,8 +167,8 @@ $gallery3 = [
                 </div>
 
                 <div class="buurderij-reservation-box buurderij-reservation-box-large">
-                    <h4>Reservation</h4>
-                    <ul>
+                    <h4 class="section-subtitle buurderij-reservation-title">Reservation</h4>
+                    <ul class="copy-text copy-text--sm">
                         <li>Reservation is required</li>
                         <li>Even for Pay As You Like events</li>
                         <li>Reservation guarantees entry (limited capacity)</li>

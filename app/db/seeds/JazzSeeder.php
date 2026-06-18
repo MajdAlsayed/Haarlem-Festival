@@ -30,20 +30,20 @@ final class JazzSeeder extends AbstractSeed
         // 4) Jazz events (cards)
         $events = [
             // THURSDAY
-            [$jazzTypeId,$patronaatId,'Gumbo Kings','Groove with the Gumbo Kings� soulful jazz!', 'thursday','18:00','19:00','Main hall',15.00],
+            [$jazzTypeId,$patronaatId,'Gumbo Kings','Groove with the Gumbo Kings\' soulful jazz!', 'thursday','18:00','19:00','Main hall',15.00],
             [$jazzTypeId,$patronaatId,'Evolve','Join Evolve for an unforgettable jazz experience!', 'thursday','19:30','20:30','Main hall',15.00],
-            [$jazzTypeId,$patronaatId,'Ntjam Rosie','Experience Ntjam Rosie�s soulful performance!', 'thursday','21:00','22:00','Main hall',15.00],
+            [$jazzTypeId,$patronaatId,'Ntjam Rosie','Experience Ntjam Rosie\'s soulful performance!', 'thursday','21:00','22:00','Main hall',15.00],
             [$jazzTypeId,$patronaatId,'Wicked Jazz Sounds','Feel the groove with Wicked Jazz Sounds!', 'thursday','18:00','19:00','Second hall',10.00],
-            [$jazzTypeId,$patronaatId,'Wouter Hamel','Enjoy Wouter Hamel�s captivating jazz tunes!', 'thursday','19:30','20:30','Second hall',10.00],
+            [$jazzTypeId,$patronaatId,'Wouter Hamel','Enjoy Wouter Hamel\'s captivating jazz tunes!', 'thursday','19:30','20:30','Second hall',10.00],
             [$jazzTypeId,$patronaatId,'Jonna Frazer','Feel the energy with Jonna Frazer live!', 'thursday','21:00','22:00','Second hall',10.00],
 
             // FRIDAY (one Karsu slot)
             [$jazzTypeId,$patronaatId,'Karsu','Experience Karsu\'s powerful voice and captivating melodies live.', 'friday','18:00','19:00','Main hall',15.00],
             [$jazzTypeId,$patronaatId,'Uncle Sue','Groove with Uncle Sue and their vibrant jazz tunes.', 'friday','19:30','20:30','Main hall',15.00],
             [$jazzTypeId,$patronaatId,'Chris Allen','Let Chris Allen mesmerize you with soulful rhythms.', 'friday','21:00','22:00','Main hall',15.00],
-            [$jazzTypeId,$patronaatId,'Myles Sanko','Dive into Myles Sanko�s smooth jazz vibes.', 'friday','18:00','19:00','Second hall',10.00],
-            [$jazzTypeId,$patronaatId,'Ilse Huizinga','Feel the elegance of Ilse Huizinga�s performance.', 'friday','19:30','20:30','Second hall',10.00],
-            [$jazzTypeId,$patronaatId,'Eric Vloeimans en Hotspot','Enjoy Eric Vloeimans and Hotspot�s dynamic fusion.', 'friday','21:00','22:00','Second hall',10.00],
+            [$jazzTypeId,$patronaatId,'Myles Sanko','Dive into Myles Sanko\'s smooth jazz vibes.', 'friday','18:00','19:00','Second hall',10.00],
+            [$jazzTypeId,$patronaatId,'Ilse Huizinga','Feel the elegance of Ilse Huizinga\'s performance.', 'friday','19:30','20:30','Second hall',10.00],
+            [$jazzTypeId,$patronaatId,'Eric Vloeimans en Hotspot','Enjoy Eric Vloeimans and Hotspot\'s dynamic fusion.', 'friday','21:00','22:00','Second hall',10.00],
 
             // SATURDAY
             [$jazzTypeId,$patronaatId,'Gare du Nord','Immerse yourself in the smooth jazz stylings of Gare du Nord.', 'saturday','18:00','19:00','Main hall',15.00],
@@ -51,7 +51,7 @@ final class JazzSeeder extends AbstractSeed
             [$jazzTypeId,$patronaatId,'Soul Six','Soulful harmonies and dynamic sound.', 'saturday','21:00','22:00','Main hall',15.00],
             [$jazzTypeId,$patronaatId,'Han Bennink','Iconic jazz rhythms in an intimate setting.', 'saturday','18:00','19:00','Third hall',10.00],
             [$jazzTypeId,$patronaatId,'The Nordanians','Innovative and eclectic jazz sound.', 'saturday','19:30','20:30','Third hall',10.00],
-            [$jazzTypeId,$patronaatId,'Lilith Merlot','Close the night with Lilith Merlot�s captivating performance.', 'saturday','21:00','22:00','Third hall',10.00],
+            [$jazzTypeId,$patronaatId,'Lilith Merlot','Close the night with Lilith Merlot\'s captivating performance.', 'saturday','21:00','22:00','Third hall',10.00],
 
             // SUNDAY (open air examples)
             [$jazzTypeId,$groteMarktId,'Ruis Soundsystem','Kick off Sunday with dynamic beats (free).', 'sunday','15:00','16:00',null,0.00],

@@ -1,18 +1,18 @@
 <?php
-/** @var \App\ViewModels\AdminHomepageEditViewModel $viewModel */
-$app = $viewModel->appSettings;
-$c = $viewModel->cmsHome;
+
+$app = $vm->appSettings;
+$c = $vm->cmsHome;
+
+$pageTitle = 'Edit homepage — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Edit homepage — <?= htmlspecialchars((string)($app['site_name'] ?? 'Haarlem Festival')) ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string)($app['css_version'] ?? '1.0')) ?>">
-    <link rel="stylesheet" href="/css/admin.css?v=<?= htmlspecialchars((string)($app['css_version'] ?? '1.0')) ?>">
-</head>
-<body class="admin-page" data-upload-csrf="<?= htmlspecialchars($viewModel->uploadCsrf) ?>" data-upload-url="/admin/cms/upload">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+<body class="<?= $bodyClass ?>"
+      data-upload-csrf="<?= htmlspecialchars($vm->uploadCsrf) ?>"
+      data-upload-url="/admin/cms/upload">
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main class="admin-main">
@@ -25,25 +25,28 @@ $c = $viewModel->cmsHome;
             <span>Homepage CMS</span>
         </nav>
 
-        <h1 class="admin-title">Edit homepage</h1>
-        <p class="admin-lead admin-lead--cms">Title comes from <code class="admin-cms-inline-code">pages</code> (slug <code class="admin-cms-inline-code">home</code>). Other fields are <code class="admin-cms-inline-code">site_settings</code> keys <code class="admin-cms-inline-code">cms_home_*</code>. TinyMCE on selected fields; you can upload the about image. <a href="/" target="_blank" rel="noopener">View site</a></p>
+        <section class="admin-page-header admin-page-header-row">
+            <div>
+                <h1 class="admin-title">Edit homepage</h1>
+                <p class="admin-subtitle">Update hero, welcome, about, and events content for the festival homepage.</p>
+            </div>
+            <a href="/" target="_blank" rel="noopener" class="admin-btn admin-btn-secondary">View site</a>
+        </section>
 
-        <?php require __DIR__ . '/partials/admin_nav.php'; ?>
-
-    <?php if ($viewModel->success !== null): ?>
-        <div class="admin-alert admin-alert-success"><?= htmlspecialchars($viewModel->success) ?></div>
+    <?php if ($vm->success !== null): ?>
+        <div class="admin-alert admin-alert-success"><?= htmlspecialchars($vm->success) ?></div>
     <?php endif; ?>
-    <?php if ($viewModel->error !== null): ?>
-        <div class="admin-alert admin-alert-error"><?= htmlspecialchars($viewModel->error) ?></div>
+    <?php if ($vm->error !== null): ?>
+        <div class="admin-alert admin-alert-error"><?= htmlspecialchars($vm->error) ?></div>
     <?php endif; ?>
 
     <form method="post" action="/admin/cms/homepage" class="admin-cms-home-form">
-        <input type="hidden" name="_csrf" value="<?= htmlspecialchars($viewModel->csrf) ?>">
+        <input type="hidden" name="_csrf" value="<?= htmlspecialchars($vm->csrf) ?>">
 
         <div class="admin-cms-field">
             <label for="page_title">Homepage title (browser tab)</label>
             <input type="text" id="page_title" name="page_title" required maxlength="255"
-                   value="<?= htmlspecialchars($viewModel->pageTitle) ?>">
+                   value="<?= htmlspecialchars($vm->pageTitle) ?>">
         </div>
 
         <div class="admin-cms-section">
@@ -71,7 +74,7 @@ $c = $viewModel->cmsHome;
                 <label for="cms_hero_cta_href">Button link</label>
                 <input type="text" id="cms_hero_cta_href" name="cms[hero_cta_href]" maxlength="500"
                        value="<?= htmlspecialchars($c['hero_cta_href'] ?? '') ?>">
-                <p class="admin-cms-hint">Use <code>#events</code>, <code>/path</code>, or <code>https://…</code></p>
+                <p class="admin-cms-hint">A web link or an on-page section.</p>
             </div>
         </div>
 
@@ -107,10 +110,10 @@ $c = $viewModel->cmsHome;
                 <label for="cms_about_image_src">Image URL path</label>
                 <input type="text" id="cms_about_image_src" name="cms[about_image_src]" maxlength="500"
                        value="<?= htmlspecialchars($c['about_image_src'] ?? '') ?>">
-                <p class="admin-cms-hint">Site path, e.g. <code>/images/cms/home/…</code> or upload below.</p>
+                <p class="admin-cms-hint">Image path, or upload below.</p>
             </div>
             <div class="admin-cms-upload admin-cms-upload--home">
-                <strong>Upload about image</strong> (max 5 MB) → <code class="admin-cms-inline-code">/images/cms/home/</code>
+                <strong>Upload about image</strong> (max 5 MB)
                 <div class="admin-cms-upload-row">
                     <input type="file" id="cms-upload-home-file" accept="image/jpeg,image/png,image/gif,image/webp">
                     <button type="button" class="admin-btn admin-btn-primary admin-btn-sm" id="cms-upload-home-btn">Upload &amp; fill path</button>

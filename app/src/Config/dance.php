@@ -13,7 +13,7 @@ return [
     'all_events_section_title' => 'All events',
     'artists_section_title' => 'Artists',
     'hero_cta_label' => 'See featured events',
-    'hero_subtitle' => '<p>Electronic music across three nights — venues, passes, and headline sets.</p>',
+    'hero_subtitle' => '<p>Electronic music across three nights — venues, passes, and headline sets</p>',
     'about_paragraphs' => [
         '<p>Haarlem Dance brings DJs and live electronic acts to iconic venues. Browse by day, grab tickets or passes, and explore artist profiles.</p>',
     ],
@@ -90,8 +90,8 @@ return [
     'day_label_friday' => 'Friday',
     'day_label_saturday' => 'Saturday',
     'day_label_sunday' => 'Sunday',
-    'artist_info_label' => 'INFO >',
-    'show_more_artists_label' => 'Show More Artists >',
+    'artist_info_label' => 'INFO →',
+    'show_more_artists_label' => 'Show More Artists →',
 
     'venue_order_friday' => [4, 7, 5, 8, 9],
     'venue_order_saturday' => [6, 5, 7],

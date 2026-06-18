@@ -4,46 +4,57 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Core\Database;
+use App\Contracts\EventTypeRepositoryInterface;
+use App\Core\Repository;
 use App\Models\EventType;
+use PDO;
 
-class EventTypeRepository
+final class EventTypeRepository extends Repository implements EventTypeRepositoryInterface
 {
-    /**
-     * Returns event_type_id values in table order (used for homepage category order).
-     *
-     * @return int[]
-     */
     public function getAllIdsOrdered(): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->query('SELECT event_type_id FROM event_types ORDER BY event_type_id');
-        $rows = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-        return array_map('intval', $rows);
+        $stmt = $this->db->query('SELECT event_type_id FROM event_types ORDER BY event_type_id');
+
+        return array_map(static fn ($id): int => (int) $id, $stmt->fetchAll(PDO::FETCH_COLUMN));
     }
 
-    /**
-     * Returns all event types with display fields (for homepage category cards).
-     *
-     * @return EventType[]
-     */
     public function getAllWithDisplay(): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->query(
+        $stmt = $this->db->query(
             'SELECT event_type_id, name, description, card_image, info_path FROM event_types ORDER BY event_type_id'
         );
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
         $types = [];
-        foreach ($rows as $row) {
-            $type = new EventType();
-            $type->id = (int) $row['event_type_id'];
-            $type->name = $row['name'];
-            $type->description = $row['description'];
-            $type->cardImage = !empty($row['card_image']) ? $row['card_image'] : null;
-            $type->infoPath = !empty($row['info_path']) ? $row['info_path'] : '#';
-            $types[] = $type;
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $types[] = $this->mapRowToEventType($row);
         }
+
         return $types;
+    }
+
+    private function mapRowToEventType(array $row): EventType
+    {
+        $type = new EventType();
+        $type->id = (int) $row['event_type_id'];
+        $type->name = (string) $row['name'];
+        $type->description = isset($row['description']) ? (string) $row['description'] : '';
+        $type->cardImage = $this->nullableText($row, 'card_image');
+        $type->infoPath = $this->infoPath($row);
+
+        return $type;
+    }
+
+    private function nullableText(array $row, string $key): ?string
+    {
+        $value = isset($row[$key]) ? (string) $row[$key] : '';
+
+        return $value !== '' ? $value : null;
+    }
+
+    private function infoPath(array $row): string
+    {
+        $value = isset($row['info_path']) ? (string) $row['info_path'] : '';
+
+        return $value !== '' ? $value : '#';
     }
 }

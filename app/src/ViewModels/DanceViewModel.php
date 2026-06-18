@@ -1,44 +1,62 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\ViewModels;
 
-use App\Models\Event;
-
-/** View model for the Dance index: keeps the template thin by passing structured data only. */
 class DanceViewModel
 {
-    public array $events;
-    public array $fridayEvents;
-    public array $saturdayEvents;
-    public array $sundayEvents;
-    public array $featuredEvents;
-    public array $artists;
-    public array $appSettings;
-    public array $danceSettings;
-    public array $breadcrumbs;
-    public string $pageTitle;
-
     public function __construct(
-        array $events,
-        array $fridayEvents,
-        array $saturdayEvents,
-        array $sundayEvents,
-        array $featuredEvents,
-        array $artists,
-        array $appSettings,
-        array $danceSettings,
-        array $breadcrumbs,
-        string $pageTitle = 'Dance Festival'
+        public string $pageTitle,
+        public array $appSettings,
+        public array $breadcrumbs,
+        public string $heroTitle,
+        public string $heroImage,
+        public string $heroSubtitle,
+        public string $heroButtonText,
+        public string $heroButtonUrl,
+        public string $aboutHeading,
+        public array $aboutParagraphs,
+        public string $featuredTitle,
+        public array $featuredCards,
+        public string $allEventsTitle,
+        public array $dayLabels,
+        public array $dayPanels,
+        public string $artistsTitle,
+        public string $artistInfoLabel,
+        public string $showMoreLabel,
+        public array $artistCards,
     ) {
-        $this->events = $events;
-        $this->fridayEvents = $fridayEvents;
-        $this->saturdayEvents = $saturdayEvents;
-        $this->sundayEvents = $sundayEvents;
-        $this->featuredEvents = $featuredEvents;
-        $this->artists = $artists;
-        $this->appSettings = $appSettings;
-        $this->danceSettings = $danceSettings;
-        $this->breadcrumbs = $breadcrumbs;
-        $this->pageTitle = $pageTitle;
+    }
+
+    public static function fromPageData(array $page): self
+    {
+        $hero = $page['hero'];
+        $about = $page['about'];
+        $featured = $page['featured'];
+        $schedule = $page['schedule'];
+        $artists = $page['artists'];
+
+        return new self(
+            pageTitle: (string) $page['pageTitle'],
+            appSettings: $page['appSettings'],
+            breadcrumbs: $page['breadcrumbs'],
+            heroTitle: (string) $hero['title'],
+            heroImage: (string) $hero['image'],
+            heroSubtitle: (string) $hero['subtitle'],
+            heroButtonText: (string) $hero['buttonText'],
+            heroButtonUrl: (string) $hero['buttonUrl'],
+            aboutHeading: (string) $about['heading'],
+            aboutParagraphs: $about['paragraphs'],
+            featuredTitle: (string) $featured['title'],
+            featuredCards: $featured['cards'],
+            allEventsTitle: (string) $schedule['title'],
+            dayLabels: $schedule['dayLabels'],
+            dayPanels: $schedule['panels'],
+            artistsTitle: (string) $artists['title'],
+            artistInfoLabel: (string) $artists['infoLabel'],
+            showMoreLabel: (string) $artists['showMoreLabel'],
+            artistCards: $artists['cards'],
+        );
     }
 }

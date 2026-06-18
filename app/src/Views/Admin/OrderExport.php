@@ -1,65 +1,124 @@
 <?php
-/** @var \App\ViewModels\AdminOrderExportViewModel $viewModel */
+
 $app = $viewModel->appSettings;
+$h = static fn(mixed $v): string => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+
+$pageTitle = 'Export orders — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page admin-orders-page admin-export-page';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Export orders — <?= htmlspecialchars((string)($app['site_name'] ?? 'Haarlem Festival')) ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string)($app['css_version'] ?? '1.0')) ?>">
-    <style>
-        .admin-export-wrap { max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
-        .admin-export-wrap h1 { margin-bottom: 0.5rem; }
-        .admin-export-wrap .hint { color: #555; font-size: 0.95rem; margin-bottom: 1.5rem; }
-        .admin-export-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1.5rem; margin: 1rem 0; }
-        .admin-export-columns label { display: flex; align-items: center; gap: 0.5rem; font-weight: normal; }
-        .admin-export-actions { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
-        .admin-export-error { background: #fee; border: 1px solid #c00; padding: 0.75rem; margin-bottom: 1rem; border-radius: 4px; }
-    </style>
-</head>
-<body>
-<?php $app = $viewModel->appSettings; require __DIR__ . '/../partials/header.php'; ?>
+<?php require __DIR__ . '/../partials/head.php'; ?>
+<body class="<?= $h($bodyClass) ?>">
 
-<main class="admin-export-wrap">
-    <?php require __DIR__ . '/partials/admin_nav.php'; ?>
-    <h1>Export orders</h1>
-    <p class="hint">Choose columns and format. <strong>Total amount</strong> and <strong>Paid at</strong> are available as columns. Excel downloads as <code>.xls</code> (opens in Microsoft Excel).</p>
+<?php require __DIR__ . '/../partials/header.php'; ?>
 
-    <?php if ($viewModel->error !== null): ?>
-        <div class="admin-export-error"><?= htmlspecialchars($viewModel->error) ?></div>
-    <?php endif; ?>
+<main class="admin-main">
+    <div class="admin-container admin-container--wide">
+        <nav class="admin-breadcrumb" aria-label="Breadcrumb">
+            <a href="/"><?= $h($app['site_name'] ?? 'Festival') ?></a>
+            <span class="admin-breadcrumb-sep">›</span>
+            <a href="/admin">Admin</a>
+            <span class="admin-breadcrumb-sep">›</span>
+            <a href="/admin/orders">Orders</a>
+            <span class="admin-breadcrumb-sep">›</span>
+            <span>Export</span>
+        </nav>
 
-    <form method="post" action="/admin/orders/export">
-        <input type="hidden" name="_csrf" value="<?= htmlspecialchars($viewModel->csrf) ?>">
-
-        <fieldset>
-            <legend>Columns</legend>
-            <p class="hint">Leave all unchecked to export every column.</p>
-            <div class="admin-export-columns">
-                <?php foreach ($viewModel->columnLabels as $key => $label): ?>
-                    <label>
-                        <input type="checkbox" name="columns[]" value="<?= htmlspecialchars($key) ?>">
-                        <?= htmlspecialchars($label) ?>
-                    </label>
-                <?php endforeach; ?>
+        <section class="admin-page-header admin-page-header-row">
+            <div>
+                <h1 class="admin-title">Export orders</h1>
+                <p class="admin-subtitle">Download order data for reporting or analysis.</p>
             </div>
-        </fieldset>
+            <a href="/admin/orders" class="admin-btn admin-btn-secondary">← Back to orders</a>
+        </section>
 
-        <fieldset>
-            <legend>Format</legend>
-            <label><input type="radio" name="format" value="csv" checked> CSV (.csv)</label>
-            &nbsp;&nbsp;
-            <label><input type="radio" name="format" value="excel"> Excel (.xls)</label>
-        </fieldset>
+        <?php if ($viewModel->error !== null): ?>
+            <div class="admin-alert admin-alert-error"><?= $h($viewModel->error) ?></div>
+        <?php endif; ?>
 
-        <div class="admin-export-actions">
-            <button type="submit" class="btn btn-primary">Download export</button>
-            <a href="/">Back to site</a>
-        </div>
-    </form>
+        <form method="post" action="/admin/orders/export" class="admin-export-form">
+            <input type="hidden" name="_csrf" value="<?= $h($viewModel->csrf) ?>">
+
+            <div class="admin-export-layout">
+                <section class="admin-panel admin-export-card">
+                    <div class="admin-panel-top admin-export-card-head">
+                        <div>
+                            <h2 class="admin-section-heading">Columns</h2>
+                            <p class="admin-section-note">Pick fields to include. Leave all unchecked for every column.</p>
+                        </div>
+                        <div class="admin-export-quick-actions">
+                            <button type="button" class="admin-btn admin-btn-secondary admin-btn-sm" data-export-select-all>Select all</button>
+                            <button type="button" class="admin-btn admin-btn-secondary admin-btn-sm" data-export-clear-all>Clear</button>
+                        </div>
+                    </div>
+                    <div class="admin-export-columns">
+                        <?php foreach ($viewModel->columnLabels as $key => $label): ?>
+                            <label class="admin-export-column-card">
+                                <input type="checkbox" name="columns[]" value="<?= $h($key) ?>" data-export-column>
+                                <span class="admin-export-column-title"><?= $h($label) ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                </section>
+
+                <aside class="admin-export-sidebar">
+                    <section class="admin-panel admin-export-card">
+                        <div class="admin-panel-top">
+                            <h2 class="admin-section-heading">Format</h2>
+                        </div>
+                        <div class="admin-format-cards">
+                            <label class="admin-format-card is-selected">
+                                <input type="radio" name="format" value="csv" checked>
+                                <span class="admin-format-card-title">CSV</span>
+                                <span class="admin-format-card-desc">Spreadsheets &amp; imports</span>
+                                <span class="admin-format-card-ext">.csv</span>
+                            </label>
+                            <label class="admin-format-card">
+                                <input type="radio" name="format" value="excel">
+                                <span class="admin-format-card-title">Excel</span>
+                                <span class="admin-format-card-desc">Opens in Microsoft Excel</span>
+                                <span class="admin-format-card-ext">.xls</span>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="admin-panel admin-export-card admin-export-download-card">
+                        <p class="admin-export-download-lead">Ready to download your export file.</p>
+                        <button type="submit" class="admin-btn admin-btn-primary admin-btn-export admin-btn-export--block">
+                            <span class="admin-btn-icon" aria-hidden="true">↓</span>
+                            Download export
+                        </button>
+                    </section>
+                </aside>
+            </div>
+        </form>
+    </div>
 </main>
+
+<script>
+(function () {
+    const form = document.querySelector('.admin-export-form');
+    if (!form) return;
+
+    const boxes = form.querySelectorAll('[data-export-column]');
+    form.querySelector('[data-export-select-all]')?.addEventListener('click', function () {
+        boxes.forEach(function (el) { el.checked = true; });
+    });
+    form.querySelector('[data-export-clear-all]')?.addEventListener('click', function () {
+        boxes.forEach(function (el) { el.checked = false; });
+    });
+
+    form.querySelectorAll('.admin-format-card input[type="radio"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            form.querySelectorAll('.admin-format-card').forEach(function (card) {
+                card.classList.toggle('is-selected', card.querySelector('input')?.checked === true);
+            });
+        });
+    });
+})();
+</script>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
 </body>

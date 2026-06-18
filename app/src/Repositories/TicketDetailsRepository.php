@@ -4,52 +4,40 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Core\Database;
+use App\Core\Repository;
+use InvalidArgumentException;
 use PDO;
+use RuntimeException;
+use Throwable;
 
-/**
- * One table holds every sellable thing: single-event tickets, day passes, all-access passes, etc.
- *
- * This class is what admin uses to list, create, update, and force-delete rows. When you delete something that
- * already appeared on an old order, we don’t break accounting — those lines get pointed at a hidden “archive” row instead.
- */
-final class TicketDetailsRepository
+final class TicketDetailsRepository extends Repository
 {
     public const ARCHIVE_PLACEHOLDER_NAME = '[SYSTEM] Archived catalog item';
 
     public const ARCHIVE_PLACEHOLDER_CATEGORY = 'internal';
 
-    /**
-     * Single catalog row by primary key — used by admin edit and archive checks.
-     *
-     * @return ?array<string,mixed>
-     */
+    private const SELECT_COLUMNS = 'ticket_details_id, event_id, session_id, ticket_type, category, pass_day, pass_time,
+                    schedule_display, sort_order, is_free, name, description, price';
+
     public function findById(int $id): ?array
     {
         if ($id <= 0) {
             return null;
         }
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
-            'SELECT ticket_details_id, event_id, session_id, ticket_type, category, pass_day, pass_time,
-                    schedule_display, sort_order, is_free, name, description, price
+
+        $stmt = $this->db->prepare(
+            'SELECT ' . self::SELECT_COLUMNS . '
              FROM ticket_details WHERE ticket_details_id = :id LIMIT 1'
         );
         $stmt->execute(['id' => $id]);
-        $r = $stmt->fetch(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $r ?: null;
+        return $row === false ? null : $row;
     }
 
-    /**
-     * Everything in the shop catalog with joined event title/type for the admin table.
-     *
-     * @return list<array<string,mixed>>
-     */
     public function listAllForAdmin(): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->query(
+        $stmt = $this->db->query(
             'SELECT td.ticket_details_id, td.event_id, td.session_id, td.ticket_type, td.category, td.pass_day, td.pass_time,
                     td.schedule_display, td.sort_order, td.is_free, td.name, td.description, td.price,
                     e.title AS event_title,
@@ -63,68 +51,42 @@ final class TicketDetailsRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Event tickets for a public event detail page (Buy tickets).
-     *
-     * @return list<array<string,mixed>>
-     */
     public function listByEventIdForPublic(int $eventId): array
     {
         if ($eventId <= 0) {
             return [];
         }
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+
+        $stmt = $this->db->prepare(
             "SELECT ticket_details_id, name, description, price, is_free, sort_order
              FROM ticket_details
              WHERE event_id = :eid AND ticket_type = 'event_ticket'
              ORDER BY sort_order ASC, ticket_details_id ASC"
         );
         $stmt->execute(['eid' => $eventId]);
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return is_array($rows) ? $rows : [];
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** Creates a new sellable row — returns the new `ticket_details_id`. */
     public function insert(array $row): int
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'INSERT INTO ticket_details (event_id, session_id, ticket_type, category, pass_day, pass_time,
              schedule_display, sort_order, is_free, name, description, price)
              VALUES (:eid, :sid, :tt, :cat, :pd, :pt, :sd, :so, :free, :name, :desc, :price)'
         );
-        $stmt->execute([
-            'eid' => $row['event_id'],
-            'sid' => $row['session_id'],
-            'tt' => $row['ticket_type'],
-            'cat' => $row['category'] ?? 'all',
-            'pd' => $row['pass_day'] ?? null,
-            'pt' => $row['pass_time'] ?? null,
-            'sd' => $row['schedule_display'] ?? null,
-            'so' => (int) ($row['sort_order'] ?? 0),
-            'free' => !empty($row['is_free']) ? 1 : 0,
-            'name' => $row['name'],
-            'desc' => $row['description'] ?? null,
-            'price' => $row['price'],
-        ]);
+        $stmt->execute($this->writeValues($row));
 
-        return (int) $db->lastInsertId();
+        return (int) $this->db->lastInsertId();
     }
 
-    /**
-     * Food reservation helper: creates a ticket_details row linked to reservation_id
-     * so booking fees can be processed through the shared cart/checkout flow.
-     */
     public function createForReservation(
         int $reservationId,
         string $name,
         string $description,
         float $price
     ): int {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'INSERT INTO ticket_details (
                 reservation_id, event_id, session_id, ticket_type, category, pass_day, pass_time,
                 schedule_display, sort_order, is_free, name, description, price
@@ -143,14 +105,12 @@ final class TicketDetailsRepository
             'price' => number_format($price, 2, '.', ''),
         ]);
 
-        return (int) $db->lastInsertId();
+        return (int) $this->db->lastInsertId();
     }
 
-    /** Overwrites an existing catalog row (admin save). */
     public function update(int $id, array $row): void
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'UPDATE ticket_details SET event_id = :eid, session_id = :sid, ticket_type = :tt, category = :cat,
              pass_day = :pd, pass_time = :pt, schedule_display = :sd, sort_order = :so, is_free = :free,
              name = :name, description = :desc, price = :price
@@ -158,50 +118,35 @@ final class TicketDetailsRepository
         );
         $stmt->execute([
             'id' => $id,
-            'eid' => $row['event_id'],
-            'sid' => $row['session_id'],
-            'tt' => $row['ticket_type'],
-            'cat' => $row['category'] ?? 'all',
-            'pd' => $row['pass_day'] ?? null,
-            'pt' => $row['pass_time'] ?? null,
-            'sd' => $row['schedule_display'] ?? null,
-            'so' => (int) ($row['sort_order'] ?? 0),
-            'free' => !empty($row['is_free']) ? 1 : 0,
-            'name' => $row['name'],
-            'desc' => $row['description'] ?? null,
-            'price' => $row['price'],
+            ...$this->writeValues($row),
         ]);
     }
 
-    /** Raw DELETE — prefer {@see adminForceDelete()} in admin so orders stay valid. */
     public function delete(int $id): void
     {
-        $stmt = Database::getConnection()->prepare('DELETE FROM ticket_details WHERE ticket_details_id = :id');
+        $stmt = $this->db->prepare('DELETE FROM ticket_details WHERE ticket_details_id = :id');
         $stmt->execute(['id' => $id]);
     }
 
-    /** True for the hidden “[SYSTEM] Archived…” row you must never edit or delete. */
     public function isArchivePlaceholderId(int $id): bool
     {
         if ($id <= 0) {
             return false;
         }
+
         $row = $this->findById($id);
         if ($row === null) {
             return false;
         }
 
-        return strcasecmp(trim((string) ($row['category'] ?? '')), self::ARCHIVE_PLACEHOLDER_CATEGORY) === 0
-            && (string) ($row['name'] ?? '') === self::ARCHIVE_PLACEHOLDER_NAME;
+        return strcasecmp(trim($this->rowText($row, 'category')), self::ARCHIVE_PLACEHOLDER_CATEGORY) === 0
+            && $this->rowText($row, 'name') === self::ARCHIVE_PLACEHOLDER_NAME;
     }
 
-    /**
-     * Hidden row for order_items after a real catalog ticket row is removed.
-     */
+    // hidden system row for deleted catalog items
     public function getArchivePlaceholderId(): int
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT ticket_details_id FROM ticket_details
              WHERE name = :n AND LOWER(TRIM(category)) = :c LIMIT 1'
         );
@@ -230,94 +175,60 @@ final class TicketDetailsRepository
         ]);
     }
 
-    /**
-     * Remove a catalog ticket: reassign existing order lines to the archive placeholder,
-     * remove cart and personal-program rows, then delete the ticket_details row.
-     *
-     * @return int Number of order lines reassigned
-     */
+    // old order lines go to archive placeholder
     public function adminForceDelete(int $id): int
     {
         if ($id <= 0) {
-            throw new \InvalidArgumentException('Invalid ticket id.');
+            throw new InvalidArgumentException('Invalid ticket id.');
         }
 
         $placeholderId = $this->getArchivePlaceholderId();
         if ($id === $placeholderId) {
-            throw new \RuntimeException('Cannot delete the system archive placeholder row.');
+            throw new RuntimeException('Cannot delete the system archive placeholder row.');
         }
 
-        $db = Database::getConnection();
-        $db->beginTransaction();
+        $this->db->beginTransaction();
         try {
-            $cntStmt = $db->prepare('SELECT COUNT(*) FROM order_items WHERE ticket_details_id = :id');
+            $cntStmt = $this->db->prepare('SELECT COUNT(*) FROM order_items WHERE ticket_details_id = :id');
             $cntStmt->execute(['id' => $id]);
             $reassigned = (int) $cntStmt->fetchColumn();
 
-            $db->prepare(
+            $this->db->prepare(
                 'UPDATE order_items SET ticket_details_id = :p WHERE ticket_details_id = :id'
             )->execute(['p' => $placeholderId, 'id' => $id]);
 
-            $db->prepare('DELETE FROM cart_items WHERE ticket_details_id = :id')->execute(['id' => $id]);
+            $this->db->prepare('DELETE FROM cart_items WHERE ticket_details_id = :id')->execute(['id' => $id]);
 
-            if ($this->databaseHasTable($db, 'personal_program_items')) {
-                $db->prepare('DELETE FROM personal_program_items WHERE ticket_details_id = :id')->execute(['id' => $id]);
+            if ($this->databaseHasTable('personal_program_items')) {
+                $this->db->prepare('DELETE FROM personal_program_items WHERE ticket_details_id = :id')->execute(['id' => $id]);
             }
 
-            if ($this->databaseTableHasColumn($db, 'history_tours', 'ticket_details_id')) {
-                $db->prepare('UPDATE history_tours SET ticket_details_id = NULL WHERE ticket_details_id = :id')->execute(['id' => $id]);
+            if ($this->databaseTableHasColumn('history_tours', 'ticket_details_id')) {
+                $this->db->prepare('UPDATE history_tours SET ticket_details_id = NULL WHERE ticket_details_id = :id')->execute(['id' => $id]);
             }
 
-            $del = $db->prepare('DELETE FROM ticket_details WHERE ticket_details_id = :id');
+            $del = $this->db->prepare('DELETE FROM ticket_details WHERE ticket_details_id = :id');
             $del->execute(['id' => $id]);
             if ($del->rowCount() === 0) {
-                $db->rollBack();
-                throw new \RuntimeException('Ticket not found.');
+                $this->db->rollBack();
+                throw new RuntimeException('Ticket not found.');
             }
 
-            $db->commit();
+            $this->db->commit();
 
             return $reassigned;
-        } catch (\Throwable $e) {
-            if ($db->inTransaction()) {
-                $db->rollBack();
+        } catch (Throwable $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
             }
+
             throw $e;
         }
     }
 
-    /** Feature-detect optional tables before running deletes/updates in a portable way. */
-    private function databaseHasTable(PDO $db, string $table): bool
-    {
-        $stmt = $db->prepare(
-            'SELECT 1 FROM information_schema.tables
-             WHERE table_schema = DATABASE() AND table_name = :t LIMIT 1'
-        );
-        $stmt->execute(['t' => $table]);
-
-        return (bool) $stmt->fetchColumn();
-    }
-
-    private function databaseTableHasColumn(PDO $db, string $table, string $column): bool
-    {
-        $stmt = $db->prepare(
-            'SELECT 1 FROM information_schema.columns
-             WHERE table_schema = DATABASE() AND table_name = :t AND column_name = :c LIMIT 1'
-        );
-        $stmt->execute(['t' => $table, 'c' => $column]);
-
-        return (bool) $stmt->fetchColumn();
-    }
-
-    /**
-     * Events that can have an event_ticket (for admin dropdown).
-     *
-     * @return list<array{event_id:int,title:string,cat:string}>
-     */
     public function listEventsForTicketForm(): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->query(
+        $stmt = $this->db->query(
             "SELECT e.event_id, e.title, LOWER(et.name) AS cat
              FROM events e
              JOIN event_types et ON et.event_type_id = e.event_type_id
@@ -328,15 +239,9 @@ final class TicketDetailsRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Events that still need a ticket_details row — handy callouts on the admin form.
-     *
-     * @return list<array{event_id:int,title:string}>
-     */
     public function listEventsWithoutTicket(): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->query(
+        $stmt = $this->db->query(
             "SELECT e.event_id, e.title FROM events e
              JOIN event_types et ON et.event_type_id = e.event_type_id
              LEFT JOIN ticket_details td ON td.event_id = e.event_id
@@ -346,5 +251,83 @@ final class TicketDetailsRepository
         );
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getEventCategoryByEventId(int $eventId): ?string
+    {
+        if ($eventId <= 0) {
+            return null;
+        }
+
+        $stmt = $this->db->prepare(
+            'SELECT LOWER(et.name) AS n FROM events e
+             INNER JOIN event_types et ON et.event_type_id = e.event_type_id
+             WHERE e.event_id = :id LIMIT 1'
+        );
+        $stmt->execute(['id' => $eventId]);
+        $name = $stmt->fetchColumn();
+
+        return is_string($name) ? strtolower($name) : null;
+    }
+
+    private function writeValues(array $row): array
+    {
+        return [
+            'eid' => $this->rowValue($row, 'event_id'),
+            'sid' => $this->rowValue($row, 'session_id'),
+            'tt' => $row['ticket_type'],
+            'cat' => $this->categoryValue($row),
+            'pd' => $this->rowValue($row, 'pass_day'),
+            'pt' => $this->rowValue($row, 'pass_time'),
+            'sd' => $this->rowValue($row, 'schedule_display'),
+            'so' => isset($row['sort_order']) ? (int) $row['sort_order'] : 0,
+            'free' => !empty($row['is_free']) ? 1 : 0,
+            'name' => $row['name'],
+            'desc' => $this->rowValue($row, 'description'),
+            'price' => $row['price'],
+        ];
+    }
+
+    private function categoryValue(array $row): string
+    {
+        if (!isset($row['category'])) {
+            return 'all';
+        }
+
+        $category = (string) $row['category'];
+
+        return $category !== '' ? $category : 'all';
+    }
+
+    private function databaseHasTable(string $table): bool
+    {
+        $stmt = $this->db->prepare(
+            'SELECT 1 FROM information_schema.tables
+             WHERE table_schema = DATABASE() AND table_name = :t LIMIT 1'
+        );
+        $stmt->execute(['t' => $table]);
+
+        return (bool) $stmt->fetchColumn();
+    }
+
+    private function databaseTableHasColumn(string $table, string $column): bool
+    {
+        $stmt = $this->db->prepare(
+            'SELECT 1 FROM information_schema.columns
+             WHERE table_schema = DATABASE() AND table_name = :t AND column_name = :c LIMIT 1'
+        );
+        $stmt->execute(['t' => $table, 'c' => $column]);
+
+        return (bool) $stmt->fetchColumn();
+    }
+
+    private function rowText(array $row, string $key): string
+    {
+        return isset($row[$key]) ? (string) $row[$key] : '';
+    }
+
+    private function rowValue(array $row, string $key): mixed
+    {
+        return array_key_exists($key, $row) ? $row[$key] : null;
     }
 }

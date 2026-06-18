@@ -1,28 +1,36 @@
 <?php
-/** Public homepage template: $viewModel from HomeController; $cmsHome is merged settings (edited in /admin/cms/homepage). */
-$page = $viewModel->page;
-$categories = $viewModel->categories;
-$cmsHome = $viewModel->cmsHome;
+
+$page = $vm->page;
+$categories = $vm->categories;
+$cmsHome = $vm->cmsHome;
 // shared for header/footer and any partial that needs them
 $app = (new \App\Repositories\SettingsRepository())->getAll();
 $navLinks = (new \App\Repositories\MenuRepository())->getNavLinks();
-$skipHeaderStyleSheet = true;
+
+// Settings for the page title, styles, body class
+$pageTitle = (string) ($page->title ?? ($app['site_name'] ?? 'Haarlem Festival'));
+$pageStyles = ['/css/pages/home.css'];
+$bodyClass = 'home-page';
+
+// Hero settings
+$heroModifier = 'festival-hero--home';
+$heroImage = '/images/haarlem-hero.png';
+$heroImageAlt = 'Haarlem Festival';
+$heroTitle = (string) ($cmsHome['hero_heading'] ?? '');
+$heroSubtitle = \App\Core\HtmlSanitizer::purify($cmsHome['hero_subtitle'] ?? '');
+$heroButtonText = (string) ($cmsHome['hero_cta_label'] ?? '');
+$heroButtonUrl = (string) ($cmsHome['hero_cta_href'] ?? '#events');
+$heroButtonClass = 'btn btn--light';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= htmlspecialchars((string) ($page->title ?? '')) ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css?v=<?= htmlspecialchars((string) ($app['css_version'] ?? '1')) ?>">
-</head>
-<body>
+<?php require __DIR__ . '/../partials/head.php'; ?>
+<body class="<?= htmlspecialchars($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main>
-    <?php require __DIR__ . '/../partials/hero.php'; ?>
+    <?php require __DIR__ . '/../partials/festival-hero.php'; ?>
     <?php require __DIR__ . '/../partials/welcome.php'; ?>
     <?php require __DIR__ . '/../partials/events.php'; ?>
     <?php require __DIR__ . '/../partials/about.php'; ?>

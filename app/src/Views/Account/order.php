@@ -1,48 +1,57 @@
 <?php
-/** @var array $app */
-/** @var array<string, mixed> $order */
-/** @var list<array{name:string,quantity:int,unit_price:string,line_total:string}> $lines */
-/** @var list<array{ticket_code:string,item_name:string}> $tickets */
-/** @var ?string $orderError */
-/** @var string $checkoutCsrf */
-/** @var bool $stripeOn */
+
 $h = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 $oid = (int) ($order['order_id'] ?? 0);
 $status = (string) ($order['status'] ?? '');
 $isPendingPayLater = $status === 'pending' && !empty($order['expires_at']);
+
 if (!isset($orderError)) {
     $orderError = null;
 }
+
 if (!isset($checkoutCsrf)) {
     $checkoutCsrf = '';
 }
+
 if (!isset($stripeOn)) {
     $stripeOn = false;
 }
+
+// Settings for the page title, styles, body class
+$pageTitle = 'Order #' . $oid . ' — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/account.css'];
+$bodyClass = 'account-page account-invoice-page';
+
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'My orders', 'url' => '/account/orders'],
+        ['label' => 'Order #' . $oid, 'url' => null],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Order #<?= $h((string) $oid) ?> — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/tickets.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-</head>
-<body class="tickets-page cart-page account-invoice-page">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+
+<body class="<?= $h($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
-<main class="tickets-main container account-invoice" style="padding-top:2rem;max-width:640px;">
-    <p class="no-print" style="margin-bottom:1rem;">
-        <a href="/account/orders">← My orders</a>
-        ·
-        <button type="button" class="tickets-btn-buy" style="border:none;cursor:pointer;" onclick="window.print()">Print invoice</button>
-    </p>
+<?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
-    <header class="account-invoice-header">
-        <h1 class="tickets-section-title">Invoice &amp; tickets</h1>
-        <p class="tickets-card-sub">
+<main class="account-main container account-invoice">
+    <div class="account-page-actions no-print">
+        <a href="/account/orders" class="btn btn--outline btn--sm">← My orders</a>
+        <button type="button" class="btn btn--outline btn--sm" onclick="window.print()">Print invoice</button>
+        <?php if ($status === 'paid'): ?>
+            <a href="/account/order/<?= $h((string) $oid) ?>/invoice" class="btn btn--outline btn--sm" target="_blank" rel="noopener">Download invoice (PDF)</a>
+            <a href="/account/order/<?= $h((string) $oid) ?>/tickets" class="btn btn--primary btn--sm" target="_blank" rel="noopener">Download tickets (PDF)</a>
+        <?php endif; ?>
+    </div>
+
+    <div class="account-invoice-header">
+        <h1 class="section-title section-title--accent account-title">Invoice &amp; tickets</h1>
+
+        <p class="copy-text copy-text--sm copy-text--muted account-meta">
             <?= $h($app['site_name'] ?? 'Haarlem Festival') ?> — Order #<?= $h((string) $oid) ?><br>
             Status: <?= $h((string) ($order['status'] ?? '')) ?> ·
             Total: €<?= $h((string) ($order['total_amount'] ?? '0')) ?><br>
@@ -52,45 +61,49 @@ if (!isset($stripeOn)) {
                 Paid: <?= $h((string) ($order['paid_at'] ?? '—')) ?>
             <?php endif; ?>
         </p>
-    </header>
+    </div>
 
     <?php if ($orderError !== null && $orderError !== ''): ?>
-        <p class="tickets-flash-success" style="border-color:rgba(220,53,69,0.5);background:rgba(220,53,69,0.15);color:#f5a5ad;"><?= $h($orderError) ?></p>
+        <p class="account-error"><?= $h($orderError) ?></p>
     <?php endif; ?>
 
     <?php if ($isPendingPayLater): ?>
-        <section style="margin-top:1rem;padding:1rem;border-radius:8px;border:1px solid rgba(245,180,0,0.35);background:rgba(245,180,0,0.08);">
-            <h2 class="tickets-section-title" style="font-size:1.05rem;">Complete payment</h2>
-            <p class="tickets-card-sub">This order is reserved. Pay within 24 hours to receive ticket codes.</p>
+        <section class="account-card pending-payment-card">
+            <h2 class="section-subtitle pending-payment-title">Complete payment</h2>
+
+            <p class="copy-text copy-text--sm copy-text--muted">
+                This order is reserved. Pay within 24 hours to receive ticket codes.
+            </p>
+
             <?php if ($stripeOn && (float) ($order['total_amount'] ?? 0) > 0): ?>
-                <form method="post" action="/checkout/pay-pending-stripe" style="margin-bottom:0.75rem;">
+                <form method="post" action="/checkout/pay-pending-stripe" class="pending-payment-form">
                     <input type="hidden" name="_csrf" value="<?= $h($checkoutCsrf) ?>">
                     <input type="hidden" name="order_id" value="<?= $h((string) $oid) ?>">
-                    <button type="submit" class="tickets-btn-buy" style="width:100%;">Pay with card or iDEAL (Stripe)</button>
+                    <button type="submit" class="btn btn--primary btn--block">Pay with card or iDEAL (Stripe)</button>
                 </form>
             <?php endif; ?>
+
             <form method="post" action="/checkout/pay-pending">
                 <input type="hidden" name="_csrf" value="<?= $h($checkoutCsrf) ?>">
                 <input type="hidden" name="order_id" value="<?= $h((string) $oid) ?>">
-                <button type="submit" class="tickets-btn-buy" style="width:100%;background:transparent;border:1px solid rgba(245,180,0,0.6);color:#f5b400;">
-                    Confirm without payment (demo)
-                </button>
+                <button type="submit" class="btn btn--light btn--block">Confirm without payment (demo)</button>
             </form>
         </section>
     <?php endif; ?>
 
-    <section style="margin-top:1.5rem;">
-        <h2 class="tickets-section-title" style="font-size:1.1rem;">Line items</h2>
-        <table class="account-invoice-table">
-            <thead>
+    <section class="account-section">
+
+        <div class="festival-table-wrap">
+            <table class="festival-table account-invoice-table">
+                <thead>
                 <tr>
                     <th>Item</th>
                     <th>Qty</th>
                     <th>Unit</th>
                     <th>Line</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 <?php foreach ($lines as $l): ?>
                     <tr>
                         <td><?= $h($l['name']) ?></td>
@@ -99,22 +112,24 @@ if (!isset($stripeOn)) {
                         <td>€<?= $h($l['line_total']) ?></td>
                     </tr>
                 <?php endforeach; ?>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </section>
 
-    <section style="margin-top:1.5rem;">
-        <h2 class="tickets-section-title" style="font-size:1.1rem;">Your tickets</h2>
+    <section class="account-section account-ticket-section">
+        <h2 class="section-subtitle account-section-title">Your tickets</h2>
+
         <?php if ($isPendingPayLater): ?>
-            <p class="tickets-card-sub">Ticket codes appear here after payment is completed.</p>
+            <p class="copy-text copy-text--sm copy-text--muted">Ticket codes appear here after payment is completed.</p>
         <?php elseif ($tickets === []): ?>
-            <p class="tickets-card-sub">No ticket codes on file for this order.</p>
+            <p class="copy-text copy-text--sm copy-text--muted">No ticket codes on file for this order.</p>
         <?php else: ?>
-            <ul class="checkout-ticket-list" style="list-style:none;padding:0;margin:0;">
+            <ul class="account-ticket-list">
                 <?php foreach ($tickets as $t): ?>
-                    <li class="tickets-card tickets-card--pass" style="margin-bottom:0.5rem;padding:0.75rem;font-family:monospace;font-size:0.9rem;">
-                        <strong><?= $h($t['item_name']) ?></strong><br>
-                        <span><?= $h($t['ticket_code']) ?></span>
+                    <li class="account-card account-ticket-item">
+                        <strong class="section-subtitle account-ticket-title"><?= $h($t['item_name']) ?></strong>
+                        <span class="copy-text copy-text--sm account-ticket-code"><?= $h($t['ticket_code']) ?></span>
                     </li>
                 <?php endforeach; ?>
             </ul>

@@ -1,19 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Contracts\EventRepositoryInterface;
-use App\Core\Database;
+use App\Core\Repository;
 use App\Models\Event;
+use PDO;
 
-/** events + event_types + venues (JOIN). Used by EventService. */
-class EventRepository implements EventRepositoryInterface
+class EventRepository extends Repository implements EventRepositoryInterface
 {
+    private const DEFAULT_VENUE_CITY = 'Haarlem';
+
+    private ?string $defaultVenueCity = null;
+
+    public function __construct(
+        private SettingsRepository $settingsRepository = new SettingsRepository(),
+    ) {
+        parent::__construct();
+    }
+
     public function getAll(): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT e.event_id,
                     e.event_type_id,
                     e.venue_id,
@@ -32,21 +42,14 @@ class EventRepository implements EventRepositoryInterface
         );
 
         $stmt->execute();
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        $events = [];
-        foreach ($rows as $row) {
-            $events[] = $this->mapRowToEvent($row);
-        }
-
-        return $events;
+        return $this->rowsToEvents($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
+    // dance programme uses category dance
     public function getByCategory(string $eventTypeName): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT e.event_id,
                     e.event_type_id,
                     e.venue_id,
@@ -61,25 +64,17 @@ class EventRepository implements EventRepositoryInterface
              JOIN event_types et ON e.event_type_id = et.event_type_id
              JOIN venues v ON e.venue_id = v.venue_id
              WHERE LOWER(et.name) = LOWER(:event_type_name)
-             ORDER BY FIELD(e.event_day, "friday", "saturday", "sunday"), e.start_time' 
+             ORDER BY FIELD(e.event_day, "friday", "saturday", "sunday"), e.start_time'
         );
 
         $stmt->execute(['event_type_name' => $eventTypeName]);
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        $events = [];
-        foreach ($rows as $row) {
-            $events[] = $this->mapRowToEvent($row);
-        }
-
-        return $events;
+        return $this->rowsToEvents($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function getByCategoryAndDay(string $eventTypeName, string $eventDay): array
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT e.event_id,
                     e.event_type_id,
                     e.venue_id,
@@ -102,21 +97,13 @@ class EventRepository implements EventRepositoryInterface
             'event_type_name' => $eventTypeName,
             'event_day' => trim($eventDay),
         ]);
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        $events = [];
-        foreach ($rows as $row) {
-            $events[] = $this->mapRowToEvent($row);
-        }
-
-        return $events;
+        return $this->rowsToEvents($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function getById(int $id): ?Event
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT e.event_id,
                     e.event_type_id,
                     e.venue_id,
@@ -138,35 +125,68 @@ class EventRepository implements EventRepositoryInterface
         );
 
         $stmt->execute(['id' => $id]);
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$row) {
+        if ($row === false) {
             return null;
         }
 
         return $this->mapRowToEvent($row);
     }
 
-    /** DB row → Event (private so only this repo builds entities). */
+    private function rowsToEvents(array $rows): array
+    {
+        $events = [];
+        foreach ($rows as $row) {
+            $events[] = $this->mapRowToEvent($row);
+        }
+
+        return $events;
+    }
+
     private function mapRowToEvent(array $row): Event
     {
         $event = new Event();
         $event->id = (int) $row['event_id'];
         $event->eventTypeId = (int) $row['event_type_id'];
         $event->venueId = (int) $row['venue_id'];
-        $event->title = $row['title'];
-        $event->description = $row['description'] ?? null;
+        $event->title = (string) $row['title'];
+        $event->description = isset($row['description']) ? (string) $row['description'] : null;
         $event->eventDay = isset($row['event_day']) ? (string) $row['event_day'] : null;
         $event->startTime = isset($row['start_time']) ? (string) $row['start_time'] : null;
         $event->eventTypeName = (string) $row['event_type_name'];
         $event->venueName = (string) $row['venue_name'];
-        $settings = (new SettingsRepository())->getAll();
-        $event->venueCity = !empty($row['venue_city'])
-            ? (string) $row['venue_city']
-            : (string) ($settings['default_venue_city'] ?? 'Haarlem');
+        $event->venueCity = $this->venueCity($row);
         $event->venueAddress = isset($row['venue_address']) ? (string) $row['venue_address'] : null;
         $event->cardImage = isset($row['card_image']) ? (string) $row['card_image'] : null;
         $event->infoPath = isset($row['info_path']) ? (string) $row['info_path'] : null;
+
         return $event;
+    }
+
+    private function venueCity(array $row): string
+    {
+        if (isset($row['venue_city']) && (string) $row['venue_city'] !== '') {
+            return (string) $row['venue_city'];
+        }
+
+        return $this->defaultVenueCity();
+    }
+
+    // fallback when venue has no city
+    private function defaultVenueCity(): string
+    {
+        if ($this->defaultVenueCity !== null) {
+            return $this->defaultVenueCity;
+        }
+
+        $settings = $this->settingsRepository->getAll();
+        $city = isset($settings['default_venue_city']) && is_string($settings['default_venue_city'])
+            ? trim($settings['default_venue_city'])
+            : '';
+
+        $this->defaultVenueCity = $city !== '' ? $city : self::DEFAULT_VENUE_CITY;
+
+        return $this->defaultVenueCity;
     }
 }

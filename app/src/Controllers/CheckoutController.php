@@ -17,7 +17,7 @@ use App\Services\StripePaymentService;
 use App\Services\TicketAvailabilityService;
 
 /**
- * Checkout: confirmation page, demo and Stripe payment, pay-later reserve, and completing pending orders from account.
+ * Checkout: confirmation page, Stripe payment, pay-later reserve, and completing pending orders from account.
  */
 final class CheckoutController
 {
@@ -36,35 +36,10 @@ final class CheckoutController
         $app = (new SettingsRepository())->getAll();
         $error = Session::getFlash('checkout_error');
         $csrf = Csrf::token('checkout');
-        // €0 cart → no Stripe button (class demo still uses “Confirm without payment”).
+        // Show Stripe button only when configured and cart total is above €0
         $stripeOn = StripePaymentService::isConfigured() && $vm->total > 0;
-        $demoOn = true;
 
         require __DIR__ . '/../Views/Checkout/confirm.php';
-    }
-
-    /** Demo / free-only: instant paid order (no Stripe). */
-    public function pay(): void
-    {
-        $userId = $this->requireLoginOrRedirect();
-
-        if (!Csrf::validate('checkout', $_POST['_csrf'] ?? null)) {
-            Session::setFlash('checkout_error', 'Invalid security token. Try again.');
-            header('Location: /checkout');
-            exit;
-        }
-
-        $checkout = $this->makeCheckoutService();
-
-        try {
-            $orderId = $checkout->completePurchase($userId);
-            header('Location: /checkout/success?order_id=' . $orderId);
-            exit;
-        } catch (\Throwable $e) {
-            Session::setFlash('checkout_error', $e->getMessage());
-            header('Location: /checkout');
-            exit;
-        }
     }
 
     /** Real payment: redirect to Stripe Checkout (card + iDEAL). */
@@ -99,6 +74,7 @@ final class CheckoutController
             header('Location: ' . $url);
             exit;
         } catch (\Throwable $e) {
+            error_log('CheckoutController::payStripe error: ' . $e->getMessage());
             Session::setFlash('checkout_error', $e->getMessage());
             header('Location: /checkout');
             exit;
@@ -123,13 +99,14 @@ final class CheckoutController
             header('Location: /account/order/' . $orderId);
             exit;
         } catch (\Throwable $e) {
+            error_log('CheckoutController::payLater error: ' . $e->getMessage());
             Session::setFlash('checkout_error', $e->getMessage());
             header('Location: /checkout');
             exit;
         }
     }
 
-    /** Demo: complete a pay-later order without Stripe. */
+    /** Complete a pay-later order — used from account page. */
     public function payPending(): void
     {
         $userId = $this->requireLoginOrRedirect();
@@ -154,6 +131,7 @@ final class CheckoutController
             header('Location: /checkout/success?order_id=' . $orderId);
             exit;
         } catch (\Throwable $e) {
+            error_log('CheckoutController::payPending error: ' . $e->getMessage());
             Session::setFlash('order_error', $e->getMessage());
             header('Location: /account/order/' . $orderId);
             exit;
@@ -218,6 +196,7 @@ final class CheckoutController
             header('Location: ' . $url);
             exit;
         } catch (\Throwable $e) {
+            error_log('CheckoutController::payPendingStripe error: ' . $e->getMessage());
             Session::setFlash('order_error', $e->getMessage());
             header('Location: /account/order/' . $orderId);
             exit;
@@ -236,7 +215,7 @@ final class CheckoutController
     {
         $userId = $this->requireLoginOrRedirect();
 
-        // Stripe redirect: ?session_id=… → we finalize the order then redirect again with ?order_id= for a clean URL.
+        // Stripe redirect: ?session_id=… → finalize the order then redirect with ?order_id= for a clean URL.
         $stripeSessionId = trim((string) ($_GET['session_id'] ?? ''));
         if ($stripeSessionId !== '') {
             if (!StripePaymentService::isConfigured()) {
@@ -249,6 +228,7 @@ final class CheckoutController
                 header('Location: /checkout/success?order_id=' . $orderId);
                 exit;
             } catch (\Throwable $e) {
+                error_log('CheckoutController::success (Stripe) error: ' . $e->getMessage());
                 Session::setFlash('checkout_error', $e->getMessage());
                 header('Location: /checkout');
                 exit;
@@ -261,19 +241,26 @@ final class CheckoutController
             exit;
         }
 
-        $orders = new OrderRepository();
-        $order = $orders->findForCustomer($orderId, $userId);
-        if ($order === null) {
-            http_response_code(404);
-            echo 'Order not found.';
+        try {
+            $orders = new OrderRepository();
+            $order = $orders->findForCustomer($orderId, $userId);
+            if ($order === null) {
+                http_response_code(404);
+                echo 'Order not found.';
+                exit;
+            }
+
+            $tickets = $orders->getTicketCodesForOrder($orderId);
+            $app = (new SettingsRepository())->getAll();
+            $paidWithStripe = !empty($order['stripe_checkout_session_id']);
+
+            require __DIR__ . '/../Views/Checkout/success.php';
+        } catch (\Throwable $e) {
+            error_log('CheckoutController::success error: ' . $e->getMessage());
+            Session::setFlash('checkout_error', 'Could not load order details.');
+            header('Location: /cart');
             exit;
         }
-
-        $tickets = $orders->getTicketCodesForOrder($orderId);
-        $app = (new SettingsRepository())->getAll();
-        $paidWithStripe = !empty($order['stripe_checkout_session_id']);
-
-        require __DIR__ . '/../Views/Checkout/success.php';
     }
 
     /**
@@ -283,15 +270,15 @@ final class CheckoutController
      */
     private function cartInfrastructure(): array
     {
-        $cartRepo = new CartRepository();
+        $cartRepo   = new CartRepository();
         $ticketRepo = new TicketRepository();
         $availability = new TicketAvailabilityService($cartRepo, $ticketRepo);
 
         return [
-            'cartRepo' => $cartRepo,
-            'ticketRepo' => $ticketRepo,
+            'cartRepo'     => $cartRepo,
+            'ticketRepo'   => $ticketRepo,
             'availability' => $availability,
-            'cartService' => new CartService($cartRepo, $availability),
+            'cartService'  => new CartService($cartRepo, $availability),
         ];
     }
 

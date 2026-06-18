@@ -38,11 +38,11 @@ document.addEventListener('DOMContentLoaded', function () {
         var ticketAction = '';
 
         if (lang !== '') {
-            langRow = `<div class="meta-row"><span class="meta-ico">Lang</span><span>Lang: ${lang}</span></div>`;
+            langRow = `<div class="meta-row"><span class="meta-ico">Lang</span><span>${lang}</span></div>`;
         }
 
         if (age !== '') {
-            ageRow = `<div class="meta-row"><span class="meta-ico">Age</span><span>Age ${age}</span></div>`;
+            ageRow = `<div class="meta-row"><span class="meta-ico">Age</span><span>${age}</span></div>`;
         }
 
         if (ticketDetailsId > 0) {
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         return `
-            <article class="stories-card">
+            <article class="festival-card festival-card--stories stories-card">
                 <div class="stories-card-img"
                      style="background-image:url('${img}')"
                      role="img"

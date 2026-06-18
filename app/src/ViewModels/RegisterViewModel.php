@@ -8,13 +8,11 @@ class RegisterViewModel
 {
     public function __construct(
         public string  $csrf,
-        public string  $captchaQuestion,
-        public ?string $error           = null,
-        public string  $username        = '',
-        public string  $email           = '',
-        public string  $firstName       = '',
-        public string  $lastName        = '',
-        public array $appSettings = [],
-
+        public string  $recaptchaSiteKey,
+        public ?string $error     = null,
+        public string  $username  = '',
+        public string  $email     = '',
+        public string  $firstName = '',
+        public string  $lastName  = '',
     ) {}
 }

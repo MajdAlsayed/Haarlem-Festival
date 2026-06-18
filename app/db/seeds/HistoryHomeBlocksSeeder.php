@@ -38,7 +38,7 @@ class HistoryHomeBlocksSeeder extends AbstractSeed
                 'page_id' => $pageId,
                 'block_type' => 'hero',
                 'content_json' => json_encode([
-                    'title' => "A STROLL\nTHROUGH HISTORY",
+                    'title' => "A Stroll\nThrough History",
                     'subtitle' => 'Discover 9 Landmarks That Shaped Haarlem',
                     'description' => 'Experience these sites on our guided walking tours',
                     'button_text' => 'EXPLORE TOURS',
@@ -52,13 +52,13 @@ class HistoryHomeBlocksSeeder extends AbstractSeed
                 'block_type' => 'about_banner',
                 'content_json' => json_encode([
                     'title' => "HAARLEM'S RICH HISTORICAL HERITAGE",
-                    'text' => 'Haarlem, the captivating capital of North Holland, has been a chartered city since 1245. '.
+                    'text' => '<p>Haarlem, the captivating capital of North Holland, has been a chartered city since 1245. '.
                         'During the Dutch Golden Age of the 17th century, it flourished as a center of art, culture, and '.
                         'commerce. Wealthy merchants commissioned grand buildings and patronized renowned artists like Frans '.
-                        'Hals, whose legacy still resonates through the city\'s museums and galleries. The nine landmarks '.
-                        'featured in our journey represent the essence of Haarlem\'s story: from medieval defenses and '.
+                        'Hals, whose legacy still resonates through the city\'s museums and galleries.</p>'.
+                        '<p>The nine landmarks featured in our journey represent the essence of Haarlem\'s story: from medieval defenses and '.
                         'magnificent churches to unique hofjes that reflect the city\'s charitable traditions. Together, they '.
-                        'paint a vivid picture of how this remarkable Dutch city evolved into the cultural treasure it is today.'
+                        'paint a vivid picture of how this remarkable Dutch city evolved into the cultural treasure it is today.</p>'
                 ]),
                 'sort_order' => 2
             ],

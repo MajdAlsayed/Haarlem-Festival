@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\ViewModels;
 
 use App\Models\Event;
 
-/** View model for a Dance artist profile (music block, gallery, schedule asset, related events). */
 class ArtistDetailViewModel
 {
     public array $artist;
@@ -29,6 +30,8 @@ class ArtistDetailViewModel
     public string $albumCoverImage;
     public ?string $heroTagline;
     public ?string $followUrl;
+    public string $heroTitle;
+    public string $heroAlt;
 
     public function __construct(
         array $artist,
@@ -52,7 +55,8 @@ class ArtistDetailViewModel
         string $profileImage,
         string $albumCoverImage,
         ?string $heroTagline = null,
-        ?string $followUrl = null
+        ?string $followUrl = null,
+        string $heroTitle = '',
     ) {
         $this->artist = $artist;
         $this->galleryImages = $galleryImages;
@@ -76,9 +80,47 @@ class ArtistDetailViewModel
         $this->albumCoverImage = $albumCoverImage;
         $this->heroTagline = $heroTagline;
         $this->followUrl = $followUrl;
+        $name = isset($artist['name']) ? (string) $artist['name'] : '';
+        $this->heroTitle = $heroTitle !== '' ? $heroTitle : ($name !== '' ? $name : 'Dance Artist');
+        $this->heroAlt = $this->heroTitle;
     }
 
-    /** @deprecated Prefer checking sections individually (career highlights, tracks, gallery). */
+    public static function fromPageData(array $page): self
+    {
+        $hero = $page['hero'];
+        $gallery = $page['gallery'];
+        $schedule = $page['schedule'];
+        $music = $page['music'];
+        $about = $page['about'];
+        $events = $page['events'];
+
+        return new self(
+            artist: $page['artist'],
+            galleryImages: $gallery['images'],
+            artistEvents: $events['items'],
+            heroImage: (string) $hero['image'],
+            scheduleImage: (string) $schedule['image'],
+            breadcrumbs: $page['breadcrumbs'],
+            appSettings: $page['appSettings'],
+            aboutParagraphs: $about['paragraphs'],
+            careerHighlights: $about['highlights'],
+            musicTracks: $music['tracks'],
+            musicExtraTracks: $music['extraTracks'],
+            musicDisplayName: (string) $music['displayName'],
+            musicRealName: (string) $music['realName'],
+            musicLocation: (string) $music['location'],
+            albumTitle: (string) $music['albumTitle'],
+            albumSub: (string) $music['albumSub'],
+            galleryStats: $gallery['stats'],
+            careerImage: (string) $gallery['careerImage'],
+            profileImage: (string) $music['profileImage'],
+            albumCoverImage: (string) $music['albumCoverImage'],
+            heroTagline: $hero['tagline'],
+            followUrl: $hero['followUrl'],
+            heroTitle: (string) $hero['title'],
+        );
+    }
+
     public function hasFullPage(): bool
     {
         return $this->aboutParagraphs !== null && $this->careerHighlights !== null;

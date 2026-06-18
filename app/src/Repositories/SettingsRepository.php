@@ -2,19 +2,16 @@
 
 namespace App\Repositories;
 
-use App\Core\Database;
+use App\Contracts\SettingsRepositoryInterface;
+use App\Core\Repository;
 
-/**
- * Reads site_settings from the database (css_version, home_path, footer, etc.).
- * If the database fails or has no rows, we use the config file.
- */
-class SettingsRepository
+class SettingsRepository extends Repository implements SettingsRepositoryInterface
 {
+    // site name, footer, cms_home merge — whole site uses this
     public function getAll(): array
     {
         try {
-            $db = Database::getConnection();
-            $stmt = $db->query('SELECT setting_key, setting_value FROM site_settings');
+            $stmt = $this->db->query('SELECT setting_key, setting_value FROM site_settings');
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Throwable $e) {
             return require __DIR__ . '/../Config/app.php';
@@ -55,19 +52,13 @@ class SettingsRepository
         ];
     }
 
-    /**
-     * Homepage CMS: config defaults + site_settings overlay (keys cms_home_*).
-     *
-     * @return array<string, string>
-     */
     public function getMergedCmsHome(): array
     {
         $app = require __DIR__ . '/../Config/app.php';
         $defaults = $app['cms_home'] ?? [];
 
         try {
-            $db = Database::getConnection();
-            $stmt = $db->query("SELECT setting_key, setting_value FROM site_settings WHERE setting_key LIKE 'cms_home_%'");
+            $stmt = $this->db->query("SELECT setting_key, setting_value FROM site_settings WHERE setting_key LIKE 'cms_home_%'");
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Throwable $e) {
             return $defaults;
@@ -88,11 +79,6 @@ class SettingsRepository
         return $defaults;
     }
 
-    /**
-     * @param array<string, mixed> $rawRows key => value from site_settings (partial)
-     *
-     * @return array<string, string>
-     */
     private function mergeCmsHomeFromRaw(array $rawRows): array
     {
         $app = require __DIR__ . '/../Config/app.php';
@@ -114,8 +100,7 @@ class SettingsRepository
     public function upsertSetting(string $key, string $value): bool
     {
         try {
-            $db = Database::getConnection();
-            $stmt = $db->prepare(
+            $stmt = $this->db->prepare(
                 'INSERT INTO site_settings (setting_key, setting_value) VALUES (:k, :v)
                  ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)'
             );

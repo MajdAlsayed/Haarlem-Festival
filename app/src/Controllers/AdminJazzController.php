@@ -62,7 +62,7 @@ final class AdminJazzController
     {
         $this->requireAdmin();
         $app = $this->app();
-        require __DIR__ . '/../Views/Admin/jazz-index.php';
+        require __DIR__ . '/../Views/Admin/Jazz/jazz-index.php';
     }
 
     // -------------------------------------------------------------------------
@@ -75,7 +75,7 @@ final class AdminJazzController
         $this->requireAdmin();
         $app = $this->app();
         $events = $this->cms->listJazzEventsForAdmin();
-        require __DIR__ . '/../Views/Admin/jazz-events-list.php';
+        require __DIR__ . '/../Views/Admin/Jazz/jazz-events-list.php';
     }
 
     /** Edit form for one existing jazz event, including optional preview-audio row from `event_audio`. */
@@ -97,7 +97,7 @@ final class AdminJazzController
         $audio = $this->cms->getEventAudio($id);
         $app = $this->app();
         $csrf = Csrf::token('admin_jazz_event');
-        require __DIR__ . '/../Views/Admin/jazz-event-edit.php';
+        require __DIR__ . '/../Views/Admin/Jazz/jazz-event-edit.php';
     }
 
     /** Blank form to add a new jazz show (same fields as edit, no `event_id` yet). */
@@ -107,7 +107,7 @@ final class AdminJazzController
         $venues = $this->cms->listVenues();
         $app = $this->app();
         $csrf = Csrf::token('admin_jazz_event');
-        require __DIR__ . '/../Views/Admin/jazz-event-new.php';
+        require __DIR__ . '/../Views/Admin/Jazz/jazz-event-new.php';
     }
 
     /**
@@ -278,7 +278,7 @@ final class AdminJazzController
         $csrf = Csrf::token('admin_jazz_settings');
         $success = Session::getFlash('admin_success');
         $error = Session::getFlash('admin_error');
-        require __DIR__ . '/../Views/Admin/jazz-settings.php';
+        require __DIR__ . '/../Views/Admin/Jazz/jazz-settings.php';
     }
 
     /**
@@ -470,7 +470,7 @@ final class AdminJazzController
         }
 
         $tracks = $this->cms->listDiscographyBySlug($slug);
-        require __DIR__ . '/../Views/Admin/jazz-discography.php';
+        require __DIR__ . '/../Views/Admin/Jazz/jazz-discography.php';
     }
 
     /** Add or edit one discography row (?slug= for new, ?id= for existing). */
@@ -498,7 +498,7 @@ final class AdminJazzController
 
         $app = $this->app();
         $csrf = Csrf::token('admin_jazz_disc');
-        require __DIR__ . '/../Views/Admin/jazz-discography-edit.php';
+        require __DIR__ . '/../Views/Admin/Jazz/jazz-discography-edit.php';
     }
 
     /** POST handler: optional cover/audio uploads, then insert or update `artist_discography`. */
@@ -640,7 +640,7 @@ final class AdminJazzController
         }
 
         $members = $this->cms->listBandMembersBySlug($slug);
-        require __DIR__ . '/../Views/Admin/jazz-band-members.php';
+        require __DIR__ . '/../Views/Admin/Jazz/jazz-band-members.php';
     }
 
     /** Add or edit one band member (?slug= new, ?id= edit). */
@@ -668,7 +668,7 @@ final class AdminJazzController
 
         $app = $this->app();
         $csrf = Csrf::token('admin_jazz_band');
-        require __DIR__ . '/../Views/Admin/jazz-band-member-edit.php';
+        require __DIR__ . '/../Views/Admin/Jazz/jazz-band-member-edit.php';
     }
 
     /** POST handler: optional photo upload, then insert or update `jazz_band_members`. */

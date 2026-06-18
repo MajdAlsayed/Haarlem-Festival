@@ -4,56 +4,44 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Core\Database;
+use App\Core\Repository;
 use App\Core\SecureToken;
 use PDO;
+use PDOStatement;
+use RuntimeException;
 
-/**
- * Real tickets people get after paying — each row is a scannable code tied to an order line.
- *
- * The door app uses this. The shop uses it too, indirectly: we count how many are already sold per catalog item
- * so TicketAvailabilityService can say “sold out” or “only a few left” on /tickets and in the cart.
- */
-final class TicketRepository
+final class TicketRepository extends Repository
 {
-    /**
-     * Insert a ticket with a new secure code. Returns ticket_id.
-     * Call from checkout when order_items exist.
-     */
+    private const CODE_GENERATION_ATTEMPTS = 10;
+
+    // one qr row per seat at checkout
     public function createForOrderItem(int $orderItemId): int
     {
-        $db = Database::getConnection();
-        $code = $this->uniqueTicketCode($db);
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'INSERT INTO tickets (order_item_id, ticket_code, status) VALUES (:oid, :code, \'valid\')'
         );
-        $stmt->execute(['oid' => $orderItemId, 'code' => $code]);
+        $stmt->execute([
+            'oid' => $orderItemId,
+            'code' => $this->uniqueTicketCode(),
+        ]);
 
-        return (int) $db->lastInsertId();
+        return (int) $this->db->lastInsertId();
     }
 
-    /** Minimal lookup by barcode/QR string — door check without joins. */
     public function findByCode(string $ticketCode): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT ticket_id, order_item_id, ticket_code, status, issued_at FROM tickets WHERE ticket_code = :code LIMIT 1'
         );
         $stmt->execute(['code' => $ticketCode]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $row ?: null;
+        return $this->fetchRow($stmt);
     }
 
-    /**
-     * Ticket + catalog + event for staff scanner UI.
-     *
-     * @return array<string, mixed>|null
-     */
+    // scanner — only paid orders
     public function findByCodeWithDetails(string $ticketCode): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT t.ticket_id, t.order_item_id, t.ticket_code, t.status, t.issued_at,
                     td.name AS ticket_name, td.ticket_type,
                     e.title AS event_title, e.event_day
@@ -66,16 +54,13 @@ final class TicketRepository
              LIMIT 1'
         );
         $stmt->execute(['code' => $ticketCode]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $row ?: null;
+        return $this->fetchRow($stmt);
     }
 
-    /** Tickets issued for paid orders (excludes cancelled ticket rows). */
     public function countSoldForTicketDetails(int $ticketDetailsId): int
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT COUNT(*)
              FROM tickets t
              INNER JOIN order_items oi ON oi.order_item_id = t.order_item_id
@@ -89,18 +74,17 @@ final class TicketRepository
         return (int) $stmt->fetchColumn();
     }
 
-    /**
-     * @return 'success'|'already_scanned'|'cancelled'|'not_found'
-     */
+    // atomic update so two scanners dont both pass
     public function markScannedIfValid(int $ticketId): string
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare('SELECT status FROM tickets WHERE ticket_id = :id LIMIT 1');
+        $stmt = $this->db->prepare('SELECT status FROM tickets WHERE ticket_id = :id LIMIT 1');
         $stmt->execute(['id' => $ticketId]);
         $status = $stmt->fetchColumn();
         if ($status === false) {
             return 'not_found';
         }
+
+        $status = (string) $status;
         if ($status === 'scanned') {
             return 'already_scanned';
         }
@@ -108,27 +92,32 @@ final class TicketRepository
             return 'cancelled';
         }
 
-        // WHERE status = 'valid' makes the update atomic: two scanners at once → one row updated, other sees already_scanned.
-        $upd = $db->prepare(
+        $update = $this->db->prepare(
             "UPDATE tickets SET status = 'scanned', scanned_at = NOW() WHERE ticket_id = :id AND status = 'valid'"
         );
-        $upd->execute(['id' => $ticketId]);
+        $update->execute(['id' => $ticketId]);
 
-        return $upd->rowCount() > 0 ? 'success' : 'already_scanned';
+        return $update->rowCount() > 0 ? 'success' : 'already_scanned';
     }
 
-    /** Tries a few random codes until one is unused — extremely unlikely to loop out on a sane DB. */
-    private function uniqueTicketCode(PDO $db): string
+    private function uniqueTicketCode(): string
     {
-        for ($i = 0; $i < 10; $i++) {
+        for ($attempt = 0; $attempt < self::CODE_GENERATION_ATTEMPTS; $attempt++) {
             $code = SecureToken::ticketCode();
-            $check = $db->prepare('SELECT 1 FROM tickets WHERE ticket_code = :c LIMIT 1');
+            $check = $this->db->prepare('SELECT 1 FROM tickets WHERE ticket_code = :c LIMIT 1');
             $check->execute(['c' => $code]);
-            if (!$check->fetchColumn()) {
+            if ($check->fetchColumn() === false) {
                 return $code;
             }
         }
 
-        throw new \RuntimeException('Could not generate unique ticket code.');
+        throw new RuntimeException('Could not generate unique ticket code.');
+    }
+
+    private function fetchRow(PDOStatement $stmt): ?array
+    {
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row === false ? null : $row;
     }
 }

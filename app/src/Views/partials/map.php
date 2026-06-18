@@ -13,7 +13,7 @@ $mapLayers = array_unique(array_column($mapLocations, 'layer'));
 ?>
 <section class="map-section">
     <div class="container">
-        <h2 class="map-heading">Festival Locations — Haarlem City Map</h2>
+        <h2 class="section-title section-title--underlined map-heading">Festival Locations — Haarlem City Map</h2>
         <p class="map-intro">
             Explore the key festival venues spread across the historic center of Haarlem. From iconic squares to intimate cultural spaces, each location hosts unique performances, workshops, and experiences throughout the festival days.
         </p>
@@ -38,8 +38,8 @@ $mapLayers = array_unique(array_column($mapLocations, 'layer'));
             </div>
         </div>
         <div class="map-actions">
-            <button type="button" class="map-btn map-btn-secondary" id="map-center-btn" aria-label="Center map on all venues">Center map</button>
-            <a href="https://www.google.com/maps/search/festival+haarlem" target="_blank" rel="noopener" class="map-btn map-btn-primary">View live map &gt;</a>
+            <button type="button" class="btn btn--light" id="map-center-btn" aria-label="Center map on all venues">Center map</button>
+            <a href="https://www.google.com/maps/search/festival+haarlem" target="_blank" rel="noopener" class="btn btn--light">View live map →</a>
         </div>
     </div>
 </section>

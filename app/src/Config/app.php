@@ -25,6 +25,10 @@ return [
     /** Absolute site URL for Stripe redirects (e.g. http://localhost or https://yourdomain.nl). */
     'public_base_url' => rtrim((string) (getenv('APP_PUBLIC_URL') ?: 'http://localhost'), '/'),
 
+        /** Google reCAPTCHA v2. Replace env vars with real keys in production. Test keys always pass. */
+    'recaptcha_site_key'   => getenv('RECAPTCHA_SITE_KEY')   ?: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+    'recaptcha_secret_key' => getenv('RECAPTCHA_SECRET_KEY') ?: '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe',
+    
     /**
      * Homepage hero / welcome / about copy. Overridden by site_settings keys `cms_home_*` (see SettingsRepository::getMergedCmsHome).
      *
@@ -36,9 +40,9 @@ return [
         'hero_subtitle' => '<p>Five days of music, food, culture, and stories across the city.</p>',
         'hero_cta_label' => 'Explore',
         'hero_cta_href' => '#events',
-        'welcome_heading' => '',
-        'welcome_p1' => '',
-        'welcome_p2' => '',
+        'welcome_heading' => 'Welcome to Haarlem Festival',
+        'welcome_p1' => '<p>For five days, Haarlem comes alive with music, food, history, and stories across the whole city.</p>',
+        'welcome_p2' => '<p>Pick a theme, build your own programme, and book it all in one place.</p>',
         'about_heading' => 'Discover Haarlem Festival',
         'about_text' => '<p>From jazz clubs and dance nights to history walks, food experiences, and immersive stories — the festival turns Haarlem into a stage for everyone.</p><p>Browse by theme, build your programme, and book tickets in one place.</p>',
         'about_image_src' => '/images/About-haarlem.jpg',
@@ -47,8 +51,8 @@ return [
         'about_more_href' => '#events',
         'events_heading' => 'Upcoming Festival and Events',
         'events_subtitle' => 'Music, jazz, dance, history, food, and stories — pick a path and get tickets.',
-        'events_info_label' => 'INFO >',
-        'events_tickets_label' => 'TICKETS >',
+        'events_info_label' => 'INFO →',
+        'events_tickets_label' => 'TICKETS →',
         'events_category_dance' => 'Dance',
         'events_category_jazz' => 'Jazz',
         'events_category_history' => 'History',

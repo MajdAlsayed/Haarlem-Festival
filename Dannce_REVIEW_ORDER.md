@@ -30,7 +30,7 @@
 ## 4) Admin Form + Mapping
 
 18. [AdminDanceEditViewModel](app/src/ViewModels/AdminDanceEditViewModel.php)
-19. [DanceEdit View](app/src/Views/Admin/DanceEdit.php)
+19. [DanceEdit View](app/src/Views/Admin/Dance/DanceEdit.php)
 
 ## 5) Runtime View Models
 

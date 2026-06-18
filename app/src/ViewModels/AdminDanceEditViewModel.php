@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\ViewModels;
 
-/** Form payload for /admin/cms/dance: flat fields for the editor plus upload CSRF token. */
 final class AdminDanceEditViewModel
 {
     public function __construct(

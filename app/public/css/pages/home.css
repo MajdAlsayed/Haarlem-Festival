@@ -1,0 +1,170 @@
+.festival-card--home {
+    --festival-card-bg: rgba(255, 255, 255, 0.04);
+    --festival-card-border: rgba(255, 255, 255, 0.08);
+}
+
+.festival-hero--home .festival-hero__background img {
+    object-position: center;
+}
+
+.expect-heading {
+    text-align: center;
+}
+
+.expect-heading::after {
+    margin-inline: auto;
+}
+
+.expect-card {
+    padding: 24px 22px;
+}
+
+.expect-list li::before {
+    background: var(--color-accent);
+}
+
+@media (max-width: 900px) {
+    .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px;
+    }
+
+    .event-content-overlay {
+        padding: 22px 18px 18px;
+    }
+
+    .event-title {
+        font-size: 20px;
+    }
+
+    .event-description {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .expect-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .map-layer-legend {
+        position: static;
+        width: 100%;
+        margin-bottom: 16px;
+    }
+
+    .map-wrapper {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        padding-bottom: 0;
+    }
+
+    .map-iframe,
+    #festival-map {
+        position: relative;
+        min-height: 420px;
+    }
+}
+
+@media (max-width: 600px) {
+    .events-section {
+        padding: 48px 0 64px;
+    }
+
+    .section-header {
+        margin-bottom: 32px;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+        gap: 22px;
+    }
+
+    .event-image-wrapper {
+        padding-bottom: 68%;
+    }
+
+    .event-image-overlay {
+        height: 72%;
+    }
+
+    .event-content-overlay {
+        padding: 20px 16px 16px;
+    }
+
+    .event-actions {
+        gap: 10px;
+    }
+
+    .event-actions .btn {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .welcome-section,
+    .about-section,
+    .expect-section,
+    .map-section {
+        padding-top: 48px;
+        padding-bottom: 56px;
+    }
+
+    .about-content {
+        padding: 24px 20px;
+    }
+
+    .about-link {
+        width: 100%;
+    }
+
+    .expect-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .expect-intro {
+        margin-bottom: 32px;
+    }
+
+    .expect-subheading {
+        font-size: 19px;
+    }
+
+    .expect-cta {
+        padding: 22px 18px;
+        font-size: 15px;
+    }
+
+    .map-intro {
+        margin-bottom: 28px;
+    }
+
+    .map-iframe,
+    #festival-map {
+        min-height: 360px;
+    }
+
+    .map-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .map-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 380px) {
+    .event-actions {
+        flex-direction: column;
+    }
+
+    .event-actions .btn {
+        width: 100%;
+    }
+}

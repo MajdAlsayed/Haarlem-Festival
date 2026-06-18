@@ -6,9 +6,10 @@ namespace App\Services;
 
 use App\Repositories\OrderRepository;
 
-/** Pay-later housekeeping without a cron job; invoked from the front controller after Session::start(). */
+// runs on each request — pay-later reminder emails
 final class PendingOrderMaintenance
 {
+    // expire stale pending + send one reminder email each
     public static function run(): void
     {
         $orders = new OrderRepository();

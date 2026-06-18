@@ -1,83 +1,62 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Contracts\PageRepositoryInterface;
-use App\Core\Database;
+use App\Core\Repository;
 use App\Models\Page;
+use PDO;
 
-/** pages table lookup by slug. Used by PageService. */
-class PageRepository implements PageRepositoryInterface
+final class PageRepository extends Repository implements PageRepositoryInterface
 {
     public function getBySlug(string $slug): ?Page
     {
-        $db = Database::getConnection();
-
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT page_id, slug, title
              FROM pages
              WHERE slug = :slug AND is_published = 1'
         );
-
         $stmt->execute(['slug' => $slug]);
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-        if (!$row) {
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row === false) {
             return null;
         }
 
         return $this->mapRowToPage($row);
     }
 
-    /** @return list<array{page_id:int,slug:string,title:string,is_published:bool}> All pages for CMS admin. */
     public function getAllForAdmin(): array
     {
-        $db = Database::getConnection();
-        $stmt = $db->query(
+        $stmt = $this->db->query(
             'SELECT page_id, slug, title, is_published
              FROM pages
              ORDER BY title ASC'
         );
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        return array_map(static function ($r) {
-            return [
-                'page_id' => (int) $r['page_id'],
-                'slug' => (string) $r['slug'],
-                'title' => (string) $r['title'],
-                'is_published' => (bool) $r['is_published'],
-            ];
-        }, $rows);
+        return array_map(fn (array $row): array => $this->mapAdminRow($row), $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
-    /** Get page by id for admin edit. Returns array with page_id, slug, title, is_published or null. */
     public function getById(int $id): ?array
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT page_id, slug, title, is_published
              FROM pages
              WHERE page_id = :id'
         );
         $stmt->execute(['id' => $id]);
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-        if (!$row) {
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row === false) {
             return null;
         }
 
-        return [
-            'page_id' => (int) $row['page_id'],
-            'slug' => (string) $row['slug'],
-            'title' => (string) $row['title'],
-            'is_published' => (bool) $row['is_published'],
-        ];
+        return $this->mapAdminRow($row);
     }
 
-    /** Update page title, slug, is_published. */
     public function update(int $id, string $title, string $slug, bool $isPublished): bool
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'UPDATE pages SET title = :title, slug = :slug, is_published = :pub
              WHERE page_id = :id'
         );
@@ -93,38 +72,58 @@ class PageRepository implements PageRepositoryInterface
 
     public function findBySlugForAdmin(string $slug): ?Page
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'SELECT page_id, slug, title FROM pages WHERE slug = :slug LIMIT 1'
         );
-        $stmt->execute(['slug' => strtolower(trim($slug))]);
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt->execute(['slug' => $this->normalizeSlug($slug)]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row === false) {
+            return null;
+        }
 
-        return $row ? $this->mapRowToPage($row) : null;
+        return $this->mapRowToPage($row);
     }
 
     public function updateTitleBySlug(string $slug, string $title): bool
     {
-        $db = Database::getConnection();
-        $stmt = $db->prepare(
+        $stmt = $this->db->prepare(
             'UPDATE pages SET title = :title WHERE slug = :slug LIMIT 1'
         );
 
         return $stmt->execute([
             'title' => $title,
-            'slug' => strtolower(trim($slug)),
+            'slug' => $this->normalizeSlug($slug),
         ]);
     }
 
-    /** DB row → Page (private). */
     private function mapRowToPage(array $row): Page
     {
         $page = new Page();
         $page->id = (int) $row['page_id'];
-        $page->slug = $row['slug'] ?? '';
-        $page->title = $row['title'] ?? '';
+        $page->slug = $this->rowText($row, 'slug');
+        $page->title = $this->rowText($row, 'title');
         $page->content = '';
 
         return $page;
+    }
+
+    private function mapAdminRow(array $row): array
+    {
+        return [
+            'page_id' => (int) $row['page_id'],
+            'slug' => (string) $row['slug'],
+            'title' => (string) $row['title'],
+            'is_published' => (bool) $row['is_published'],
+        ];
+    }
+
+    private function normalizeSlug(string $slug): string
+    {
+        return strtolower(trim($slug));
+    }
+
+    private function rowText(array $row, string $key): string
+    {
+        return isset($row[$key]) ? (string) $row[$key] : '';
     }
 }

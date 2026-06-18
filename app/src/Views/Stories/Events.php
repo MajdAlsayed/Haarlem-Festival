@@ -9,62 +9,54 @@ if (!function_exists('h')) {
 }
 
 $selectedDay = $vm->selectedDay ?? 'all';
+$selectedDay = $vm->selectedDay ?? 'all';
 $heroImages = $vm->getEventsHeroImages();
 $heroImage1 = $heroImages[0] ?? '';
 $heroImage2 = $heroImages[1] ?? '';
 $mapLocations = $vm->getEventsMapLocations();
+
+// Settings for the page title, styles, body class
+$pageTitle = $vm->pageTitle ?? 'Events - Haarlem Stories';
+$pageStyles = ['/css/pages/stories.css'];
+$bodyClass = 'stories-page stories-events-page';
+
+// Hero settings
+$pageHeroTitle = 'Events of Haarlem Stories';
+$pageHeroSubtitle = 'Discover the best of Haarlem through various storytelling experiences. Check age labels for each event.';
+$pageHeroImage = '/images/Stories/stories-events.jpg';
+$pageHeroAlt = 'Events of Haarlem Stories';
+$pageHeroClass = 'stories-events-hero';
+$pageHeroContentClass = 'stories-events-hero__content';
+
+// Breadcrumbs
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'Stories', 'url' => '/stories'],
+        ['label' => 'Events', 'url' => null],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= h($vm->pageTitle ?? 'Events - Haarlem Stories') ?></title>
+<?php require __DIR__ . '/../partials/head.php'; ?>
 
-    <link rel="stylesheet" href="/css/style.css?v=<?= h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/Stories/events.css?v=<?= h($app['css_version'] ?? '1') ?>-eventmain">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-</head>
-
-<body class="stories-events-page">
+<body class="<?= htmlspecialchars($bodyClass) ?>">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main>
 
-    <section class="stories-hero-banner" aria-label="Events hero images">
-        <div class="hero-img hero-img-left" style="background-image: url('<?= h($heroImage1) ?>');" role="img" aria-label="Events banner image 1"></div>
-        <div class="hero-img hero-img-right" style="background-image: url('<?= h($heroImage2) ?>');" role="img" aria-label="Events banner image 2"></div>
-        <div class="hero-overlay">
-            <h1><?= h($vm->settings['events_hero_heading'] ?? 'The Event of Haarlem Stories') ?></h1>
-            <p><?= h($vm->settings['events_hero_tagline'] ?? '') ?></p>
-        </div>
-    </section>
+    <!-- Hero -->
+    <?php require __DIR__ . '/../partials/page-hero.php'; ?>
 
-    <nav class="stories-breadcrumb" aria-label="Breadcrumb">
-        <div class="stories-breadcrumb-inner">
-            <a href="/" class="stories-breadcrumb-link">HOME</a>
-            <span class="stories-breadcrumb-separator" aria-hidden="true">&rarr;</span>
-            <a href="/stories" class="stories-breadcrumb-link">STORIES</a>
-            <span class="stories-breadcrumb-separator" aria-hidden="true">&rarr;</span>
-            <span class="stories-breadcrumb-link active" aria-current="page">EVENTS</span>
-        </div>
-    </nav>
+    <!-- Breadcrumb -->
+    <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
-    <section class="stories-heading-section">
-        <div class="stories-heading-inner">
-            <h2 class="stories-heading-title"><?= h($vm->settings['events_intro_heading'] ?? 'Discover Stories Across Haarlem') ?></h2>
-            <p class="stories-heading-text">
-                <?= h($vm->settings['events_intro_text'] ?? '') ?>
-            </p>
-        </div>
-    </section>
-
-    <section class="schedule-section" aria-label="Day filter">
+    <section class="container schedule-section" aria-label="Day filter">
         <div class="schedule-row">
             <div class="schedule-label"><?= h($vm->settings['events_schedule_label'] ?? 'Select the Day:') ?></div>
             <div class="schedule-content">
-                <div class="day-tabs day-tabs-inline">
+                <div class="filter-tabs stories-day-tabs">
                     <?php
                     $days = [
                         'all' => 'All Events >',
@@ -74,7 +66,7 @@ $mapLocations = $vm->getEventsMapLocations();
                         'sunday' => 'Sunday >',
                     ];
                     foreach ($days as $key => $label): ?>
-                        <a class="day-tab <?= $vm->isActive($key) ? 'active' : '' ?>"
+                        <a class="filter-tab stories-day-tab <?= $vm->isActive($key) ? 'active' : '' ?>"
                            href="/stories/events?day=<?= h($key) ?>"
                            aria-current="<?= $vm->isActive($key) ? 'page' : 'false' ?>">
                             <?= h($label) ?>
@@ -85,9 +77,9 @@ $mapLocations = $vm->getEventsMapLocations();
         </div>
     </section>
 
-    <section class="stories-cards" aria-label="Story cards">
+    <section class="container stories-cards" aria-label="Story cards">
         <div class="stories-cards-grid" id="storiesGrid">
-            <div class="cards-loading" id="cardsLoading">
+            <div class="cards-loading copy-text copy-text--muted" id="cardsLoading">
                 <div class="cards-loading-spinner" aria-hidden="true"></div>
                 Loading stories...
             </div>

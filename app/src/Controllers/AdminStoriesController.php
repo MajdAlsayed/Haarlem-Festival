@@ -30,7 +30,7 @@ class AdminStoriesController
         $stories = $this->storiesService->getAllStoriesForAdminWithDetailStatus();
         $csrf = Csrf::token('admin_stories_delete');
 
-        require __DIR__ . '/../Views/Stories/Admin/Index.php';
+        require __DIR__ . '/../Views/Admin/Stories/Index.php';
     }
 
     public function edit(): void
@@ -51,7 +51,7 @@ class AdminStoriesController
         // CSRF token prevents form hacking
         $csrf = Csrf::token('admin_stories_edit');
 
-        require __DIR__ . '/../Views/Stories/Admin/Edit.php';
+        require __DIR__ . '/../Views/Admin/Stories/Edit.php';
     }
 
     public function update(): void
@@ -108,7 +108,7 @@ class AdminStoriesController
         $highlights = $data['highlights'];
         $gallery    = $data['gallery'];
 
-        require __DIR__ . '/../Views/Stories/Admin/DetailPageForm.php';
+        require __DIR__ . '/../Views/Admin/Stories/DetailPageForm.php';
     }
 
     public function saveDetailPage(): void

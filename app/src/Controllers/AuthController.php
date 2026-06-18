@@ -3,11 +3,9 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Contracts\ServiceInterface\AuthServiceInterface;
 use App\Core\Csrf;
 use App\Core\Session;
-use App\Repositories\PasswordResetTokenRepository;
-use App\Repositories\SettingsRepository;
-use App\Repositories\UserRepository;
 use App\Services\AuthService;
 use App\ViewModels\ForgotPasswordViewModel;
 use App\ViewModels\LoginViewModel;
@@ -16,23 +14,13 @@ use App\ViewModels\ResetPasswordViewModel;
 
 final class AuthController
 {
-    private AuthService $auth;
-    private SettingsRepository $settingsRepository;
+    private AuthServiceInterface $auth;
 
     public function __construct()
     {
-        $this->auth = new AuthService(
-            new UserRepository(),
-            new PasswordResetTokenRepository()
-        );
-
-        $this->settingsRepository = new SettingsRepository();
+        $this->auth = new AuthService();
     }
 
-    private function appSettings(): array
-    {
-        return $this->settingsRepository->getAll();
-    }
 
     public function showLogin(): void
     {
@@ -44,7 +32,6 @@ final class AuthController
         $viewModel = new LoginViewModel(
             csrf: Csrf::token('login'),
             error: Session::getFlash('login_error'),
-            appSettings: $this->appSettings(),
             returnTo: $returnTo,
         );
 
@@ -62,7 +49,13 @@ final class AuthController
         $identifier = trim((string)($_POST['identifier'] ?? ''));
         $password = (string)($_POST['password'] ?? '');
 
-        $user = $this->auth->attemptLogin($identifier, $password);
+        try {
+            $user = $this->auth->attemptLogin($identifier, $password);
+        } catch (\Throwable $e) {
+            Session::setFlash('login_error', 'An error occurred. Please try again.');
+            header('Location: /login');
+            exit;
+        }
 
         if ($user === null) {
             Session::setFlash('login_error', 'Invalid credentials.');
@@ -101,16 +94,16 @@ final class AuthController
     public function showRegister(): void
     {
         $old = json_decode(Session::getFlash('register_old') ?? '{}', true) ?? [];
+        $appConfig = require __DIR__ . '/../Config/app.php';
 
         $viewModel = new RegisterViewModel(
             csrf: Csrf::token('register'),
-            captchaQuestion: $this->auth->newCaptchaQuestion(),
+            recaptchaSiteKey: $appConfig['recaptcha_site_key'],
             error: Session::getFlash('register_error'),
             username: (string)($old['username'] ?? ''),
             email: (string)($old['email'] ?? ''),
             firstName: (string)($old['firstName'] ?? ''),
             lastName: (string)($old['lastName'] ?? ''),
-            appSettings: $this->appSettings(),
         );
 
         require __DIR__ . '/../Views/Authentication/Register.php';
@@ -138,21 +131,28 @@ final class AuthController
             'lastName' => $lastName,
         ]);
 
-        if (!$this->auth->validateCaptcha($_POST['captcha'] ?? null)) {
-            Session::setFlash('register_error', 'CAPTCHA incorrect.');
+        if (!$this->verifyRecaptcha((string)($_POST['g-recaptcha-response'] ?? ''))) {
+            Session::setFlash('register_error', 'Please complete the CAPTCHA.');
             Session::setFlash('register_old', $old);
             header('Location: /register');
             exit;
         }
 
-        $result = $this->auth->register(
-            username: $username,
-            email: $email,
-            password: $password,
-            passwordConfirm: $passwordConfirm,
-            firstName: $firstName,
-            lastName: $lastName,
-        );
+        try {
+            $result = $this->auth->register(
+                username: $username,
+                email: $email,
+                password: $password,
+                passwordConfirm: $passwordConfirm,
+                firstName: $firstName,
+                lastName: $lastName,
+            );
+        } catch (\Throwable $e) {
+            Session::setFlash('register_error', 'An error occurred. Please try again.');
+            Session::setFlash('register_old', $old);
+            header('Location: /register');
+            exit;
+        }
 
         if (!$result['ok']) {
             Session::setFlash('register_error', $result['error']);
@@ -182,7 +182,6 @@ final class AuthController
             success: Session::getFlash('forgot_password_success'),
             dummyLink: Session::getFlash('forgot_password_dummy_link'),
             identifier: Session::getFlash('forgot_password_old_identifier') ?? '',
-            appSettings: $this->appSettings(),
         );
 
         require __DIR__ . '/../Views/Authentication/ForgotPassword.php';
@@ -199,7 +198,13 @@ final class AuthController
         $identifier = trim((string)($_POST['identifier'] ?? ''));
         Session::setFlash('forgot_password_old_identifier', $identifier);
 
-        $result = $this->auth->createPasswordResetRequest($identifier);
+        try {
+            $result = $this->auth->createPasswordResetRequest($identifier);
+        } catch (\Throwable $e) {
+            Session::setFlash('forgot_password_error', 'An error occurred. Please try again.');
+            header('Location: /forgot-password');
+            exit;
+        }
 
         if (!$result['ok']) {
             Session::setFlash('forgot_password_error', $result['error']);
@@ -220,8 +225,12 @@ final class AuthController
         $error = Session::getFlash('reset_password_error');
         $success = Session::getFlash('reset_password_success');
 
-        if ($success === null && !$this->auth->validatePasswordResetToken($token)) {
-            $error = $error ?? 'Invalid or expired reset link.';
+        try {
+            if ($success === null && !$this->auth->validatePasswordResetToken($token)) {
+                $error = $error ?? 'Invalid or expired reset link.';
+            }
+        } catch (\Throwable $e) {
+            $error = 'An error occurred. Please try again.';
         }
 
         $viewModel = new ResetPasswordViewModel(
@@ -229,10 +238,35 @@ final class AuthController
             token: $token,
             error: $error,
             success: $success,
-            appSettings: $this->appSettings(),
         );
 
         require __DIR__ . '/../Views/Authentication/ResetPassword.php';
+    }
+
+    private function verifyRecaptcha(string $token): bool
+    {
+        if ($token === '') return false;
+
+        $appConfig = require __DIR__ . '/../Config/app.php';
+        $url = 'https://www.google.com/recaptcha/api/siteverify';
+        $body = http_build_query([
+            'secret'   => $appConfig['recaptcha_secret_key'],
+            'response' => $token,
+            'remoteip' => $_SERVER['REMOTE_ADDR'] ?? '',
+        ]);
+
+        $ctx = stream_context_create(['http' => [
+            'method'  => 'POST',
+            'header'  => 'Content-Type: application/x-www-form-urlencoded',
+            'content' => $body,
+            'timeout' => 5,
+        ]]);
+
+        $raw = @file_get_contents($url, false, $ctx);
+        if ($raw === false) return false;
+
+        $data = json_decode($raw, true);
+        return isset($data['success']) && $data['success'] === true;
     }
 
     public function resetPassword(): void
@@ -245,11 +279,17 @@ final class AuthController
 
         $token = trim((string)($_POST['token'] ?? ''));
 
-        $result = $this->auth->resetPassword(
-            $token,
-            (string)($_POST['password'] ?? ''),
-            (string)($_POST['password_confirm'] ?? ''),
-        );
+        try {
+            $result = $this->auth->resetPassword(
+                $token,
+                (string)($_POST['password'] ?? ''),
+                (string)($_POST['password_confirm'] ?? ''),
+            );
+        } catch (\Throwable $e) {
+            Session::setFlash('reset_password_error', 'An error occurred. Please try again.');
+            header('Location: /reset-password?token=' . urlencode($token));
+            exit;
+        }
 
         if (!$result['ok']) {
             Session::setFlash('reset_password_error', $result['error']);

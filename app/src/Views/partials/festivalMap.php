@@ -55,8 +55,8 @@ $defaultUrl = $baseMapUrl . "&ll=" . urlencode($default['ll']) . "&z=" . (int)$d
     </div>
 
     <div class="map-actions">
-      <button type="button" class="map-btn map-btn-primary" id="mapExpandBtn">View it Big</button>
-      <a class="map-btn map-btn-secondary" href="<?= h($baseMapUrl) ?>" target="_blank" rel="noopener">Open in Google Maps</a>
+      <button type="button" class="btn btn--light" id="mapExpandBtn">View it Big</button>
+      <a class="btn btn--light" href="<?= h($baseMapUrl) ?>" target="_blank" rel="noopener">Open in Google Maps</a>
     </div>
   </div>
 </section>

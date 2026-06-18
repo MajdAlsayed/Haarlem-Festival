@@ -7,36 +7,35 @@ use App\Contracts\ServiceInterface\EventServiceInterface;
 use App\Models\Event;
 use App\Validation\Validator;
 
-/** Event listing by category/day; validates input then delegates to repo. */
+// shared event queries — dance schedule, jazz lists, etc
 class EventService implements EventServiceInterface
 {
-    /** Keep event lookups decoupled from concrete repository implementation. */
     public function __construct(
         private EventRepositoryInterface $eventRepository
     ) {
     }
 
-    /** @return Event[] */
+    // every event row
     public function getAll(): array
     {
         return $this->eventRepository->getAll();
     }
 
-    /** @return Event[] */
+    // e.g. all dance events
     public function getByCategory(string $eventTypeName): array
     {
         Validator::validateEventCategory($eventTypeName);
         return $this->eventRepository->getByCategory(trim($eventTypeName));
     }
 
-    /** @return Event[] */
+    // filter by category + friday/saturday/sunday
     public function getByCategoryAndDay(string $eventTypeName, string $eventDay): array
     {
         Validator::validateEventCategory($eventTypeName);
         return $this->eventRepository->getByCategoryAndDay(trim($eventTypeName), trim($eventDay));
     }
 
-    /** Single event fetch with guard against invalid ids. */
+    // single event or null
     public function getById(int $id): ?Event
     {
         if ($id <= 0) {

@@ -1,9 +1,5 @@
 <?php
-/** @var array $app */
-/** @var string $csrf */
-/** @var string|null $error */
-/** @var array<string, mixed>|null $result */
-/** @var bool $showCmsLinks */
+
 if (!isset($showCmsLinks)) {
     $showCmsLinks = true;
 }
@@ -41,17 +37,15 @@ $demoQrCode = '';
 if ($result !== null && !empty($result['ticket_code'])) {
     $demoQrCode = (string) $result['ticket_code'];
 }
+
+$pageTitle = 'Ticket scanner — ' . ($app['site_name'] ?? 'Haarlem Festival');
+$pageStyles = ['/css/admin.css'];
+$bodyClass = 'admin-page';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ticket scanner — <?= $h($app['site_name'] ?? 'Haarlem Festival') ?></title>
-    <link rel="stylesheet" href="/css/style.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-    <link rel="stylesheet" href="/css/admin.css?v=<?= $h($app['css_version'] ?? '1') ?>">
-</head>
-<body class="admin-page">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+<body class="<?= $h($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
@@ -67,10 +61,6 @@ if ($result !== null && !empty($result['ticket_code'])) {
 
         <h1 class="admin-title">Ticket scanner</h1>
         <p class="admin-lead">Use the camera for QR codes, paste one code, or enter up to four codes (one per line) for a group.</p>
-
-        <?php if ($showCmsLinks): ?>
-            <?php require __DIR__ . '/partials/admin_nav.php'; ?>
-        <?php endif; ?>
 
         <?php if ($error !== null && $error !== ''): ?>
             <p class="admin-scan-error" role="alert"><?= $h($error) ?></p>
@@ -134,9 +124,8 @@ if ($result !== null && !empty($result['ticket_code'])) {
             <p class="admin-scan-label admin-scan-label--tight">Camera (QR)</p>
             <div class="admin-scan-qr-wrap" id="qr-reader-wrap">
                 <div id="qr-reader-idle" class="admin-scan-qr-idle" aria-hidden="false">
-                    <p class="admin-scan-qr-idle-title">No live preview yet</p>
-                    <p class="admin-scan-qr-idle-text">Tap <strong>Start camera</strong> and allow access. The video feed appears here — there was no QR on screen before, only an empty (black) box.</p>
-                    <p class="admin-scan-qr-idle-text">Use <strong>https</strong> or <strong>localhost</strong>; some browsers block the camera on plain <code>http://</code> except localhost.</p>
+                    <p class="admin-scan-qr-idle-title">Camera preview</p>
+                    <p class="admin-scan-qr-idle-text">Tap <strong>Start camera</strong> and allow access — the live feed appears here.</p>
                 </div>
                 <div id="qr-reader" class="admin-scan-qr-reader" aria-label="QR scanner live view"></div>
             </div>

@@ -5,6 +5,7 @@ ehthumbs.db
 Icon?
 # allow our app icons folder (Icon? above would otherwise ignore it)
 !/app/public/images/icons/
+!/app/public/images/history/icons/
 
 # Editor/IDE
 .vscode/

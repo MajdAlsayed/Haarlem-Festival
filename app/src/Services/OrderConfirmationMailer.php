@@ -4,164 +4,193 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\MailArchive;
+use App\Models\User;
 use App\Repositories\OrderRepository;
 use App\Repositories\SettingsRepository;
 use App\Repositories\UserRepository;
+use App\Views\EmailView;
+use App\Views\InvoiceView;
+use App\Views\TicketView;
 
-/** Paid confirmation, pay-later reservation, and payment reminders; logs to file and attempts PHP mail(). */
+// checkout emails — paid confirmation, reservation, pay-later reminders
 final class OrderConfirmationMailer
 {
+    private const DEFAULT_SITE_NAME = 'Haarlem Festival';
+    private const STATUS_PAID = 'paid';
+    private const STATUS_PENDING = 'pending';
+
+    public function __construct(
+        private OrderRepository $orderRepository = new OrderRepository(),
+        private UserRepository $userRepository = new UserRepository(),
+        private SettingsRepository $settingsRepository = new SettingsRepository(),
+        private InvoicePdfService $invoicePdfService = new InvoicePdfService(),
+        private TicketPdfService $ticketPdfService = new TicketPdfService(),
+        private QrCodeService $qrCodeService = new QrCodeService(),
+        private MailArchive $mailArchive = new MailArchive(),
+        private SmtpMailer $smtpMailer = new SmtpMailer(),
+    ) {
+    }
+
+    // paid order: email + invoice + tickets pdfs
     public function send(int $orderId, int $userId): void
     {
-        $user = (new UserRepository())->findById($userId);
-        if ($user === null) {
+        $context = $this->customerOrder($orderId, $userId, self::STATUS_PAID);
+        if ($context === null) {
             return;
         }
 
-        $orders = new OrderRepository();
-        $order = $orders->findForCustomer($orderId, $userId);
-        if ($order === null || ($order['status'] ?? '') !== 'paid') {
-            return;
-        }
+        [$user, $order] = $context;
+        $site = $this->siteName();
+        $name = $this->customerName($user);
+        $lines = $this->orderRepository->getOrderLineItemsForInvoice($orderId);
+        $tickets = $this->orderRepository->getTicketCodesForOrder($orderId);
 
-        $lines = $orders->getOrderLineItemsForInvoice($orderId);
-        $tickets = $orders->getTicketCodesForOrder($orderId);
-        $app = (new SettingsRepository())->getAll();
-        $site = (string) ($app['site_name'] ?? 'Haarlem Festival');
-
-        $plain = $this->buildPlainBody($site, $orderId, $order, $lines, $tickets);
         $subject = "{$site} — Order #{$orderId} (tickets)";
+        $body = EmailView::paidOrder($site, $orderId, $order, $lines, $tickets);
+        $attachments = $this->buildPaidOrderAttachments($orderId, $order, $lines, $name, $user->email, $site);
 
-        $this->appendLog($user->email, $subject, $plain);
-        $this->tryPhpMail($user->email, $subject, $plain);
-    }
-
-    /** After “Pay later” reserve: cart held as pending order (no ticket codes yet). */
-    public function sendPendingReservation(int $orderId, int $userId): void
-    {
-        $user = (new UserRepository())->findById($userId);
-        if ($user === null) {
-            return;
-        }
-
-        $orders = new OrderRepository();
-        $order = $orders->findForCustomer($orderId, $userId);
-        if ($order === null || ($order['status'] ?? '') !== 'pending') {
-            return;
-        }
-
-        $lines = $orders->getOrderLineItemsForInvoice($orderId);
-        $app = (new SettingsRepository())->getAll();
-        $site = (string) ($app['site_name'] ?? 'Haarlem Festival');
-        $expires = (string) ($order['expires_at'] ?? '');
-
-        $buf = [];
-        $buf[] = "Your tickets at {$site} are reserved — payment is still due.";
-        $buf[] = '';
-        $buf[] = "Order #{$orderId}";
-        $buf[] = 'Total: €' . ($order['total_amount'] ?? '0');
-        $buf[] = 'Complete payment before: ' . ($expires !== '' ? $expires : '(see your account)');
-        $buf[] = '';
-        $buf[] = '--- Reserved lines ---';
-        foreach ($lines as $l) {
-            $buf[] = sprintf('%s × %s @ €%s = €%s', $l['name'], (string) $l['quantity'], $l['unit_price'], $l['line_total']);
-        }
-        $buf[] = '';
-        $buf[] = 'Pay from: /account/order/' . $orderId;
-
-        $plain = implode("\n", $buf);
-        $subject = "{$site} — Order #{$orderId} reserved (pay within 24h)";
-        $this->appendLog($user->email, $subject, $plain);
-        $this->tryPhpMail($user->email, $subject, $plain);
-    }
-
-    public function sendPendingPaymentReminder(int $orderId, int $userId, string $totalAmount, string $expiresAt): void
-    {
-        $user = (new UserRepository())->findById($userId);
-        if ($user === null) {
-            return;
-        }
-
-        $orders = new OrderRepository();
-        $order = $orders->findForCustomer($orderId, $userId);
-        if ($order === null || ($order['status'] ?? '') !== 'pending') {
-            return;
-        }
-
-        $app = (new SettingsRepository())->getAll();
-        $site = (string) ($app['site_name'] ?? 'Haarlem Festival');
-
-        $plain = "Reminder: order #{$orderId} at {$site} is still unpaid.\n"
-            . "Total: €{$totalAmount}\n"
-            . "Payment deadline: {$expiresAt}\n\n"
-            . 'Complete payment: /account/order/' . $orderId;
-
-        $subject = "{$site} — Reminder: complete payment for order #{$orderId}";
-        $this->appendLog($user->email, $subject, $plain);
-        $this->tryPhpMail($user->email, $subject, $plain);
+        $this->deliverEmail($user->email, $subject, $body, $attachments);
     }
 
     /**
-     * @param array{order_id?:int,status?:string,total_amount?:string,paid_at?:string,created_at?:string} $order
-     * @param list<array{name:string,quantity:int,unit_price:string,line_total:string}> $lines
-     * @param list<array{ticket_code:string,item_name:string}> $tickets
+     * @param array<string, mixed> $order
+     * @param list<array<string, mixed>> $lines
+     * @return list<array{name: string, content: string}>
      */
-    private function buildPlainBody(
-        string $site,
+    private function buildPaidOrderAttachments(
         int $orderId,
         array $order,
         array $lines,
-        array $tickets
-    ): string {
-        $buf = [];
-        $buf[] = "Thank you for your order at {$site}.";
-        $buf[] = '';
-        $buf[] = "Order #{$orderId}";
-        $buf[] = 'Status: ' . ($order['status'] ?? '');
-        $buf[] = 'Total: €' . ($order['total_amount'] ?? '0');
-        $buf[] = 'Paid at: ' . ($order['paid_at'] ?? '—');
-        $buf[] = '';
-        $buf[] = '--- Invoice lines ---';
-        foreach ($lines as $l) {
-            $buf[] = sprintf(
-                '%s × %s @ €%s = €%s',
-                $l['name'],
-                (string) $l['quantity'],
-                $l['unit_price'],
-                $l['line_total']
-            );
-        }
-        $buf[] = '';
-        $buf[] = '--- Your ticket codes (show at entrance) ---';
-        foreach ($tickets as $t) {
-            $buf[] = ($t['item_name'] ?? '') . ': ' . ($t['ticket_code'] ?? '');
-        }
-        $buf[] = '';
-        $buf[] = 'View orders anytime: /account/orders';
+        string $name,
+        string $email,
+        string $site,
+    ): array {
+        $attachments = [];
 
-        return implode("\n", $buf);
+        try {
+            $attachments[] = [
+                'name' => 'invoice-' . $orderId . '.pdf',
+                'content' => $this->invoicePdfService->render(
+                    InvoiceView::html($order, $lines, $name, $email, $site),
+                ),
+            ];
+        } catch (\Throwable $e) {
+            error_log('OrderConfirmationMailer: invoice PDF skipped for order #' . $orderId . ': ' . $e->getMessage());
+        }
+
+        try {
+            $attachments[] = [
+                'name' => 'tickets-' . $orderId . '.pdf',
+                'content' => $this->buildTicketsPdf($orderId, $name, $site),
+            ];
+        } catch (\Throwable $e) {
+            error_log('OrderConfirmationMailer: tickets PDF skipped for order #' . $orderId . ': ' . $e->getMessage());
+        }
+
+        return $attachments;
     }
 
-    /** Demo-friendly: tail app/storage/mail/orders.log; swap for real SMTP in production. */
-    private function appendLog(string $toEmail, string $subject, string $body): void
+    // pay-later: email only, no pdfs yet
+    public function sendPendingReservation(int $orderId, int $userId): void
     {
-        $base = dirname(__DIR__, 2) . '/storage/mail';
-        if (!is_dir($base) && !@mkdir($base, 0755, true) && !is_dir($base)) {
+        $context = $this->customerOrder($orderId, $userId, self::STATUS_PENDING);
+        if ($context === null) {
             return;
         }
 
-        $line = str_repeat('=', 60) . "\n"
-            . date('c') . "\n"
-            . 'To: ' . $toEmail . "\n"
-            . 'Subject: ' . $subject . "\n\n"
-            . $body . "\n\n";
-        @file_put_contents($base . '/orders.log', $line, FILE_APPEND | LOCK_EX);
+        [$user, $order] = $context;
+        $site = $this->siteName();
+        $lines = $this->orderRepository->getOrderLineItemsForInvoice($orderId);
+        $subject = "{$site} — Order #{$orderId} reserved (pay within 24h)";
+        $body = EmailView::pendingReservation($site, $orderId, $order, $lines);
+
+        $this->deliverEmail($user->email, $subject, $body);
     }
 
-    private function tryPhpMail(string $to, string $subject, string $body): void
+    // cron-style nudge before pending order expires
+    public function sendPendingPaymentReminder(int $orderId, int $userId, string $totalAmount, string $expiresAt): void
     {
-        $from = getenv('MAIL_FROM') ?: 'noreply@haarlem-festival.local';
-        $headers = 'From: ' . $from . "\r\nContent-Type: text/plain; charset=UTF-8";
-        @mail($to, $subject, $body, $headers);
+        $context = $this->customerOrder($orderId, $userId, self::STATUS_PENDING);
+        if ($context === null) {
+            return;
+        }
+
+        [$user] = $context;
+        $site = $this->siteName();
+        $subject = "{$site} — Reminder: complete payment for order #{$orderId}";
+        $body = EmailView::pendingReminder($site, $orderId, $totalAmount, $expiresAt);
+
+        $this->deliverEmail($user->email, $subject, $body);
+    }
+
+    private function customerOrder(int $orderId, int $userId, string $status): ?array
+    {
+        $user = $this->userRepository->findById($userId);
+        if ($user === null) {
+            return null;
+        }
+
+        $order = $this->orderRepository->findForCustomer($orderId, $userId);
+        if ($order === null || $this->rowText($order, 'status') !== $status) {
+            return null;
+        }
+
+        return [$user, $order];
+    }
+
+    private function deliverEmail(string $email, string $subject, string $body, array $attachments = []): void
+    {
+        $this->mailArchive->log($email, $subject, $body);
+        if ($attachments !== []) {
+            $this->mailArchive->savePdfs($attachments);
+        }
+
+        $this->smtpMailer->send($email, $subject, $body, $attachments);
+    }
+
+    private function buildTicketsPdf(int $orderId, string $customerName, string $site): string
+    {
+        $tickets = $this->orderRepository->getTicketsWithDetailsForOrder($orderId);
+        $qrByCode = $this->qrCodeService->pngDataUrisForCodes($this->ticketCodes($tickets));
+        $html = TicketView::html($tickets, $customerName, $site, $qrByCode);
+
+        return $this->ticketPdfService->render($html);
+    }
+
+    private function ticketCodes(array $tickets): array
+    {
+        $codes = [];
+        foreach ($tickets as $ticket) {
+            $codes[] = $this->rowText($ticket, 'ticket_code');
+        }
+
+        return $codes;
+    }
+
+    private function customerName(User $user): string
+    {
+        return trim($user->firstName . ' ' . $user->lastName);
+    }
+
+    private function siteName(): string
+    {
+        $name = $this->settingText($this->settingsRepository->getAll(), 'site_name');
+
+        return $name !== '' ? $name : self::DEFAULT_SITE_NAME;
+    }
+
+    private function settingText(array $settings, string $key): string
+    {
+        if (isset($settings[$key]) && is_string($settings[$key])) {
+            return $settings[$key];
+        }
+
+        return '';
+    }
+
+    private function rowText(array $row, string $key): string
+    {
+        return isset($row[$key]) ? (string) $row[$key] : '';
     }
 }

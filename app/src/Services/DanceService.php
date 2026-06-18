@@ -1,152 +1,410 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
+use App\Contracts\ServiceInterface\ArtistServiceInterface;
+use App\Contracts\ServiceInterface\DanceServiceInterface;
+use App\Contracts\ServiceInterface\DanceSettingsServiceInterface;
+use App\Contracts\ServiceInterface\EventServiceInterface;
+use App\Contracts\ServiceInterface\SettingsServiceInterface;
 use App\Models\Event;
-use App\Repositories\ArtistsRepository;
-use App\Repositories\DanceSettingsRepository;
-use App\Repositories\EventRepository;
+use App\ViewModels\DanceArtistCard;
+use App\ViewModels\DanceDayPanel;
+use App\ViewModels\DanceEventCard;
+use App\ViewModels\DanceViewModel;
 
-/**
- * Data for /dance: per-day venue order from dance_settings or defaults in dance.php; artist list from the same merged config.
- */
-class DanceService
+// dance page data for the view
+class DanceService implements DanceServiceInterface
 {
     private const CATEGORY_DANCE = 'dance';
+    private const DAYS = ['friday', 'saturday', 'sunday'];
 
-    private EventRepository $eventRepository;
-    private DanceSettingsRepository $danceSettingsRepository;
+    private ?array $danceSettings = null;
+    private ?array $appSettings = null;
 
-    /** Keep service testable by injecting repositories. */
     public function __construct(
-        EventRepository $eventRepository,
-        DanceSettingsRepository $danceSettingsRepository
+        private EventServiceInterface $eventService,
+        private DanceSettingsServiceInterface $danceSettingsService,
+        private ArtistServiceInterface $artistService,
+        private SettingsServiceInterface $settingsService,
     ) {
-        $this->eventRepository = $eventRepository;
-        $this->danceSettingsRepository = $danceSettingsRepository;
     }
 
-    /**
-     * Get dance events per day. Each day is sorted by venue order from dance_settings.
-     */
-    public function getEventsGroupedByDay(): array
+    // controller calls this, viewmodel comes from page data
+    public function buildIndexViewModel(): DanceViewModel
     {
-        $settings = $this->danceSettingsRepository->getMergedWithConfig();
-        $venueOrderFriday = $this->getVenueOrder($settings, 'venue_order_friday');
-        $venueOrderSaturday = $this->getVenueOrder($settings, 'venue_order_saturday');
-        $venueOrderSunday = $this->getVenueOrder($settings, 'venue_order_sunday');
+        return DanceViewModel::fromPageData($this->getDancePageData());
+    }
 
-        $fridayEvents = $this->eventRepository->getByCategoryAndDay(self::CATEGORY_DANCE, 'friday');
-        $saturdayEvents = $this->eventRepository->getByCategoryAndDay(self::CATEGORY_DANCE, 'saturday');
-        $sundayEvents = $this->eventRepository->getByCategoryAndDay(self::CATEGORY_DANCE, 'sunday');
-
-        $fridayEvents = $this->sortEventsByVenueOrder($fridayEvents, $venueOrderFriday);
-        $saturdayEvents = $this->sortEventsByVenueOrder($saturdayEvents, $venueOrderSaturday);
-        $sundayEvents = $this->sortEventsByVenueOrder($sundayEvents, $venueOrderSunday);
-
-        $all = $this->eventRepository->getByCategory(self::CATEGORY_DANCE);
+    // hero, about, schedule, artists — everything /dance needs
+    public function getDancePageData(): array
+    {
+        $settings = $this->getDanceSettings();
+        $grouped = $this->getEventsGroupedByDay();
+        $dayLabels = $this->buildDayLabels($settings);
 
         return [
-            'friday' => $fridayEvents,
-            'saturday' => $saturdayEvents,
-            'sunday' => $sundayEvents,
-            'all' => $all,
+            'pageTitle' => $this->resolvePageTitle($settings),
+            'appSettings' => $this->appSettings(),
+            'breadcrumbs' => $this->buildBreadcrumbs($settings),
+            'hero' => $this->loadHeroData($settings),
+            'about' => $this->loadAboutData($settings),
+            'featured' => $this->loadFeaturedData($grouped, $settings),
+            'schedule' => $this->loadScheduleData($grouped, $settings, $dayLabels),
+            'artists' => $this->loadArtistsData($settings),
         ];
     }
 
-    /** Stable sort by configured venue order, then start time inside the same venue bucket. */
+    // friday / saturday / sunday buckets for the schedule
+    public function getEventsGroupedByDay(): array
+    {
+        $settings = $this->getDanceSettings();
+        $grouped = [];
+
+        foreach (self::DAYS as $day) {
+            $events = $this->eventService->getByCategoryAndDay(self::CATEGORY_DANCE, $day);
+            $venueOrder = $this->getVenueOrder($settings, 'venue_order_' . $day);
+            $grouped[$day] = $this->sortEventsByVenueOrder($events, $venueOrder);
+        }
+
+        $grouped['all'] = $this->eventService->getByCategory(self::CATEGORY_DANCE);
+
+        return $grouped;
+    }
+
+    // homepage artist cards in display order
+    public function getArtistsOrdered(): array
+    {
+        $settings = $this->getDanceSettings();
+
+        if (isset($settings['artists']) && is_array($settings['artists']) && $settings['artists'] !== []) {
+            return $settings['artists'];
+        }
+
+        return $this->getDanceArtistsFromDatabase($settings);
+    }
+
+    // merged dance_settings + config defaults (cached per request)
+    public function getDanceSettings(): array
+    {
+        if ($this->danceSettings === null) {
+            $this->danceSettings = $this->danceSettingsService->getMergedWithConfig();
+        }
+
+        return $this->danceSettings;
+    }
+
+    private function loadHeroData(array $settings): array
+    {
+        return [
+            'title' => $this->settingTextOr($settings, 'hero_title', 'Dance'),
+            'image' => $this->danceImage($this->settingText($settings, 'hero_image')),
+            'subtitle' => $this->settingText($settings, 'hero_subtitle'),
+            'buttonText' => $this->settingTextOr($settings, 'hero_button_text', 'Explore events'),
+            'buttonUrl' => $this->settingTextOr($settings, 'hero_button_url', '#featured-events'),
+        ];
+    }
+
+    private function loadAboutData(array $settings): array
+    {
+        return [
+            'heading' => $this->settingText($settings, 'about_section_heading'),
+            'paragraphs' => $this->settingList($settings, 'about_paragraphs'),
+        ];
+    }
+
+    private function loadFeaturedData(array $grouped, array $settings): array
+    {
+        $events = $this->buildFeaturedEvents($grouped['saturday'], $grouped['sunday']);
+
+        return [
+            'title' => $this->settingText($settings, 'featured_section_title'),
+            'cards' => $this->buildFeaturedCards($events, $settings),
+        ];
+    }
+
+    private function loadScheduleData(array $grouped, array $settings, array $dayLabels): array
+    {
+        return [
+            'title' => $this->settingText($settings, 'all_events_section_title'),
+            'dayLabels' => $dayLabels,
+            'panels' => $this->buildDayPanels($grouped, $settings, $dayLabels),
+        ];
+    }
+
+    private function loadArtistsData(array $settings): array
+    {
+        return [
+            'title' => $this->settingText($settings, 'artists_section_title'),
+            'infoLabel' => $this->settingText($settings, 'artist_info_label'),
+            'showMoreLabel' => $this->settingText($settings, 'show_more_artists_label'),
+            'cards' => $this->buildArtistCards($this->getArtistsOrdered()),
+        ];
+    }
+
+    private function buildDayLabels(array $settings): array
+    {
+        $labels = [];
+        foreach (self::DAYS as $day) {
+            $labels[$day] = $this->settingText($settings, 'day_label_' . $day);
+        }
+
+        return $labels;
+    }
+
+    private function buildFeaturedEvents(array $saturdayEvents, array $sundayEvents): array
+    {
+        return array_merge(
+            array_slice($saturdayEvents, 0, 1),
+            array_slice($sundayEvents, 1, 2)
+        );
+    }
+
+    private function buildFeaturedCards(array $events, array $settings): array
+    {
+        $images = $this->settingList($settings, 'featured_images');
+        $genres = $this->settingList($settings, 'featured_genre_labels');
+        $defaultDay = $this->settingTextOr($settings, 'default_event_day', self::DAYS[0]);
+        $defaultTime = $this->defaultEventTime();
+
+        $cards = [];
+        foreach ($events as $i => $event) {
+            $day = $this->resolveEventDay($event, $defaultDay);
+            $startTime = $this->resolveStartTime($event, $defaultTime);
+
+            $cards[] = $this->toEventCard(
+                $event,
+                $this->pickListItem($images, $i, rotate: false, useFirstWhenMissing: true),
+                $this->pickListItem($genres, $i, rotate: false),
+                ucfirst($day) . ' • ' . $startTime,
+            );
+        }
+
+        return $cards;
+    }
+
+    private function buildDayPanels(array $grouped, array $settings, array $dayLabels): array
+    {
+        $defaultTime = $this->defaultEventTime();
+        $panels = [];
+
+        foreach (self::DAYS as $day) {
+            $images = $this->settingList($settings, $day . '_images');
+            $genres = $this->settingList($settings, $day . '_genres');
+            $label = $dayLabels[$day];
+
+            $cards = [];
+            foreach ($grouped[$day] as $i => $event) {
+                $startTime = $this->resolveStartTime($event, $defaultTime);
+                $cards[] = $this->toEventCard(
+                    $event,
+                    $this->pickListItem($images, $i, rotate: true),
+                    $this->pickListItem($genres, $i, rotate: true),
+                    $label . ' • ' . $startTime,
+                );
+            }
+
+            $panels[$day] = new DanceDayPanel(
+                panelClass: $day === self::DAYS[0] ? 'dance-events-panel active' : 'dance-events-panel',
+                cards: $cards,
+            );
+        }
+
+        return $panels;
+    }
+
+    private function buildArtistCards(array $artists): array
+    {
+        $cards = [];
+        foreach ($artists as $artist) {
+            if (!is_array($artist)) {
+                continue;
+            }
+
+            $slug = $this->arrayText($artist, 'slug');
+            $url = $slug !== '' ? '/dance/artist/' . rawurlencode($slug) : '#';
+
+            $cards[] = new DanceArtistCard(
+                name: $this->arrayText($artist, 'name'),
+                bio: $this->arrayText($artist, 'bio'),
+                imagePath: $this->danceImage($this->arrayText($artist, 'image')),
+                url: $url,
+            );
+        }
+
+        return $cards;
+    }
+
+    private function toEventCard(Event $event, string $imageName, string $genre, string $whenLabel): DanceEventCard
+    {
+        return new DanceEventCard(
+            id: (int) $event->id,
+            title: (string) $event->title,
+            description: (string) $event->description,
+            imagePath: $this->danceImage($imageName),
+            genre: $genre,
+            venueLine: $event->venueName . ', ' . $event->venueCity,
+            whenLabel: $whenLabel,
+        );
+    }
+
+    private function pickListItem(array $items, int $index, bool $rotate, bool $useFirstWhenMissing = false): string
+    {
+        if ($items === []) {
+            return '';
+        }
+
+        if ($rotate) {
+            return (string) $items[$index % count($items)];
+        }
+
+        if (isset($items[$index])) {
+            return (string) $items[$index];
+        }
+
+        if ($useFirstWhenMissing && isset($items[0])) {
+            return (string) $items[0];
+        }
+
+        return '';
+    }
+
+    private function resolveEventDay(Event $event, string $defaultDay): string
+    {
+        if ($event->eventDay === null || $event->eventDay === '') {
+            return $defaultDay;
+        }
+
+        return (string) $event->eventDay;
+    }
+
+    private function resolveStartTime(Event $event, string $defaultTime): string
+    {
+        if ($event->startTime === null || $event->startTime === '') {
+            return $defaultTime;
+        }
+
+        return (string) $event->startTime;
+    }
+
+    private function buildBreadcrumbs(array $settings): array
+    {
+        return [
+            ['label' => $this->settingText($settings, 'breadcrumb_home_label'), 'url' => '/'],
+            ['label' => $this->settingText($settings, 'breadcrumb_dance_label'), 'url' => null],
+        ];
+    }
+
+    private function resolvePageTitle(array $settings): string
+    {
+        return $this->settingText($settings, 'dance_page_title');
+    }
+
     private function sortEventsByVenueOrder(array $events, array $venueOrder): array
     {
-        // Venues not listed in CMS/config go to the end, then we sort by start time inside the same slot.
-        $unknownPosition = count($venueOrder);
-        usort($events, function (Event $a, Event $b) use ($venueOrder, $unknownPosition) {
-            $posA = array_search($a->venueId, $venueOrder, true);
-            $posB = array_search($b->venueId, $venueOrder, true);
-            if ($posA === false) {
-                $posA = $unknownPosition;
+        usort($events, function (Event $first, Event $second) use ($venueOrder) {
+            $firstVenue = $this->venuePosition($first->venueId, $venueOrder);
+            $secondVenue = $this->venuePosition($second->venueId, $venueOrder);
+
+            if ($firstVenue !== $secondVenue) {
+                return $firstVenue - $secondVenue;
             }
-            if ($posB === false) {
-                $posB = $unknownPosition;
-            }
-            if ($posA !== $posB) {
-                return $posA <=> $posB;
-            }
-            return strcmp($a->startTime ?? '', $b->startTime ?? '');
+
+            return strcmp((string) $first->startTime, (string) $second->startTime);
         });
+
         return $events;
     }
 
-    /** Read integer venue order list from settings; fallback to empty list. */
+    private function venuePosition(?int $venueId, array $venueOrder): int
+    {
+        $position = array_search($venueId, $venueOrder, true);
+
+        return $position === false ? count($venueOrder) : $position;
+    }
+
     private function getVenueOrder(array $settings, string $key): array
     {
-        $raw = $settings[$key] ?? null;
-        if (is_array($raw)) {
-            return array_map('intval', $raw);
+        if (isset($settings[$key]) && is_array($settings[$key])) {
+            return array_map('intval', $settings[$key]);
         }
+
         return [];
     }
 
-    /**
-     * Homepage artist strip: non-empty CMS `artists` JSON, else defaults from dance.php, else `artists` table rows
-     * whose slug is listed in `dance_index_artist_slugs` (Hardwell / Tiësto — not Jazz slugs).
-     */
-    public function getArtistsOrdered(): array
+    private function getDanceArtistsFromDatabase(array $settings): array
     {
-        $settings = $this->danceSettingsRepository->getMergedWithConfig();
-        $artists = $settings['artists'] ?? null;
-        if (is_array($artists) && count($artists) > 0) {
-            return $artists;
-        }
-        $config = require __DIR__ . '/../Config/dance.php';
-        $fromConfig = $config['artists'] ?? [];
-        if (is_array($fromConfig) && count($fromConfig) > 0) {
-            return $fromConfig;
-        }
+        $slugs = $this->settingList($settings, 'dance_index_artist_slugs');
+        $allArtists = $this->artistService->getAllOrdered();
+        $artists = [];
 
-        return $this->getDanceArtistsFromDatabase();
-    }
-
-    /**
-     * @return list<array{name: string, slug: string, bio: string, image: string}>
-     */
-    private function getDanceArtistsFromDatabase(): array
-    {
-        $defaults = require __DIR__ . '/../Config/dance.php';
-        $slugs = $defaults['dance_index_artist_slugs'] ?? [];
-        if (!is_array($slugs)) {
-            $slugs = [];
-        }
-
-        $repo = new ArtistsRepository();
-        $all = $repo->getAllOrdered();
-        $bySlug = [];
-        foreach ($all as $row) {
-            $s = $row['slug'] ?? null;
-            if (is_string($s) && $s !== '') {
-                $bySlug[$s] = $row;
-            }
-        }
-
-        $out = [];
         foreach ($slugs as $slug) {
-            if (!isset($bySlug[$slug])) {
-                continue;
+            foreach ($allArtists as $artist) {
+                if ($artist['slug'] === $slug) {
+                    $artists[] = $artist;
+                    break;
+                }
             }
-            $r = $bySlug[$slug];
-            $out[] = [
-                'name' => (string) ($r['name'] ?? ''),
-                'slug' => $slug,
-                'bio' => (string) ($r['bio'] ?? ''),
-                'image' => (string) ($r['image'] ?? ''),
-            ];
         }
 
-        return $out;
+        return $artists;
     }
 
-    /** Public accessor so controllers don't read repository/config directly. */
-    public function getDanceSettings(): array
+    private function appSettings(): array
     {
-        return $this->danceSettingsRepository->getMergedWithConfig();
+        if ($this->appSettings === null) {
+            $this->appSettings = $this->settingsService->getAll();
+        }
+
+        return $this->appSettings;
     }
+
+    private function defaultEventTime(): string
+    {
+        $app = $this->appSettings();
+
+        return isset($app['default_event_time']) ? (string) $app['default_event_time'] : '';
+    }
+
+    private function settingTextOr(array $settings, string $key, string $fallback): string
+    {
+        $value = $this->settingText($settings, $key);
+
+        return $value !== '' ? $value : $fallback;
+    }
+
+    private function settingList(array $settings, string $key): array
+    {
+        if (isset($settings[$key]) && is_array($settings[$key])) {
+            return $settings[$key];
+        }
+
+        return [];
+    }
+
+    private function settingText(array $settings, string $key): string
+    {
+        if (isset($settings[$key]) && is_string($settings[$key])) {
+            return $settings[$key];
+        }
+
+        return '';
+    }
+
+    private function danceImage(string $name): string
+    {
+        if ($name === '') {
+            return '';
+        }
+
+        return '/images/dance/' . rawurlencode($name);
+    }
+
+    private function arrayText(array $row, string $key): string
+    {
+        return isset($row[$key]) ? (string) $row[$key] : '';
+    }
+
 }

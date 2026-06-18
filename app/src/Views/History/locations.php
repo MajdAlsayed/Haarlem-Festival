@@ -1,36 +1,37 @@
+<?php
+// Settings for the page title, styles, body class
+$pageTitle = $viewModel->hero['title'] ?? 'History — Haarlem Festival';
+$pageStyles = ['/css/pages/history.css'];
+$bodyClass = 'history-page';
+
+// Hero settings
+$pageHeroTitle = $viewModel->hero['title'] ?? 'Landmarks';
+$pageHeroSubtitle = '';
+$pageHeroImage = $viewModel->heroImage?->imageUrl ?? '';
+$pageHeroAlt = $viewModel->heroImage?->altText ?? $pageHeroTitle;
+$pageHeroClass = 'history-detail-hero history-locations-hero';
+$pageHeroContentClass = 'history-detail-hero__content';
+
+$breadcrumbs = [
+        ['label' => 'Home', 'url' => '/'],
+        ['label' => 'History', 'url' => '/history'],
+        ['label' => 'Landmarks', 'url' => null],
+];
+?>
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($viewModel->hero['title'] ?? '') ?></title>
-
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/history.css">
-</head>
-<body class="history-page">
+<?php require __DIR__ . '/../partials/head.php'; ?>
+<body class="<?= htmlspecialchars($bodyClass) ?>">
 
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <main>
     <!-- HERO -->
-    <?php
-    $sectionModifier = 'history-hero-section--locations';
-    $titleModifier = 'history-hero-title--yellow';
-    $showSubtitle = false;
-    $showButton = false;
-    require __DIR__ . '/../partials/history/history-hero.php';
-    ?>
+    <?php require __DIR__ . '/../partials/page-hero.php'; ?>
 
     <!-- BREADCRUMBS -->
-    <?php
-    $breadcrumbs = [
-        ['label' => 'HOME', 'url' => '/'],
-        ['label' => 'HISTORY', 'url' => '/history'],
-        ['label' => 'LOCATIONS', 'url' => null],
-    ];
-    require __DIR__ . '/../partials/history/history-breadcrumb.php';
-    ?>
+    <?php require __DIR__ . '/../partials/breadcrumbs.php'; ?>
 
     <!-- ABOUT BANNER -->
     <?php
@@ -60,22 +61,20 @@
                         >
                     </div>
                     <div class="history-location-content">
-                        <h2 class="history-location-title">
+                        <h2 class="section-title section-title--underlined history-location-title">
                             <?= htmlspecialchars($location->name) ?>
                         </h2>
                         <div class="history-location-description">
-                            <div class="history-location-text">
+                            <div class="copy-text history-location-text">
                                 <?= htmlspecialchars($location->description1 ?? '') ?>
                             </div>
-                            <div class="history-location-text">
+                            <div class="copy-text history-location-text">
                                 <?= htmlspecialchars($location->description2 ?? '') ?>
                             </div>
                         </div>
                         <a href="/history/location/<?= htmlspecialchars($location->slug) ?>"
-                           class="history-read-more-button">
-                            <span class="history-read-more-text">
-                                READ MORE
-                            </span>
+                           class="btn btn--outline btn--sm history-read-more-button">
+                            READ MORE →
                         </a>
                     </div>
                 </div>
@@ -86,13 +85,11 @@
     <!-- GO BACK -->
     <section class="history-back-section">
         <div class="container">
-            <p class="history-back-text">
+            <p class="section-lead history-back-text">
                 Go back to the Event Page
             </p>
-            <a href="/history" class="history-button-big">
-                <span class="history-button-text">
-                    BACK
-                </span>
+            <a href="/history" class="btn btn--primary">
+                ← BACK
             </a>
         </div>
     </section>

@@ -1,6 +1,6 @@
 <section class="history-tours-map">
     <div class="container">
-        <h2>ROUTE MAP</h2>
+        <h2 class="section-title history-tours-section-title">ROUTE MAP</h2>
         <div id="history-tours-leaflet-map" class="history-tours-leaflet-map"></div>
     </div>
 </section>
@@ -29,7 +29,7 @@
         locations.forEach(function (loc, index) {
             var customIcon = L.divIcon({
                 className: 'history-tours-marker-wrapper',
-                html: '<div class="history-tours-map-marker">' + (index + 1) + '</div>',
+                html: '<div class="section-subtitle history-tours-map-marker">' + (index + 1) + '</div>',
                 iconSize: [32, 32],
                 iconAnchor: [16, 16],
             });
